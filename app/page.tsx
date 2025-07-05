@@ -10,7 +10,7 @@ export default function Home() {
         </p>
         <div className="space-y-4">
           <button className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-            시작하기
+            시작하기 하이
           </button>
           <div className="bg-green-100 text-green-800 p-4 rounded-lg text-center">
             ✅ Tailwind CSS가 정상적으로 작동 중입니다!
