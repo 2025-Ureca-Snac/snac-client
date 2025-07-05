@@ -59,7 +59,7 @@ npm run dev
   <tbody>
     <tr>
       <td align="center"><a href="https://github.com/hyonun321"><img src="https://avatars.githubusercontent.com/u/196058650?v=4" width="120px;" alt=""/><br /><b>김현훈</b></a><br /><p>👑팀장</p></td>
-      <td align="center"><a href="https://github.com/yshls"><img src="https://avatars.githubusercontent.com/u/97035336?v=4" width="120px;" alt=""/><br /><b>김세현</b></a><br /><p>개발</p></td>
+      <td align="center"><a href="https://github.com/yshls"><img src="https://avatars.githubusercontent.com/u/97035336?v=4" width="120px;" alt=""/><br /><b>양세현</b></a><br /><p>개발</p></td>
       <td align="center"><a href="https://github.com/seungwoo505"><img src="https://avatars.githubusercontent.com/u/51819005?v=4" width="120px;" alt=""/><br /><b>이승우</b></a><br /><p>개발</p></td>
     </tr>
   </tbody>
