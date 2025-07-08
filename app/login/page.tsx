@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 export default function Login() {
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isOpen, setIsOpen] = useState<number>(0);
+  //const [isOpen, setIsOpen] = useState<number>(0);
 
   useEffect(() => {
     /**
@@ -31,12 +31,12 @@ export default function Login() {
     console.log('로그인');
   };
 
-  const findEmail = () => {
-    setIsOpen(1);
-  };
-  const findPassword = () => {
-    setIsOpen(2);
-  };
+  // const findEmail = () => {
+  //   setIsOpen(1);
+  // };
+  // const findPassword = () => {
+  //   setIsOpen(2);
+  // };
 
   return (
     <div className="w-1/2 h-screen flex justify-center items-center">
@@ -60,9 +60,9 @@ export default function Login() {
         <div>
           <Link href="/user/signup">이메일 가입</Link>
           <span className="mx-2">|</span>
-          <button onClick={findEmail}>이메일 찾기</button>
+          <button>이메일 찾기</button>
           <span className="mx-2">|</span>
-          <button onClick={findPassword}>비밀번호 찾기</button>
+          <button>비밀번호 찾기</button>
         </div>
         <button>카카오톡 로그인</button>
         <button>네이버 로그인</button>
