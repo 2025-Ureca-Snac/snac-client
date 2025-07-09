@@ -29,9 +29,9 @@ const socialLinks = [
   },
 ];
 
-interface MobileFooter {}
+// interface MobileFooter {}
 
-export const MobileFooter = ({}: MobileFooter) => {
+export const MobileFooter = () => {
   const [isPagesOpen, setIsPagesOpen] = useState(false);
 
   return (

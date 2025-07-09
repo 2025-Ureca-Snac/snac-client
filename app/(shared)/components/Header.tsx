@@ -3,33 +3,35 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { MenuLink } from './MenuLink';
 
 //TODO: 로그인 기능 다 되면, 부모로부터 USER 객체 PROPS 받아오도록 수정하기! (2025-07-09)
-interface HeaderProps {}
+// interface HeaderProps {}
 
-export const Header = ({}: HeaderProps) => {
+export const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   return (
-    <header className="w-full bg-white h-[57px] lg:h-[67px] white px-6 flex justify-between items-center lg:pl-[160px] lg:pr-[51px]">
+    <header className="w-full bg-white h-[57px] md:h-[67px] white px-6 flex justify-between items-center md:pl-[160px] md:pr-[51px]">
       <Link href="/">
         <Image src="/logo_mobile.svg" alt="스낵 로고" width={68} height={25} />
       </Link>
 
       <div className="flex gap-4">
-        <Link href="/mypage" className="flex gap-2">
-          <Image src="/matching.png" alt="스낵 로고" width={24} height={24} />
-          <span className="hidden md:flex text-midnight-black text-regular-sm ">
-            실시간 매칭
-          </span>
-        </Link>
+        <MenuLink
+          href="/matching"
+          imgSrc="/matching.png"
+          alt="실시간 매칭"
+          text="실시간 매칭"
+        />
+
         {isLoggedIn ? (
-          <Link href="/mypage" className="flex gap-2">
-            <Image src="/user.png" alt="스낵 로고" width={24} height={24} />
-            <span className="hidden md:flex text-midnight-black text-regular-sm ">
-              마이페이지
-            </span>
-          </Link>
+          <MenuLink
+            href="/mypage"
+            imgSrc="/user.png"
+            alt="마이페이지"
+            text="마이페이지"
+          />
         ) : (
           <Link
             href="/login"
