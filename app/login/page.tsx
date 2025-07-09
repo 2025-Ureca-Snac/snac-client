@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import SearchModal from './SearchModal';
 
 /**
  * 로그인 페이지
@@ -9,7 +11,8 @@ import { useEffect, useState } from 'react';
 export default function Login() {
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  //const [isOpen, setIsOpen] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState<number>(0);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   useEffect(() => {
     /**
@@ -31,42 +34,106 @@ export default function Login() {
     console.log('로그인');
   };
 
-  // const findEmail = () => {
-  //   setIsOpen(1);
-  // };
-  // const findPassword = () => {
-  //   setIsOpen(2);
-  // };
+  const findEmail = () => {
+    setIsOpen(1);
+  };
+  const findPassword = () => {
+    setIsOpen(2);
+  };
 
   return (
-    <div className="w-1/2 h-screen flex justify-center items-center">
-      <div>
-        <h2 className="text-2xl font-bold">로그인</h2>
+    <div className="w-full md:w-1/2 flex justify-center items-center px-6 py-8 md:px-0 md:h-screen">
+      <div className="w-full max-w-sm md:w-[80%]">
+        <h2 className="text-heading-2xl md:text-heading-3xl mb-8">로그인</h2>
         <input
           type="text"
           placeholder="아이디"
           value={id}
           onChange={handleIdChange}
-          className="block border-b-2 border-gray-300 p-2 focus:outline-none focus:border-b-2 focus:border-gray-700"
+          className="text-regular-md block w-full border-b-2 border-gray-300 p-2 py-4 focus:outline-none focus:border-b-2 focus:border-gray-700 mb-4"
         />
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={handlePasswordChange}
-          className="block border-b-2 border-gray-300 p-2 focus:outline-none focus:border-b-2 focus:border-gray-700"
-        />
-        <button onClick={login}>로그인</button>
-        <div>
-          <Link href="/user/signup">이메일 가입</Link>
-          <span className="mx-2">|</span>
-          <button>이메일 찾기</button>
-          <span className="mx-2">|</span>
-          <button>비밀번호 찾기</button>
+        <div className="relative flex items-center w-full mb-6">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="비밀번호"
+            value={password}
+            onChange={handlePasswordChange}
+            className="text-regular-md block w-full border-b-2 border-gray-300 p-2 py-4 pr-10 focus:outline-none focus:border-b-2 focus:border-gray-700"
+          />
+          <button
+            type="button"
+            tabIndex={-1}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+          >
+            {showPassword ? (
+              <Image
+                src="/eye-open.png"
+                width={22}
+                height={22}
+                alt="비밀번호 보기"
+              />
+            ) : (
+              // 눈 가린 아이콘 (비밀번호 숨김 상태)
+              <Image
+                src="/eye-closed.png"
+                width={22}
+                height={22}
+                alt="비밀번호 숨기기"
+              />
+            )}
+          </button>
         </div>
-        <button>카카오톡 로그인</button>
-        <button>네이버 로그인</button>
+        <button
+          onClick={login}
+          className="text-regular-md w-full bg-midnight-black text-cloud-white rounded-xl py-2 text-center text-lg font-normal mb-6"
+        >
+          로그인
+        </button>
+        <div className="flex justify-center text-regular-md mb-8">
+          <Link href="/user/signup">이메일 가입</Link>
+          <span className="mx-4 md:mx-7">|</span>
+          <button onClick={findEmail}>이메일 찾기</button>
+          <span className="mx-4 md:mx-7">|</span>
+          <button onClick={findPassword}>비밀번호 찾기</button>
+        </div>
+        <div className="space-y-3">
+          <button className="block w-full">
+            <Image
+              src="/kakao_login.svg"
+              alt="카카오"
+              width={100}
+              height={100}
+              className="w-full object-contain hidden md:block"
+            />
+            <Image
+              src="/kakao_mobile_login.svg"
+              alt="카카오"
+              width={100}
+              height={100}
+              className="w-full object-contain block md:hidden"
+            />
+          </button>
+          <button className="block w-full">
+            <Image
+              src="/naver_login.svg"
+              alt="네이버"
+              width={100}
+              height={100}
+              className="w-full object-contain hidden md:block"
+            />
+            <Image
+              src="/naver_mobile_login.svg"
+              alt="네이버"
+              width={100}
+              height={100}
+              className="w-full object-contain block md:hidden"
+            />
+          </button>
+        </div>
       </div>
+      {isOpen !== 0 && <SearchModal setIsOpen={setIsOpen} />}
     </div>
   );
 }
