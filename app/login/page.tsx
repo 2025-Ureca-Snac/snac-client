@@ -35,8 +35,11 @@ export default function Login() {
     const loginResponse = await axios.post(
       'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/login',
       {
-        id,
+        email: id,
         password,
+      },
+      {
+        withCredentials: true,
       }
     );
 
@@ -48,6 +51,21 @@ export default function Login() {
   };
   const findPassword = () => {
     setIsOpen(2);
+  };
+
+  const test = async () => {
+    const testResponse = await axios.post(
+      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/reissue',
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      }
+    );
+
+    console.log('토큰 재발급 응답', testResponse);
   };
 
   return (
@@ -141,6 +159,7 @@ export default function Login() {
             />
           </button>
         </div>
+        <button onClick={test}>테스트</button>
       </div>
       {isOpen !== 0 && <SearchModal setIsOpen={setIsOpen} />}
     </div>
