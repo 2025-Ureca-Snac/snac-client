@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import InputField from '../(shared)/components/InputField';
-import InputWithButton from '../(shared)/components/InputWithButton';
-import VerificationInput from '../(shared)/components/VerificationInput';
-import PasswordInput from '../(shared)/components/PasswordInput';
+import InputField from '../(shared)/components/input-field';
+import InputWithButton from '../(shared)/components/input-with-button';
+import VerificationInput from '../(shared)/components/verification-input';
+import PasswordInput from '../(shared)/components/password-input';
 import type {
   PasswordMatchState,
   SignUpFormData,
-} from '../(shared)/types/signUp';
+} from '../(shared)/types/sign-up';
+import { useTimer } from '../(shared)/hooks/useTimer';
 
 export default function SignUp() {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
@@ -19,8 +20,8 @@ export default function SignUp() {
   const [isPhoneSent, setIsPhoneSent] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
-  const [emailTimer, setEmailTimer] = useState(0);
-  const [phoneTimer, setPhoneTimer] = useState(0);
+  const emailTimer = useTimer();
+  const phoneTimer = useTimer();
   const [passwordMatch, setPasswordMatch] =
     useState<PasswordMatchState>('none');
   const [formData, setFormData] = useState<SignUpFormData>({
@@ -33,38 +34,6 @@ export default function SignUp() {
     emailVerificationCode: '',
     phoneVerificationCode: '',
   });
-
-  // 이메일 타이머
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (emailTimer > 0) {
-      interval = setInterval(() => {
-        setEmailTimer((prev) => {
-          if (prev <= 1) {
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [emailTimer]);
-
-  // 전화번호 타이머
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (phoneTimer > 0) {
-      interval = setInterval(() => {
-        setPhoneTimer((prev) => {
-          if (prev <= 1) {
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [phoneTimer]);
 
   // 비밀번호 일치 확인
   useEffect(() => {
@@ -121,8 +90,8 @@ export default function SignUp() {
     console.log('이메일 인증 요청', formData.email);
     setShowEmailVerification(true);
     setIsEmailSent(true);
-    setEmailTimer(300); // 5분 = 300초
-  }, [formData.email]);
+    emailTimer.start(300); // 5분 = 300초
+  }, [formData.email, emailTimer]);
 
   /**
    * @author 이승우
@@ -148,8 +117,8 @@ export default function SignUp() {
 
     setShowPhoneVerification(true);
     setIsPhoneSent(true);
-    setPhoneTimer(300); // 5분 = 300초
-  }, [formData.phoneNumber]);
+    phoneTimer.start(300); // 5분 = 300초
+  }, [formData.phoneNumber, phoneTimer]);
 
   /**
    * @author 이승우
@@ -229,12 +198,12 @@ export default function SignUp() {
   const emailButtonText = useMemo(() => {
     if (isEmailVerified) return '완료';
     if (!isEmailSent) return '인증';
-    if (emailTimer > 240) {
-      const cooldownTime = 300 - emailTimer;
+    if (emailTimer.time > 240) {
+      const cooldownTime = 300 - emailTimer.time;
       return `재전송 (${60 - cooldownTime}초)`;
     }
     return '재전송';
-  }, [isEmailVerified, isEmailSent, emailTimer]);
+  }, [isEmailVerified, isEmailSent, emailTimer.time]);
 
   /**
    * @author 이승우
@@ -244,12 +213,12 @@ export default function SignUp() {
   const phoneButtonText = useMemo(() => {
     if (isPhoneVerified) return '완료';
     if (!isPhoneSent) return '인증';
-    if (phoneTimer > 240) {
-      const cooldownTime = 300 - phoneTimer;
+    if (phoneTimer.time > 240) {
+      const cooldownTime = 300 - phoneTimer.time;
       return `재전송 (${60 - cooldownTime}초)`;
     }
     return '재전송';
-  }, [isPhoneVerified, isPhoneSent, phoneTimer]);
+  }, [isPhoneVerified, isPhoneSent, phoneTimer.time]);
 
   /**
    * @author 이승우
@@ -257,8 +226,8 @@ export default function SignUp() {
    * @return 이메일 인증 도움말 텍스트 반환(분:초)
    */
   const emailHelpText = useMemo(() => {
-    return `이메일로 전송된 인증코드를 입력해주세요.${emailTimer > 0 ? ` (${formatTime(emailTimer)})` : ''}`;
-  }, [emailTimer]);
+    return `이메일로 전송된 인증코드를 입력해주세요.${emailTimer.time > 0 ? ` (${formatTime(emailTimer.time)})` : ''}`;
+  }, [emailTimer.time]);
 
   /**
    * @author 이승우
@@ -266,8 +235,8 @@ export default function SignUp() {
    * @return 전화번호 인증 도움말 텍스트 반환(분:초)
    */
   const phoneHelpText = useMemo(() => {
-    return `휴대폰으로 전송된 인증코드를 입력해주세요.${phoneTimer > 0 ? ` (${formatTime(phoneTimer)})` : ''}`;
-  }, [phoneTimer]);
+    return `휴대폰으로 전송된 인증코드를 입력해주세요.${phoneTimer.time > 0 ? ` (${formatTime(phoneTimer.time)})` : ''}`;
+  }, [phoneTimer.time]);
 
   /**
    * @author 이승우
@@ -339,9 +308,8 @@ export default function SignUp() {
             buttonText={emailButtonText}
             onButtonClick={handleEmailVerification}
             buttonDisabled={
-              isEmailVerified || (isEmailSent && emailTimer > 240)
+              isEmailVerified || (isEmailSent && emailTimer.time > 240)
             }
-            className=""
           />
 
           <VerificationInput
@@ -370,7 +338,7 @@ export default function SignUp() {
             buttonText={phoneButtonText}
             onButtonClick={handlePhoneVerification}
             buttonDisabled={
-              isPhoneVerified || (isPhoneSent && phoneTimer > 240)
+              isPhoneVerified || (isPhoneSent && phoneTimer.time > 240)
             }
           />
 

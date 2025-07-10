@@ -17,6 +17,12 @@ export default function PasswordInput({
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
+  const helpTextColorClass: Record<string, string> = {
+    red: 'text-red-500',
+    green: 'text-green-500',
+    gray: 'text-gray-500',
+  };
+
   return (
     <div>
       <label
@@ -51,13 +57,7 @@ export default function PasswordInput({
         </button>
       </div>
       <p
-        className={`text-sm mt-2 min-h-[20px] ${
-          helpTextColor === 'red'
-            ? 'text-red-500'
-            : helpTextColor === 'green'
-              ? 'text-green-500'
-              : 'text-gray-500'
-        }`}
+        className={`text-sm mt-2 min-h-[20px] ${helpTextColorClass[helpTextColor] || 'text-gray-500'}`}
       >
         {showHelpText && helpText ? helpText : ''}
       </p>
