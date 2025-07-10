@@ -1,31 +1,22 @@
-import { ChangeEvent } from 'react';
+import type { InputFieldProps } from '../types/formComponents';
 
-interface InputFieldProps {
-  label: string;
-  id: string;
-  name: string;
-  value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  required?: boolean;
-  disabled?: boolean;
-  type?: string;
-  helpText?: string;
-  showHelpText?: boolean;
-}
-
+/**
+ * @author 이승우
+ * @description 일반 입력 필드 컴포넌트
+ * @param props 컴포넌트 속성 {@link InputFieldProps}(label, type='text', id, name, value, onChange, placeholder, required=false, disabled=false, className='')
+ * @returns 일반 입력 필드 컴포넌트
+ */
 export default function InputField({
   label,
+  type = 'text',
   id,
   name,
   value,
   onChange,
-  placeholder = '',
+  placeholder,
   required = false,
   disabled = false,
-  type = 'text',
-  helpText = '',
-  showHelpText = false,
+  className = '',
 }: InputFieldProps) {
   return (
     <div>
@@ -44,11 +35,9 @@ export default function InputField({
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+        className={`w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${className}`}
       />
-      <p className="text-sm mt-2 min-h-[20px] text-gray-500">
-        {showHelpText && helpText ? helpText : ''}
-      </p>
+      <div className="min-h-[20px] mt-2"></div>
     </div>
   );
 }
