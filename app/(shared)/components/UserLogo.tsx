@@ -1,5 +1,10 @@
 import Image from 'next/image';
 
+/**
+ * @author 이승우
+ * @description 회원가입, 로그인 화면 로고 컴포넌트
+ * @returns 로고 컴포넌트
+ */
 export default function UserLogo() {
   return (
     <div

@@ -92,7 +92,7 @@ export default function Login() {
           로그인
         </button>
         <div className="flex justify-center text-regular-md mb-8">
-          <Link href="/user/signup">이메일 가입</Link>
+          <Link href="/singUp">이메일 가입</Link>
           <span className="mx-4 md:mx-7">|</span>
           <button onClick={findEmail}>이메일 찾기</button>
           <span className="mx-4 md:mx-7">|</span>
