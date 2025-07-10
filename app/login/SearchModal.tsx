@@ -1,11 +1,8 @@
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
+import { SearchModalProps } from '../(shared)/types';
 
-export default function SearchModal({
-  setIsOpen,
-}: {
-  setIsOpen: (isOpen: number) => void;
-}) {
-  const [searchType, setSearchType] = useState<'id' | 'password'>('id');
+export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   const [isVerified, setIsVerified] = useState(false);
   const [canVerify, setCanVerify] = useState(false); // 인증 확인 버튼 활성화 여부
   const [timer, setTimer] = useState(0); // 남은 시간(초)
@@ -42,8 +39,8 @@ export default function SearchModal({
   }, [resendCooldown]);
 
   // 탭 전환 시 상태 초기화
-  const handleTab = (type: 'id' | 'password') => {
-    setSearchType(type);
+  const handleTab = (type: SearchModalProps['isOpen']) => {
+    setIsOpen(type);
     setIsVerified(false);
     setCanVerify(false);
     setTimer(0);
@@ -71,17 +68,17 @@ export default function SearchModal({
         {/* 닫기 버튼 */}
         <button
           className="absolute top-4 right-4 text-2xl"
-          onClick={() => setIsOpen(0)}
+          onClick={() => setIsOpen(null)}
           aria-label="닫기"
         >
-          ×
+          <Image src="/close.png" alt="close" width={24} height={24} />
         </button>
 
         {/* 탭 */}
         <div className="flex border-b mb-6">
           <button
             className={`flex-1 py-2 text-center text-base font-semibold ${
-              searchType === 'id'
+              isOpen === 'id'
                 ? 'text-midnight-black border-b-2 border-midnight-black'
                 : 'text-gray-400'
             }`}
@@ -91,7 +88,7 @@ export default function SearchModal({
           </button>
           <button
             className={`flex-1 py-2 text-center text-base font-semibold ${
-              searchType === 'password'
+              isOpen === 'password'
                 ? 'text-midnight-black border-b-2 border-midnight-black'
                 : 'text-gray-400'
             }`}
@@ -102,7 +99,7 @@ export default function SearchModal({
         </div>
 
         {/* 폼 */}
-        {searchType === 'id' ? (
+        {isOpen === 'id' ? (
           <form className="space-y-4">
             <div className="flex gap-2">
               <input
