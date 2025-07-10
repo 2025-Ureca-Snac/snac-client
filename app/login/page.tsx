@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import SearchModal from './SearchModal';
+import axios from 'axios';
 
 /**
  * 로그인 페이지
@@ -30,8 +31,16 @@ export default function Login() {
     setPassword(e.target.value);
   };
 
-  const login = () => {
-    console.log('로그인');
+  const login = async () => {
+    const loginResponse = await axios.post(
+      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/login',
+      {
+        id,
+        password,
+      }
+    );
+
+    console.log('로그인 응답', loginResponse);
   };
 
   const findEmail = () => {
