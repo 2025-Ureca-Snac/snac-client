@@ -1,12 +1,12 @@
 import { BlogPost } from '@/app/(shared)/components/BlogCard';
-import { blogPosts } from '../data/blogPosts';
+import { BLOG_POSTS } from '../data/blogPosts';
 
 /**
  * 추천 포스트만 필터링하여 반환
  * @returns 추천 포스트 배열
  */
 export const getFeaturedPosts = (): BlogPost[] => {
-  return blogPosts.filter((post) => post.featured);
+  return BLOG_POSTS.filter((post) => post.featured);
 };
 
 /**
@@ -15,7 +15,7 @@ export const getFeaturedPosts = (): BlogPost[] => {
  * @returns 해당 ID의 포스트 또는 undefined
  */
 export const getPostById = (id: number): BlogPost | undefined => {
-  return blogPosts.find((post) => post.id === id);
+  return BLOG_POSTS.find((post) => post.id === id);
 };
 
 /**
@@ -27,7 +27,7 @@ export const getPostById = (id: number): BlogPost | undefined => {
 export const getPostsByPage = (page: number, limit: number = 9): BlogPost[] => {
   const start = (page - 1) * limit;
   const end = start + limit;
-  return blogPosts.slice(start, end);
+  return BLOG_POSTS.slice(start, end);
 };
 
 /**
@@ -35,7 +35,7 @@ export const getPostsByPage = (page: number, limit: number = 9): BlogPost[] => {
  * @returns 전체 포스트 개수
  */
 export const getTotalPostsCount = (): number => {
-  return blogPosts.length;
+  return BLOG_POSTS.length;
 };
 
 /**
@@ -44,5 +44,5 @@ export const getTotalPostsCount = (): number => {
  * @returns 전체 페이지 수
  */
 export const getTotalPages = (limit: number = 9): number => {
-  return Math.ceil(blogPosts.length / limit);
+  return Math.ceil(BLOG_POSTS.length / limit);
 };
