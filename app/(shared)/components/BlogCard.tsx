@@ -49,15 +49,15 @@ interface BlogCardProps {
 export const BlogCard = ({ post, onClick }: BlogCardProps) => {
   return (
     <div
-      className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+      className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
       onClick={onClick}
     >
-      <div className="relative h-48 bg-gray-100">
+      <div className="relative h-48 bg-gray-100 overflow-hidden">
         <Image
           src={post.image}
           alt={post.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
       <div className="p-6">
