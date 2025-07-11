@@ -31,4 +31,9 @@ export interface VerificationInputProps {
   codeValue?: string;
   onVerify?: () => void;
   verifyDisabled?: boolean;
+export type SearchModalType = 'id' | 'password' | null;
+
+export interface SearchModalProps {
+  isOpen: SearchModalType;
+  setIsOpen: React.Dispatch<React.SetStateAction<SearchModalType>>;
 }

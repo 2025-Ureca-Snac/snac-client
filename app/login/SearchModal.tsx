@@ -1,77 +1,201 @@
-import { useState } from 'react';
 import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
+import { SearchModalProps } from '../(shared)/types';
 
-export default function SearchModal({
-  setIsOpen,
-}: {
-  setIsOpen: (isOpen: number) => void;
-}) {
-  const [searchType, setSearchType] = useState<string>('id');
+export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
+  const [isVerified, setIsVerified] = useState(false);
+  const [canVerify, setCanVerify] = useState(false); // 인증 확인 버튼 활성화 여부
+  const [timer, setTimer] = useState(0); // 남은 시간(초)
+  const [canResend, setCanResend] = useState(true); // 인증 요청/재전송 버튼 활성화 여부
+  const [resendCooldown, setResendCooldown] = useState(0); // 재전송 쿨타임(초)
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const cooldownRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleSearchType = (type: string) => {
-    setSearchType(type);
+  // 타이머 감소
+  useEffect(() => {
+    if (timer > 0) {
+      timerRef.current = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [timer]);
+
+  // 1분 쿨타임 감소
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      setCanResend(false);
+      cooldownRef.current = setInterval(() => {
+        setResendCooldown((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, [resendCooldown]);
+
+  // 탭 전환 시 상태 초기화
+  const handleTab = (type: SearchModalProps['isOpen']) => {
+    setIsOpen(type);
+    setIsVerified(false);
+    setCanVerify(false);
+    setTimer(0);
+    setCanResend(true);
+    setResendCooldown(0);
   };
+
+  // 인증 요청/재전송 버튼 클릭
+  const handleRequest = () => {
+    setCanVerify(true);
+    setTimer(300); // 5분
+    setResendCooldown(60); // 1분 쿨타임
+  };
+
+  // 타이머 포맷
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div className="absolute w-1/2 h-screen flex justify-center items-center bg-gray-300/70">
-      <div className="flex justify-center items-center flex-col bg-white w-[70%] h-[70%]">
-        <div>
-          <div>
-            <div
-              className="flex justify-end w-[300px]"
-              onClick={() => setIsOpen(0)}
-            >
-              <Image
-                src="/close.png"
-                alt="close"
-                width={24}
-                height={24}
-                className="cursor-pointer"
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+      <div className="bg-white rounded-xl w-[350px] p-6 relative">
+        {/* 닫기 버튼 */}
+        <button
+          className="absolute top-4 right-4 text-2xl"
+          onClick={() => setIsOpen(null)}
+          aria-label="닫기"
+        >
+          <Image src="/close.png" alt="close" width={24} height={24} />
+        </button>
+
+        {/* 탭 */}
+        <div className="flex border-b mb-6">
+          <button
+            className={`flex-1 py-2 text-center text-base font-semibold ${
+              isOpen === 'id'
+                ? 'text-midnight-black border-b-2 border-midnight-black'
+                : 'text-gray-400'
+            }`}
+            onClick={() => handleTab('id')}
+          >
+            아이디 찾기
+          </button>
+          <button
+            className={`flex-1 py-2 text-center text-base font-semibold ${
+              isOpen === 'password'
+                ? 'text-midnight-black border-b-2 border-midnight-black'
+                : 'text-gray-400'
+            }`}
+            onClick={() => handleTab('password')}
+          >
+            비밀번호 찾기
+          </button>
+        </div>
+
+        {/* 폼 */}
+        {isOpen === 'id' ? (
+          <form className="space-y-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="휴대폰 번호를 입력해주세요"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none"
               />
+              <button
+                type="button"
+                className="w-24 h-12 rounded-lg bg-midnight-black text-white font-semibold"
+              >
+                인증 요청
+              </button>
             </div>
-          </div>
-          <div className="flex w-[300px] border-b border-gray-200">
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                placeholder="인증번호"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none"
+              />
+              <button
+                type="button"
+                className="w-24 h-12 rounded-lg bg-midnight-black text-white font-semibold"
+              >
+                인증 확인
+              </button>
+            </div>
+            <div className="text-right text-xs text-red-500 pr-2">5:00</div>
             <button
-              onClick={() => handleSearchType('id')}
-              className={`flex-1 py-3 text-lg font-semibold transition-colors
-                ${
-                  searchType === 'id'
-                    ? 'text-purple-600 border-b-2 border-purple-600 bg-white'
-                    : 'text-gray-400 border-b-2 border-transparent bg-white'
-                }`}
+              type="submit"
+              className="w-full h-12 mt-2 rounded-lg bg-midnight-black text-white font-semibold"
             >
               아이디 찾기
             </button>
+          </form>
+        ) : (
+          <form className="space-y-4">
+            {!isVerified && (
+              <>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="이메일 또는 휴대폰 번호를 입력해주세요"
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    className={`w-24 h-12 rounded-lg font-semibold text-white ${canResend ? 'bg-midnight-black' : 'bg-gray-300 text-gray-400'}`}
+                    onClick={handleRequest}
+                    disabled={!canResend}
+                  >
+                    {timer > 0 ? '재전송' : '인증 요청'}
+                  </button>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="인증번호"
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    className="w-24 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400"
+                    onClick={() => setIsVerified(true)}
+                    disabled={!canVerify}
+                  >
+                    인증 확인
+                  </button>
+                </div>
+                <div className="text-right text-xs text-red-500 pr-2">
+                  {timer > 0 ? formatTime(timer) : '5:00'}
+                </div>
+              </>
+            )}
+            {isVerified && (
+              <>
+                <input
+                  type="password"
+                  placeholder="비밀번호"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none"
+                />
+                <input
+                  type="password"
+                  placeholder="비밀번호 확인"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none"
+                />
+              </>
+            )}
             <button
-              onClick={() => handleSearchType('password')}
-              className={`flex-1 py-3 text-lg font-semibold transition-colors
-                ${
-                  searchType === 'password'
-                    ? 'text-purple-600 border-b-2 border-purple-600 bg-white'
-                    : 'text-gray-400 border-b-2 border-transparent bg-white'
-                }`}
+              type="submit"
+              className="w-full h-12 mt-2 rounded-lg bg-midnight-black text-white font-semibold"
             >
               비밀번호 찾기
             </button>
-          </div>
-        </div>
-        {
-          <div>
-            <div>
-              <input
-                type="text"
-                placeholder={`${searchType === 'id' ? '휴대폰 번호를 입력해주세요' : '이메일 또는 휴대폰 번호를 입력해주세요'}`}
-              />
-              <button>인증 요청</button>
-            </div>
-            <div>
-              <input type="text" placeholder="인증번호" />
-              <button>인증 확인</button>
-            </div>
-            <button>
-              {searchType === 'id' ? '아이디 찾기' : '비밀번호 찾기'}
-            </button>
-          </div>
-        }
+          </form>
+        )}
       </div>
     </div>
   );

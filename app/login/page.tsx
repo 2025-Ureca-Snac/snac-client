@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import SearchModal from './SearchModal';
+import axios from 'axios';
+import { SearchModalType } from '../(shared)/types';
+import SocialLoginButtons from '../(shared)/components/SocialLoginButtons';
 
 /**
  * 로그인 페이지
@@ -11,7 +14,7 @@ import SearchModal from './SearchModal';
 export default function Login() {
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isOpen, setIsOpen] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState<SearchModalType>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   useEffect(() => {
@@ -30,15 +33,41 @@ export default function Login() {
     setPassword(e.target.value);
   };
 
-  const login = () => {
-    console.log('로그인');
+  const login = async () => {
+    const loginResponse = await axios.post(
+      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/login',
+      {
+        email: id,
+        password,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    console.log('로그인 응답', loginResponse);
   };
 
   const findEmail = () => {
-    setIsOpen(1);
+    setIsOpen('id');
   };
   const findPassword = () => {
-    setIsOpen(2);
+    setIsOpen('password');
+  };
+
+  const test = async () => {
+    const testResponse = await axios.post(
+      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/reissue',
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      }
+    );
+
+    console.log('토큰 재발급 응답', testResponse);
   };
 
   return (
@@ -62,7 +91,6 @@ export default function Login() {
           />
           <button
             type="button"
-            tabIndex={-1}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
@@ -98,42 +126,10 @@ export default function Login() {
           <span className="mx-4 md:mx-7">|</span>
           <button onClick={findPassword}>비밀번호 찾기</button>
         </div>
-        <div className="space-y-3">
-          <button className="block w-full">
-            <Image
-              src="/kakao_login.svg"
-              alt="카카오"
-              width={100}
-              height={100}
-              className="w-full object-contain hidden md:block"
-            />
-            <Image
-              src="/kakao_mobile_login.svg"
-              alt="카카오"
-              width={100}
-              height={100}
-              className="w-full object-contain block md:hidden"
-            />
-          </button>
-          <button className="block w-full">
-            <Image
-              src="/naver_login.svg"
-              alt="네이버"
-              width={100}
-              height={100}
-              className="w-full object-contain hidden md:block"
-            />
-            <Image
-              src="/naver_mobile_login.svg"
-              alt="네이버"
-              width={100}
-              height={100}
-              className="w-full object-contain block md:hidden"
-            />
-          </button>
-        </div>
+        <SocialLoginButtons />
+        <button onClick={test}>테스트</button>
       </div>
-      {isOpen !== 0 && <SearchModal setIsOpen={setIsOpen} />}
+      {isOpen && <SearchModal isOpen={isOpen} setIsOpen={setIsOpen} />}
     </div>
   );
 }

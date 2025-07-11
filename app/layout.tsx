@@ -20,7 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${notoSansKr.className} antialiased`}>{children}</body>
+      {/* bg-slate-200 임시로 해놨습니다. */}
+      <body className={`${notoSansKr.className} antialiased bg-slate-200`}>
+        <div className="w-full max-w-[375px] lg:max-w-[1440px] mx-auto transition-all duration-300 ease-in-out">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
