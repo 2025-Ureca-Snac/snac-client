@@ -13,3 +13,10 @@ export interface ApiResponse<T> {
 }
 
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+
+export type SearchModalType = 'id' | 'password' | null;
+
+export interface SearchModalProps {
+  isOpen: SearchModalType;
+  setIsOpen: React.Dispatch<React.SetStateAction<SearchModalType>>;
+}

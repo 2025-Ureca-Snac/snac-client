@@ -1,13 +1,13 @@
-import Logo from './Logo';
+import UserLogo from '../(shared)/components/UserLogo';
 
-export default function RootLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex">
-      <Logo />
+    <div className="flex flex-col md:flex-row min-h-screen">
+      <UserLogo />
       {children}
     </div>
   );
