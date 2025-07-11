@@ -9,7 +9,7 @@ interface BlogTabNavigationProps {
   onSortChange?: (sortBy: string) => void;
 }
 
-const blogSortOptions: SortOption[] = [
+const BLOG_SORT_OPTIONS: SortOption[] = [
   { value: 'latest', label: '최신순' },
   { value: 'popular', label: '인기순' },
   { value: 'views', label: '조회순' },
@@ -54,7 +54,7 @@ export const BlogTabNavigation = ({
 
       {/* 정렬 옵션 */}
       <SortDropdown
-        options={blogSortOptions}
+        options={BLOG_SORT_OPTIONS}
         defaultValue="latest"
         onChange={onSortChange}
       />

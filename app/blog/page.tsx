@@ -5,7 +5,7 @@ import { Header } from '@/app/(shared)/components/Header';
 import { BlogPost } from '@/app/(shared)/components/BlogCard';
 import { BlogHero } from './components/BlogHero';
 import { BlogContent } from './components/BlogContent';
-import { blogPosts } from './data/blogPosts';
+import { BLOG_POSTS } from './data/blogPosts';
 
 export default function BlogPage() {
   const handleShowMore = () => {
@@ -29,7 +29,7 @@ export default function BlogPage() {
       <Header />
       <BlogHero />
       <BlogContent
-        posts={blogPosts}
+        posts={BLOG_POSTS}
         onShowMore={handleShowMore}
         onPostClick={handlePostClick}
         onSortChange={handleSortChange}

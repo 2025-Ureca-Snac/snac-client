@@ -1,6 +1,6 @@
 import { BlogPost } from '@/app/(shared)/components/BlogCard';
 
-export const blogPosts: BlogPost[] = [
+export const BLOG_POSTS: BlogPost[] = [
   {
     id: 1,
     title: '데이터 기반 아웃렛 마케팅은?',

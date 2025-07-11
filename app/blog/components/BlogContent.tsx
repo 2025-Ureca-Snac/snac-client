@@ -29,10 +29,6 @@ export const BlogContent = ({
   const filteredPosts =
     activeTab === 'all' ? posts : posts.filter((post) => post.featured);
 
-  const handlePostClick = (post: BlogPost) => {
-    onPostClick?.(post);
-  };
-
   const handleTabChange = (tab: 'all' | 'featured') => {
     setActiveTab(tab);
   };
@@ -52,7 +48,7 @@ export const BlogContent = ({
           <BlogCard
             key={post.id}
             post={post}
-            onClick={() => handlePostClick(post)}
+            onClick={() => onPostClick?.(post)}
           />
         ))}
       </div>

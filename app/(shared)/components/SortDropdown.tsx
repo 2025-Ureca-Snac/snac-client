@@ -41,7 +41,7 @@ export const SortDropdown = ({
   return (
     <div className={`relative ${className}`}>
       <select
-        className="appearance-none bg-white border rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 focus:outline-none  cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="appearance-none bg-white border rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         defaultValue={defaultValue}
         onChange={(e) => onChange?.(e.target.value)}
         disabled={disabled}
