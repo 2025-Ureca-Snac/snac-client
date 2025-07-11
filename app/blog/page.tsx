@@ -19,6 +19,11 @@ export default function BlogPage() {
     // 예: router.push(`/blog/${post.id}`)
   };
 
+  const handleSortChange = (sortBy: string) => {
+    console.log('Sort changed to:', sortBy);
+    // 여기에 정렬 로직 추가
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -27,6 +32,7 @@ export default function BlogPage() {
         posts={blogPosts}
         onShowMore={handleShowMore}
         onPostClick={handlePostClick}
+        onSortChange={handleSortChange}
       />
       <Footer />
     </div>

@@ -1,10 +1,5 @@
-/**
- * BlogHero 컴포넌트 Props
- */
 interface BlogHeroProps {
-  /** 히어로 섹션 제목 */
   title?: string;
-  /** 히어로 섹션 부제목 */
   subtitle?: string;
 }
 
