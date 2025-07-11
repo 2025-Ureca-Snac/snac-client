@@ -44,7 +44,7 @@ export const BlogCard = ({ post, onClick }: BlogCardProps) => {
         src={post.image}
         alt={post.title}
         fill
-        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+        className="object-cover  transition-transform duration-300 group-hover:scale-105"
         priority
       />
       {/* 텍스트 오버레이 */}
