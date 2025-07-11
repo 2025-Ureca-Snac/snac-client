@@ -49,22 +49,25 @@ interface BlogCardProps {
 export const BlogCard = ({ post, onClick }: BlogCardProps) => {
   return (
     <div
-      className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
+      className="relative rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group aspect-square"
       onClick={onClick}
     >
-      <div className="relative h-48 bg-gray-100 overflow-hidden">
-        <Image
-          src={post.image}
-          alt={post.title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-      </div>
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+      {/* 이미지 */}
+      <Image
+        src={post.image}
+        alt={post.title}
+        fill
+        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+        priority
+      />
+      {/* 텍스트 오버레이 */}
+      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5">
+        <h3 className="text-white text-lg font-semibold mb-2 drop-shadow-md line-clamp-2">
           {post.title}
         </h3>
-        <p className="text-sm text-gray-600">{post.subtitle}</p>
+        <p className="text-white text-sm font-medium drop-shadow-md flex items-center gap-1">
+          {post.subtitle}
+        </p>
       </div>
     </div>
   );
