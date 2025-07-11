@@ -65,13 +65,3 @@ export const blogPosts: BlogPost[] = [
     featured: true,
   },
 ];
-
-// 추가 유틸리티 함수들
-export const getFeaturedPosts = () => blogPosts.filter((post) => post.featured);
-export const getPostById = (id: number) =>
-  blogPosts.find((post) => post.id === id);
-export const getPostsByPage = (page: number, limit: number = 9) => {
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  return blogPosts.slice(start, end);
-};
