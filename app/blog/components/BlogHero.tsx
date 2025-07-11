@@ -1,8 +1,19 @@
+/**
+ * BlogHero 컴포넌트 Props
+ */
 interface BlogHeroProps {
+  /** 히어로 섹션 제목 */
   title?: string;
+  /** 히어로 섹션 부제목 */
   subtitle?: string;
 }
 
+/**
+ * 블로그 페이지 히어로 섹션 컴포넌트
+ *
+ * @param props - BlogHero 컴포넌트 props
+ * @returns 히어로 섹션 JSX 엘리먼트
+ */
 export const BlogHero = ({
   title = 'snac 읽을거리',
   subtitle = '간식처럼 가볍게 읽어보세요',
