@@ -67,6 +67,7 @@ const config: Config = {
         'candy-pink': '#FF66C4',
         'packet-golden': '#D09436',
         'cloud-white': '#F3F3F3',
+        red: '#ED1B23',
         gray: {
           50: '#FAFAFA',
           100: '#F5F5F5',
@@ -83,21 +84,22 @@ const config: Config = {
     },
   },
   plugins: [
-    plugin(function ({ addUtilities }) {
+    plugin(({ addUtilities }) => {
       const newUtilities: Record<
         string,
-        { fontSize: string; fontWeight: string }
+        { fontSize: string; fontWeight?: string }
       > = {};
+
       Object.entries(typography).forEach(([type, sizes]) => {
         Object.entries(sizes).forEach(([size, value]) => {
           const key = `.text-${type}-${size}`;
-          newUtilities[key] = {
-            fontSize: value,
-            fontWeight:
-              type === 'heading' ? '700' : type === 'medium' ? '500' : '400',
-          };
+
+          newUtilities[key] = { fontSize: value };
+
+          // if (type === 'heading') newUtilities[key].fontWeight = '700';
         });
       });
+
       addUtilities(newUtilities);
     }),
   ],
