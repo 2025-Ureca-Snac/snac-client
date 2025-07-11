@@ -1,28 +1,15 @@
 import Image from 'next/image';
 
-/**
- * 블로그 포스트 데이터 타입
- */
 export interface BlogPost {
-  /** 포스트 고유 식별자 */
   id: number;
-  /** 포스트 제목 */
   title: string;
-  /** 포스트 부제목 또는 설명 */
   subtitle: string;
-  /** 포스트 대표 이미지 경로 */
   image: string;
-  /** 추천 포스트 여부 */
   featured: boolean;
 }
 
-/**
- * BlogCard 컴포넌트 Props
- */
 interface BlogCardProps {
-  /** 렌더링할 블로그 포스트 데이터 */
   post: BlogPost;
-  /** 카드 클릭 시 실행할 콜백 함수 */
   onClick?: () => void;
 }
 
