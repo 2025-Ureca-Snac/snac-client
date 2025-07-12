@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
 import InputField from '../(shared)/components/input-field';
 import InputWithButton from '../(shared)/components/input-with-button';
 import VerificationInput from '../(shared)/components/verification-input';
@@ -12,7 +11,13 @@ import type {
   SignUpFormData,
 } from '../(shared)/types/sign-up';
 import { useTimer } from '../(shared)/hooks/useTimer';
+import { api } from '../(shared)/utils/api';
+import { useRouter } from 'next/navigation';
 
+/**
+ * @author 이승우
+ * @description 회원가입 페이지
+ */
 export default function SignUp() {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [showPhoneVerification, setShowPhoneVerification] = useState(false);
@@ -22,6 +27,7 @@ export default function SignUp() {
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const emailTimer = useTimer();
   const phoneTimer = useTimer();
+  const router = useRouter();
   const [passwordMatch, setPasswordMatch] =
     useState<PasswordMatchState>('none');
   const [formData, setFormData] = useState<SignUpFormData>({
@@ -29,6 +35,7 @@ export default function SignUp() {
     nickname: '',
     email: '',
     phoneNumber: '',
+    birthDate: new Date(),
     password: '',
     passwordConfirm: '',
     emailVerificationCode: '',
@@ -57,6 +64,7 @@ export default function SignUp() {
       formData.nickname.trim() !== '' &&
       formData.email.trim() !== '' &&
       formData.phoneNumber.trim() !== '' &&
+      formData.birthDate &&
       formData.password.trim() !== '' &&
       formData.passwordConfirm.trim() !== '' &&
       isEmailVerified &&
@@ -71,6 +79,17 @@ export default function SignUp() {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
+      }));
+    },
+    []
+  );
+
+  const handleDateChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        birthDate: new Date(value),
       }));
     },
     []
@@ -106,18 +125,19 @@ export default function SignUp() {
 
     console.log('전화번호 인증 요청', formData.phoneNumber);
 
-    const phoneVerificationCode = await axios.post(
-      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/send-verification-code',
-      {
+    try {
+      const phoneVerificationCode = await api.post('/send-verification-code', {
         phone: formData.phoneNumber,
-      }
-    );
+      });
 
-    console.log('전화번호 인증 요청 응답', phoneVerificationCode);
+      console.log('전화번호 인증 요청 응답', phoneVerificationCode);
 
-    setShowPhoneVerification(true);
-    setIsPhoneSent(true);
-    phoneTimer.start(300); // 5분 = 300초
+      setShowPhoneVerification(true);
+      setIsPhoneSent(true);
+      phoneTimer.start(300); // 5분 = 300초
+    } catch (error) {
+      console.error('전화번호 인증 요청 오류', error);
+    }
   }, [formData.phoneNumber, phoneTimer]);
 
   /**
@@ -137,11 +157,23 @@ export default function SignUp() {
    * @description 전화번호 인증코드 확인
    * @return 전화번호 인증코드 확인에 성공 여부 반환(성공, 실패)
    */
-  const handlePhoneVerificationCheck = useCallback(() => {
+  const handlePhoneVerificationCheck = useCallback(async () => {
     console.log('전화번호 인증코드 확인', formData.phoneVerificationCode);
 
-    setIsPhoneVerified(true);
-    setShowPhoneVerification(false);
+    const response = await api.post('/verify-code', {
+      phone: formData.phoneNumber,
+      code: formData.phoneVerificationCode,
+    });
+
+    if (
+      (response.data as { code?: string })?.code ===
+      'SMS_CODE_VERIFICATION_SUCCESS_200'
+    ) {
+      setIsPhoneVerified(true);
+      setShowPhoneVerification(false);
+    } else {
+      alert('인증코드가 일치하지 않습니다.');
+    }
   }, [formData.phoneVerificationCode]);
 
   /**
@@ -165,14 +197,19 @@ export default function SignUp() {
         password: formData.password,
         name: formData.name,
         phone: formData.phoneNumber,
+        birthDate: formData.birthDate,
       };
 
-      const response = await axios.post(
-        'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/join',
-        data
-      );
+      const response = await api.post('/join', data);
 
-      console.log('회원가입 응답', response);
+      if (
+        (response.data as { code?: string })?.code === 'USER_JOIN_SUCCESS_200'
+      ) {
+        alert('회원가입이 완료되었습니다.');
+        router.push('/login');
+      } else {
+        alert('회원가입에 실패했습니다.');
+      }
     } catch (error) {
       console.error('회원가입 오류', error);
     }
@@ -293,6 +330,16 @@ export default function SignUp() {
             name="nickname"
             value={formData.nickname}
             onChange={handleInputChange}
+            required
+          />
+
+          <InputField
+            label="생년월일"
+            type="date"
+            id="birthDate"
+            name="birthDate"
+            value={formData.birthDate.toISOString().split('T')[0]}
+            onChange={handleDateChange}
             required
           />
 
