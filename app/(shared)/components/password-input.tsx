@@ -2,6 +2,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import type { PasswordInputProps } from '../types/formComponents';
 
+/**
+ * @author 이승우
+ * @description 비밀번호 입력 필드 컴포넌트
+ * @param props 컴포넌트 속성 {@link PasswordInputProps}(label, id, name, value, onChange, placeholder, required=false, disabled=false, helpText, showHelpText=false, helpTextColor='gray')
+ */
 export default function PasswordInput({
   label,
   id,
@@ -17,6 +22,10 @@ export default function PasswordInput({
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
+  /**
+   * @author 이승우
+   * @description 레드 : 비밀번호 불일치, 그린 : 비밀번호 일치, 그레이 : 비밀번호 입력 전
+   */
   const helpTextColorClass: Record<string, string> = {
     red: 'text-red-500',
     green: 'text-green-500',

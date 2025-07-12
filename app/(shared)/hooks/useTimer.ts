@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
+/**
+ * @author 이승우
+ * @description 타이머 훅
+ * @param initial 초기 시간( 기본값 0 )
+ * @returns 타이머 시간( 초 단위로 감소 ), 타이머 시작(start( 초 단위 )), 타이머 멈춤(stop())
+ */
 export function useTimer(initial: number = 0) {
   const [time, setTime] = useState(initial);
   const timerRef = useRef<NodeJS.Timeout | null>(null);

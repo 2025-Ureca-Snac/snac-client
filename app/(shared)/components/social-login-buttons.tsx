@@ -13,6 +13,10 @@ const SOCIALS = [
   },
 ];
 
+/**
+ * @author 이승우
+ * @description 소셜 로그인 버튼 컴포넌트( 카카오, 네이버 )
+ */
 export default function SocialLoginButtons() {
   return (
     <div className="space-y-3">
