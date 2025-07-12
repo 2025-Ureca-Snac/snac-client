@@ -6,6 +6,7 @@
  * @property nickname: 닉네임
  * @property email: 이메일
  * @property phoneNumber: 전화번호
+ * @property birthDate: 생년월일
  * @property password: 비밀번호
  * @property passwordConfirm: 비밀번호 확인
  * @property emailVerificationCode: 이메일 인증코드
@@ -16,6 +17,7 @@ export interface SignUpFormData {
   nickname: string;
   email: string;
   phoneNumber: string;
+  birthDate: Date;
   password: string;
   passwordConfirm: string;
   emailVerificationCode: string;

@@ -4,7 +4,6 @@ import type { InputFieldProps } from '../types/formComponents';
  * @author 이승우
  * @description 일반 입력 필드 컴포넌트
  * @param props 컴포넌트 속성 {@link InputFieldProps}(label, type='text', id, name, value, onChange, placeholder, required=false, disabled=false, className='')
- * @returns 일반 입력 필드 컴포넌트
  */
 export default function InputField({
   label,
