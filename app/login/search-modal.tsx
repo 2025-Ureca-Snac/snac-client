@@ -163,7 +163,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
 
   // 로그인하러 가기
   const goToLogin = () => {
-    window.location.href = '/login';
+    setIsOpen(null);
   };
 
   return (
