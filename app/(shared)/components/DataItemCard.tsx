@@ -38,7 +38,7 @@ export const DataItemCard = ({
       </div>
 
       <div className="flex-grow flex flex-col items-center md:items-start md:py-[18px] mt-2">
-        <h3 className="text-medium-xs md:text-medium-md text-[#141718]">
+        <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718]">
           {title}
         </h3>
         <p className="text-medium-sm md:text-medium-sm text-gray-900">
