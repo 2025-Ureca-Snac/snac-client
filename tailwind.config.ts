@@ -80,6 +80,22 @@ const config: Config = {
           800: '#262626',
           900: '#171717',
         },
+        'btn-dark': '#1F1F1F',
+      },
+      width: {
+        'card-sm': '152px',
+        'card-md': '238px',
+        'btn-sm': '133px',
+        'btn-md': '214px',
+      },
+      height: {
+        'card-sm': '203px',
+        'card-md': '348px',
+        'btn-sm': '26px',
+        'btn-md': '40px',
+      },
+      borderRadius: {
+        card: '24px',
       },
     },
   },
