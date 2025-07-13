@@ -10,7 +10,7 @@ interface DataItemCardProps {
   price: number;
   onClickBuy: () => void;
   isNew?: boolean;
-  newBadgeText: string;
+  newBadgeText?: string;
   buyButtonText?: string;
 }
 
