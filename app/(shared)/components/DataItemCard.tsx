@@ -10,6 +10,7 @@ interface DataItemCardProps {
   price: number;
   onClickBuy: () => void;
   isNew?: boolean;
+  buyButtonText?: string;
 }
 
 export const DataItemCard = ({
@@ -17,7 +18,7 @@ export const DataItemCard = ({
   title,
   price,
   isNew,
-
+  buyButtonText = '구매하기',
   onClickBuy,
 }: DataItemCardProps) => {
   return (
@@ -51,7 +52,7 @@ export const DataItemCard = ({
           onClick={onClickBuy}
           className="w-[133px] h-[26px] md:w-[214px] md:h-[40px] bg-gray-900 hover:bg-gray-800 transition text-regular-md border rounded-lg flex items-center justify-center"
         >
-          구매하기
+          {buyButtonText}
         </Button>
       </div>
     </div>
