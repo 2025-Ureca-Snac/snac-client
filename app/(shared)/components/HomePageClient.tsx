@@ -22,9 +22,9 @@ export const HomePageClient = ({ cards }: HomePageClientProps) => {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-      {cards.map((item, index) => (
+      {cards.map((item) => (
         <DataItemCard
-          key={item.id || index}
+          key={item.id}
           title={item.title}
           imageUrl={item.imageUrl}
           price={item.price}
