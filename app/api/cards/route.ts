@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 // 임시 데이터
-const cardData = [
+const CARD_DATA = [
   {
     id: 1,
     title: 'SKT 데이터 1GB',
@@ -94,5 +94,5 @@ const cardData = [
 ];
 
 export async function GET() {
-  return NextResponse.json(cardData);
+  return NextResponse.json(CARD_DATA);
 }
