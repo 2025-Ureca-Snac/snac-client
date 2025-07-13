@@ -95,8 +95,6 @@ const config: Config = {
           const key = `.text-${type}-${size}`;
 
           newUtilities[key] = { fontSize: value };
-
-          // if (type === 'heading') newUtilities[key].fontWeight = '700';
         });
       });
 
