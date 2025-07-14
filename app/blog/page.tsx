@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { Header } from '@/app/(shared)/components/Header';
 import { BlogPost } from '@/app/(shared)/components/BlogCard';
@@ -8,6 +9,8 @@ import { BlogContent } from './components/BlogContent';
 import { BLOG_POSTS } from './data/blogPosts';
 
 export default function BlogPage() {
+  const router = useRouter();
+
   const handleShowMore = () => {
     console.log('Show more clicked!');
     // 여기에 더 많은 포스트를 로드하는 로직 추가
@@ -15,8 +18,8 @@ export default function BlogPage() {
 
   const handlePostClick = (post: BlogPost) => {
     console.log('Post clicked:', post.title);
-    // 여기에 개별 포스트 페이지로 이동하는 로직 추가
-    // 예: router.push(`/blog/${post.id}`)
+    // 개별 포스트 페이지로 이동
+    router.push(`/blog/${post.id}`);
   };
 
   const handleSortChange = (sortBy: string) => {
