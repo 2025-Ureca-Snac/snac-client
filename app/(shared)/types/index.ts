@@ -39,3 +39,8 @@ export interface SearchModalProps {
   isOpen: SearchModalType;
   setIsOpen: React.Dispatch<React.SetStateAction<SearchModalType>>;
 }
+
+// Store 타입들
+export * from './auth-store';
+export * from './user-store';
+export * from './modal-store';
