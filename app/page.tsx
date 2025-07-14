@@ -3,16 +3,18 @@ import { Header } from './(shared)/components/Header';
 import { Footer } from './(shared)/components/Footer';
 import { HomePageClient } from './(shared)/components/HomePageClient';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 async function getCardData() {
-  const res = await fetch('http://localhost:3000/api/cards', {
+  const res = await fetch(`${API_BASE}/api/cards`, {
     cache: 'no-store',
   });
-
   if (!res.ok) {
     throw new Error('Failed to fetch data');
   }
   return res.json();
 }
+
 export default async function Home() {
   const cards = await getCardData();
   return (
