@@ -7,9 +7,13 @@ const API_BASE = process.env.API_BASE_URL;
 
 async function getCardData() {
   try {
-    const res = await fetch(`${API_BASE}/api/cards`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(
+      `${API_BASE}/api/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
+      {
+        cache: 'no-store',
+      }
+    );
+
     if (!res.ok) {
       console.error('Failed to fetch data:', res.status, res.statusText);
       return [];
