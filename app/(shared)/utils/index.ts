@@ -21,3 +21,13 @@ export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
+
+/**
+ * @author 이승우
+ * @description 날짜를 YYYYMMDD 형식으로 변환
+ * @param date 날짜
+ * @returns YYYYMMDD 형식의 문자열
+ */
+export const formatDateYYYYMMDD = (date: Date) => {
+  return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+};
