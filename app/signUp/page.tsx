@@ -100,13 +100,22 @@ export default function SignUp() {
    * @description 이메일 인증 요청
    * @return 이메일 인증 요청에 성공 여부 반환(성공, 중복, 실패)
    */
-  const handleEmailVerification = useCallback(() => {
+  const handleEmailVerification = useCallback(async () => {
     if (!formData.email) {
       alert('이메일을 입력해주세요.');
       return;
     }
 
     console.log('이메일 인증 요청', formData.email);
+    try {
+      const response = await api.post('/email/send-verification-code', {
+        email: formData.email,
+      });
+
+      console.log('이메일 인증 요청 응답', response);
+    } catch (error) {
+      console.error('이메일 인증 요청 오류', error);
+    }
     setShowEmailVerification(true);
     setIsEmailSent(true);
     emailTimer.start(300); // 5분 = 300초
@@ -145,8 +154,19 @@ export default function SignUp() {
    * @description 이메일 인증코드 확인
    * @return 이메일 인증코드 확인에 성공 여부 반환(성공, 실패)
    */
-  const handleEmailVerificationCheck = useCallback(() => {
+  const handleEmailVerificationCheck = useCallback(async () => {
     console.log('이메일 인증코드 확인', formData.emailVerificationCode);
+
+    try {
+      const response = await api.post('/email/verify-code', {
+        email: formData.email,
+        code: formData.emailVerificationCode,
+      });
+
+      console.log('이메일 인증코드 확인 응답', response);
+    } catch (error) {
+      console.error('이메일 인증코드 확인 오류', error);
+    }
 
     setIsEmailVerified(true);
     setShowEmailVerification(false);
@@ -197,7 +217,12 @@ export default function SignUp() {
         password: formData.password,
         name: formData.name,
         phone: formData.phoneNumber,
-        birthDate: formData.birthDate,
+        birthDate: `${formData.birthDate.getFullYear()}${String(
+          formData.birthDate.getMonth() + 1
+        ).padStart(2, '0')}${String(formData.birthDate.getDate()).padStart(
+          2,
+          '0'
+        )}`,
       };
 
       const response = await api.post('/join', data);
