@@ -1,6 +1,7 @@
 'use client';
 
 import { DataItemCard } from './DataItemCard';
+import { isToday } from '@/app/(shared)/utils';
 
 interface DataItem {
   id: number;
@@ -56,7 +57,7 @@ export const HomePageClient = ({ cards }: HomePageClientProps) => {
           title={`${item.carrier} 데이터 ${item.dataAmount}MB`}
           imageUrl={getCarrierImageUrl(item.carrier)}
           price={item.price}
-          isNew={item.sellStatus === 'SELLING'}
+          isNew={isToday(item.updatedAt)}
           onClickBuy={() =>
             handleBuy(`${item.carrier} 데이터 ${item.dataAmount}MB`)
           }
