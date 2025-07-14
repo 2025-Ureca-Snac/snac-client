@@ -3,25 +3,33 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import SearchModal from './SearchModal';
-import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import SearchModal from './search-modal';
+import { SearchModalType } from '../(shared)/types';
+import SocialLoginButtons from '../(shared)/components/social-login-buttons';
+import { useAuthStore } from '../(shared)/stores/auth-store';
+import { api } from '../(shared)/utils/api';
 
 /**
- * 로그인 페이지
+ * @author 이승우
+ * @description 로그인 페이지
  */
 export default function Login() {
+  const router = useRouter();
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isOpen, setIsOpen] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState<SearchModalType>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
+  // Zustand 스토어 사용
+  const { user, isLoading, login } = useAuthStore();
+
   useEffect(() => {
-    /**
-     * 로그인 상태 확인
-     * 토큰 값이 없다면 로그인 페이지 유지
-     * 토큰 값이 있다면 메인 페이지 강제 리다이렉트
-     */
-  }, []);
+    // 이미 로그인된 상태라면 메인 페이지로 리다이렉트
+    if (user) {
+      //router.push('/');
+    }
+  }, [user]);
 
   const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setId(e.target.value);
@@ -31,41 +39,36 @@ export default function Login() {
     setPassword(e.target.value);
   };
 
-  const login = async () => {
-    const loginResponse = await axios.post(
-      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/login',
-      {
-        email: id,
-        password,
-      },
-      {
-        withCredentials: true,
-      }
-    );
+  const handleLogin = async () => {
+    if (!id || !password) {
+      alert('아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
 
-    console.log('로그인 응답', loginResponse);
+    try {
+      await login(id, password);
+      // 로그인 성공 시 메인 페이지로 이동
+      router.push('/');
+    } catch (error) {
+      // 에러는 스토어에서 처리됨
+      console.error('로그인 실패:', error);
+    }
   };
 
   const findEmail = () => {
-    setIsOpen(1);
+    setIsOpen('id');
   };
   const findPassword = () => {
-    setIsOpen(2);
+    setIsOpen('password');
   };
 
   const test = async () => {
-    const testResponse = await axios.post(
-      'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api/reissue',
-      {},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      }
-    );
-
-    console.log('토큰 재발급 응답', testResponse);
+    try {
+      const testResponse = await api.post('/reissue');
+      console.log('토큰 재발급 응답', testResponse);
+    } catch (error) {
+      console.error('토큰 재발급 실패:', error);
+    }
   };
 
   return (
@@ -89,7 +92,6 @@ export default function Login() {
           />
           <button
             type="button"
-            tabIndex={-1}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
@@ -113,55 +115,23 @@ export default function Login() {
           </button>
         </div>
         <button
-          onClick={login}
-          className="text-regular-md w-full bg-midnight-black text-cloud-white rounded-xl py-2 text-center text-lg font-normal mb-6"
+          onClick={handleLogin}
+          disabled={isLoading}
+          className="text-regular-md w-full bg-midnight-black text-cloud-white rounded-xl py-2 text-center text-lg font-normal mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          로그인
+          {isLoading ? '로그인 중...' : '로그인'}
         </button>
         <div className="flex justify-center text-regular-md mb-8">
-          <Link href="/user/signup">이메일 가입</Link>
+          <Link href="/signUp">이메일 가입</Link>
           <span className="mx-4 md:mx-7">|</span>
           <button onClick={findEmail}>이메일 찾기</button>
           <span className="mx-4 md:mx-7">|</span>
           <button onClick={findPassword}>비밀번호 찾기</button>
         </div>
-        <div className="space-y-3">
-          <button className="block w-full">
-            <Image
-              src="/kakao_login.svg"
-              alt="카카오"
-              width={100}
-              height={100}
-              className="w-full object-contain hidden md:block"
-            />
-            <Image
-              src="/kakao_mobile_login.svg"
-              alt="카카오"
-              width={100}
-              height={100}
-              className="w-full object-contain block md:hidden"
-            />
-          </button>
-          <button className="block w-full">
-            <Image
-              src="/naver_login.svg"
-              alt="네이버"
-              width={100}
-              height={100}
-              className="w-full object-contain hidden md:block"
-            />
-            <Image
-              src="/naver_mobile_login.svg"
-              alt="네이버"
-              width={100}
-              height={100}
-              className="w-full object-contain block md:hidden"
-            />
-          </button>
-        </div>
+        <SocialLoginButtons />
         <button onClick={test}>테스트</button>
       </div>
-      {isOpen !== 0 && <SearchModal setIsOpen={setIsOpen} />}
+      {isOpen && <SearchModal isOpen={isOpen} setIsOpen={setIsOpen} />}
     </div>
   );
 }

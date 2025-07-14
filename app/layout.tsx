@@ -20,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${notoSansKr.className} antialiased`}>{children}</body>
+      <body className={`${notoSansKr.className} antialiased`}>
+        <div className="w-full  md:max-w-[1440px] mx-auto ">{children}</div>
+      </body>
     </html>
   );
 }
