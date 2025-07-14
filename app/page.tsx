@@ -6,13 +6,19 @@ import { HomePageClient } from './(shared)/components/HomePageClient';
 const API_BASE = process.env.API_BASE_URL;
 
 async function getCardData() {
-  const res = await fetch(`${API_BASE}/api/cards`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
+  try {
+    const res = await fetch(`${API_BASE}/api/cards`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch data:', res.status, res.statusText);
+      return [];
+    }
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching card data:', error);
+    return [];
   }
-  return res.json();
 }
 
 export default async function Home() {
