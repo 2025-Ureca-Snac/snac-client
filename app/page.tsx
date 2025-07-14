@@ -14,7 +14,8 @@ async function getCardData() {
       console.error('Failed to fetch data:', res.status, res.statusText);
       return [];
     }
-    return res.json();
+    const response = await res.json();
+    return response.data?.cardResponseList || [];
   } catch (error) {
     console.error('Error fetching card data:', error);
     return [];

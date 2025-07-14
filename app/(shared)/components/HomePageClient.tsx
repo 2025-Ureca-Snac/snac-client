@@ -4,15 +4,32 @@ import { DataItemCard } from './DataItemCard';
 
 interface DataItem {
   id: number;
-  title: string;
-  imageUrl: string;
+  name: string;
+  sellStatus: string;
+  cardCategory: string;
+  carrier: string;
+  dataAmount: number;
   price: number;
-  isNew?: boolean;
+  updatedAt: string;
 }
 
 interface HomePageClientProps {
   cards: DataItem[];
 }
+
+// carrier에 따른 이미지 URL 매핑
+const getCarrierImageUrl = (carrier: string): string => {
+  switch (carrier) {
+    case 'SKT':
+      return '/SKT.svg';
+    case 'KT':
+      return '/KT.svg';
+    case 'LGU+':
+      return '/LGU+.svg';
+    default:
+      return '/SKT.svg'; // 기본값
+  }
+};
 
 // alert 임시
 export const HomePageClient = ({ cards }: HomePageClientProps) => {
@@ -36,11 +53,13 @@ export const HomePageClient = ({ cards }: HomePageClientProps) => {
       {cards.map((item) => (
         <DataItemCard
           key={item.id}
-          title={item.title}
-          imageUrl={item.imageUrl}
+          title={`${item.carrier} 데이터 ${item.dataAmount}MB`}
+          imageUrl={getCarrierImageUrl(item.carrier)}
           price={item.price}
-          isNew={item.isNew}
-          onClickBuy={() => handleBuy(item.title)}
+          isNew={item.sellStatus === 'SELLING'}
+          onClickBuy={() =>
+            handleBuy(`${item.carrier} 데이터 ${item.dataAmount}MB`)
+          }
         />
       ))}
     </div>
