@@ -3,7 +3,7 @@ import { Header } from './(shared)/components/Header';
 import { Footer } from './(shared)/components/Footer';
 import { HomePageClient } from './(shared)/components/HomePageClient';
 
-async function getItem() {
+async function getCardData() {
   const res = await fetch('http://localhost:3000/api/cards', {
     cache: 'no-store',
   });
@@ -14,7 +14,7 @@ async function getItem() {
   return res.json();
 }
 export default async function Home() {
-  const cards = await getItem();
+  const cards = await getCardData();
   return (
     <>
       <Header />
