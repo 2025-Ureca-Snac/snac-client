@@ -13,6 +13,7 @@ import type {
 import { useTimer } from '../(shared)/hooks/useTimer';
 import { api } from '../(shared)/utils/api';
 import { useRouter } from 'next/navigation';
+import { formatDateYYYYMMDD } from '../(shared)/utils';
 
 /**
  * @author 이승우
@@ -113,12 +114,13 @@ export default function SignUp() {
       });
 
       console.log('이메일 인증 요청 응답', response);
+
+      setShowEmailVerification(true);
+      setIsEmailSent(true);
+      emailTimer.start(300); // 5분 = 300초
     } catch (error) {
       console.error('이메일 인증 요청 오류', error);
     }
-    setShowEmailVerification(true);
-    setIsEmailSent(true);
-    emailTimer.start(300); // 5분 = 300초
   }, [formData.email, emailTimer]);
 
   /**
@@ -162,6 +164,16 @@ export default function SignUp() {
         email: formData.email,
         code: formData.emailVerificationCode,
       });
+
+      if (
+        (response.data as { code?: string })?.code ===
+        'EMAIL_CODE_VERIFICATION_SUCCESS_200'
+      ) {
+        setIsEmailVerified(true);
+        setShowEmailVerification(false);
+      } else {
+        alert('인증코드가 일치하지 않습니다.');
+      }
 
       console.log('이메일 인증코드 확인 응답', response);
     } catch (error) {
@@ -217,12 +229,7 @@ export default function SignUp() {
         password: formData.password,
         name: formData.name,
         phone: formData.phoneNumber,
-        birthDate: `${formData.birthDate.getFullYear()}${String(
-          formData.birthDate.getMonth() + 1
-        ).padStart(2, '0')}${String(formData.birthDate.getDate()).padStart(
-          2,
-          '0'
-        )}`,
+        birthDate: formatDateYYYYMMDD(formData.birthDate),
       };
 
       const response = await api.post('/join', data);
