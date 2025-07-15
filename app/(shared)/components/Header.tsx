@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MenuLink } from './MenuLink';
 
-//TODO: 로그인 기능 다 되면, 부모로부터 USER 객체 PROPS 받아오도록 수정하기! (2025-07-09)
-// interface HeaderProps {}
-
+// TODO: 실제 로그인 상태를 부모 또는 컨텍스트에서 받아오도록 수정 예정 (2025-07-09)
 export const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const isLoggedIn = false; // 로그인 로직 연동 전 기본값
 
   return (
-    <header className="w-full bg-white h-[57px] md:h-[67px] white px-6 flex justify-between items-center md:pl-[160px] md:pr-[51px]">
+    <header className="w-full bg-white h-[57px] md:h-[67px] px-6 flex justify-between items-center md:pl-[160px] md:pr-[51px]">
       <Link href="/">
         <Image src="/logo_mobile.svg" alt="스낵 로고" width={68} height={25} />
       </Link>
@@ -41,13 +39,6 @@ export const Header = () => {
           </Link>
         )}
       </div>
-      {/* --- 테스트용 버튼: 나중에 삭제하기! --- */}
-      <button
-        onClick={() => setIsLoggedIn(!isLoggedIn)}
-        className="absolute top-20 right-4 bg-blue-500 text-white p-2 rounded"
-      >
-        로그인 상태 전환
-      </button>
     </header>
   );
 };
