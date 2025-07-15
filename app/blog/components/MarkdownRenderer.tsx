@@ -9,9 +9,14 @@ import type { Components } from 'react-markdown';
 interface MarkdownRendererProps {
   content: string;
   images?: string[];
+  imagePositions?: number[]; // 이미지가 삽입될 위치 (단락 인덱스)
 }
 
-export function MarkdownRenderer({ content, images }: MarkdownRendererProps) {
+export function MarkdownRenderer({
+  content,
+  images,
+  imagePositions,
+}: MarkdownRendererProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const openImageModal = (imageSrc: string) => {
@@ -20,6 +25,53 @@ export function MarkdownRenderer({ content, images }: MarkdownRendererProps) {
 
   const closeImageModal = () => {
     setSelectedImage(null);
+  };
+
+  // 마크다운 내용을 단락으로 분리하고 이미지 삽입
+  const renderContentWithImages = () => {
+    if (!images || images.length === 0) {
+      return (
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+          {content}
+        </ReactMarkdown>
+      );
+    }
+
+    // 마크다운 내용을 단락으로 분리
+    const paragraphs = content.split('\n\n');
+    const result = [];
+
+    for (let i = 0; i < paragraphs.length; i++) {
+      // 단락 렌더링
+      result.push(
+        <div key={`paragraph-${i}`}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+            {paragraphs[i]}
+          </ReactMarkdown>
+        </div>
+      );
+
+      // 이미지 삽입 위치 확인
+      if (imagePositions && imagePositions.includes(i)) {
+        const imageIndex = imagePositions.indexOf(i);
+        if (images[imageIndex]) {
+          result.push(
+            <div key={`image-${i}`} className="my-6">
+              <Image
+                src={images[imageIndex]}
+                alt={`Content image ${imageIndex + 1}`}
+                width={800}
+                height={400}
+                className="max-w-full h-auto rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => openImageModal(images[imageIndex])}
+              />
+            </div>
+          );
+        }
+      }
+    }
+
+    return result;
   };
 
   const components: Components = {
@@ -104,7 +156,7 @@ export function MarkdownRenderer({ content, images }: MarkdownRendererProps) {
         {children}
       </a>
     ),
-    // 이미지 스타일링
+    // 이미지 스타일링 (마크다운 내부 이미지)
     img({ src, alt }) {
       if (!src || typeof src !== 'string') return null;
       return (
@@ -124,13 +176,9 @@ export function MarkdownRenderer({ content, images }: MarkdownRendererProps) {
 
   return (
     <div className="text-gray-700 leading-relaxed">
-      <div className="prose max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-          {content}
-        </ReactMarkdown>
-      </div>
+      <div className="prose max-w-none">{renderContentWithImages()}</div>
 
-      {/* 이미지 갤러리 */}
+      {/* 이미지 갤러리 (추가 이미지들) */}
       {images && images.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">

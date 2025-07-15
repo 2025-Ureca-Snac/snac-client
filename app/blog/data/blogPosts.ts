@@ -9,6 +9,7 @@ export interface ExtendedBlogPost extends BlogPost {
   readTime?: string;
   category?: string;
   images?: string[]; // 추가 이미지 배열
+  imagePositions?: number[]; // 이미지가 삽입될 단락의 위치
 }
 
 export const BLOG_POSTS: ExtendedBlogPost[] = [
@@ -23,6 +24,7 @@ export const BLOG_POSTS: ExtendedBlogPost[] = [
     readTime: '5분',
     category: '마케팅',
     images: ['/blog1.png', '/blog2.png', '/blog3.png'],
+    imagePositions: [1, 3, 6], // 첫 번째, 세 번째, 여섯 번째 단락 뒤에 이미지 삽입
     content: `
       데이터 기반 아웃렛 마케팅은 현대 비즈니스에서 가장 중요한 전략 중 하나입니다. 
       고객의 행동 패턴과 선호도를 분석하여 개인화된 마케팅 메시지를 전달함으로써 
