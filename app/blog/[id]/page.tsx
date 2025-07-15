@@ -7,6 +7,7 @@ import { Header } from '@/app/(shared)/components/Header';
 import { ExtendedBlogPost, BLOG_POSTS } from '../data/blogPosts';
 import { getPostById } from '../utils/blogUtils';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
+import { BlogCard } from '@/app/(shared)/components/BlogCard';
 import Image from 'next/image';
 
 export default function BlogPostPage() {
@@ -215,29 +216,15 @@ export default function BlogPostPage() {
             )
               .slice(0, 3)
               .map((relatedPost: ExtendedBlogPost) => (
-                <div
+                <BlogCard
                   key={relatedPost.id}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  post={relatedPost}
+                  variant="detailed"
+                  showAuthor={true}
+                  showReadTime={true}
+                  showCategory={true}
                   onClick={() => router.push(`/blog/${relatedPost.id}`)}
-                >
-                  <div className="relative h-32 mb-3">
-                    <Image
-                      src={relatedPost.image}
-                      alt={relatedPost.title}
-                      fill
-                      className="object-cover rounded"
-                    />
-                  </div>
-                  <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {relatedPost.title}
-                  </h4>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    {relatedPost.author && <span>{relatedPost.author}</span>}
-                    {relatedPost.readTime && (
-                      <span>• {relatedPost.readTime}</span>
-                    )}
-                  </div>
-                </div>
+                />
               ))}
           </div>
           {BLOG_POSTS.filter(
