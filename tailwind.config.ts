@@ -67,6 +67,7 @@ const config: Config = {
         'candy-pink': '#FF66C4',
         'packet-golden': '#D09436',
         'cloud-white': '#F3F3F3',
+        'teal-green': '#38CB89',
         red: '#ED1B23',
         gray: {
           50: '#FAFAFA',
