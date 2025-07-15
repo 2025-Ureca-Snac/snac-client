@@ -22,7 +22,7 @@ export const BLOG_POSTS: ExtendedBlogPost[] = [
     author: '마케팅팀',
     publishDate: '2024-01-15',
     readTime: '5분',
-    category: '마케팅',
+    category: '데이터분석',
     images: ['/blog1.png', '/blog2.png', '/blog3.png'],
     imagePositions: [1, 3, 6], // 첫 번째, 세 번째, 여섯 번째 단락 뒤에 이미지 삽입
     content: `

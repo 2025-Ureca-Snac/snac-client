@@ -198,30 +198,30 @@ export default function BlogPostPage() {
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
             관련 포스트
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {BLOG_POSTS.filter(
+          {(() => {
+            const relatedPosts = BLOG_POSTS.filter(
               (p: ExtendedBlogPost) =>
                 p.id !== post.id && p.category === post.category
-            )
-              .slice(0, 3)
-              .map((relatedPost: ExtendedBlogPost) => (
-                <BlogCard
-                  key={relatedPost.id}
-                  post={relatedPost}
-                  variant="detailed"
-                  showAuthor={true}
-                  showReadTime={true}
-                  showCategory={true}
-                  onClick={() => router.push(`/blog/${relatedPost.id}`)}
-                />
-              ))}
-          </div>
-          {BLOG_POSTS.filter(
-            (p: ExtendedBlogPost) =>
-              p.id !== post.id && p.category === post.category
-          ).length === 0 && (
-            <p className="text-gray-600">관련된 다른 포스트가 없습니다.</p>
-          )}
+            ).slice(0, 3);
+
+            return relatedPosts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {relatedPosts.map((relatedPost: ExtendedBlogPost) => (
+                  <BlogCard
+                    key={relatedPost.id}
+                    post={relatedPost}
+                    variant="detailed"
+                    showAuthor={true}
+                    showReadTime={true}
+                    showCategory={true}
+                    onClick={() => router.push(`/blog/${relatedPost.id}`)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-600">관련된 다른 포스트가 없습니다.</p>
+            );
+          })()}
         </div>
       </div>
 
