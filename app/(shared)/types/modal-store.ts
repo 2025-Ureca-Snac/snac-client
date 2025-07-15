@@ -1,8 +1,14 @@
 /**
  * @author 이승우
- * @description 모달 타입( search(검색), payment(결제), confirm(확인), alert(알림) )
+ * @description 모달 타입( search(검색), payment(결제), confirm(확인), alert(알림), blog(블로그) )
  */
-export type ModalType = 'search' | 'payment' | 'confirm' | 'alert' | null;
+export type ModalType =
+  | 'search'
+  | 'payment'
+  | 'confirm'
+  | 'alert'
+  | 'blog'
+  | null;
 
 /**
  * @author 이승우
