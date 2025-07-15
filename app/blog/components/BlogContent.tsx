@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { BlogCard, BlogPost } from '@/app/(shared)/components/BlogCard';
+import { BlogCard } from '@/app/(shared)/components/BlogCard';
 import { BlogTabNavigation } from './BlogTabNavigation';
+import { BlogDetailModal } from './BlogDetailModal';
+import { ExtendedBlogPost } from '../data/blogPosts';
 
 interface BlogContentProps {
-  posts: BlogPost[];
+  posts: ExtendedBlogPost[];
   onShowMore?: () => void;
-  onPostClick?: (post: BlogPost) => void;
+  onPostClick?: (post: ExtendedBlogPost) => void;
   onSortChange?: (sortBy: string) => void;
 }
 
@@ -25,12 +27,27 @@ export const BlogContent = ({
   onSortChange,
 }: BlogContentProps) => {
   const [activeTab, setActiveTab] = useState<'all' | 'featured'>('all');
+  const [selectedPost, setSelectedPost] = useState<ExtendedBlogPost | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredPosts =
     activeTab === 'all' ? posts : posts.filter((post) => post.featured);
 
   const handleTabChange = (tab: 'all' | 'featured') => {
     setActiveTab(tab);
+  };
+
+  const handlePostClick = (post: ExtendedBlogPost) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+    onPostClick?.(post);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
   };
 
   return (
@@ -48,7 +65,7 @@ export const BlogContent = ({
           <BlogCard
             key={post.id}
             post={post}
-            onClick={() => onPostClick?.(post)}
+            onClick={() => handlePostClick(post)}
           />
         ))}
       </div>
@@ -62,6 +79,16 @@ export const BlogContent = ({
           Show more
         </button>
       </div>
+
+      {/* 블로그 상세 모달 */}
+      <BlogDetailModal
+        post={selectedPost}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onPostSelect={(post) => {
+          setSelectedPost(post);
+        }}
+      />
     </div>
   );
 };
