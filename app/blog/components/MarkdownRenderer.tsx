@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
 import { useState } from 'react';
+import type { Components } from 'react-markdown';
 
 interface MarkdownRendererProps {
   content: string;
@@ -21,120 +22,110 @@ export function MarkdownRenderer({ content, images }: MarkdownRendererProps) {
     setSelectedImage(null);
   };
 
+  const components: Components = {
+    // 제목 스타일링
+    h1: ({ children }) => (
+      <h1 className="text-3xl font-bold text-gray-900 mb-6 mt-8">{children}</h1>
+    ),
+    h2: ({ children }) => (
+      <h2 className="text-2xl font-semibold text-gray-900 mb-4 mt-6">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }) => (
+      <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-5">
+        {children}
+      </h3>
+    ),
+    h4: ({ children }) => (
+      <h4 className="text-lg font-semibold text-gray-900 mb-2 mt-4">
+        {children}
+      </h4>
+    ),
+    // 단락 스타일링
+    p: ({ children }) => (
+      <p className="mb-4 text-gray-700 leading-relaxed">{children}</p>
+    ),
+    // 목록 스타일링
+    ul: ({ children }) => <ul className="mb-4 pl-6 list-disc">{children}</ul>,
+    ol: ({ children }) => (
+      <ol className="mb-4 pl-6 list-decimal">{children}</ol>
+    ),
+    li: ({ children }) => <li className="mb-1">{children}</li>,
+    // 강조 스타일링
+    strong: ({ children }) => (
+      <strong className="font-semibold text-gray-900">{children}</strong>
+    ),
+    em: ({ children }) => <em className="italic">{children}</em>,
+    // 코드 블록 스타일링
+    code({ className, children, ...props }) {
+      const match = /language-(\w+)/.exec(className || '');
+      const isInline = !match;
+      return !isInline ? (
+        <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
+          <code className={className} {...props}>
+            {children}
+          </code>
+        </pre>
+      ) : (
+        <code
+          className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
+          {...props}
+        >
+          {children}
+        </code>
+      );
+    },
+    // 테이블 스타일링
+    table: ({ children }) => (
+      <div className="overflow-x-auto my-4">
+        <table className="min-w-full border-collapse border border-gray-300">
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children }) => (
+      <th className="border border-gray-300 px-4 py-2 bg-gray-50 font-semibold text-left">
+        {children}
+      </th>
+    ),
+    td: ({ children }) => (
+      <td className="border border-gray-300 px-4 py-2">{children}</td>
+    ),
+    // 인용구 스타일링
+    blockquote: ({ children }) => (
+      <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 italic">
+        {children}
+      </blockquote>
+    ),
+    // 링크 스타일링
+    a: ({ href, children }) => (
+      <a href={href} className="text-blue-600 hover:text-blue-800 underline">
+        {children}
+      </a>
+    ),
+    // 이미지 스타일링
+    img({ src, alt }) {
+      if (!src || typeof src !== 'string') return null;
+      return (
+        <div className="my-4">
+          <Image
+            src={src}
+            alt={alt || ''}
+            width={800}
+            height={400}
+            className="max-w-full h-auto rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => openImageModal(src)}
+          />
+        </div>
+      );
+    },
+  };
+
   return (
     <div className="text-gray-700 leading-relaxed">
       <div className="prose max-w-none">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            // 제목 스타일링
-            h1: ({ children }) => (
-              <h1 className="text-3xl font-bold text-gray-900 mb-6 mt-8">
-                {children}
-              </h1>
-            ),
-            h2: ({ children }) => (
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4 mt-6">
-                {children}
-              </h2>
-            ),
-            h3: ({ children }) => (
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-5">
-                {children}
-              </h3>
-            ),
-            h4: ({ children }) => (
-              <h4 className="text-lg font-semibold text-gray-900 mb-2 mt-4">
-                {children}
-              </h4>
-            ),
-            // 단락 스타일링
-            p: ({ children }) => (
-              <p className="mb-4 text-gray-700 leading-relaxed">{children}</p>
-            ),
-            // 목록 스타일링
-            ul: ({ children }) => (
-              <ul className="mb-4 pl-6 list-disc">{children}</ul>
-            ),
-            ol: ({ children }) => (
-              <ol className="mb-4 pl-6 list-decimal">{children}</ol>
-            ),
-            li: ({ children }) => <li className="mb-1">{children}</li>,
-            // 강조 스타일링
-            strong: ({ children }) => (
-              <strong className="font-semibold text-gray-900">
-                {children}
-              </strong>
-            ),
-            em: ({ children }) => <em className="italic">{children}</em>,
-            // 코드 블록 스타일링
-            code({ className, children, ...props }: any) {
-              const match = /language-(\w+)/.exec(className || '');
-              const isInline = !match;
-              return !isInline ? (
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                </pre>
-              ) : (
-                <code
-                  className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
-                  {...props}
-                >
-                  {children}
-                </code>
-              );
-            },
-            // 테이블 스타일링
-            table: ({ children }: any) => (
-              <div className="overflow-x-auto my-4">
-                <table className="min-w-full border-collapse border border-gray-300">
-                  {children}
-                </table>
-              </div>
-            ),
-            th: ({ children }: any) => (
-              <th className="border border-gray-300 px-4 py-2 bg-gray-50 font-semibold text-left">
-                {children}
-              </th>
-            ),
-            td: ({ children }: any) => (
-              <td className="border border-gray-300 px-4 py-2">{children}</td>
-            ),
-            // 인용구 스타일링
-            blockquote: ({ children }: any) => (
-              <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 italic">
-                {children}
-              </blockquote>
-            ),
-            // 링크 스타일링
-            a: ({ href, children }: any) => (
-              <a
-                href={href}
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                {children}
-              </a>
-            ),
-            // 이미지 스타일링
-            img({ src, alt }: any) {
-              if (!src) return null;
-              return (
-                <div className="my-4">
-                  <Image
-                    src={src}
-                    alt={alt || ''}
-                    width={800}
-                    height={400}
-                    className="max-w-full h-auto rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => openImageModal(src)}
-                  />
-                </div>
-              );
-            },
-          }}
-        >
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
           {content}
         </ReactMarkdown>
       </div>

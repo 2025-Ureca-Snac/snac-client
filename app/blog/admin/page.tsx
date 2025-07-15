@@ -33,7 +33,10 @@ export default function BlogAdminPage() {
   const [previewMode, setPreviewMode] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState('');
 
-  const handleInputChange = (field: keyof BlogPostForm, value: any) => {
+  const handleInputChange = (
+    field: keyof BlogPostForm,
+    value: string | boolean
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
