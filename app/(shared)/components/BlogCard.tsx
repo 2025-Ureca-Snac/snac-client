@@ -65,8 +65,9 @@ export const BlogCard = ({
         <Image
           src={post.image}
           alt={post.title}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          width={400}
+          height={300}
+          className="object-cover transition-transform duration-300 group-hover:scale-105 w-full h-full"
           priority
         />
 
