@@ -85,7 +85,7 @@ const config: Config = {
         'btn-dark': '#1F1F1F',
       },
       boxShadow: {
-        light: '0 4px 16px rgba(158,158,158,0.25)',
+        light: '0 4px 16px rgba(163, 163, 163, 0.25)', // gray-400(회색 400), 불투명도 25%
       },
       width: {
         'card-sm': '152px',
