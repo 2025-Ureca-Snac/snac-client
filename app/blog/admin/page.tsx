@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Header } from '@/app/(shared)/components/Header';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
+import Image from 'next/image';
 
 interface BlogPostForm {
   title: string;
@@ -202,7 +203,7 @@ export default function BlogAdminPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {formData.images.map((image, index) => (
                     <div key={index} className="relative">
-                      <img
+                      <Image
                         src={image}
                         alt={`Gallery ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg"
