@@ -68,6 +68,7 @@ const config: Config = {
         'packet-golden': '#D09436',
         'cloud-white': '#F3F3F3',
         'teal-green': '#38CB89',
+        'surface-light': '#F3F5F7',
         red: '#ED1B23',
         gray: {
           50: '#FAFAFA',
@@ -82,6 +83,9 @@ const config: Config = {
           900: '#171717',
         },
         'btn-dark': '#1F1F1F',
+      },
+      boxShadow: {
+        light: '0 4px 16px rgba(158,158,158,0.25)',
       },
       width: {
         'card-sm': '152px',
