@@ -82,28 +82,43 @@ const config: Config = {
           800: '#262626',
           900: '#171717',
         },
+        'btn-dark': '#1F1F1F',
       },
       boxShadow: {
         light: '0 4px 16px rgba(158,158,158,0.25)',
       },
+      width: {
+        'card-sm': '152px',
+        'card-md': '238px',
+        'btn-sm': '133px',
+        'btn-md': '214px',
+      },
+      height: {
+        'card-sm': '203px',
+        'card-md': '348px',
+        'btn-sm': '26px',
+        'btn-md': '40px',
+      },
+      borderRadius: {
+        card: '24px',
+      },
     },
   },
   plugins: [
-    plugin(function ({ addUtilities }) {
+    plugin(({ addUtilities }) => {
       const newUtilities: Record<
         string,
-        { fontSize: string; fontWeight: string }
+        { fontSize: string; fontWeight?: string }
       > = {};
+
       Object.entries(typography).forEach(([type, sizes]) => {
         Object.entries(sizes).forEach(([size, value]) => {
           const key = `.text-${type}-${size}`;
-          newUtilities[key] = {
-            fontSize: value,
-            fontWeight:
-              type === 'heading' ? '700' : type === 'medium' ? '500' : '400',
-          };
+
+          newUtilities[key] = { fontSize: value };
         });
       });
+
       addUtilities(newUtilities);
     }),
   ],
