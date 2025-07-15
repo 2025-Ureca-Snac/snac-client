@@ -10,12 +10,14 @@ interface MarkdownRendererProps {
   content: string;
   images?: string[];
   imagePositions?: number[]; // 이미지가 삽입될 위치 (단락 인덱스)
+  showGallery?: boolean; // 갤러리 표시 여부 props
 }
 
 export function MarkdownRenderer({
   content,
   images,
   imagePositions,
+  showGallery = true, // 기본값은 true로 설정
 }: MarkdownRendererProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -179,7 +181,7 @@ export function MarkdownRenderer({
       <div className="prose max-w-none">{renderContentWithImages()}</div>
 
       {/* 이미지 갤러리 (추가 이미지들) */}
-      {images && images.length > 0 && (
+      {showGallery && images && images.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
             이미지 갤러리
@@ -187,7 +189,7 @@ export function MarkdownRenderer({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {images.map((image, index) => (
               <div
-                key={index}
+                key={image}
                 className="relative h-32 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => openImageModal(image)}
               >

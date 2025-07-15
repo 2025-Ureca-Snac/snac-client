@@ -317,6 +317,7 @@ export default function BlogAdminPage() {
                     content={formData.markdownContent}
                     images={formData.images}
                     imagePositions={formData.imagePositions}
+                    showGallery={false}
                   />
                 </div>
               ) : (
