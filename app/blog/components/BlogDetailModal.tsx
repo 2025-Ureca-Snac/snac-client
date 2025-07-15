@@ -37,9 +37,9 @@ export const BlogDetailModal = ({
 
       {/* 모달 컨텐츠 */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] shadow-2xl flex flex-col">
           {/* 헤더 */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
+          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">블로그 포스트</h2>
               <button
@@ -64,7 +64,7 @@ export const BlogDetailModal = ({
           </div>
 
           {/* 컨텐츠 */}
-          <div className="p-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
             {/* 이미지 */}
             <div className="relative h-64 mb-6 rounded-lg overflow-hidden">
               <Image
@@ -214,7 +214,7 @@ export const BlogDetailModal = ({
           </div>
 
           {/* 푸터 */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-2xl">
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4"></div>
               <button
