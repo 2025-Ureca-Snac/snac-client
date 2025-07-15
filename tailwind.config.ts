@@ -68,6 +68,7 @@ const config: Config = {
         'packet-golden': '#D09436',
         'cloud-white': '#F3F3F3',
         'teal-green': '#38CB89',
+        red: '#ED1B23',
         gray: {
           50: '#FAFAFA',
           100: '#F5F5F5',
