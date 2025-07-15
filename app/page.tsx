@@ -25,6 +25,7 @@ async function getCardData() {
     return [];
   }
 }
+export const dynamic = 'force-dynamic'; // <- 추가
 
 export default async function Home() {
   const cards = await getCardData();
