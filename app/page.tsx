@@ -3,7 +3,7 @@ import { Header } from './(shared)/components/Header';
 import { Footer } from './(shared)/components/Footer';
 import { HomePageClient } from './(shared)/components/HomePageClient';
 
-const API_BASE = process.env.API_BASE_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 async function getCardData() {
   try {
