@@ -3,12 +3,12 @@ import { Header } from './(shared)/components/Header';
 import { Footer } from './(shared)/components/Footer';
 import { HomePageClient } from './(shared)/components/HomePageClient';
 
-const API_BASE = process.env.API_BASE_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 async function getCardData() {
   try {
     const res = await fetch(
-      `${API_BASE}/api/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
+      `${API_BASE}/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
       {
         cache: 'no-store',
       }
@@ -25,6 +25,7 @@ async function getCardData() {
     return [];
   }
 }
+export const dynamic = 'force-dynamic'; // <- 추가
 
 export default async function Home() {
   const cards = await getCardData();

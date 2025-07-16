@@ -1,11 +1,10 @@
-import { BlogPost } from '@/app/(shared)/components/BlogCard';
-import { BLOG_POSTS } from '../data/blogPosts';
+import { ExtendedBlogPost, BLOG_POSTS } from '../data/blogPosts';
 
 /**
  * 추천 포스트만 필터링하여 반환
  * @returns 추천 포스트 배열
  */
-export const getFeaturedPosts = (): BlogPost[] => {
+export const getFeaturedPosts = (): ExtendedBlogPost[] => {
   return BLOG_POSTS.filter((post) => post.featured);
 };
 
@@ -14,7 +13,7 @@ export const getFeaturedPosts = (): BlogPost[] => {
  * @param id - 검색할 포스트 ID
  * @returns 해당 ID의 포스트 또는 undefined
  */
-export const getPostById = (id: number): BlogPost | undefined => {
+export const getPostById = (id: number): ExtendedBlogPost | undefined => {
   return BLOG_POSTS.find((post) => post.id === id);
 };
 
@@ -24,7 +23,10 @@ export const getPostById = (id: number): BlogPost | undefined => {
  * @param limit - 페이지당 포스트 수 (기본값: 9)
  * @returns 해당 페이지의 포스트 배열
  */
-export const getPostsByPage = (page: number, limit: number = 9): BlogPost[] => {
+export const getPostsByPage = (
+  page: number,
+  limit: number = 9
+): ExtendedBlogPost[] => {
   const start = (page - 1) * limit;
   const end = start + limit;
   return BLOG_POSTS.slice(start, end);
