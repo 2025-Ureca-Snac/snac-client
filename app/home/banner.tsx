@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Button } from '../(shared)/components/Button';
+import { Button } from '@/app/(shared)/components/Button';
 
 interface BannerProps {
   avgMinutes?: number;
