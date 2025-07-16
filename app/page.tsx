@@ -8,7 +8,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 async function getCardData() {
   try {
     const res = await fetch(
-      `${API_BASE}/api/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
+      `${API_BASE}/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
       {
         cache: 'no-store',
       }
