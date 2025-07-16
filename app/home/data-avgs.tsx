@@ -13,7 +13,7 @@ export function DataAvg({ providers, averagePrice }: DataAvgProps) {
 
   useEffect(() => {
     const intervalId = setInterval(() => setIndex((i) => i + 1), 3000);
-    return () => clearTimeout(intervalId);
+    return () => clearInterval(intervalId);
   }, [providers.length]);
 
   return (
@@ -34,7 +34,7 @@ export function DataAvg({ providers, averagePrice }: DataAvgProps) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             transition={{ ease: 'easeInOut' }}
-            className="text-[#38CB89] text-regular-xl  md:text-medium-4xl font-bold"
+            className="text-teal-green text-regular-xl  md:text-medium-4xl font-bold"
           >
             {providers[index % providers.length]}
           </motion.span>
@@ -45,7 +45,9 @@ export function DataAvg({ providers, averagePrice }: DataAvgProps) {
       </h2>
       <p className="text-regular-lg md:text-medium-3xl font-bold pt-[28px]">
         평균
-        <span className="text-[#38CB89] ">{averagePrice.toLocaleString()}</span>
+        <span className="text-teal-green ">
+          {averagePrice.toLocaleString()}
+        </span>
         원에 거래되고 있어요
       </p>
     </div>
