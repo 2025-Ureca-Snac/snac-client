@@ -8,9 +8,12 @@ interface BannerProps {
 
 const formatTime = (time: number) => time.toString().padStart(2, '0');
 
+const DEFAULT_AVG_MINUTES = 2;
+const DEFAULT_AVG_SECONDS = 12;
+
 export default function Banner({
-  avgMinutes = 2,
-  avgSeconds = 12,
+  avgMinutes = DEFAULT_AVG_MINUTES,
+  avgSeconds = DEFAULT_AVG_SECONDS,
 }: BannerProps) {
   return (
     <section className="bg-black ">
