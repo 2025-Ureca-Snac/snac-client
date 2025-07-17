@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FilterGroup from './FilterGroup';
 import FilterButtons from './FilterButtons';
 
@@ -13,19 +13,27 @@ interface Filters {
 
 interface FilterSectionProps {
   onFilterChange?: (filters: Filters) => void;
+  onApply?: () => void;
+  onReset?: () => void;
+  currentFilters?: Filters;
   title?: string;
 }
 
 export default function FilterSection({
   onFilterChange,
+  onApply,
+  onReset,
+  currentFilters,
   title = '실시간 매칭 조건을 선택해주세요',
 }: FilterSectionProps) {
-  const [selectedFilters, setSelectedFilters] = useState<Filters>({
-    transactionType: [],
-    carrier: [],
-    dataAmount: [],
-    price: [],
-  });
+  const [selectedFilters, setSelectedFilters] = useState<Filters>(
+    currentFilters || {
+      transactionType: [],
+      carrier: [],
+      dataAmount: [],
+      price: [],
+    }
+  );
 
   const handleFilterChange = (
     category: string,
@@ -66,12 +74,20 @@ export default function FilterSection({
     };
     setSelectedFilters(emptyFilters);
     onFilterChange?.(emptyFilters);
+    onReset?.();
   };
 
   const applyFilters = () => {
-    // 여기서 실제 필터 적용 로직을 구현할 수 있습니다
-    console.log('Applying filters:', selectedFilters);
+    onFilterChange?.(selectedFilters);
+    onApply?.();
   };
+
+  // currentFilters가 변경될 때 selectedFilters 업데이트
+  useEffect(() => {
+    if (currentFilters) {
+      setSelectedFilters(currentFilters);
+    }
+  }, [currentFilters]);
 
   // 필터 옵션 데이터
   const filterOptions = {

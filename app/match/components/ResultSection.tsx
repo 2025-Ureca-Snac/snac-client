@@ -15,7 +15,7 @@ interface User {
 }
 
 interface ResultSectionProps {
-  users?: User[];
+  users: User[];
   isLoading?: boolean;
   onUserClick?: (user: User) => void;
 }
@@ -26,35 +26,8 @@ const categories = [
   { id: 'buyer', label: '구매자' },
 ];
 
-const defaultUsers: User[] = [
-  {
-    id: 1,
-    type: 'buyer',
-    name: 'user04',
-    carrier: 'SKT',
-    data: '1GB',
-    price: '1,500원',
-  },
-  {
-    id: 2,
-    type: 'buyer',
-    name: 'user02',
-    carrier: 'SKT',
-    data: '1GB',
-    price: '1,400원',
-  },
-  {
-    id: 3,
-    type: 'seller',
-    name: 'user07',
-    carrier: 'KT',
-    data: '2GB',
-    price: '2,000원',
-  },
-];
-
 export default function ResultSection({
-  users = defaultUsers,
+  users,
   isLoading = false,
   onUserClick,
 }: ResultSectionProps) {
@@ -70,7 +43,7 @@ export default function ResultSection({
   };
 
   return (
-    <section className="bg-white py-8 px-6 h-[30vh]">
+    <section className="bg-white py-8 px-6 min-h-[30vh]">
       <div className="max-w-4xl mx-auto">
         <CategoryFilter
           categories={categories}
