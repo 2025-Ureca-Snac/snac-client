@@ -41,7 +41,7 @@ export default function FilterOption({
           disabled ? 'cursor-not-allowed' : ''
         }`}
       />
-      <span className="text-sm">{label}</span>
+      <span className="text-sm md:text-lg">{label}</span>
     </label>
   );
 }

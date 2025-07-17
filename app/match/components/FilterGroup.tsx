@@ -26,7 +26,7 @@ export default function FilterGroup({
 }: FilterGroupProps) {
   return (
     <div className="space-y-3">
-      <h3 className="font-semibold text-lg">{title}</h3>
+      <h3 className="font-semibold text-lg md:text-2xl">{title}</h3>
       <div className="grid grid-cols-2 gap-2">
         {options.map((option) => (
           <FilterOption

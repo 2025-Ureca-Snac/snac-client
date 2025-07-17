@@ -110,10 +110,10 @@ export default function FilterSection({
 
   return (
     <section className="bg-gradient-to-b from-green-900 to-black text-white py-12 px-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold text-center mb-8">{title}</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
           <FilterGroup
             title="거래 방식"
             options={filterOptions.transactionType}
