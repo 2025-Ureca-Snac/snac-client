@@ -70,7 +70,7 @@ export default function ResultSection({
   };
 
   return (
-    <section className="bg-white py-8 px-6">
+    <section className="bg-white py-8 px-6 h-[30vh]">
       <div className="max-w-4xl mx-auto">
         <CategoryFilter
           categories={categories}
