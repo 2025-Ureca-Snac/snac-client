@@ -7,8 +7,8 @@ interface User {
   type: 'buyer' | 'seller';
   name: string;
   carrier: string;
-  data: string;
-  price: string;
+  data: number; // GB 단위 (1 = 1GB, 0.5 = 500MB)
+  price: number; // 원 단위
 }
 
 interface UserCardProps {
@@ -50,13 +50,26 @@ function UserTypeButton({ type }: { type: 'buyer' | 'seller' }) {
 
 // 유저 정보 표시
 function UserInfo({ user }: { user: User }) {
+  // 데이터 표시 형식 변환
+  const formatData = (data: number) => {
+    if (data < 1) {
+      return `${data * 1000}MB`;
+    }
+    return `${data}GB`;
+  };
+
+  // 가격 표시 형식 변환
+  const formatPrice = (price: number) => {
+    return `${price.toLocaleString()}원`;
+  };
+
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
       <UserAvatar />
       <span className="font-medium text-sm md:text-base">{user.name}</span>
       <span className="text-gray-500 text-sm md:text-base">|</span>
       <span className="text-sm md:text-base">
-        {user.carrier} | {user.data} | {user.price}
+        {user.carrier} | {formatData(user.data)} | {formatPrice(user.price)}
       </span>
     </div>
   );

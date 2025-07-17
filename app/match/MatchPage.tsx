@@ -18,8 +18,8 @@ interface User {
   type: 'buyer' | 'seller';
   name: string;
   carrier: string;
-  data: string;
-  price: string;
+  data: number; // GB 단위 (1 = 1GB, 0.5 = 500MB)
+  price: number; // 원 단위
 }
 
 // 샘플 유저 데이터
@@ -29,40 +29,40 @@ const allUsers: User[] = [
     type: 'buyer',
     name: 'user04',
     carrier: 'SKT',
-    data: '1GB',
-    price: '1,500원',
+    data: 1, // 1GB
+    price: 1500,
   },
   {
     id: 2,
     type: 'buyer',
     name: 'user02',
     carrier: 'SKT',
-    data: '1GB',
-    price: '1,400원',
+    data: 0.5, // 500MB
+    price: 1400,
   },
   {
     id: 3,
     type: 'seller',
     name: 'user07',
     carrier: 'KT',
-    data: '2GB',
-    price: '2,000원',
+    data: 2, // 2GB
+    price: 2000,
   },
   {
     id: 4,
     type: 'seller',
     name: 'user10',
     carrier: 'LG U+',
-    data: '1GB',
-    price: '1,200원',
+    data: 1, // 1GB
+    price: 1200,
   },
   {
     id: 5,
     type: 'buyer',
     name: 'user15',
     carrier: 'KT',
-    data: '1GB',
-    price: '1,600원',
+    data: 1.5, // 1.5GB
+    price: 1600,
   },
 ];
 
@@ -108,10 +108,9 @@ export default function MatchPage() {
       if (appliedFilters.dataAmount.length > 0) {
         const userData = user.data;
         const matchesDataFilter = appliedFilters.dataAmount.some((filter) => {
-          if (filter === '1GB 미만') return userData === '1GB';
-          if (filter === '1GB 이상')
-            return userData === '1GB' || userData === '2GB';
-          if (filter === '2GB 이상') return userData === '2GB';
+          if (filter === '1GB 미만') return userData < 1;
+          if (filter === '1GB 이상') return userData >= 1;
+          if (filter === '2GB 이상') return userData >= 2;
           return false;
         });
         if (!matchesDataFilter) return false;
@@ -119,7 +118,7 @@ export default function MatchPage() {
 
       // 가격 필터
       if (appliedFilters.price.length > 0) {
-        const userPrice = parseInt(user.price.replace(/[^0-9]/g, ''));
+        const userPrice = user.price;
         const matchesPriceFilter = appliedFilters.price.some((filter) => {
           if (filter === '0 - 999') return userPrice >= 0 && userPrice <= 999;
           if (filter === '1,000 - 1,499')
@@ -144,6 +143,17 @@ export default function MatchPage() {
   };
 
   const handleApplyFilters = () => {
+    // 모든 필터 카테고리에서 하나씩은 선택되어야 함
+    const hasTransactionType = pendingFilters.transactionType.length > 0;
+    const hasCarrier = pendingFilters.carrier.length > 0;
+    const hasDataAmount = pendingFilters.dataAmount.length > 0;
+    const hasPrice = pendingFilters.price.length > 0;
+
+    if (!hasTransactionType || !hasCarrier || !hasDataAmount || !hasPrice) {
+      alert('모든 필터 조건을 선택해주세요.');
+      return;
+    }
+
     setAppliedFilters(pendingFilters);
     console.log('Filters applied:', pendingFilters);
   };
