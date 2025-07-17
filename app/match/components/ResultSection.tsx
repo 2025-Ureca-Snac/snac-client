@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import CategoryFilter from './CategoryFilter';
+import UserList from './UserList';
+import LoadingSpinner from '@/app/(shared)/components/LoadingSpinner';
 
 interface User {
   id: number;
@@ -14,6 +17,7 @@ interface User {
 interface ResultSectionProps {
   users?: User[];
   isLoading?: boolean;
+  onUserClick?: (user: User) => void;
 }
 
 const categories = [
@@ -52,6 +56,7 @@ const defaultUsers: User[] = [
 export default function ResultSection({
   users = defaultUsers,
   isLoading = false,
+  onUserClick,
 }: ResultSectionProps) {
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -60,73 +65,24 @@ export default function ResultSection({
       ? users
       : users.filter((user) => user.type === activeCategory);
 
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId);
+  };
+
   return (
     <section className="bg-white py-8 px-6">
       <div className="max-w-4xl mx-auto">
-        {/* 카테고리 필터 */}
-        <div className="flex border-b border-gray-200 mb-6">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeCategory === cat.id
-                  ? 'border-green-600 text-black'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        <CategoryFilter
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+        />
 
-        {/* 유저 리스트 */}
-        <div className="space-y-4">
-          {filteredUsers.map((user) => (
-            <div
-              key={user.id}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              <div className="flex items-center space-x-4">
-                <button
-                  className={`px-4 py-2 rounded-lg text-white font-medium ${
-                    user.type === 'buyer' ? 'bg-green-500' : 'bg-pink-500'
-                  }`}
-                >
-                  {user.type === 'buyer' ? '구매' : '판매'}
-                </button>
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-amber-600"></div>
-                  <span className="font-medium">{user.name}</span>
-                  <span className="text-gray-500">|</span>
-                  <span>
-                    {user.carrier} | {user.data} | {user.price}
-                  </span>
-                </div>
-              </div>
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
-          ))}
-
-          {/* 로딩 스피너 */}
-          {isLoading && (
-            <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-            </div>
-          )}
-        </div>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <UserList users={filteredUsers} onUserClick={onUserClick} />
+        )}
       </div>
     </section>
   );
