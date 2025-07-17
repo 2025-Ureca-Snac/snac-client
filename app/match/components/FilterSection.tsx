@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import FilterGroup from './FilterGroup';
+import FilterButtons from './FilterButtons';
 
 interface Filters {
   transactionType: string[];
@@ -11,9 +13,13 @@ interface Filters {
 
 interface FilterSectionProps {
   onFilterChange?: (filters: Filters) => void;
+  title?: string;
 }
 
-export default function FilterSection({ onFilterChange }: FilterSectionProps) {
+export default function FilterSection({
+  onFilterChange,
+  title = '실시간 매칭 조건을 선택해주세요',
+}: FilterSectionProps) {
   const [selectedFilters, setSelectedFilters] = useState<Filters>({
     transactionType: [],
     carrier: [],
@@ -21,16 +27,30 @@ export default function FilterSection({ onFilterChange }: FilterSectionProps) {
     price: [],
   });
 
-  const handleFilterChange = (category: string, value: string) => {
-    const newFilters = {
-      ...selectedFilters,
-      [category]: selectedFilters[
+  const handleFilterChange = (
+    category: string,
+    value: string,
+    multiSelect: boolean = true
+  ) => {
+    let newValues: string[];
+
+    if (multiSelect) {
+      // 다중선택: 기존 로직
+      newValues = selectedFilters[
         category as keyof typeof selectedFilters
       ].includes(value)
         ? selectedFilters[category as keyof typeof selectedFilters].filter(
             (item) => item !== value
           )
-        : [...selectedFilters[category as keyof typeof selectedFilters], value],
+        : [...selectedFilters[category as keyof typeof selectedFilters], value];
+    } else {
+      // 단일선택: 새로운 값으로 교체
+      newValues = [value];
+    }
+
+    const newFilters = {
+      ...selectedFilters,
+      [category]: newValues,
     };
 
     setSelectedFilters(newFilters);
@@ -48,117 +68,82 @@ export default function FilterSection({ onFilterChange }: FilterSectionProps) {
     onFilterChange?.(emptyFilters);
   };
 
+  const applyFilters = () => {
+    // 여기서 실제 필터 적용 로직을 구현할 수 있습니다
+    console.log('Applying filters:', selectedFilters);
+  };
+
+  // 필터 옵션 데이터
+  const filterOptions = {
+    transactionType: [
+      { value: '판매자', label: '판매자' },
+      { value: '구매자', label: '구매자' },
+    ],
+    carrier: [
+      { value: 'SKT', label: 'SKT' },
+      { value: 'KT', label: 'KT' },
+      { value: 'LG U+', label: 'LG U+' },
+    ],
+    dataAmount: [
+      { value: '1GB 미만', label: '1GB 미만' },
+      { value: '1GB 이상', label: '1GB 이상' },
+      { value: '2GB 이상', label: '2GB 이상' },
+    ],
+    price: [
+      { value: '0 - 999', label: '0 - 999' },
+      { value: '1,000 - 1,499', label: '1,000 - 1,499' },
+      { value: '1,500 - 1,999', label: '1,500 - 1,999' },
+      { value: '2,000 - 2,499', label: '2,000 - 2,499' },
+      { value: '2,500 이상', label: '2,500 이상' },
+    ],
+  };
+
   return (
     <section className="bg-gradient-to-b from-green-900 to-black text-white py-12 px-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-8">
-          실시간 매칭 조건을 선택해주세요
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-8">{title}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* 거래 방식 */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">거래 방식</h3>
-            <div className="space-y-2">
-              {['판매자', '구매자'].map((type) => (
-                <label
-                  key={type}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.transactionType.includes(type)}
-                    onChange={() => handleFilterChange('transactionType', type)}
-                    className="w-4 h-4 text-green-600 bg-gray-700 rounded focus:ring-green-500"
-                  />
-                  <span className="text-sm">{type}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <FilterGroup
+            title="거래 방식"
+            options={filterOptions.transactionType}
+            selectedValues={selectedFilters.transactionType}
+            onValueChange={(value) =>
+              handleFilterChange('transactionType', value, false)
+            }
+            multiSelect={false}
+          />
 
-          {/* 통신사 */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">통신사</h3>
-            <div className="space-y-2">
-              {['SKT', 'KT', 'LG U+'].map((carrier) => (
-                <label
-                  key={carrier}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.carrier.includes(carrier)}
-                    onChange={() => handleFilterChange('carrier', carrier)}
-                    className="w-4 h-4 text-green-600 bg-gray-700 rounded focus:ring-green-500"
-                  />
-                  <span className="text-sm">{carrier}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <FilterGroup
+            title="통신사"
+            options={filterOptions.carrier}
+            selectedValues={selectedFilters.carrier}
+            onValueChange={(value) =>
+              handleFilterChange('carrier', value, false)
+            }
+            multiSelect={false}
+          />
 
-          {/* 데이터량 */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">데이터량</h3>
-            <div className="space-y-2">
-              {['1GB 미만', '1GB 이상', '2GB 이상'].map((amount) => (
-                <label
-                  key={amount}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.dataAmount.includes(amount)}
-                    onChange={() => handleFilterChange('dataAmount', amount)}
-                    className="w-4 h-4 text-green-600 bg-gray-700 rounded focus:ring-green-500"
-                  />
-                  <span className="text-sm">{amount}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <FilterGroup
+            title="데이터량"
+            options={filterOptions.dataAmount}
+            selectedValues={selectedFilters.dataAmount}
+            onValueChange={(value) =>
+              handleFilterChange('dataAmount', value, true)
+            }
+            multiSelect={true}
+          />
 
-          {/* 가격 */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">가격</h3>
-            <div className="space-y-2">
-              {[
-                '0 - 999',
-                '1,000 - 1,499',
-                '1,500 - 1,999',
-                '2,000 - 2,499',
-                '2,500 이상',
-              ].map((price) => (
-                <label
-                  key={price}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.price.includes(price)}
-                    onChange={() => handleFilterChange('price', price)}
-                    className="w-4 h-4 text-green-600 bg-gray-700 rounded focus:ring-green-500"
-                  />
-                  <span className="text-sm">{price}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <FilterGroup
+            title="가격"
+            options={filterOptions.price}
+            selectedValues={selectedFilters.price}
+            onValueChange={(value) => handleFilterChange('price', value, true)}
+            multiSelect={true}
+          />
         </div>
 
-        {/* 버튼들 */}
-        <div className="flex justify-center gap-4 mt-8">
-          <button
-            onClick={resetFilters}
-            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            초기화
-          </button>
-          <button className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-            검색/적용
-          </button>
-        </div>
+        <FilterButtons onReset={resetFilters} onApply={applyFilters} />
       </div>
     </section>
   );
