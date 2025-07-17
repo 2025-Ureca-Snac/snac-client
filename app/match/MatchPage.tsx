@@ -5,22 +5,7 @@ import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
 import FilterSection from './components/FilterSection';
 import ResultSection from './components/ResultSection';
-
-interface Filters {
-  transactionType: string[];
-  carrier: string[];
-  dataAmount: string[];
-  price: string[];
-}
-
-interface User {
-  id: number;
-  type: 'buyer' | 'seller';
-  name: string;
-  carrier: string;
-  data: number; // GB 단위 (1 = 1GB, 0.5 = 500MB)
-  price: number; // 원 단위
-}
+import { User, Filters } from './types';
 
 // 샘플 유저 데이터
 const allUsers: User[] = [

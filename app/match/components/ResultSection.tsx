@@ -4,15 +4,7 @@ import React, { useState } from 'react';
 import CategoryFilter from './CategoryFilter';
 import UserList from './UserList';
 import LoadingSpinner from '@/app/(shared)/components/LoadingSpinner';
-
-interface User {
-  id: number;
-  type: 'buyer' | 'seller';
-  name: string;
-  carrier: string;
-  data: number; // GB 단위 (1 = 1GB, 0.5 = 500MB)
-  price: number; // 원 단위
-}
+import { User, CategoryOption } from '../types';
 
 interface ResultSectionProps {
   users: User[];
@@ -20,7 +12,7 @@ interface ResultSectionProps {
   onUserClick?: (user: User) => void;
 }
 
-const categories = [
+const categories: CategoryOption[] = [
   { id: 'all', label: '모두 보기' },
   { id: 'seller', label: '판매자' },
   { id: 'buyer', label: '구매자' },

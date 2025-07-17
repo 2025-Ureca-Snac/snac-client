@@ -1,14 +1,10 @@
 'use client';
 
 import React from 'react';
-
-interface Category {
-  id: string;
-  label: string;
-}
+import { CategoryOption } from '../types';
 
 interface CategoryFilterProps {
-  categories: Category[];
+  categories: CategoryOption[];
   activeCategory: string;
   onCategoryChange: (categoryId: string) => void;
 }

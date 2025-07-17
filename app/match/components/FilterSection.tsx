@@ -3,13 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import FilterGroup from './FilterGroup';
 import FilterButtons from './FilterButtons';
-
-interface Filters {
-  transactionType: string[];
-  carrier: string[];
-  dataAmount: string[];
-  price: string[];
-}
+import { Filters } from '../types';
 
 interface FilterSectionProps {
   onFilterChange?: (filters: Filters) => void;

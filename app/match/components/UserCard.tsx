@@ -1,15 +1,7 @@
 'use client';
 
 import React from 'react';
-
-interface User {
-  id: number;
-  type: 'buyer' | 'seller';
-  name: string;
-  carrier: string;
-  data: number; // GB 단위 (1 = 1GB, 0.5 = 500MB)
-  price: number; // 원 단위
-}
+import { User } from '../types';
 
 interface UserCardProps {
   user: User;
