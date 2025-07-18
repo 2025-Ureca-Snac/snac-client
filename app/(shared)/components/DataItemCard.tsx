@@ -4,10 +4,13 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 
+// email과 createdAt은 props로 받지만, 화면에는 표시하지 않습니다.
 interface DataItemCardProps {
   imageUrl: string;
   title: string;
   price: number;
+  email: string;
+  createdAt: string;
   onClickBuy: () => void;
   isNew?: boolean;
   newBadgeText?: string;
@@ -18,6 +21,8 @@ export const DataItemCard = ({
   imageUrl,
   title,
   price,
+  email, // 데이터는 받지만 사용하지 않음
+  createdAt, // 데이터는 받지만 사용하지 않음
   isNew,
   newBadgeText = 'NEW',
   buyButtonText = '구매하기',
