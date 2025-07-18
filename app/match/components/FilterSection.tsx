@@ -109,11 +109,13 @@ export default function FilterSection({
   };
 
   return (
-    <section className="bg-gradient-to-b from-green-900 to-black text-white py-12 px-6">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-8">{title}</h1>
+    <section className="bg-gradient-to-b from-green-900 to-black text-white py-16 px-6">
+      <div className="max-w-[524px] mx-auto">
+        <h1 className="text-2xl md:text-3xl font-semibold text-center mb-3 text-white">
+          {title}
+        </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+        <div className="space-y-2">
           <FilterGroup
             title="거래 방식"
             options={filterOptions.transactionType}
