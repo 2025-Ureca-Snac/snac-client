@@ -266,7 +266,7 @@ export default function BankManagement({ loading, setResponse }: CommonProps) {
           <button
             onClick={deleteBank}
             disabled={loading || !bankDeleteId}
-            className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full bg-red text-white py-2 px-4 rounded-md hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {loading ? '삭제 중...' : '은행 삭제'}
           </button>

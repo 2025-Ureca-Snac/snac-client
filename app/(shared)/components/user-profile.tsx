@@ -116,7 +116,7 @@ export default function UserProfile() {
 
         <button
           onClick={logout}
-          className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+          className="w-full bg-red text-white py-2 px-4 rounded-md hover:bg-red-600"
         >
           로그아웃
         </button>

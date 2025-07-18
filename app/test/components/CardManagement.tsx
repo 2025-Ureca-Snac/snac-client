@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { api, handleApiError, ApiResponse } from '../../(shared)/utils/api';
+import { testTokenManager } from '../utils/tokenManager';
 import {
   CardData,
   ScrollParams,
@@ -21,12 +22,12 @@ export default function CardManagement({
   loading,
   setResponse,
 }: CardManagementProps) {
-  // 카드 등록 데이터
+  // 카드 등록 데이터 (추가 필드 포함)
   const [createData, setCreateData] = useState<CardData>({
     cardCategory: 'SELL',
     carrier: 'SKT',
-    dataAmount: 0,
-    price: 0,
+    dataAmount: 1,
+    price: 1000,
   });
 
   // 카드 조회 파라미터
@@ -53,17 +54,37 @@ export default function CardManagement({
 
   // 카드 등록 API 호출
   const createCard = async () => {
+    // 토큰 확인
+    const token = testTokenManager.getToken();
+    if (!token) {
+      setResponse('❌ 로그인이 필요합니다. 먼저 로그인해 주세요.');
+      return;
+    }
+
     try {
+      // 요청 전에 데이터 확인
+      console.log('전송할 데이터:', createData);
+      console.log('API URL:', api.defaults.baseURL);
+      console.log('토큰:', token?.slice(0, 20) + '...');
+
       const result = await api.post<ApiResponse>('/cards', createData);
-      console.log(result);
+      console.log('응답 결과:', result);
       setResponse(JSON.stringify(result.data, null, 2));
     } catch (error) {
+      console.error('에러 상세:', error);
       setResponse(`Error: ${handleApiError(error)}`);
     }
   };
 
   // 카드 목록 조회 API 호출
   const getCardList = async () => {
+    // 토큰 확인
+    const token = testTokenManager.getToken();
+    if (!token) {
+      setResponse('❌ 로그인이 필요합니다. 먼저 로그인해 주세요.');
+      return;
+    }
+
     try {
       const params = new URLSearchParams();
       params.append('cardCategory', listParams.cardCategory);
@@ -101,6 +122,13 @@ export default function CardManagement({
 
   // 카드 수정 API 호출
   const updateCard = async () => {
+    // 토큰 확인
+    const token = testTokenManager.getToken();
+    if (!token) {
+      setResponse('❌ 로그인이 필요합니다. 먼저 로그인해 주세요.');
+      return;
+    }
+
     try {
       const { cardId, ...updatePayload } = updateData;
       const result = await api.put<ApiResponse>(
@@ -115,6 +143,13 @@ export default function CardManagement({
 
   // 카드 삭제 API 호출
   const deleteCard = async () => {
+    // 토큰 확인
+    const token = testTokenManager.getToken();
+    if (!token) {
+      setResponse('❌ 로그인이 필요합니다. 먼저 로그인해 주세요.');
+      return;
+    }
+
     try {
       const result = await api.delete<ApiResponse>(`/cards/${deleteId}`);
       setResponse(JSON.stringify(result.data, null, 2));
@@ -526,7 +561,7 @@ export default function CardManagement({
           <button
             onClick={deleteCard}
             disabled={loading || !deleteId}
-            className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full bg-red text-white py-2 px-4 rounded-md hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {loading ? '삭제 중...' : '판매글/구매글 삭제'}
           </button>
