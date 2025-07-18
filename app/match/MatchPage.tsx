@@ -8,7 +8,7 @@ import ResultSection from './components/ResultSection';
 import { User, Filters } from './types';
 
 // 샘플 유저 데이터
-const allUsers: User[] = [
+const ALL_USERS: User[] = [
   {
     id: 1,
     type: 'buyer',
@@ -73,7 +73,7 @@ export default function MatchPage() {
       return [];
     }
 
-    return allUsers.filter((user) => {
+    return ALL_USERS.filter((user) => {
       // 거래 방식 필터
       if (appliedFilters.transactionType.length > 0) {
         const userType = user.type === 'buyer' ? '구매자' : '판매자';

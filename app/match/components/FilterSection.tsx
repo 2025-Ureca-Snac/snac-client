@@ -13,6 +13,31 @@ interface FilterSectionProps {
   title?: string;
 }
 
+// 필터 옵션 데이터
+const FILTER_OPTIONS = {
+  transactionType: [
+    { value: '판매자', label: '판매자' },
+    { value: '구매자', label: '구매자' },
+  ],
+  carrier: [
+    { value: 'SKT', label: 'SKT' },
+    { value: 'KT', label: 'KT' },
+    { value: 'LG U+', label: 'LG U+' },
+  ],
+  dataAmount: [
+    { value: '1GB 미만', label: '1GB 미만' },
+    { value: '1GB 이상', label: '1GB 이상' },
+    { value: '2GB 이상', label: '2GB 이상' },
+  ],
+  price: [
+    { value: '0 - 999', label: '0 - 999' },
+    { value: '1,000 - 1,499', label: '1,000 - 1,499' },
+    { value: '1,500 - 1,999', label: '1,500 - 1,999' },
+    { value: '2,000 - 2,499', label: '2,000 - 2,499' },
+    { value: '2,500 이상', label: '2,500 이상' },
+  ],
+};
+
 export default function FilterSection({
   onFilterChange,
   onApply,
@@ -30,7 +55,7 @@ export default function FilterSection({
   );
 
   const handleFilterChange = (
-    category: string,
+    category: keyof Filters,
     value: string,
     multiSelect: boolean = true
   ) => {
@@ -83,31 +108,6 @@ export default function FilterSection({
     }
   }, [currentFilters]);
 
-  // 필터 옵션 데이터
-  const filterOptions = {
-    transactionType: [
-      { value: '판매자', label: '판매자' },
-      { value: '구매자', label: '구매자' },
-    ],
-    carrier: [
-      { value: 'SKT', label: 'SKT' },
-      { value: 'KT', label: 'KT' },
-      { value: 'LG U+', label: 'LG U+' },
-    ],
-    dataAmount: [
-      { value: '1GB 미만', label: '1GB 미만' },
-      { value: '1GB 이상', label: '1GB 이상' },
-      { value: '2GB 이상', label: '2GB 이상' },
-    ],
-    price: [
-      { value: '0 - 999', label: '0 - 999' },
-      { value: '1,000 - 1,499', label: '1,000 - 1,499' },
-      { value: '1,500 - 1,999', label: '1,500 - 1,999' },
-      { value: '2,000 - 2,499', label: '2,000 - 2,499' },
-      { value: '2,500 이상', label: '2,500 이상' },
-    ],
-  };
-
   return (
     <section className="bg-gradient-to-b from-green-900 to-black text-white py-16 px-6">
       <div className="max-w-[524px] mx-auto">
@@ -118,7 +118,7 @@ export default function FilterSection({
         <div className="space-y-2">
           <FilterGroup
             title="거래 방식"
-            options={filterOptions.transactionType}
+            options={FILTER_OPTIONS.transactionType}
             selectedValues={selectedFilters.transactionType}
             onValueChange={(value) =>
               handleFilterChange('transactionType', value, false)
@@ -128,7 +128,7 @@ export default function FilterSection({
 
           <FilterGroup
             title="통신사"
-            options={filterOptions.carrier}
+            options={FILTER_OPTIONS.carrier}
             selectedValues={selectedFilters.carrier}
             onValueChange={(value) =>
               handleFilterChange('carrier', value, false)
@@ -138,7 +138,7 @@ export default function FilterSection({
 
           <FilterGroup
             title="데이터량"
-            options={filterOptions.dataAmount}
+            options={FILTER_OPTIONS.dataAmount}
             selectedValues={selectedFilters.dataAmount}
             onValueChange={(value) =>
               handleFilterChange('dataAmount', value, true)
@@ -148,7 +148,7 @@ export default function FilterSection({
 
           <FilterGroup
             title="가격"
-            options={filterOptions.price}
+            options={FILTER_OPTIONS.price}
             selectedValues={selectedFilters.price}
             onValueChange={(value) => handleFilterChange('price', value, true)}
             multiSelect={true}

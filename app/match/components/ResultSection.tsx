@@ -12,7 +12,7 @@ interface ResultSectionProps {
   onUserClick?: (user: User) => void;
 }
 
-const categories: CategoryOption[] = [
+const CATEGORIES: CategoryOption[] = [
   { id: 'all', label: '모두 보기' },
   { id: 'seller', label: '판매자' },
   { id: 'buyer', label: '구매자' },
@@ -38,7 +38,7 @@ export default function ResultSection({
     <section className="bg-white py-8 px-6 min-h-[30vh]">
       <div className="max-w-4xl mx-auto">
         <CategoryFilter
-          categories={categories}
+          categories={CATEGORIES}
           activeCategory={activeCategory}
           onCategoryChange={handleCategoryChange}
         />
