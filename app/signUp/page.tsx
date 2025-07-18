@@ -206,7 +206,7 @@ export default function SignUp() {
     } else {
       alert('인증코드가 일치하지 않습니다.');
     }
-  }, [formData.phoneVerificationCode]);
+  }, [formData.phoneVerificationCode, formData.phoneNumber]);
 
   /**
    * @author 이승우
