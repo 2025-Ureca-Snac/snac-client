@@ -20,7 +20,7 @@ export default function CategoryFilter({
         <button
           key={cat.id}
           onClick={() => onCategoryChange(cat.id)}
-          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+          className={`px-6 py-3 text-lg md:text-2xl font-medium border-b-2 transition-colors ${
             activeCategory === cat.id
               ? 'border-green-600 text-black'
               : 'border-transparent text-gray-500 hover:text-gray-700'
