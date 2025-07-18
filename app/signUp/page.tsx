@@ -13,6 +13,7 @@ import type {
 import { useTimer } from '../(shared)/hooks/useTimer';
 import { api } from '../(shared)/utils/api';
 import { useRouter } from 'next/navigation';
+import { formatDateYYYYMMDD } from '../(shared)/utils';
 
 /**
  * @author 이승우
@@ -100,16 +101,26 @@ export default function SignUp() {
    * @description 이메일 인증 요청
    * @return 이메일 인증 요청에 성공 여부 반환(성공, 중복, 실패)
    */
-  const handleEmailVerification = useCallback(() => {
+  const handleEmailVerification = useCallback(async () => {
     if (!formData.email) {
       alert('이메일을 입력해주세요.');
       return;
     }
 
     console.log('이메일 인증 요청', formData.email);
-    setShowEmailVerification(true);
-    setIsEmailSent(true);
-    emailTimer.start(300); // 5분 = 300초
+    try {
+      const response = await api.post('/email/send-verification-code', {
+        email: formData.email,
+      });
+
+      console.log('이메일 인증 요청 응답', response);
+
+      setShowEmailVerification(true);
+      setIsEmailSent(true);
+      emailTimer.start(300); // 5분 = 300초
+    } catch (error) {
+      console.error('이메일 인증 요청 오류', error);
+    }
   }, [formData.email, emailTimer]);
 
   /**
@@ -145,8 +156,29 @@ export default function SignUp() {
    * @description 이메일 인증코드 확인
    * @return 이메일 인증코드 확인에 성공 여부 반환(성공, 실패)
    */
-  const handleEmailVerificationCheck = useCallback(() => {
+  const handleEmailVerificationCheck = useCallback(async () => {
     console.log('이메일 인증코드 확인', formData.emailVerificationCode);
+
+    try {
+      const response = await api.post('/email/verify-code', {
+        email: formData.email,
+        code: formData.emailVerificationCode,
+      });
+
+      if (
+        (response.data as { code?: string })?.code ===
+        'EMAIL_CODE_VERIFICATION_SUCCESS_200'
+      ) {
+        setIsEmailVerified(true);
+        setShowEmailVerification(false);
+      } else {
+        alert('인증코드가 일치하지 않습니다.');
+      }
+
+      console.log('이메일 인증코드 확인 응답', response);
+    } catch (error) {
+      console.error('이메일 인증코드 확인 오류', error);
+    }
 
     setIsEmailVerified(true);
     setShowEmailVerification(false);
@@ -197,7 +229,7 @@ export default function SignUp() {
         password: formData.password,
         name: formData.name,
         phone: formData.phoneNumber,
-        birthDate: formData.birthDate,
+        birthDate: formatDateYYYYMMDD(formData.birthDate),
       };
 
       const response = await api.post('/join', data);

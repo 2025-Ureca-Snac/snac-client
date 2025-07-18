@@ -3,17 +3,29 @@ import { Header } from './(shared)/components/Header';
 import { Footer } from './(shared)/components/Footer';
 import { HomePageClient } from './(shared)/components/HomePageClient';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 async function getCardData() {
-  const res = await fetch(`${API_BASE}/api/cards`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error('Failed to fetch data');
+  try {
+    const res = await fetch(
+      `${API_BASE}/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
+      {
+        cache: 'no-store',
+      }
+    );
+
+    if (!res.ok) {
+      console.error('Failed to fetch data:', res.status, res.statusText);
+      return [];
+    }
+    const response = await res.json();
+    return response.data?.cardResponseList || [];
+  } catch (error) {
+    console.error('Error fetching card data:', error);
+    return [];
   }
-  return res.json();
 }
+export const dynamic = 'force-dynamic'; // <- 추가
 
 export default async function Home() {
   const cards = await getCardData();

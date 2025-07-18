@@ -21,3 +21,29 @@ export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
+
+/**
+ * @author 이승우
+ * @description 날짜를 YYYYMMDD 형식으로 변환
+ * @param date 날짜
+ * @returns YYYYMMDD 형식의 문자열
+ */
+export const formatDateYYYYMMDD = (date: Date) => {
+  return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+};
+
+/**
+ * @description 날짜가 오늘 날짜인지 확인
+ * @param dateString 날짜 문자열
+ * @returns 오늘 날짜이면 true, 아니면 false
+ */
+export const isToday = (dateString: string): boolean => {
+  const today = new Date();
+  const itemDate = new Date(dateString);
+
+  return (
+    today.getFullYear() === itemDate.getFullYear() &&
+    today.getMonth() === itemDate.getMonth() &&
+    today.getDate() === itemDate.getDate()
+  );
+};
