@@ -18,6 +18,8 @@ export interface UserProfile {
   nickname: string;
   phone: string;
   birthDate: Date;
+  points: number;
+  money: number;
   preferences: {
     theme: 'light' | 'dark' | 'auto';
     language: 'ko' | 'en';

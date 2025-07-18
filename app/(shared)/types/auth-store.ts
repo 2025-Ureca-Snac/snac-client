@@ -3,6 +3,7 @@
  * @description 인증 상태
  * @param user 사용자 이름
  * @param role 사용자 역할
+ * @param token 토큰
  * @param isLoading 로딩 상태
  *
  * @param login 로그인 액션( 이메일, 비밀번호 )
@@ -13,6 +14,7 @@ export interface AuthState {
   // 상태
   user: string | null;
   role: string | null;
+  token: string | null;
   isLoading: boolean;
 
   // 액션
