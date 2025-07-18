@@ -7,17 +7,14 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
-// 통신사 옵션 데이터
 const carrierOptions = [
   { name: 'SKT', imageUrl: '/SKT.svg' },
   { name: 'KT', imageUrl: '/KT.svg' },
   { name: 'LGU+', imageUrl: '/LGU+.svg' },
 ];
 
-// 데이터 용량 프리셋
 const dataPresets = ['500MB', '1GB', '2GB'];
 
-// 커스텀 체크박스 아이콘 컴포넌트
 const CheckboxIcon = ({ checked }: { checked: boolean }) => (
   <div
     className={`w-4 h-4 border-2 flex items-center justify-center rounded-sm ${
@@ -42,9 +39,8 @@ export const Modal = () => {
   const { isCreateModalOpen, actions } = useHomeStore();
   const router = useRouter();
 
-  // 폼 상태 관리 (사용자 경험을 위해 기본값을 설정합니다)
-  const [cardCategory, setCardCategory] = useState('SELL');
-  const [carrier, setCarrier] = useState('SKT');
+  const [cardCategory, setCardCategory] = useState('');
+  const [carrier, setCarrier] = useState('');
   const [dataAmount, setDataAmount] = useState('');
   const [dataUnit, setDataUnit] = useState('MB');
   const [price, setPrice] = useState('');
