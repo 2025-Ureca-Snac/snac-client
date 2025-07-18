@@ -1,11 +1,14 @@
+'use client';
+
 import Image from 'next/image';
 import { useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { SearchModalProps } from '../(shared)/types';
 import { useTimer } from '../(shared)/hooks/useTimer';
 import FindEmailSection from '../(shared)/components/find-email-section';
 import FindPasswordSection from '../(shared)/components/find-password-section';
 import ModalPortal from '../(shared)/components/modal-portal';
+import TabNavigation from '../(shared)/components/TabNavigation';
 import { api } from '../(shared)/utils/api';
 
 /**
@@ -44,6 +47,12 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     passwordConfirm: '',
   });
 
+  // 탭 정의
+  const tabs = [
+    { id: 'id', label: '이메일 찾기' },
+    { id: 'password', label: '비밀번호 찾기' },
+  ];
+
   // 탭 전환 시 상태 초기화
   const handleTab = (type: SearchModalProps['isOpen']) => {
     setIsOpen(type);
@@ -65,6 +74,11 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     });
     setFoundEmail(null);
     setFormHeight(null);
+  };
+
+  // 탭 변경 핸들러
+  const handleTabChange = (tabId: string) => {
+    handleTab(tabId as SearchModalProps['isOpen']);
   };
 
   // 아이디 찾기 인증 요청
@@ -158,7 +172,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         alert(`이메일을 찾을 수 없습니다. ${error}`);
       }
     },
-    [isIdVerified, idFormData.phone]
+    [isIdVerified]
   );
 
   // 로그인하러 가기
@@ -180,33 +194,14 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           </button>
 
           {/* 탭 */}
-          <div className="flex border-b mb-6 relative">
-            <button
-              className={`flex-1 py-2 text-center text-base font-semibold relative z-10 ${
-                isOpen === 'id' ? 'text-midnight-black' : 'text-gray-400'
-              }`}
-              onClick={() => handleTab('id')}
-            >
-              이메일 찾기
-            </button>
-            <button
-              className={`flex-1 py-2 text-center text-base font-semibold relative z-10 ${
-                isOpen === 'password' ? 'text-midnight-black' : 'text-gray-400'
-              }`}
-              onClick={() => handleTab('password')}
-            >
-              비밀번호 찾기
-            </button>
-            <motion.div
-              className="absolute bottom-0 h-0.5 bg-midnight-black"
-              initial={false}
-              animate={{
-                left: isOpen === 'id' ? '0%' : '50%',
-                width: '50%',
-              }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-            />
-          </div>
+          <TabNavigation
+            tabs={tabs}
+            activeTab={isOpen || 'id'}
+            onTabChange={handleTabChange}
+            activeTextColor="text-midnight-black"
+            inactiveTextColor="text-gray-500"
+            underlineColor="bg-midnight-black"
+          />
 
           {/* 폼 */}
           <AnimatePresence mode="wait">
