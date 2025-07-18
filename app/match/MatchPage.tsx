@@ -124,7 +124,6 @@ export default function MatchPage() {
 
   const handleFilterChange = (filters: Filters) => {
     setPendingFilters(filters);
-    console.log('Filters changed (pending):', filters);
   };
 
   const handleApplyFilters = () => {
@@ -140,7 +139,6 @@ export default function MatchPage() {
     }
 
     setAppliedFilters(pendingFilters);
-    console.log('Filters applied:', pendingFilters);
   };
 
   const handleResetFilters = () => {
@@ -158,7 +156,6 @@ export default function MatchPage() {
       dataAmount: [],
       price: [],
     });
-    console.log('Filters reset');
   };
 
   return (
