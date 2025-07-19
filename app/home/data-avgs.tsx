@@ -27,18 +27,22 @@ export function DataAvg({ providers, averagePrice }: DataAvgProps) {
             className="object-contain"
           />
         </div>
-        <AnimatePresence mode="popLayout">
-          <motion.span
-            key={index}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ ease: 'easeInOut' }}
-            className="text-teal-green text-regular-xl  md:text-medium-4xl font-bold"
-          >
-            {providers[index % providers.length]}
-          </motion.span>
-        </AnimatePresence>
+
+        <div className="w-[60px] md:w-[105px] ">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={index}
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              transition={{ ease: 'easeInOut' }}
+              className="text-teal-green text-regular-xl md:text-medium-4xl font-bold inline-block"
+            >
+              {providers[index % providers.length]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
         <span className="text-regular-xl md:text-medium-4xl font-bold">
           데이터를 찾고 계신가요?
         </span>
@@ -53,3 +57,5 @@ export function DataAvg({ providers, averagePrice }: DataAvgProps) {
     </div>
   );
 }
+
+export default DataAvg;
