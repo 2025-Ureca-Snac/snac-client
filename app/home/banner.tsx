@@ -71,7 +71,7 @@ export default function Banner({
           </div>
 
           <div className="pt-6 flex justify-center">
-            <Button className="w-full  h-[38px] md:h-[44px] bg-burst-lime text-midnight-black ">
+            <Button className="w-full  h-[38px] md:h-[44px] bg-burst-lime !text-midnight-black   hover:bg-teal-green active:bg-teal-green ">
               지금 거래하러 가기
             </Button>
           </div>
