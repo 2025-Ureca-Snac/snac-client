@@ -48,7 +48,7 @@ export function DataAvg({ providers, averagePrice }: DataAvgProps) {
         </span>
       </h2>
       <p className="text-regular-lg md:text-medium-3xl font-bold pt-[28px]">
-        평균
+        평균{' '}
         <span className="text-teal-green ">
           {averagePrice.toLocaleString()}
         </span>
