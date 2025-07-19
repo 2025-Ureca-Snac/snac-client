@@ -79,7 +79,7 @@ export const Pagination = ({
 
   return (
     <nav aria-label="Page navigation">
-      <ul className="flex items-center justify-center space-x-1 sm:space-x-2 my-8 px-2">
+      <ul className="flex items-center justify-center space-x-1 sm:space-x-2 px-2">
         <li>
           <button
             onClick={() => onPageChange(currentPage - 1)}
