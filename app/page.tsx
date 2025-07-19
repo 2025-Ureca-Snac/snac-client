@@ -77,11 +77,14 @@ export default function Home() {
       <Banner />
       <DataAvg providers={['SKT', 'KT', 'LG U+']} averagePrice={1754} />
 
-      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
+      <div className="flex items-center justify-center">
         {loading ? <p>로딩 중…</p> : <HomeLayout initialCards={cards} />}
       </div>
 
-      <ArticleSection />
+      <div className="w-full">
+        <ArticleSection />
+      </div>
+
       <Footer />
     </>
   );
