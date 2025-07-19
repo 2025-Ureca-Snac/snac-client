@@ -17,6 +17,7 @@ interface HomeState {
   sortBy: SortBy;
   transactionStatus: TransactionStatus;
   priceRanges: PriceRange[];
+  showRegularsOnly: boolean;
   actions: {
     toggleFilter: () => void;
     toggleCreateModal: () => void;
@@ -24,6 +25,7 @@ interface HomeState {
     setSortBy: (sortBy: SortBy) => void;
     setTransactionStatus: (status: TransactionStatus) => void;
     togglePriceRange: (price: PriceRange) => void;
+    toggleShowRegularsOnly: () => void;
     resetFilters: () => void;
   };
 }
@@ -35,6 +37,7 @@ export const homeInitialState = {
   sortBy: '최신순' as SortBy,
   transactionStatus: 'All' as TransactionStatus,
   priceRanges: [],
+  showRegularsOnly: false,
 };
 
 export const useHomeStore = create<HomeState>((set) => ({
@@ -52,11 +55,15 @@ export const useHomeStore = create<HomeState>((set) => ({
           ? state.priceRanges.filter((r) => r !== price)
           : [...state.priceRanges, price],
       })),
+
+    toggleShowRegularsOnly: () =>
+      set((state) => ({ showRegularsOnly: !state.showRegularsOnly })),
     resetFilters: () =>
       set((state) => ({
         category: null,
         transactionStatus: null,
         priceRanges: [],
+        showRegularsOnly: false,
         sortBy: state.sortBy,
         isFilterOpen: state.isFilterOpen,
       })),
