@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
   const params = url.searchParams;
   const cardCategory = params.get('cardCategory');
   const sellStatusFilter = params.get('sellStatusFilter');
+  // TODO: priceRanges 파라미터를 기반으로 가격 필터링 기능 구현 예정
   const priceRange = params.get('priceRanges');
   const highRatingFirst = params.get('highRatingFirst') === 'true';
   const size = parseInt(params.get('size') ?? '10', 10);
