@@ -7,15 +7,58 @@
 ![vc12](https://github.com/user-attachments/assets/4523d261-9049-4efc-ab5d-ecc28d3e8fd3)
 
 
-[🔗팀노션]()
-[🎨피그마]()
-[🌐배포사이트]()
+[🔗팀노션](https://www.notion.so/Snac-2224a475c7f780d5a9dbd467cf15fe0b?source=copy_link)
+[🎨피그마](https://www.figma.com/design/eO8GHGStmnF8NgLo4BKyaK/%EC%A0%9C%EB%AA%A9-%EC%97%86%EC%9D%8C?node-id=0-1&t=lW8NdrlOaJu4ytEB-1)
+[🌐배포사이트](https://www.snac-app.com/)
 [👨‍🏫시연영상]()
+
+# 🚄 주요 기능
+## 로그인/회원가입
+### 로그인
+<img width="2141" height="1333" alt="image" src="https://github.com/user-attachments/assets/c987871c-1b0b-4b2b-91d5-f9769db04988" />
+
+### 회원가입
+<img width="2860" height="1908" alt="image" src="https://github.com/user-attachments/assets/252185a5-e475-4a3f-818a-1796ce3dae10" />
+
+## 구매글/판매글 조회
+<img width="1444" height="830" alt="image" src="https://github.com/user-attachments/assets/0e682c04-c04b-42d8-8067-3c9bf0558bde" />
+
+## 구매글/판매글 등록
+- [구현중]
+## 마이페이지
+- [구현중]
+## 실시간 매칭
+- [구현중]
+## 블로그글 조회
+
+
+https://github.com/user-attachments/assets/739eab49-7e3c-41da-b47d-4478b88183d6
+
 
 
 # 🗂️ 디렉토리 구조
 
 ```
+app/  # Next.js 15의 App Router 폴더
+│   ├── (shared)/ # 전역 공용 컴포넌트/유틸/상수
+│   │     ├── components/
+│   │     ├── constants/
+│   │     │     └── index.ts
+│   │     ├── hooks/
+│   │     ├── stores/
+│   │     ├── types/
+│   │     └── utils/
+│   ├── blog/ # 블로그 도메인 관련 폴더
+│   │     ├── admin/ 
+│   │     ├── components/
+│   │     ├── data/
+│   │     ├── utils/
+│   │     ├── layout.tsx
+│   │     └── page.tsx
+│   ├── login/ # 로그인 페이지
+│   ├── match/ # 실시간 매칭 페이지
+│   ├── payment/ # 결제 관련 페이지
+│   ├── signUp/ # 회원가입 페이지
 
 ```
 
@@ -35,19 +78,16 @@ npm run dev
 
 **FE 환경변수**
 ```env
-
+NEXT_PUBLIC_API_URL={백엔드 서버 URL}
 ```
 
+개발 서버를 실행할 때, 환경변수를 설정해주세요! (.env파일로 생성)
 
 ## 📚 Tech Stack
 
 ### 💻 FE Development
 
-[![My Skills](https://skillicons.dev/icons?i=ts,html,css,react,tailwind,vite)](https://skillicons.dev)
-
-### 💻 BE Development
-
-[![My Skills](https://skillicons.dev/icons?i=nodejs,express,mongodb&theme=dark)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=nextjs,ts,tailwind,react)](https://skillicons.dev)
 
 ### ⌛ Developed Period
 

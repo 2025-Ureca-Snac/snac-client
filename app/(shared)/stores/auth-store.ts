@@ -9,6 +9,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       // 초기 상태
       user: null,
+      token: null,
       role: null,
       isLoading: false,
 
@@ -21,13 +22,15 @@ export const useAuthStore = create<AuthState>()(
             password,
           });
 
+          console.log(response);
+
           const token = response.headers.get('Authorization')?.split(' ')[1];
           if (token) {
             const decoded: JwtPayload = jwtDecode(token);
-            set({ user: decoded?.username, role: decoded?.role });
+            set({ user: decoded?.username, role: decoded?.role, token: token });
           }
         } catch (error) {
-          set({ user: null, role: null });
+          set({ user: null, role: null, token: null });
           console.log(handleApiError(error));
         } finally {
           set({ isLoading: false });
@@ -40,7 +43,7 @@ export const useAuthStore = create<AuthState>()(
 
         console.log(response);
 
-        set({ user: null, role: null });
+        set({ user: null, role: null, token: null });
       },
 
       // 로딩 상태 설정
@@ -53,6 +56,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
         role: state.role,
       }),
     }

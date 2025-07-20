@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ModalPortalProps } from '../types/modal-portal';
 
@@ -15,11 +15,7 @@ export default function ModalPortal({
   onClose,
   className = '',
 }: ModalPortalProps) {
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
-
     // 모달이 열렸을 때 body 스크롤 방지
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -49,7 +45,7 @@ export default function ModalPortal({
     };
   }, [isOpen, onClose]);
 
-  if (!mounted) return null;
+  if (!isOpen) return null;
 
   return createPortal(
     <div className={`fixed inset-0 z-50 ${className}`}>{children}</div>,
