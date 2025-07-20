@@ -46,20 +46,14 @@ const ArticleCard = ({ title, link, imageUrl }: ArticleCardProps) => (
         </h3>
         <div className="flex items-center mt-2 text-medium-md md:text-regular-sm opacity-80 group-hover:opacity-100 transition-opacity underline">
           <span>더 보기</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 ml-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 8l4 4m0 0l-4 4m4-4H3"
-            />
-          </svg>
+
+          <Image
+            src="/arrow-right.svg"
+            alt="화살표 아이콘"
+            width={24}
+            height={24}
+            priority
+          />
         </div>
       </div>
     </div>
@@ -67,7 +61,7 @@ const ArticleCard = ({ title, link, imageUrl }: ArticleCardProps) => (
 );
 
 export const ArticleSection = () => (
-  <section className="w-full mx-auto py-12 px-4">
+  <section className="w-full mx-auto pt-0 md:pt-12 pb-12 px-4">
     <h2 className="text-heading-2xl font-bold text-center mb-8">읽을거리</h2>
 
     <div
