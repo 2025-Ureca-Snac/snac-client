@@ -4,7 +4,6 @@ import {
   useHomeStore,
   homeInitialState,
 } from '@/app/(shared)/stores/home-store';
-import { Sort } from '@/app/(shared)/components/SortDropdown';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
@@ -99,16 +98,16 @@ export const Filter = () => {
               const isAll = item === '모든 거래';
 
               const isSelected = isAll
-                ? transactionStatus === 'All '
+                ? transactionStatus === 'All'
                 : transactionStatus === item;
 
               return (
                 <button
                   key={item}
                   onClick={() =>
-                    actions.setTransactionStatus(isAll ? 'All ' : item)
+                    actions.setTransactionStatus(isAll ? 'All' : item)
                   }
-                  className={`px-2 py-2 text-sm w-[95px] h-[40px] rounded-lg border transition-colors md:w-auto md:h-auto md:p-0 md:border-none md:bg-transparent md:rounded-none ${
+                  className={`px-2 py-2 text-regular-sm w-[95px] h-[40px] rounded-lg border transition-colors md:w-auto md:h-auto md:p-0 md:border-none md:bg-transparent md:rounded-none ${
                     isSelected
                       ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent md:text-midnight-black md:font-bold md:underline'
                       : 'bg-white text-gray-700 hover:bg-gray-50 md:text-gray-500 md:hover:bg-transparent'
