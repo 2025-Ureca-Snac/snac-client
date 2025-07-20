@@ -1,41 +1,88 @@
-// import { Button } from './(shared)/components/Button';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Header } from './(shared)/components/Header';
+import Banner from './home/banner';
+import { DataAvg } from './home/data-avgs';
+import HomeLayout from './home/home-layout';
+import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
-import { HomePageClient } from './(shared)/components/HomePageClient';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-
-async function getCardData() {
-  try {
-    const res = await fetch(
-      `${API_BASE}/cards/scroll?cardCategory=BUY&priceRanges=ALL&size=54`,
-      {
-        cache: 'no-store',
-      }
-    );
-
-    if (!res.ok) {
-      console.error('Failed to fetch data:', res.status, res.statusText);
-      return [];
-    }
-    const response = await res.json();
-    return response.data?.cardResponseList || [];
-  } catch (error) {
-    console.error('Error fetching card data:', error);
-    return [];
-  }
+interface Card {
+  id: number;
+  cardCategory: 'BUY' | 'SELL';
+  carrier: 'SKT' | 'KT' | 'LGU+';
+  dataAmount: number;
+  price: number;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  name: string;
+  sellStatus: string;
 }
-export const dynamic = 'force-dynamic'; // <- 추가
 
-export default async function Home() {
-  const cards = await getCardData();
+interface CardApiResponse {
+  data: {
+    cardResponseList: Card[];
+    hasNext: boolean;
+  };
+}
+
+export default function Home() {
+  const [cards, setCards] = useState<Card[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { category, transactionStatus, priceRanges, sortBy } = useHomeStore();
+
+  useEffect(() => {
+    async function fetchScrollCards() {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+
+        if (category) params.append('cardCategory', category);
+        priceRanges.forEach((r) => params.append('priceRanges', r));
+        if (transactionStatus) {
+          params.append('sellStatusFilter', transactionStatus);
+        }
+        params.append('sortBy', sortBy);
+        params.append('size', '54');
+
+        const res = await fetch(`/api/cards/scroll?${params.toString()}`, {
+          cache: 'no-store',
+        });
+
+        if (!res.ok) {
+          throw new Error(`데이터를 가져오는데 실패했습니다: ${res.status}`);
+        }
+
+        const json: CardApiResponse = await res.json();
+
+        setCards(json.data.cardResponseList);
+      } catch (err) {
+        console.error('카드 스크롤 조회 실패:', err);
+        setCards([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchScrollCards();
+  }, [category, transactionStatus, JSON.stringify(priceRanges), sortBy]);
+
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        {/* 홈화면 레이아웃 기초
-        <Button>테스트</Button> */}
-        <HomePageClient cards={cards} />
+      <Banner />
+      <DataAvg providers={['SKT', 'KT', 'LG U+']} averagePrice={1754} />
+
+      <div className="flex items-center justify-center">
+        {loading ? <p>로딩 중…</p> : <HomeLayout initialCards={cards} />}
+      </div>
+
+      <div className="w-full">
+        <ArticleSection />
       </div>
 
       <Footer />
