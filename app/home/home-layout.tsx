@@ -10,7 +10,20 @@ import Image from 'next/image';
 import { Toaster } from 'sonner';
 import { Pagination } from '../(shared)/components/Pagination';
 
-export default function HomeLayout({ initialCards }) {
+interface Card {
+  id: number;
+  name: string;
+  createdAt: string;
+  email: string;
+  sellStatus: string;
+  cardCategory: string;
+  carrier: string;
+  dataAmount: number;
+  price: number;
+  updatedAt: string;
+}
+
+export default function HomeLayout({ initialCards }: { initialCards: Card[] }) {
   const [cards, setCards] = useState(initialCards);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -60,7 +73,7 @@ export default function HomeLayout({ initialCards }) {
         <div>
           {/* 모바일 */}
           <div className="mb-4 md:hidden">
-            <div className="border-b border-gray-200 pb-3 mb-3">
+            <div className="border-b border-t border-gray-200 py-3 mb-3">
               <button
                 onClick={actions.toggleFilter}
                 className="flex items-center gap-2"
