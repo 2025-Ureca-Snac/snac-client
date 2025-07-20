@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | null;
-type SortBy =
+export type SortBy =
   | '최신순'
   | '인기순'
   | '오래된순'
   | '가격 높은 순'
   | '가격 낮은 순';
-type TransactionStatus = 'All ' | '거래 전' | '거래 완료' | null;
+type TransactionStatus = 'All' | '거래 전' | '거래 완료' | null;
 type PriceRange = string;
 
 interface HomeState {
