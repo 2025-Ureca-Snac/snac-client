@@ -24,6 +24,8 @@ interface Card {
 }
 
 export default function HomeLayout({ initialCards }: { initialCards: Card[] }) {
+  // TODO: API 호출 후 setCards와 setTotalPages 사용할 예정
+
   const [cards, setCards] = useState(initialCards);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
