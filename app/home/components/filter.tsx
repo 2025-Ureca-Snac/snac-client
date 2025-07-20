@@ -9,7 +9,12 @@ import { Fragment } from 'react';
 import Image from 'next/image';
 
 const displayCategories = ['SKT', 'KT', 'LGU+'] as const;
-const transaction_status = ['모든 거래', '거래 전', '거래 완료'] as const;
+const transactionOptions = [
+  { label: '모든 거래', value: 'All' },
+  { label: '거래 전', value: '거래 전' },
+  { label: '거래 완료', value: '거래 완료' },
+] as const;
+
 const price_ranges = [
   '모든 가격',
   '₩ 0 - 999',
@@ -94,26 +99,20 @@ export const Filter = () => {
             거래 상태
           </h3>
           <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
-            {transaction_status.map((item) => {
-              const isAll = item === '모든 거래';
-
-              const isSelected = isAll
-                ? transactionStatus === 'All'
-                : transactionStatus === item;
+            {transactionOptions.map((option) => {
+              const isSelected = transactionStatus === option.value;
 
               return (
                 <button
-                  key={item}
-                  onClick={() =>
-                    actions.setTransactionStatus(isAll ? 'All' : item)
-                  }
+                  key={option.value}
+                  onClick={() => actions.setTransactionStatus(option.value)}
                   className={`px-2 py-2 text-regular-sm w-[95px] h-[40px] rounded-lg border transition-colors md:w-auto md:h-auto md:p-0 md:border-none md:bg-transparent md:rounded-none ${
                     isSelected
                       ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent md:text-midnight-black md:font-bold md:underline'
                       : 'bg-white text-gray-700 hover:bg-gray-50 md:text-gray-500 md:hover:bg-transparent'
                   }`}
                 >
-                  {item}
+                  {option.label}
                 </button>
               );
             })}
