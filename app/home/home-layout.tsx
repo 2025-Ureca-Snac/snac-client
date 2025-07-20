@@ -67,6 +67,18 @@ export default function HomeLayout({
             <div className="flex justify-between items-center">
               <Sort />
               <button
+                onClick={() => window.location.reload()}
+                aria-label="새로고침"
+              >
+                <Image
+                  src="/refresh.svg"
+                  alt="새로고침"
+                  width={18}
+                  height={18}
+                  className="cursor-pointer"
+                />
+              </button>
+              <button
                 onClick={actions.toggleCreateModal}
                 className="px-4 py-2 w-[100px] border rounded-lg text-medium-sm font-semibold hover:bg-gray-50 bg-white shadow-sm"
               >
@@ -78,6 +90,18 @@ export default function HomeLayout({
           <div className="hidden md:flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
               <Sort />
+              <button
+                onClick={() => window.location.reload()}
+                aria-label="새로고침"
+              >
+                <Image
+                  src="/refresh.svg"
+                  alt="새로고침"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer"
+                />
+              </button>
             </div>
             <button
               onClick={actions.toggleCreateModal}
