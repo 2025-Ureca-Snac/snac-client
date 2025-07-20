@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Filter } from './components/filter';
 import { Sort } from './components/sort';
 import { Modal } from './components/modal';
@@ -8,7 +7,7 @@ import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import HomeSection from './home-section';
 import Image from 'next/image';
 import { Toaster } from 'sonner';
-import { Pagination } from '../(shared)/components/Pagination';
+import { Pagination } from '@/app/(shared)/components/Pagination';
 
 interface Card {
   id: number;
@@ -23,47 +22,22 @@ interface Card {
   updatedAt: string;
 }
 
-export default function HomeLayout({ initialCards }: { initialCards: Card[] }) {
-  // TODO: API 호출 후 setCards와 setTotalPages 사용할 예정
+interface HomeLayoutProps {
+  cards: Card[];
+  isLoading: boolean;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
 
-  const [cards, setCards] = useState(initialCards);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { actions, category, sortBy, transactionStatus, priceRanges } =
-    useHomeStore();
-
-  useEffect(() => {
-    const fetchFilteredData = async () => {
-      setIsLoading(true);
-      console.log('필터 또는 페이지 변경! 새 데이터 요청:', {
-        page: currentPage,
-        category,
-        sortBy,
-        transactionStatus,
-        priceRanges,
-      });
-
-      try {
-        // TODO: 백엔드 API가 페이지 번호를 받도록 수정
-      } catch (error) {
-        console.error('데이터를 불러오는 데 실패했습니다:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (currentPage > 1) {
-      fetchFilteredData();
-    }
-  }, [currentPage, category, sortBy, transactionStatus, priceRanges]);
-
-  const handlePageChange = (page: number) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+export default function HomeLayout({
+  cards,
+  isLoading,
+  currentPage,
+  totalPages,
+  onPageChange,
+}: HomeLayoutProps) {
+  const { actions } = useHomeStore();
 
   return (
     <div className="flex w-full flex-col md:flex-row">
@@ -126,7 +100,7 @@ export default function HomeLayout({ initialCards }: { initialCards: Card[] }) {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={onPageChange}
           />
         </div>
       </main>

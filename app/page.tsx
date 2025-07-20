@@ -32,6 +32,8 @@ interface CardApiResponse {
 export default function Home() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { category, transactionStatus, priceRanges, sortBy } = useHomeStore();
 
@@ -48,6 +50,7 @@ export default function Home() {
         }
         params.append('sortBy', sortBy);
         params.append('size', '54');
+        params.append('page', currentPage.toString());
 
         const res = await fetch(`/api/cards/scroll?${params.toString()}`, {
           cache: 'no-store',
@@ -60,6 +63,7 @@ export default function Home() {
         const json: CardApiResponse = await res.json();
 
         setCards(json.data.cardResponseList);
+        setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {
         console.error('카드 스크롤 조회 실패:', err);
         setCards([]);
@@ -69,7 +73,19 @@ export default function Home() {
     }
 
     fetchScrollCards();
-  }, [category, transactionStatus, JSON.stringify(priceRanges), sortBy]);
+  }, [
+    currentPage,
+    category,
+    transactionStatus,
+    JSON.stringify(priceRanges),
+    sortBy,
+  ]);
+
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <>
@@ -78,7 +94,17 @@ export default function Home() {
       <DataAvg providers={['SKT', 'KT', 'LG U+']} averagePrice={1754} />
 
       <div className="flex items-center justify-center">
-        {loading ? <p>로딩 중…</p> : <HomeLayout initialCards={cards} />}
+        {loading ? (
+          <p>로딩 중…</p>
+        ) : (
+          <HomeLayout
+            cards={cards}
+            isLoading={loading}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
       <div className="w-full">
