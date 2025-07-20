@@ -6,8 +6,13 @@ import { Dialog, Transition, RadioGroup } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { api } from '@/app/(shared)/utils/api';
 
-const carrierOptions = [
+type CardCategory = 'SELL' | 'BUY' | '';
+type Carrier = 'SKT' | 'KT' | 'LGU+' | '';
+type DataUnit = 'MB' | 'GB';
+
+const carrierOptions: { name: Carrier; imageUrl: string }[] = [
   { name: 'SKT', imageUrl: '/SKT.svg' },
   { name: 'KT', imageUrl: '/KT.svg' },
   { name: 'LGU+', imageUrl: '/LGU+.svg' },
@@ -39,10 +44,10 @@ export const Modal = () => {
   const { isCreateModalOpen, actions } = useHomeStore();
   const router = useRouter();
 
-  const [cardCategory, setCardCategory] = useState('');
-  const [carrier, setCarrier] = useState('');
+  const [cardCategory, setCardCategory] = useState<CardCategory>('');
+  const [carrier, setCarrier] = useState<Carrier>('');
   const [dataAmount, setDataAmount] = useState('');
-  const [dataUnit, setDataUnit] = useState('MB');
+  const [dataUnit, setDataUnit] = useState<DataUnit>('GB');
   const [price, setPrice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,81 +68,70 @@ export const Modal = () => {
     setCardCategory('');
     setCarrier('');
     setDataAmount('');
-    setDataUnit('MB');
+    setDataUnit('GB');
     setPrice('');
     setIsLoading(false);
     actions.toggleCreateModal();
   };
 
-  // 데이터량 프리셋 버튼 클릭 핸들러
   const handleDataPresetClick = (preset: string) => {
     const amount = preset.replace(/[^0-9]/g, '');
-    const unit = preset.replace(/[0-9]/g, '');
+    const unit = preset.replace(/[0-9]/g, '') as DataUnit;
     setDataAmount(amount);
     setDataUnit(unit);
   };
 
-  // 폼 제출 핸들러 (API 연동)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (Number(price) < 100) {
-      toast.error('최소 가격은 100원 이상입니다.');
-      return;
-    }
+
+    // 숫자 변환을 먼저 수행하여 명확하게 검사
+    const numericPrice = Number(price);
+    const numericDataAmount = Number(dataAmount);
+
+    // 빈 값 검사
     if (!cardCategory || !carrier || !dataAmount || !price) {
       toast.error('모든 항목을 입력해주세요.');
       return;
     }
 
-    setIsLoading(true);
-
-    // GB 단위를 MB로 변환
-    let finalDataAmount = Number(dataAmount);
-    if (dataUnit === 'GB') {
-      finalDataAmount *= 1024;
+    // 데이터량 유효성 검사 (0보다 큰지 확인)
+    if (numericDataAmount <= 0) {
+      toast.error('데이터 용량을 올바르게 입력해주세요.');
+      return;
     }
 
-    // 서버에 보낼 데이터 객체 생성
-    const newCard = {
-      cardCategory,
-      carrier,
-      dataAmount: finalDataAmount,
+    // 가격 유효성 검사 (100원 이상인지 확인)
+    if (numericPrice < 100) {
+      toast.error('최소 가격은 100원 이상입니다.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const dataAmountInGB =
+      dataUnit === 'MB' ? numericDataAmount / 1024 : numericDataAmount;
+    const cards = {
+      cardCategory: cardCategory,
+      carrier: carrier === 'LGU+' ? 'LG' : carrier,
+      dataAmount: Math.round(dataAmountInGB),
       price: Number(price),
     };
 
+    console.log('서버로 전송하는 최종 데이터:', cards);
+
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL;
-      const url = `${base}/api/cards`;
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // TODO: 실제 인증 토큰이 필요하다면 여기에 추가
-        },
-        body: JSON.stringify(newCard),
-      });
-
-      const body = await res
-        .text()
-        .then((text) => (text ? JSON.parse(text) : null));
-
-      if (!res.ok) {
-        const serverMsg =
-          body?.detail ??
-          body?.error ??
-          body?.message ??
-          `서버 오류: ${res.status}`;
-        throw new Error(serverMsg);
-      }
-
+      // cards 객체를 서버로 전송합니다.
+      // const response = await api.get('/health');
+      await api.post('/cards', cards);
       toast.success('상품이 성공적으로 등록되었습니다.');
       handleClose();
-      router.refresh(); // 페이지를 새로고침하여 새 목록을 가져옴
-    } catch (err: unknown) {
-      const clientMsg =
-        err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
-      toast.error(clientMsg);
+      router.refresh();
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('알 수 없는 오류가 발생했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -224,7 +218,6 @@ export const Modal = () => {
                     </div>
                   </RadioGroup>
 
-                  {/* 통신사 */}
                   <RadioGroup value={carrier} onChange={setCarrier}>
                     <RadioGroup.Label className="block text-regular-sm text-gray-700 mb-3">
                       통신사
@@ -257,7 +250,6 @@ export const Modal = () => {
                     </div>
                   </RadioGroup>
 
-                  {/* 데이터량 */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
                       데이터량
@@ -268,14 +260,14 @@ export const Modal = () => {
                           key={preset}
                           type="button"
                           onClick={() => handleDataPresetClick(preset)}
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
+                          className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
                         >
                           {preset}
                         </button>
                       ))}
                       <button
                         type="button"
-                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
+                        className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
                       >
                         직접입력
                       </button>
@@ -289,23 +281,24 @@ export const Modal = () => {
                         type="number"
                         value={dataAmount}
                         onChange={(e) => setDataAmount(e.target.value)}
-                        className="w-5/6 border border-gray-300 rounded-lg px-3 py-2 text-regular placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                        className="w-5/6 border border-gray-300 rounded-lg py-2 px-3 text-regular placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                         placeholder="0"
                         required
                       />
                       <select
                         value={dataUnit}
-                        onChange={(e) => setDataUnit(e.target.value)}
-                        className="border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                        onChange={(e) =>
+                          setDataUnit(e.target.value as DataUnit)
+                        }
+                        className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                         aria-label="데이터 단위 선택"
                       >
-                        <option>MB</option>
-                        <option>GB</option>
+                        <option value="MB">MB</option>
+                        <option value="GB">GB</option>
                       </select>
                     </div>
                   </div>
 
-                  {/* 가격 */}
                   <div>
                     <label
                       htmlFor="price"
@@ -319,7 +312,7 @@ export const Modal = () => {
                       value={price}
                       placeholder="1,000"
                       onChange={(e) => setPrice(e.target.value)}
-                      className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 "
+                      className="mt-1 w-full border border-gray-300 rounded-lg py-2 px-3 text-regular-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 "
                       required
                     />
                     <p className="mt-1 text-xs text-gray-500">
@@ -327,19 +320,18 @@ export const Modal = () => {
                     </p>
                   </div>
 
-                  {/* 버튼 */}
                   <div className="pt-4 space-y-3">
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white disabled:bg-gray-300 transition-colors ${getButtonColorClasses()}`}
+                      className={`w-full flex justify-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-regular-md font-medium text-white disabled:bg-gray-300 transition-colors ${getButtonColorClasses()}`}
                     >
                       {isLoading ? '등록 중...' : '등록하기'}
                     </button>
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      className="w-full flex justify-center py-2 px-3 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50"
                     >
                       취소하기
                     </button>
