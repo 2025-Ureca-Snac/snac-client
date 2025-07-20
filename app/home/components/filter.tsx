@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 const displayCategories = ['SKT', 'KT', 'LGU+'] as const;
 const transactionOptions = [
-  { label: '모든 거래', value: 'All' },
+  { label: '모든 거래', value: null },
   { label: '거래 전', value: '거래 전' },
   { label: '거래 완료', value: '거래 완료' },
 ] as const;

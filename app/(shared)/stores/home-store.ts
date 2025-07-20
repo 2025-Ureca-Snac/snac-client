@@ -35,7 +35,7 @@ export const homeInitialState = {
   isCreateModalOpen: false,
   category: null,
   sortBy: '최신순' as SortBy,
-  transactionStatus: 'All' as TransactionStatus,
+  transactionStatus: null as TransactionStatus,
   priceRanges: [],
   showRegularsOnly: false,
 };
@@ -60,12 +60,11 @@ export const useHomeStore = create<HomeState>((set) => ({
       set((state) => ({ showRegularsOnly: !state.showRegularsOnly })),
     resetFilters: () =>
       set((state) => ({
-        category: null,
-        transactionStatus: null,
-        priceRanges: [],
-        showRegularsOnly: false,
-        sortBy: state.sortBy,
-        isFilterOpen: state.isFilterOpen,
+        ...state,
+        category: homeInitialState.category,
+        transactionStatus: homeInitialState.transactionStatus,
+        priceRanges: homeInitialState.priceRanges,
+        showRegularsOnly: homeInitialState.showRegularsOnly,
       })),
   },
 }));
