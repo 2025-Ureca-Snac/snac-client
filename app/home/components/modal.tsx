@@ -267,6 +267,9 @@ export const Modal = () => {
                       ))}
                       <button
                         type="button"
+                        onClick={() =>
+                          document.getElementById('dataAmountInput')?.focus()
+                        }
                         className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
                       >
                         직접입력
