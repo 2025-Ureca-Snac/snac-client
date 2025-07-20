@@ -71,9 +71,17 @@ export default function Banner({
           </div>
 
           <div className="pt-6 flex justify-center">
-            <Button className="w-full  h-[38px] md:h-[44px] bg-burst-lime !text-midnight-black   hover:bg-teal-green active:bg-teal-green ">
-              지금 거래하러 가기
-            </Button>
+            <button className="group relative w-full h-[44px] md:h-[52px] px-4 py-2 rounded-2xl border-4 border-burst-lime bg-gradient-to-br from-burst-lime/25 via-black/60 to-black/80 backdrop-blur-xl shadow-[0_4px_12px_rgba(152,255,88,0.12)] hover:shadow-[0_6px_16px_rgba(152,255,88,0.2)] hover:scale-[1.02] hover:-translate-y-[2px] hover:border-burst-lime active:scale-95 transition-all duration-500 ease-out overflow-hidden z-10">
+              {/* 호버 그라데이션 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-burst-lime/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+
+              {/* 호버 시 연한 배경 */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-burst-lime/10 via-burst-lime/10 to-burst-lime/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              <span className="relative z-10 text-white font-semibold tracking-wide transition-colors duration-300">
+                지금 거래하러 가기
+              </span>
+            </button>
           </div>
         </div>
       </div>
