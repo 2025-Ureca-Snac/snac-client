@@ -5,6 +5,14 @@ import {
   SortDropdown,
   SortOption,
 } from '@/app/(shared)/components/SortDropdown';
+
+type SortBy =
+  | '최신순'
+  | '인기순'
+  | '오래된순'
+  | '가격 높은 순'
+  | '가격 낮은 순';
+
 const sortOptions: SortOption[] = [
   { value: '최신순', label: '최신순' },
   { value: '인기순', label: '인기순' },
@@ -20,7 +28,7 @@ export const Sort = () => {
     <SortDropdown
       options={sortOptions}
       defaultValue={sortBy || '최신순'}
-      onChange={(value) => actions.setSortBy(value as any)}
+      onChange={(value) => actions.setSortBy(value as SortBy)}
     />
   );
 };
