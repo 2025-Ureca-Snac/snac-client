@@ -107,7 +107,7 @@ export default function HomeLayout({ initialCards }) {
           )}
         </div>
 
-        <div className="mt-8">
+        <div className="mt-0">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
