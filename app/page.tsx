@@ -8,6 +8,7 @@ import { DataAvg } from './home/data-avgs';
 import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
+import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
 
 interface Card {
   id: number;
@@ -36,23 +37,20 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
 
   const { category, transactionStatus, priceRanges, sortBy } = useHomeStore();
-
   useEffect(() => {
     async function fetchScrollCards() {
       setLoading(true);
       try {
-        const params = new URLSearchParams();
+        const queryString = generateQueryParams({
+          category,
+          transactionStatus,
+          priceRanges,
+          sortBy,
+          page: currentPage,
+          size: 54,
+        });
 
-        if (category) params.append('cardCategory', category);
-        priceRanges.forEach((r) => params.append('priceRanges', r));
-        if (transactionStatus) {
-          params.append('sellStatusFilter', transactionStatus);
-        }
-        params.append('sortBy', sortBy);
-        params.append('size', '54');
-        params.append('page', currentPage.toString());
-
-        const res = await fetch(`/api/cards/scroll?${params.toString()}`, {
+        const res = await fetch(`/api/cards/scroll?${queryString}`, {
           cache: 'no-store',
         });
 
@@ -61,7 +59,6 @@ export default function Home() {
         }
 
         const json: CardApiResponse = await res.json();
-
         setCards(json.data.cardResponseList);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {

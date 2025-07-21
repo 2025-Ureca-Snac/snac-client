@@ -40,19 +40,18 @@ const mockCards = [
     email: 'buyer01@example.com',
   },
 ];
-
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const params = url.searchParams;
+
   const cardCategory = params.get('cardCategory');
   const sellStatusFilter = params.get('sellStatusFilter');
-  // TODO: priceRanges 파라미터를 기반으로 가격 필터링 기능 구현 예정
-  const priceRange = params.get('priceRanges');
-  const highRatingFirst = params.get('highRatingFirst') === 'true';
+  const priceRanges = params.get('priceRanges');
+  const sortBy = params.get('sortBy');
   const size = parseInt(params.get('size') ?? '10', 10);
-  const lastId = parseInt(params.get('lastCardId') ?? '0', 10);
+  const page = parseInt(params.get('page') ?? '1', 10);
 
-  let list = mockCards.filter((c) => c.id > lastId);
+  let list = [...mockCards];
 
   if (cardCategory === 'BUY' || cardCategory === 'SELL') {
     list = list.filter((c) => c.cardCategory === cardCategory);
@@ -62,22 +61,44 @@ export async function GET(req: NextRequest) {
     list = list.filter((c) => c.sellStatus === sellStatusFilter);
   }
 
-  if (highRatingFirst) {
+  if (priceRanges) {
+    const parsedRanges = priceRanges.split(',').map((range) => {
+      const [minStr, maxStr] = range.split('-');
+      const min = Number(minStr);
+      const max = maxStr ? Number(maxStr) : Infinity;
+      return { min, max };
+    });
+
+    list = list.filter((item) =>
+      parsedRanges.some(
+        ({ min, max }) => item.price >= min && item.price <= max
+      )
+    );
+  }
+
+  if (sortBy === 'priceDesc') {
     list = list.sort((a, b) => b.price - a.price);
-  } else {
+  } else if (sortBy === 'priceAsc') {
     list = list.sort((a, b) => a.price - b.price);
   }
 
-  const page = list.slice(0, size);
-  const hasNext = list.length > size;
+  const startIndex = (page - 1) * size;
+  const endIndex = startIndex + size;
+  const pageList = list.slice(startIndex, endIndex);
+  const totalCount = list.length;
+  const hasNext = endIndex < totalCount;
 
   return NextResponse.json({
     code: 'CARD_READ_SUCCESS_200',
     status: 'OK',
-    message: '카드를 스크롤 방식으로 조회했습니다.',
-    data: { cardResponseList: page, hasNext },
+    message: '카드를 페이지 방식으로 조회했습니다.',
+    data: {
+      cardResponseList: pageList,
+      page,
+      size,
+      hasNext,
+      totalCount,
+    },
     timestamp: new Date().toISOString(),
   });
 }
-
-//TODO: 스크롤 방식 -> 숫자 표시로 변경했기에 백엔등한테 말해서 다시 수정하기
