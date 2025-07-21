@@ -1,11 +1,11 @@
 'use client';
 
+import { useUserStore } from '@/app/(shared)/stores/user-store';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MenuLink } from './MenuLink';
-
-import { useUserStore } from '@/app/(shared)/stores/user-store';
 
 export const Header = (): React.ReactElement => {
   const { profile } = useUserStore();
