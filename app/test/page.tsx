@@ -5,12 +5,13 @@ import CardManagement from './components/CardManagement';
 import AccountManagement from './components/AccountManagement';
 import BankManagement from './components/BankManagement';
 import TradeManagement from './components/TradeManagement';
+import SocketManagement from './components/SocketManagement';
 import { api, handleApiError, ApiResponse } from '../(shared)/utils/api';
 import { testTokenManager } from './utils/tokenManager';
 
 export default function TestPage() {
   const [activeTab, setActiveTab] = useState<
-    'cards' | 'accounts' | 'banks' | 'trades'
+    'cards' | 'accounts' | 'banks' | 'trades' | 'socket'
   >('cards');
   const [response, setResponse] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -203,12 +204,18 @@ export default function TestPage() {
               { key: 'accounts', label: '계좌 관리' },
               { key: 'banks', label: '은행 관리' },
               { key: 'trades', label: '거래 관리' },
+              { key: 'socket', label: '소켓 테스트' },
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() =>
                   setActiveTab(
-                    tab.key as 'cards' | 'accounts' | 'banks' | 'trades'
+                    tab.key as
+                      | 'cards'
+                      | 'accounts'
+                      | 'banks'
+                      | 'trades'
+                      | 'socket'
                   )
                 }
                 className={`px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${
@@ -290,6 +297,17 @@ export default function TestPage() {
             {/* 거래 관리 */}
             {activeTab === 'trades' && (
               <TradeManagement
+                loading={loading}
+                setResponse={(res) => {
+                  setResponse(res);
+                  setLoading(false);
+                }}
+              />
+            )}
+
+            {/* 소켓 테스트 */}
+            {activeTab === 'socket' && (
+              <SocketManagement
                 loading={loading}
                 setResponse={(res) => {
                   setResponse(res);
