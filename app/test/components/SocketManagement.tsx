@@ -88,7 +88,9 @@ export default function SocketManagement({
 
       const client = new StompClient({
         webSocketFactory: () =>
-          new SockJSConstructor('https://api.snac-app.com/ws'),
+          new SockJSConstructor(
+            process.env.NEXT_PUBLIC_WS_BASE_URL || 'https://api.snac-app.com/ws'
+          ),
         connectHeaders: {
           Authorization: 'Bearer ' + token,
         },
@@ -153,7 +155,9 @@ export default function SocketManagement({
 
   const apiPost = async (path: string, body: Record<string, unknown>) => {
     try {
-      const response = await fetch(`https://api.snac-app.com/api${path}`, {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.snac-app.com';
+      const response = await fetch(`${baseUrl}/${path}`, {
         method: 'POST',
         headers: {
           Authorization: 'Bearer ' + token,
