@@ -1,6 +1,6 @@
 'use client';
 
-import { useUserStore } from '@/app/(shared)/stores/user-store';
+import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 
 import React from 'react';
 import Link from 'next/link';
@@ -8,9 +8,8 @@ import Image from 'next/image';
 import { MenuLink } from './MenuLink';
 
 export const Header = (): React.ReactElement => {
-  const { profile } = useUserStore();
-
-  const isLoggedIn = !!profile;
+  const { user } = useAuthStore();
+  const isLoggedIn = !!user;
 
   return (
     <header className="w-full bg-white h-[57px] md:h-[67px] px-6 flex justify-between items-center md:pl-[160px] md:pr-[51px]">
