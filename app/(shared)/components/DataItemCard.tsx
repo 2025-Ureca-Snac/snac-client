@@ -4,10 +4,12 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 
+type PriceUnit = 'snack' | 'won';
 interface DataItemCardProps {
   imageUrl: string;
   title: string;
   price: number;
+  unit: PriceUnit;
   onClickBuy: () => void;
   isNew?: boolean;
   newBadgeText?: string;
@@ -17,12 +19,28 @@ interface DataItemCardProps {
 export const DataItemCard = ({
   imageUrl,
   title,
+  unit,
   price,
   isNew,
   newBadgeText = 'NEW',
   buyButtonText = '구매하기',
   onClickBuy,
 }: DataItemCardProps) => {
+  const displayPrice =
+    unit === 'snack' ? (
+      <span className="inline-flex items-center">
+        <Image
+          src="/snac-price.svg"
+          alt="스낵 단위 아이콘"
+          width={24}
+          height={24}
+          className="mr-1"
+        />
+        {price.toLocaleString()}
+      </span>
+    ) : (
+      <>₩{price.toLocaleString()}</>
+    );
   return (
     <div className="transition-transform duration-300 hover:-translate-y-[2px] hover:scale-[1.03] relative bg-[#F3F5F7] rounded-2xl shadow-md w-card-sm h-card-sm md:w-card-md md:h-card-md flex flex-col p-3">
       {isNew && (
@@ -45,7 +63,7 @@ export const DataItemCard = ({
           {title}
         </h3>
         <p className="text-medium-sm md:text-medium-sm text-gray-900">
-          ₩{price.toLocaleString()}
+          {displayPrice}
         </p>
       </div>
 
