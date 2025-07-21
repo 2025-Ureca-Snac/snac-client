@@ -11,7 +11,7 @@ interface DataItemCardProps {
   price: number;
   email: string;
   createdAt: string;
-  onClickBuy: () => void;
+  onClickBuy: (meta: { email: string; createdAt: string }) => void;
   isNew?: boolean;
   newBadgeText?: string;
   buyButtonText?: string;
@@ -56,7 +56,9 @@ export const DataItemCard = ({
 
       <div className="flex justify-center ">
         <Button
-          onClick={onClickBuy}
+          onClick={() => {
+            onClickBuy({ email, createdAt });
+          }}
           className="w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md bg-gray-900 hover:bg-gray-800 transition text-regular-md border rounded-lg flex items-center justify-center"
         >
           {buyButtonText}
