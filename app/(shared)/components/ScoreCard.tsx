@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import ModalPortal from './modal-portal';
 import { useUserStore } from '../stores/user-store';
+import { useModalStore } from '../stores/modal-store';
 import { SNACK_GRADES } from '../constants/snack-grades';
 
 /**
@@ -73,8 +74,7 @@ export default function ScoreCard() {
             className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors"
             onClick={() => {
               // 단골 목록 모달 열기
-              const event = new CustomEvent('openFavoriteModal');
-              window.dispatchEvent(event);
+              useModalStore.getState().openModal('favorite-list');
             }}
           >
             <span className="font-bold text-lg">20</span>

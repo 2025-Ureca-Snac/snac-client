@@ -12,22 +12,16 @@ import SocialLoginModal from '../(shared)/components/SocialLoginModal';
 import ServiceGuideModal from '../(shared)/components/ServiceGuideModal';
 import PrivacyPolicyModal from '../(shared)/components/PrivacyPolicyModal';
 import ThemeModal from '../(shared)/components/ThemeModal';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useUserStore } from '../(shared)/stores/user-store';
+import { useModalStore } from '../(shared)/stores/modal-store';
 
 const FAVORITES = Array(12).fill('데이터바삭이');
 
 export default function MyPage() {
   const { profile, updatePreferences, updateProfile, setProfile } =
     useUserStore();
-  const [favoriteModalOpen, setFavoriteModalOpen] = useState(false);
-  const [changePwOpen, setChangePwOpen] = useState(false);
-  const [changePhoneOpen, setChangePhoneOpen] = useState(false);
-  const [changeNicknameOpen, setChangeNicknameOpen] = useState(false);
-  const [socialLoginOpen, setSocialLoginOpen] = useState(false);
-  const [serviceGuideOpen, setServiceGuideOpen] = useState(false);
-  const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
-  const [themeModalOpen, setThemeModalOpen] = useState(false);
+  const { isOpen, modalType, closeModal } = useModalStore();
 
   // 테스트용 사용자 데이터 설정
   useEffect(() => {
@@ -58,27 +52,20 @@ export default function MyPage() {
 
   // SettingList에서 항목 클릭 시 모달 오픈
   const handleSettingClick = (item: string) => {
-    if (item === '비밀번호 변경') setChangePwOpen(true);
-    if (item === '번호 변경') setChangePhoneOpen(true);
-    if (item === '닉네임 변경') setChangeNicknameOpen(true);
-    if (item === '소셜 로그인 연동') setSocialLoginOpen(true);
-    if (item === '서비스 가이드') setServiceGuideOpen(true);
-    if (item === '개인정보 처리방침') setPrivacyPolicyOpen(true);
-    if (item === '화면 테마') setThemeModalOpen(true);
+    if (item === '비밀번호 변경')
+      useModalStore.getState().openModal('change-password');
+    if (item === '번호 변경')
+      useModalStore.getState().openModal('change-phone');
+    if (item === '닉네임 변경')
+      useModalStore.getState().openModal('change-nickname');
+    if (item === '소셜 로그인 연동')
+      useModalStore.getState().openModal('social-login');
+    if (item === '서비스 가이드')
+      useModalStore.getState().openModal('service-guide');
+    if (item === '개인정보 처리방침')
+      useModalStore.getState().openModal('privacy-policy');
+    if (item === '화면 테마') useModalStore.getState().openModal('theme');
   };
-
-  // 단골 목록 모달 열기 이벤트 리스너
-  useEffect(() => {
-    const handleOpenFavoriteModal = () => {
-      setFavoriteModalOpen(true);
-    };
-
-    window.addEventListener('openFavoriteModal', handleOpenFavoriteModal);
-
-    return () => {
-      window.removeEventListener('openFavoriteModal', handleOpenFavoriteModal);
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-white w-full">
@@ -108,78 +95,74 @@ export default function MyPage() {
                   탈퇴하기
                 </button>
               </div>
-              {/* 비밀번호 변경 모달 */}
-              <ChangePasswordModal
-                open={changePwOpen}
-                onClose={() => setChangePwOpen(false)}
-                onSubmit={(current, next, confirm) => {
-                  alert(`현재: ${current}\n새 비번: ${next}\n확인: ${confirm}`);
-                  setChangePwOpen(false);
-                }}
-              />
-              {/* 번호 변경 모달 */}
-              <ChangePhoneModal
-                open={changePhoneOpen}
-                onClose={() => setChangePhoneOpen(false)}
-                onSubmit={(current, next, code) => {
-                  alert(`현재: ${current}\n변경: ${next}\n코드: ${code}`);
-                  setChangePhoneOpen(false);
-                }}
-              />
-              <ServiceGuideModal
-                open={serviceGuideOpen}
-                onClose={() => setServiceGuideOpen(false)}
-              />
-              <PrivacyPolicyModal
-                open={privacyPolicyOpen}
-                onClose={() => setPrivacyPolicyOpen(false)}
-              />
-              {/* 소셜 로그인 연동 모달 */}
-              <SocialLoginModal
-                open={socialLoginOpen}
-                onClose={() => setSocialLoginOpen(false)}
-                onSubmit={(provider, isLinked) => {
-                  if (isLinked) {
-                    alert(`${provider} 계정이 연동되었습니다.`);
-                  } else {
-                    alert(`${provider} 계정 연동이 해제되었습니다.`);
-                  }
-                }}
-              />
-              {/* 닉네임 변경 모달 */}
-              <ChangeNicknameModal
-                open={changeNicknameOpen}
-                onClose={() => setChangeNicknameOpen(false)}
-                currentNickname={profile?.nickname || ''}
-                onSubmit={(nickname) => {
-                  if (profile) {
-                    updateProfile({ nickname });
-                  }
-                  alert(`닉네임이 "${nickname}"로 변경되었습니다.`);
-                  setChangeNicknameOpen(false);
-                }}
-              />
             </section>
           </div>
         </main>
-        {/* 단골 목록 모달 */}
-        <FavoriteListModal
-          open={favoriteModalOpen}
-          onClose={() => setFavoriteModalOpen(false)}
-          favorites={FAVORITES}
-        />
-        {/* 화면 테마 모달 */}
-        <ThemeModal
-          open={themeModalOpen}
-          onClose={() => setThemeModalOpen(false)}
-          currentTheme={profile?.preferences.theme || 'light'}
-          onThemeChange={(theme) => {
-            if (profile) {
-              updatePreferences({ theme });
-            }
-          }}
-        />
       </div>
+
+      {/* 모달들 */}
+      <ChangePasswordModal
+        open={isOpen && modalType === 'change-password'}
+        onClose={closeModal}
+        onSubmit={(current, next, confirm) => {
+          alert(`현재: ${current}\n새 비번: ${next}\n확인: ${confirm}`);
+          closeModal();
+        }}
+      />
+      <ChangePhoneModal
+        open={isOpen && modalType === 'change-phone'}
+        onClose={closeModal}
+        onSubmit={(current, next, code) => {
+          alert(`현재: ${current}\n변경: ${next}\n코드: ${code}`);
+          closeModal();
+        }}
+      />
+      <ServiceGuideModal
+        open={isOpen && modalType === 'service-guide'}
+        onClose={closeModal}
+      />
+      <PrivacyPolicyModal
+        open={isOpen && modalType === 'privacy-policy'}
+        onClose={closeModal}
+      />
+      <SocialLoginModal
+        open={isOpen && modalType === 'social-login'}
+        onClose={closeModal}
+        onSubmit={(provider, isLinked) => {
+          if (isLinked) {
+            alert(`${provider} 계정이 연동되었습니다.`);
+          } else {
+            alert(`${provider} 계정 연동이 해제되었습니다.`);
+          }
+        }}
+      />
+      <ChangeNicknameModal
+        open={isOpen && modalType === 'change-nickname'}
+        onClose={closeModal}
+        currentNickname={profile?.nickname || ''}
+        onSubmit={(nickname) => {
+          if (profile) {
+            updateProfile({ nickname });
+          }
+          alert(`닉네임이 "${nickname}"로 변경되었습니다.`);
+          closeModal();
+        }}
+      />
+      <FavoriteListModal
+        open={isOpen && modalType === 'favorite-list'}
+        onClose={closeModal}
+        favorites={FAVORITES}
+      />
+      <ThemeModal
+        open={isOpen && modalType === 'theme'}
+        onClose={closeModal}
+        currentTheme={profile?.preferences.theme || 'light'}
+        onThemeChange={(theme) => {
+          if (profile) {
+            updatePreferences({ theme });
+          }
+        }}
+      />
     </div>
   );
 }
