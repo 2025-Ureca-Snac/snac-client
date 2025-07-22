@@ -42,25 +42,46 @@ const mockEvents = {
       transactionCount: 156,
     },
   },
+  // 실시간으로 활성화된 판매자들 (실제로는 서버에서 가져옴)
   seller_update: [
     {
-      id: 3,
+      id: 101,
       type: 'seller',
-      name: 'user07',
+      name: '판매자A',
+      carrier: 'SKT',
+      data: 1.5,
+      price: 1800,
+      rating: 4.8,
+      transactionCount: 89,
+    },
+    {
+      id: 102,
+      type: 'seller',
+      name: '판매자B',
       carrier: 'KT',
       data: 2,
-      price: 2000,
+      price: 2200,
       rating: 4.9,
       transactionCount: 156,
     },
     {
-      id: 4,
+      id: 103,
       type: 'seller',
-      name: 'user10',
+      name: '판매자C',
       carrier: 'LG U+',
-      data: 1,
-      price: 1200,
-      rating: 4.5,
+      data: 0.5,
+      price: 1000,
+      rating: 4.6,
+      transactionCount: 34,
+    },
+    {
+      id: 104,
+      type: 'seller',
+      name: '새로운판매자',
+      carrier: 'SKT',
+      data: 3,
+      price: 2500,
+      rating: 4.7,
       transactionCount: 67,
     },
   ],
@@ -215,10 +236,17 @@ class RealTimeMatchingService {
   }
 
   triggerMockSellerUpdate(): void {
-    console.log('🔧 Mock: 판매자 업데이트 이벤트 발생');
+    // 매번 다른 판매자들을 보여주기 위해 랜덤하게 일부만 선택
+    const allSellers = mockEvents.seller_update;
+    const randomCount = Math.floor(Math.random() * allSellers.length) + 1;
+    const randomSellers = allSellers
+      .sort(() => 0.5 - Math.random())
+      .slice(0, randomCount);
+
+    console.log('🔧 Mock: 판매자 업데이트 이벤트 발생', randomSellers);
     this.notifyListeners('seller_update', {
       type: 'seller_update',
-      data: mockEvents.seller_update as unknown as Record<string, unknown>,
+      data: randomSellers as unknown as Record<string, unknown>,
     });
   }
 

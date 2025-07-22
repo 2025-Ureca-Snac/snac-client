@@ -7,7 +7,12 @@ import { useMatchStore } from '@/app/(shared)/stores/match-store';
 import { User, Filters } from '../types';
 import { TradeRequest } from '../types/match';
 
-type MatchingStatus = 'idle' | 'requesting' | 'requested' | 'matched';
+type MatchingStatus =
+  | 'idle'
+  | 'searching'
+  | 'requesting'
+  | 'requested'
+  | 'matched';
 
 interface UseMatchingEventsProps {
   userRole: 'buyer' | 'seller' | null;

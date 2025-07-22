@@ -19,10 +19,46 @@ import { useUserFiltering } from './hooks/useUserFiltering';
 import { useMatchingEvents } from './hooks/useMatchingEvents';
 
 // 타입 정의
-type MatchingStatus = 'idle' | 'requesting' | 'requested' | 'matched';
+type MatchingStatus =
+  | 'idle'
+  | 'searching'
+  | 'requesting'
+  | 'requested'
+  | 'matched';
 
-// 샘플 유저 데이터 (사용자가 빈 배열로 설정함)
-const ALL_USERS: User[] = [];
+// 샘플 유저 데이터 (테스트용)
+const ALL_USERS: User[] = [
+  {
+    id: 1,
+    type: 'seller',
+    name: 'user04',
+    carrier: 'SKT',
+    data: 1,
+    price: 1500,
+    rating: 4.8,
+    transactionCount: 125,
+  },
+  {
+    id: 2,
+    type: 'seller',
+    name: 'user05',
+    carrier: 'SKT',
+    data: 1,
+    price: 1600,
+    rating: 4.6,
+    transactionCount: 89,
+  },
+  {
+    id: 3,
+    type: 'seller',
+    name: 'user06',
+    carrier: 'KT',
+    data: 2,
+    price: 2000,
+    rating: 4.9,
+    transactionCount: 156,
+  },
+];
 
 export default function MatchPage() {
   const router = useRouter();
