@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ModalPortal from './modal-portal';
+import type { ChangeNicknameModalProps } from '../types/change-nickname-modal';
 
-interface ChangeNicknameModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit?: (nickname: string) => void;
-  currentNickname?: string;
-}
-
+/**
+ * @author 이승우
+ * @description 닉네임 변경 모달 컴포넌트{@link ChangeNicknameModalProps(open, onClose, onSubmit, currentNickname)}
+ * @param {boolean} open 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ * @param {Function} onSubmit 닉네임 변경 함수
+ * @param {string} currentNickname 현재 닉네임
+ */
 export default function ChangeNicknameModal({
   open,
   onClose,

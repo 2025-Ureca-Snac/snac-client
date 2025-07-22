@@ -1,12 +1,11 @@
 import axios from 'axios';
+import { useAuthStore } from '../stores/auth-store';
 
 /**
  * @author 이승우
  * @description API URL 설정
  */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 /**
 /**
@@ -28,22 +27,19 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-/**
- * @author 이승우
- * @description API 응답 타입 정의
- * @param code 응답 코드
- * @param status 응답 상태
- * @param message 응답 메시지
- * @param data 응답 데이터
- * @param timestamp 응답 시간
- */
-export interface ApiResponse<T = unknown> {
-  code: string;
-  status: string;
-  message: string;
-  data: T;
-  timestamp: string;
-}
+// 요청 인터셉터: 매 요청마다 최신 토큰을 헤더에 추가
+api.interceptors.request.use((config) => {
+  if (
+    typeof window !== 'undefined' &&
+    !(config.headers && 'Authorization' in config.headers)
+  ) {
+    const token = useAuthStore.getState().token;
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
 
 /**
  * @author 이승우

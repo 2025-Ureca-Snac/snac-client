@@ -1,12 +1,14 @@
 'use client';
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { AnimatedTabContentProps } from '../types/animated-tab-content';
 
-interface AnimatedTabContentProps {
-  children: React.ReactNode;
-  key: string;
-}
-
+/**
+ * @author 이승우
+ * @description 애니메이션 탭 콘텐츠 컴포넌트
+ * @param {React.ReactNode} children 콘텐츠
+ * @param {string} key 키
+ */
 export default function AnimatedTabContent({
   children,
   key,
