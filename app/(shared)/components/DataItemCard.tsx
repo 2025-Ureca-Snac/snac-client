@@ -24,8 +24,8 @@ export const DataItemCard = ({
   title,
   unit,
   price,
-  email, // 데이터는 받지만 사용하지 않음
-  createdAt, // 데이터는 받지만 사용하지 않음
+  email,
+  createdAt,
   isNew,
   newBadgeText = 'NEW',
   buyButtonText = '구매하기',
@@ -37,8 +37,8 @@ export const DataItemCard = ({
         <Image
           src="/snac-price.svg"
           alt="스낵 단위 아이콘"
-          width={24}
-          height={24}
+          width={18}
+          height={18}
           className="mr-1"
         />
         {price.toLocaleString()}
@@ -67,7 +67,7 @@ export const DataItemCard = ({
         <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718]">
           {title}
         </h3>
-        <p className="text-medium-sm md:text-medium-sm text-gray-900">
+        <p className="text-medium-sm md:text-medium-sm text-gray-900 h-6 flex items-center">
           {displayPrice}
         </p>
       </div>
