@@ -302,6 +302,48 @@ export default function MatchPage() {
     // await toggleSellerStatus();
   };
 
+  // 거래 요청 발송 (구매자용)
+  const handleSendTradeRequest = async (seller: User) => {
+    if (userRole !== 'buyer') {
+      alert('구매자만 거래를 요청할 수 있습니다.');
+      return;
+    }
+
+    if (seller.type !== 'seller') {
+      alert('판매자에게만 거래 요청이 가능합니다.');
+      return;
+    }
+
+    setMatchingStatus('requesting');
+
+    // 실제로는 API 호출하겠지만, 지금은 mock으로 시뮬레이션
+    console.log('🔥 거래 요청 발송:', {
+      buyerId: 'user_123',
+      sellerId: seller.id,
+      sellerName: seller.name,
+      dataAmount: seller.data,
+      price: seller.price,
+    });
+
+    alert(`${seller.name}님에게 거래 요청을 보냈습니다!`);
+
+    // Mock: 2초 후 자동 수락 시뮬레이션 (테스트용)
+    setTimeout(() => {
+      setMatchingStatus('matched');
+      foundMatch({
+        id: String(seller.id),
+        name: seller.name,
+        carrier: seller.carrier,
+        data: seller.data,
+        price: seller.price,
+        rating: seller.rating || 4.5,
+        transactionCount: seller.transactionCount || 0,
+        type: 'seller',
+      });
+      setTimeout(() => router.push('/match/trading'), 1000);
+    }, 2000);
+  };
+
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = async (
     requestId: string,
@@ -328,6 +370,10 @@ export default function MatchPage() {
       setTimeout(() => router.push('/match/trading'), 1000);
     }
   };
+
+  // 사용자 클릭 핸들러 (구매자 모드에서만)
+  const userClickHandler =
+    userRole === 'buyer' ? handleSendTradeRequest : undefined;
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -418,7 +464,7 @@ export default function MatchPage() {
         )}
 
         {/* 결과 섹션 */}
-        <ResultSection users={filteredUsers} />
+        <ResultSection users={filteredUsers} onUserClick={userClickHandler} />
 
         {/* 테스트용 버튼들 (개발 모드에서만 표시) */}
         {process.env.NODE_ENV === 'development' && (
@@ -432,7 +478,7 @@ export default function MatchPage() {
                   onClick={() => triggerMockTradeRequest()}
                   className="block w-full bg-blue-600 text-white px-3 py-2 rounded text-xs hover:bg-blue-700"
                 >
-                  거래 요청 테스트
+                  거래 요청 테스트 (판매자용)
                 </button>
                 <button
                   onClick={() => triggerMockTradeResponse(true)}
