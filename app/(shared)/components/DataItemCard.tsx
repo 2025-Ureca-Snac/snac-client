@@ -4,13 +4,23 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 
+<<<<<<< HEAD
 type PriceUnit = 'snack' | 'won';
+=======
+// email과 createdAt은 props로 받지만, 화면에는 표시하지 않습니다.
+>>>>>>> main
 interface DataItemCardProps {
   imageUrl: string;
   title: string;
   price: number;
+<<<<<<< HEAD
   unit: PriceUnit;
   onClickBuy: () => void;
+=======
+  email: string;
+  createdAt: string;
+  onClickBuy: (meta: { email: string; createdAt: string }) => void;
+>>>>>>> main
   isNew?: boolean;
   newBadgeText?: string;
   buyButtonText?: string;
@@ -21,6 +31,8 @@ export const DataItemCard = ({
   title,
   unit,
   price,
+  email, // 데이터는 받지만 사용하지 않음
+  createdAt, // 데이터는 받지만 사용하지 않음
   isNew,
   newBadgeText = 'NEW',
   buyButtonText = '구매하기',
@@ -69,7 +81,9 @@ export const DataItemCard = ({
 
       <div className="flex justify-center ">
         <Button
-          onClick={onClickBuy}
+          onClick={() => {
+            onClickBuy({ email, createdAt });
+          }}
           className="w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md bg-gray-900 hover:bg-gray-800 transition text-regular-md border rounded-lg flex items-center justify-center"
         >
           {buyButtonText}
