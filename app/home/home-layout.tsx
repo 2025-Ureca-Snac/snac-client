@@ -1,5 +1,5 @@
 'use client';
-
+import React, { useState } from 'react';
 import { Filter } from './components/filter';
 import { Sort } from './components/sort';
 import { Modal } from './components/modal';
@@ -8,6 +8,8 @@ import HomeSection from './home-section';
 import Image from 'next/image';
 import { Toaster } from 'sonner';
 import { Pagination } from '@/app/(shared)/components/Pagination';
+
+type PriceUnit = 'snack' | 'won';
 
 interface Card {
   id: number;
@@ -38,6 +40,7 @@ export default function HomeLayout({
   onPageChange,
 }: HomeLayoutProps) {
   const { actions } = useHomeStore();
+  const [currentUnit, setCurrentUnit] = useState<PriceUnit>('snack');
 
   return (
     <div className="flex w-full flex-col md:flex-row">
@@ -65,27 +68,54 @@ export default function HomeLayout({
               </button>
             </div>
             <div className="flex justify-between items-center">
-              <Sort />
-              <button
-                onClick={() => window.location.reload()}
-                aria-label="새로고침"
-              >
-                <Image
-                  src="/refresh.svg"
-                  alt="새로고침"
-                  width={18}
-                  height={18}
-                  className="cursor-pointer"
+              <div className="flex items-center gap-4">
+                <Sort />
+                <button
+                  onClick={() => window.location.reload()}
+                  aria-label="새로고침"
+                >
+                  <Image
+                    src="/refresh.svg"
+                    alt="새로고침"
+                    width={18}
+                    height={18}
+                    className="cursor-pointer"
+                  />
+                </button>
+              </div>
+              <div className="relative flex w-32 items-center rounded-full bg-gray-200 p-1">
+                <div
+                  className={`absolute h-[calc(100%-8px)] w-[calc(50%-4px)] transform rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out ${
+                    currentUnit === 'won' ? 'translate-x-full' : 'translate-x-0'
+                  }`}
                 />
-              </button>
-              <button
-                onClick={actions.toggleCreateModal}
-                className="px-4 py-2 w-[100px] border rounded-lg text-medium-sm font-semibold hover:bg-gray-50 bg-white shadow-sm"
-              >
-                + 등록하기
-              </button>
+                <button
+                  onClick={() => setCurrentUnit('snack')}
+                  className={`relative z-10 flex flex-1 items-center justify-center py-1 text-center text-xs font-bold transition-colors duration-300 ${
+                    currentUnit === 'snack' ? 'text-gray-900' : 'text-gray-500'
+                  }`}
+                >
+                  <Image
+                    src="/snac-price.svg"
+                    alt="스낵 단위 아이콘"
+                    width={16}
+                    height={16}
+                    className="mr-1"
+                  />
+                  스낵
+                </button>
+                <button
+                  onClick={() => setCurrentUnit('won')}
+                  className={`relative z-10 flex-1 py-1 text-center text-regular-sm font-bold transition-colors duration-300 ${
+                    currentUnit === 'won' ? 'text-gray-900' : 'text-gray-500'
+                  }`}
+                >
+                  ₩ 원
+                </button>
+              </div>
             </div>
           </div>
+
           {/* PC */}
           <div className="hidden md:flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
@@ -103,12 +133,36 @@ export default function HomeLayout({
                 />
               </button>
             </div>
-            <button
-              onClick={actions.toggleCreateModal}
-              className="px-4 py-2 w-[93px] md:w-[110px] border rounded-lg text-medium-md font-semibold hover:bg-gray-50 bg-white shadow-sm"
-            >
-              + 등록하기
-            </button>
+            <div className="relative flex w-44 items-center rounded-full bg-gray-200 p-1">
+              <div
+                className={`absolute h-[calc(100%-8px)] w-[calc(50%-4px)] transform rounded-full bg-white shadow-light transition-transform duration-300 ease-in-out ${
+                  currentUnit === 'won' ? 'translate-x-full' : 'translate-x-0'
+                }`}
+              />
+              <button
+                onClick={() => setCurrentUnit('snack')}
+                className={`relative z-10 flex flex-1 items-center justify-center py-2 text-center text-regular-sm font-bold transition-colors duration-300 ${
+                  currentUnit === 'snack' ? 'text-gray-900' : 'text-gray-500'
+                }`}
+              >
+                <Image
+                  src="/snac-price.svg"
+                  alt="스낵 단위 아이콘"
+                  width={18}
+                  height={18}
+                  className="mr-1.5"
+                />
+                스낵
+              </button>
+              <button
+                onClick={() => setCurrentUnit('won')}
+                className={`relative z-10 flex-1 py-2 text-center text-regular-sm font-bold transition-colors duration-300 ${
+                  currentUnit === 'won' ? 'text-gray-900' : 'text-gray-500'
+                }`}
+              >
+                ₩ 원
+              </button>
+            </div>
           </div>
         </div>
 
@@ -116,7 +170,7 @@ export default function HomeLayout({
           {isLoading ? (
             <div className="text-center py-10">로딩 중...</div>
           ) : (
-            <HomeSection cards={cards} />
+            <HomeSection cards={cards} unit={currentUnit} />
           )}
         </div>
 
