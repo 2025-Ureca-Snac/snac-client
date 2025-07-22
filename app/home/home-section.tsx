@@ -3,6 +3,8 @@
 import { DataItemCard } from '../(shared)/components/DataItemCard';
 import { isToday } from '@/app/(shared)/utils/';
 
+type PriceUnit = 'snack' | 'won';
+
 interface DataItem {
   id: number;
   name: string;
@@ -18,6 +20,7 @@ interface DataItem {
 
 interface HomeSectionProps {
   cards: DataItem[];
+  unit: PriceUnit;
 }
 
 const getCarrierImageUrl = (carrier: string): string => {
@@ -33,9 +36,11 @@ const getCarrierImageUrl = (carrier: string): string => {
   }
 };
 
-export default function HomeSection({ cards }: HomeSectionProps) {
-  const handleBuy = (title: string) => {
-    alert(`"${title}" 구매하기 클릭됨!`);
+export default function HomeSection({ cards, unit }: HomeSectionProps) {
+  const handleBuy = (meta: { email: string; createdAt: string }) => {
+    console.log(
+      `구매하기 클릭됨!\n판매자 이메일: ${meta.email}\n작성 시간: ${meta.createdAt}`
+    );
   };
 
   if (!cards || cards.length === 0) {
@@ -58,11 +63,10 @@ export default function HomeSection({ cards }: HomeSectionProps) {
           imageUrl={getCarrierImageUrl(item.carrier)}
           price={item.price}
           isNew={isToday(item.updatedAt)}
-          onClickBuy={() =>
-            handleBuy(`${item.carrier} 데이터 ${item.dataAmount}MB`)
-          }
+          unit={unit}
           email={item.email}
           createdAt={item.createdAt}
+          onClickBuy={handleBuy}
         />
       ))}
     </div>
