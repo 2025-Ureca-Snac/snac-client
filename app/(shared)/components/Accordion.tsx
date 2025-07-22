@@ -19,7 +19,7 @@ export default function Accordion() {
         <span className={`transition-transform ${open ? 'rotate-90' : ''}`}>
           <Image
             src="/chevron-down.svg"
-            alt="오른쪽 화살표"
+            alt="펼치기/접기"
             width={24}
             height={24}
             className="inline-block -rotate-90"
