@@ -25,13 +25,13 @@ interface HomeSectionProps {
 const getCarrierImageUrl = (carrier: string): string => {
   switch (carrier) {
     case 'SKT':
-      return '/SKT.svg';
+      return '/SKT.png';
     case 'KT':
-      return '/KT.svg';
+      return '/KT.png';
     case 'LGU+':
-      return '/LGU+.svg';
+      return '/LGU+.png';
     default:
-      return '/SKT.svg';
+      return '/SKT.png';
   }
 };
 
