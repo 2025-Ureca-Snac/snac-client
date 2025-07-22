@@ -204,7 +204,7 @@ export default function SalesHistoryPage() {
         open={isModalOpen}
         onClose={handleCloseModal}
         item={selectedItem}
-        type="sale"
+        type="sales"
       />
     </div>
   );

@@ -1,6 +1,10 @@
 'use client';
 
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
+import {
+  getHistoryStatusText,
+  getHistoryStatusColor,
+} from '../utils/history-status';
 
 /**
  * @author 이승우
@@ -66,19 +70,9 @@ export default function HistoryDetailModal({
               </div>
               <div className="flex items-center gap-2">
                 <span
-                  className={`text-white text-xs px-2 py-1 rounded ${
-                    isCompleted
-                      ? 'bg-black'
-                      : type === 'purchase'
-                        ? 'bg-red-500'
-                        : 'bg-green-500'
-                  }`}
+                  className={`text-white text-xs px-2 py-1 rounded ${getHistoryStatusColor(type, item.status)}`}
                 >
-                  {isCompleted
-                    ? '거래완료'
-                    : type === 'purchase'
-                      ? '구매요청'
-                      : '판매중'}
+                  {getHistoryStatusText(type, item.status)}
                 </span>
                 <span className="text-gray-900">
                   {item.price.toLocaleString()}원

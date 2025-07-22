@@ -1,38 +1,17 @@
-interface HistoryItem {
-  id: number;
-  date: string;
-  title: string;
-  price: number;
-  status: 'purchasing' | 'selling' | 'completed';
-  transactionNumber?: string;
-  carrier?: string;
-  dataAmount?: string;
-  phoneNumber?: string;
-}
+import type { HistoryItem, HistoryCardProps } from '../types/history-card';
+import {
+  getHistoryStatusText,
+  getHistoryStatusColor,
+} from '../utils/history-status';
 
-interface HistoryCardProps {
-  item: HistoryItem;
-  type: 'purchase' | 'sales';
-  onClick: (item: HistoryItem) => void;
-}
-
+/**
+ * @author 이승우
+ * @description 거래 내역 카드 컴포넌트{@link HistoryCardProps(item, type, onClick)}
+ * @param {HistoryItem} item 거래 내역 아이템
+ * @param {'purchase' | 'sales'} type 거래 유형
+ * @param {Function} onClick 거래 내역 클릭 함수
+ */
 export default function HistoryCard({ item, type, onClick }: HistoryCardProps) {
-  const getStatusText = () => {
-    if (item.status === 'completed') return '거래완료';
-    if (type === 'purchase' && item.status === 'purchasing') return '구매요청';
-    if (type === 'sales' && item.status === 'selling') return '판매중';
-    return '';
-  };
-
-  const getStatusColor = () => {
-    if (item.status === 'completed') return 'bg-black text-white';
-    if (type === 'purchase' && item.status === 'purchasing')
-      return 'bg-red-500 text-white';
-    if (type === 'sales' && item.status === 'selling')
-      return 'bg-green-500 text-white';
-    return 'bg-gray-500 text-white';
-  };
-
   return (
     <div
       className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
@@ -48,8 +27,10 @@ export default function HistoryCard({ item, type, onClick }: HistoryCardProps) {
         <div className="text-sm text-gray-500 mb-1">{item.date}</div>
         <div className="font-semibold text-gray-900 mb-1">{item.title}</div>
         <div className="flex items-center gap-2">
-          <span className={`text-xs px-2 py-1 rounded ${getStatusColor()}`}>
-            {getStatusText()}
+          <span
+            className={`text-xs px-2 py-1 rounded ${getHistoryStatusColor(type, item.status)}`}
+          >
+            {getHistoryStatusText(type, item.status)}
           </span>
           <span className="text-gray-900">{item.price.toLocaleString()}원</span>
         </div>
