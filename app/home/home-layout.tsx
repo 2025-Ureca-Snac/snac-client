@@ -70,8 +70,12 @@ export default function HomeLayout({
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <Sort />
+
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    actions.resetAll();
+                    onPageChange(1);
+                  }}
                   aria-label="새로고침"
                 >
                   <Image
