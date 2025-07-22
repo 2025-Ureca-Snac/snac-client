@@ -1,4 +1,6 @@
 // 공통 타입 정의
+export type PriceUnit = 'snack' | 'won';
+
 export interface User {
   id: string;
   email: string;
