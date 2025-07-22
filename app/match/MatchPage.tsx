@@ -26,58 +26,7 @@ interface TradeRequest {
 }
 
 // 샘플 유저 데이터
-const ALL_USERS: User[] = [
-  {
-    id: 1,
-    type: 'buyer',
-    name: 'user04',
-    carrier: 'SKT',
-    data: 1,
-    price: 1500,
-    rating: 4.8,
-    transactionCount: 125,
-  },
-  {
-    id: 2,
-    type: 'buyer',
-    name: 'user02',
-    carrier: 'SKT',
-    data: 0.5,
-    price: 1400,
-    rating: 4.6,
-    transactionCount: 89,
-  },
-  {
-    id: 3,
-    type: 'seller',
-    name: 'user07',
-    carrier: 'KT',
-    data: 2,
-    price: 2000,
-    rating: 4.9,
-    transactionCount: 156,
-  },
-  {
-    id: 4,
-    type: 'seller',
-    name: 'user10',
-    carrier: 'LG U+',
-    data: 1,
-    price: 1200,
-    rating: 4.5,
-    transactionCount: 67,
-  },
-  {
-    id: 5,
-    type: 'buyer',
-    name: 'user15',
-    carrier: 'KT',
-    data: 1.5,
-    price: 1600,
-    rating: 4.7,
-    transactionCount: 98,
-  },
-];
+const ALL_USERS: User[] = [];
 
 export default function MatchPage() {
   const router = useRouter();
