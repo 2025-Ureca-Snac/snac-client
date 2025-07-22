@@ -4,23 +4,16 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 
-<<<<<<< HEAD
 type PriceUnit = 'snack' | 'won';
-=======
-// email과 createdAt은 props로 받지만, 화면에는 표시하지 않습니다.
->>>>>>> main
+
 interface DataItemCardProps {
   imageUrl: string;
   title: string;
   price: number;
-<<<<<<< HEAD
   unit: PriceUnit;
-  onClickBuy: () => void;
-=======
   email: string;
   createdAt: string;
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
->>>>>>> main
   isNew?: boolean;
   newBadgeText?: string;
   buyButtonText?: string;
