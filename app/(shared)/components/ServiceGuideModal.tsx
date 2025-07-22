@@ -22,7 +22,7 @@ export default function ServiceGuideModal({
         role="dialog"
       >
         <div
-          className="bg-white rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-white rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 타이틀 및 닫기 */}
