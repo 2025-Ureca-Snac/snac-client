@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import axios from 'axios';
@@ -15,50 +15,45 @@ interface DisplayData {
   averagePrice: number;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
+const CARRIERS = ['SKT', 'KT', 'LG'] as const;
+
+const FALLBACK_MAP: Record<string, DisplayData> = {
+  SKT: { displayCarrier: 'SKT', averagePrice: 1200 },
+  KT: { displayCarrier: 'KT', averagePrice: 1100 },
+  LG: { displayCarrier: 'LG U+', averagePrice: 950 },
+};
+
 export function DataAvg() {
   const [index, setIndex] = useState(0);
   const [dataList, setDataList] = useState<DisplayData[]>([]);
 
-  const fallbackMap = useMemo<Record<string, DisplayData>>(
-    () => ({
-      SKT: { displayCarrier: 'SKT', averagePrice: 1200 },
-      KT: { displayCarrier: 'KT', averagePrice: 1100 },
-      LG: { displayCarrier: 'LG U+', averagePrice: 950 },
-    }),
-    []
-  );
-
   useEffect(() => {
     const fetchData = async () => {
-      const carriers = ['SKT', 'KT', 'LG'];
-      const results: DisplayData[] = [];
-
-      for (const carrier of carriers) {
+      const promises = CARRIERS.map(async (carrier) => {
         try {
           const response = await axios.get<{ data: TradeStat }>(
-            `https://api.snac-app.com/api/trade-statistics?carrier=${carrier}`
+            `${API_BASE_URL}/trade-statistics?carrier=${carrier}`
           );
-
           const { data } = response.data;
           const displayCarrier = data.carrier === 'LG' ? 'LG U+' : data.carrier;
 
-          results.push({
+          return {
             displayCarrier,
             averagePrice: data.avgPricePerGb,
-          });
+          };
         } catch (error) {
           console.warn(`${carrier} 불러오기 실패 → fallback 사용`, error);
-          results.push(fallbackMap[carrier]);
+          return FALLBACK_MAP[carrier];
         }
-      }
+      });
 
-      if (results.length > 0) {
-        setDataList(results);
-      }
+      const results = await Promise.all(promises);
+      setDataList(results);
     };
 
     fetchData();
-  }, [fallbackMap]);
+  }, []);
 
   useEffect(() => {
     if (dataList.length === 0) return;
