@@ -82,8 +82,15 @@ const ALL_USERS: User[] = [
 export default function MatchPage() {
   const router = useRouter();
   const { foundMatch } = useMatchStore();
-  const { connect, disconnect, addEventListener, removeEventListener } =
-    useRealTimeMatching();
+  const {
+    connect,
+    disconnect,
+    addEventListener,
+    removeEventListener,
+    triggerMockTradeRequest,
+    triggerMockTradeResponse,
+    triggerMockSellerUpdate,
+  } = useRealTimeMatching();
 
   // 필터링 상태
   const [pendingFilters, setPendingFilters] = useState<Filters>({
@@ -412,6 +419,55 @@ export default function MatchPage() {
 
         {/* 결과 섹션 */}
         <ResultSection users={filteredUsers} />
+
+        {/* 테스트용 버튼들 (개발 모드에서만 표시) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="fixed bottom-4 right-4 z-50">
+            <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
+              <h4 className="text-white text-sm font-medium mb-3">
+                🔧 테스트 버튼
+              </h4>
+              <div className="space-y-2">
+                <button
+                  onClick={() => triggerMockTradeRequest()}
+                  className="block w-full bg-blue-600 text-white px-3 py-2 rounded text-xs hover:bg-blue-700"
+                >
+                  거래 요청 테스트
+                </button>
+                <button
+                  onClick={() => triggerMockTradeResponse(true)}
+                  className="block w-full bg-green-600 text-white px-3 py-2 rounded text-xs hover:bg-green-700"
+                >
+                  거래 수락 테스트
+                </button>
+                <button
+                  onClick={() => triggerMockTradeResponse(false)}
+                  className="block w-full bg-red-600 text-white px-3 py-2 rounded text-xs hover:bg-red-700"
+                >
+                  거래 거부 테스트
+                </button>
+                <button
+                  onClick={() => triggerMockSellerUpdate()}
+                  className="block w-full bg-purple-600 text-white px-3 py-2 rounded text-xs hover:bg-purple-700"
+                >
+                  판매자 업데이트
+                </button>
+                <button
+                  onClick={() => router.push('/match/trading')}
+                  className="block w-full bg-yellow-600 text-white px-3 py-2 rounded text-xs hover:bg-yellow-700"
+                >
+                  거래 페이지로
+                </button>
+                <button
+                  onClick={() => router.push('/match/complete')}
+                  className="block w-full bg-indigo-600 text-white px-3 py-2 rounded text-xs hover:bg-indigo-700"
+                >
+                  완료 페이지로
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       <Footer />
     </div>

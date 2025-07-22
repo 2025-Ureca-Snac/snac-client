@@ -6,13 +6,65 @@ interface MatchingEventData {
     | 'payment_completed'
     | 'transfer_status'
     | 'transaction_completed'
-    | 'connection_failed';
+    | 'connection_failed'
+    | 'trade_request'
+    | 'trade_response'
+    | 'seller_update';
   data: Record<string, unknown>;
 }
 
 interface MatchingEventListener {
   (event: MatchingEventData): void;
 }
+
+// Mock 모드 활성화 (서버 없이 테스트용)
+const MOCK_MODE = true;
+
+// Mock 데이터
+const mockEvents = {
+  trade_request: {
+    id: 'req_123',
+    buyerId: 'buyer_456',
+    buyerName: 'user04',
+    sellerId: 'user_123',
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  },
+  trade_response: {
+    status: 'accepted',
+    matchData: {
+      partnerId: 'partner_789',
+      partnerName: 'user07',
+      carrier: 'KT',
+      dataAmount: 2,
+      price: 2000,
+      rating: 4.9,
+      transactionCount: 156,
+    },
+  },
+  seller_update: [
+    {
+      id: 3,
+      type: 'seller',
+      name: 'user07',
+      carrier: 'KT',
+      data: 2,
+      price: 2000,
+      rating: 4.9,
+      transactionCount: 156,
+    },
+    {
+      id: 4,
+      type: 'seller',
+      name: 'user10',
+      carrier: 'LG U+',
+      data: 1,
+      price: 1200,
+      rating: 4.5,
+      transactionCount: 67,
+    },
+  ],
+};
 
 class RealTimeMatchingService {
   private eventSource: EventSource | null = null;
@@ -23,6 +75,14 @@ class RealTimeMatchingService {
 
   // SSE 연결 시작
   connect(userId: string, transactionId?: string): void {
+    if (MOCK_MODE) {
+      console.log('🔧 Mock 모드: SSE 연결 시뮬레이션', {
+        userId,
+        transactionId,
+      });
+      return;
+    }
+
     if (this.eventSource) {
       this.disconnect();
     }
@@ -59,6 +119,11 @@ class RealTimeMatchingService {
 
   // 연결 종료
   disconnect(): void {
+    if (MOCK_MODE) {
+      console.log('🔧 Mock 모드: SSE 연결 해제 시뮬레이션');
+      return;
+    }
+
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;
@@ -91,6 +156,8 @@ class RealTimeMatchingService {
 
   // 재연결 처리
   private handleReconnect(userId: string, transactionId?: string): void {
+    if (MOCK_MODE) return;
+
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       console.log(
@@ -123,10 +190,47 @@ class RealTimeMatchingService {
     }
   }
 
-  // 매칭 요청 전송 (실제로는 HTTP API 호출)
+  // Mock 이벤트 발생 함수들 (테스트용)
+  triggerMockTradeRequest(): void {
+    console.log('🔧 Mock: 거래 요청 이벤트 발생');
+    this.notifyListeners('trade_request', {
+      type: 'trade_request',
+      data: mockEvents.trade_request,
+    });
+  }
+
+  triggerMockTradeResponse(accept: boolean = true): void {
+    const responseData = accept
+      ? mockEvents.trade_response
+      : {
+          status: 'rejected',
+          message: '거래가 거부되었습니다.',
+        };
+
+    console.log('🔧 Mock: 거래 응답 이벤트 발생', responseData);
+    this.notifyListeners('trade_response', {
+      type: 'trade_response',
+      data: responseData,
+    });
+  }
+
+  triggerMockSellerUpdate(): void {
+    console.log('🔧 Mock: 판매자 업데이트 이벤트 발생');
+    this.notifyListeners('seller_update', {
+      type: 'seller_update',
+      data: mockEvents.seller_update as unknown as Record<string, unknown>,
+    });
+  }
+
+  // 매칭 요청 전송 (Mock 모드)
   async startMatching(
     filters: Record<string, unknown>
   ): Promise<{ success: boolean; message?: string }> {
+    if (MOCK_MODE) {
+      console.log('🔧 Mock: 매칭 요청 시뮬레이션', filters);
+      return { success: true, message: 'Mock 매칭 요청 성공' };
+    }
+
     try {
       const response = await fetch('/api/matching/start', {
         method: 'POST',
@@ -144,10 +248,15 @@ class RealTimeMatchingService {
     }
   }
 
-  // 매칭 취소
+  // 매칭 취소 (Mock 모드)
   async cancelMatching(
     transactionId: string
   ): Promise<{ success: boolean; message?: string }> {
+    if (MOCK_MODE) {
+      console.log('🔧 Mock: 매칭 취소 시뮬레이션', transactionId);
+      return { success: true, message: 'Mock 매칭 취소 성공' };
+    }
+
     try {
       const response = await fetch('/api/matching/cancel', {
         method: 'POST',
@@ -165,12 +274,21 @@ class RealTimeMatchingService {
     }
   }
 
-  // 거래 상태 업데이트
+  // 거래 상태 업데이트 (Mock 모드)
   async updateTradingStatus(
     transactionId: string,
     status: string,
     data?: Record<string, unknown>
   ): Promise<{ success: boolean; message?: string }> {
+    if (MOCK_MODE) {
+      console.log('🔧 Mock: 거래 상태 업데이트 시뮬레이션', {
+        transactionId,
+        status,
+        data,
+      });
+      return { success: true, message: 'Mock 거래 상태 업데이트 성공' };
+    }
+
     try {
       const response = await fetch('/api/trading/update', {
         method: 'POST',
@@ -232,6 +350,19 @@ export function useRealTimeMatching() {
     return realtimeService.updateTradingStatus(transactionId, status, data);
   };
 
+  // Mock 테스트 함수들
+  const triggerMockTradeRequest = () => {
+    realtimeService.triggerMockTradeRequest();
+  };
+
+  const triggerMockTradeResponse = (accept: boolean = true) => {
+    realtimeService.triggerMockTradeResponse(accept);
+  };
+
+  const triggerMockSellerUpdate = () => {
+    realtimeService.triggerMockSellerUpdate();
+  };
+
   return {
     connect,
     disconnect,
@@ -240,5 +371,9 @@ export function useRealTimeMatching() {
     startMatching,
     cancelMatching,
     updateTradingStatus,
+    // Mock 테스트 함수들
+    triggerMockTradeRequest,
+    triggerMockTradeResponse,
+    triggerMockSellerUpdate,
   };
 }
