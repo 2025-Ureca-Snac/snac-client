@@ -9,6 +9,7 @@ import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
+import Image from 'next/image';
 
 interface Card {
   id: number;
@@ -35,6 +36,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const { actions } = useHomeStore();
 
   const { category, transactionStatus, priceRanges, sortBy } = useHomeStore();
   useEffect(() => {
@@ -89,6 +91,14 @@ export default function Home() {
       <Header />
       <Banner />
       <DataAvg providers={['SKT', 'KT', 'LG U+']} averagePrice={1754} />
+      <button
+        onClick={actions.toggleCreateModal}
+        className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all
+      bg-gradient-to-br from-[#98FF58] to-[#38CB89] hover:brightness-90"
+        aria-label="글 등록하기"
+      >
+        <Image src="/write.svg" alt="글쓰기" width={24} height={24} />
+      </button>
 
       <div className="flex items-center justify-center">
         {loading ? (
@@ -107,7 +117,6 @@ export default function Home() {
       <div className="w-full">
         <ArticleSection />
       </div>
-
       <Footer />
     </>
   );
