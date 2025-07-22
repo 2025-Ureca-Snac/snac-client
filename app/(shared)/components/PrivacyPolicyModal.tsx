@@ -1,11 +1,13 @@
 import React from 'react';
 import ModalPortal from './modal-portal';
+import type { PrivacyPolicyModalProps } from '../types/privacy-policy-modal';
 
-interface PrivacyPolicyModalProps {
-  open: boolean;
-  onClose: () => void;
-}
-
+/**
+ * @author 이승우
+ * @description 개인정보처리방침 모달 컴포넌트({@link PrivacyPolicyModalProps(open, onClose)})
+ * @param {boolean} open 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ */
 export default function PrivacyPolicyModal({
   open,
   onClose,

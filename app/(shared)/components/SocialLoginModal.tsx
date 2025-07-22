@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import ModalPortal from './modal-portal';
-import { api, handleApiError } from '../utils/api';
 import { useAuthStore } from '../stores/auth-store';
+import {
+  SOCIAL_MODAL_PROVIDERS,
+  SOCIAL_LOGIN_MODAL_INITIAL_STATE,
+} from '../constants/social-login-modal-constants';
+import { SocialLoginModalProps } from '../types/social-login-modal';
 
-interface SocialLoginModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit?: (provider: string, isLinked: boolean) => void;
-}
-
+/**
+ * @author 이승우
+ * @description 소셜 로그인 모달 컴포넌트{@link SocialLoginModalProps(open, onClose, onSubmit)}
+ * @param {boolean} open 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ * @param {Function} onSubmit 소셜 로그인 연동 함수
+ */
 export default function SocialLoginModal({
   open,
   onClose,
   onSubmit,
 }: SocialLoginModalProps) {
-  const { token } = useAuthStore();
+  const { linkSocialAccount, unlinkSocialAccount } = useAuthStore();
   const [linkedProviders, setLinkedProviders] = useState<{
     [key: string]: boolean;
-  }>({
-    kakao: false,
-    naver: false,
-    google: false,
-  });
+  }>(SOCIAL_LOGIN_MODAL_INITIAL_STATE);
+
   // 모달이 열릴 때 현재 연동 상태를 가져오기
   React.useEffect(() => {
     if (open) {
@@ -31,41 +33,12 @@ export default function SocialLoginModal({
 
   const fetchLinkedProviders = async () => {
     // 현재는 상태 조회 API가 없으므로 기본값으로 설정
-    setLinkedProviders({
-      kakao: false,
-      naver: false,
-      google: false,
-    });
+    setLinkedProviders(SOCIAL_LOGIN_MODAL_INITIAL_STATE);
   };
-
-  const socialProviders = [
-    {
-      id: 'kakao',
-      name: '카카오',
-      color: 'bg-yellow-400',
-      textColor: 'text-black',
-      icon: 'K',
-    },
-    {
-      id: 'naver',
-      name: '네이버',
-      color: 'bg-green-500',
-      textColor: 'text-white',
-      icon: 'N',
-    },
-    {
-      id: 'google',
-      name: '구글',
-      color: 'bg-white',
-      textColor: 'text-gray-700',
-      icon: 'G',
-      border: 'border border-gray-300',
-    },
-  ];
 
   const handleToggleProvider = async (providerId: string) => {
     const isCurrentlyLinked = linkedProviders[providerId];
-    const provider = socialProviders.find((p) => p.id === providerId);
+    const provider = SOCIAL_MODAL_PROVIDERS.find((p) => p.id === providerId);
 
     if (!provider) {
       alert('지원하지 않는 소셜 로그인 제공자입니다.');
@@ -74,38 +47,20 @@ export default function SocialLoginModal({
 
     try {
       if (!isCurrentlyLinked) {
-        // 소셜 로그인 연동 - 팝업으로 OAuth2 인증 페이지 열기
-        const popup = window.open(
-          `http://localhost:8080/oauth2/authorization/${providerId}?state=${token}`,
-          'socialLogin',
-          'width=500,height=600,scrollbars=yes,resizable=yes'
-        );
-
-        // 팝업이 차단되었는지 확인
-        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-          alert(
-            '팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.'
-          );
-          return;
-        }
-
-        // 팝업 창이 닫힐 때까지 대기
-        const checkClosed = setInterval(() => {
-          if (popup.closed) {
-            clearInterval(checkClosed);
-            // 팝업이 닫히면 연동 성공으로 간주하고 상태 업데이트
-            setLinkedProviders((prev) => ({
-              ...prev,
-              [providerId]: true,
-            }));
-            if (onSubmit) {
-              onSubmit(providerId, true);
-            }
+        // 소셜 로그인 연동
+        const success = await linkSocialAccount(providerId);
+        if (success) {
+          setLinkedProviders((prev) => ({
+            ...prev,
+            [providerId]: true,
+          }));
+          if (onSubmit) {
+            onSubmit(providerId, true);
           }
-        }, 1000);
+        }
       } else {
-        // 소셜 로그인 해제 API 호출
-        await api.delete(`/oauth2/authorization/unlink/${providerId}`);
+        // 소셜 로그인 해제
+        await unlinkSocialAccount(providerId);
         setLinkedProviders((prev) => ({
           ...prev,
           [providerId]: false,
@@ -115,8 +70,9 @@ export default function SocialLoginModal({
         }
       }
     } catch (error) {
-      const errorMessage = handleApiError(error);
-      alert(`소셜 로그인 연동 처리 중 오류가 발생했습니다: ${errorMessage}`);
+      alert(
+        `소셜 로그인 연동 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
+      );
     }
   };
 
@@ -164,7 +120,7 @@ export default function SocialLoginModal({
 
           {/* 소셜 로그인 옵션들 */}
           <div className="w-full flex flex-col gap-3 mb-6">
-            {socialProviders.map((provider) => (
+            {SOCIAL_MODAL_PROVIDERS.map((provider) => (
               <div
                 key={provider.id}
                 className="w-full flex items-center justify-between p-4 rounded-lg border-2 border-gray-200"

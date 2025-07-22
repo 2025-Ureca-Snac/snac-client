@@ -1,83 +1,44 @@
 import Image from 'next/image';
-
-const SOCIALS = [
-  {
-    name: '카카오',
-    pcSrc: '/kakao_login.svg',
-    mobileSrc: '/kakao_mobile_login.svg',
-    providerId: 'kakao',
-  },
-  {
-    name: '네이버',
-    pcSrc: '/naver_login.svg',
-    mobileSrc: '/naver_mobile_login.svg',
-    providerId: 'naver',
-  },
-  {
-    name: '구글',
-    pcSrc: '/google_login.svg',
-    mobileSrc: '/google_mobile_login.svg',
-    providerId: 'google',
-  },
-];
+import { useAuthStore } from '../stores/auth-store';
+import { SOCIALS } from '../constants/social-login-data';
 
 /**
  * @author 이승우
- * @description 소셜 로그인 버튼 컴포넌트( 카카오, 네이버, 구글 )
+ * @description 소셜 로그인 버튼 컴포넌트( 브랜드별 맞춤 스타일 )
  */
 export default function SocialLoginButtons() {
+  const { linkSocialAccount } = useAuthStore();
+
   const handleSocialLogin = async (providerId: string) => {
     try {
-      // 팝업으로 OAuth2 인증 페이지 열기
-      const popup = window.open(
-        `http://localhost:8080/oauth2/authorization/${providerId}`,
-        'socialLogin',
-        'width=500,height=600,scrollbars=yes,resizable=yes'
-      );
-
-      // 팝업이 차단되었는지 확인
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        alert('팝업이 차단되었습니다. 팝업 차단을 해제하고 다시 시도해주세요.');
-        return;
+      // auth-store의 소셜 로그인 기능 사용
+      const success = await linkSocialAccount(providerId);
+      if (success) {
+        console.log('소셜 로그인 성공');
       }
-
-      // 팝업 창이 닫힐 때까지 대기
-      const checkClosed = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(checkClosed);
-          // 팝업이 닫히면 로그인 성공으로 간주하고 페이지 새로고침
-          window.location.reload();
-        }
-      }, 1000);
     } catch (error) {
       console.error('소셜 로그인 실패:', error);
-      alert('소셜 로그인 중 오류가 발생했습니다.');
+      alert(
+        `소셜 로그인 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
+      );
     }
   };
 
   return (
-    <div className="space-y-3">
-      {SOCIALS.map(({ name, pcSrc, mobileSrc, providerId }) => (
-        <button
-          className="block w-full"
-          key={name}
-          onClick={() => handleSocialLogin(providerId)}
-        >
-          <Image
-            src={pcSrc}
-            alt={name}
-            width={100}
-            height={100}
-            className="w-full object-contain hidden md:block"
-          />
-          <Image
-            src={mobileSrc}
-            alt={name}
-            width={100}
-            height={100}
-            className="w-full object-contain block md:hidden"
-          />
-        </button>
+    <div className="flex justify-center space-x-4">
+      {SOCIALS.map(({ name, src, providerId }) => (
+        <div key={name} className="flex flex-col items-center space-y-2">
+          <div className="w-36 h-36 rounded-full flex items-center justify-center">
+            <Image
+              src={src}
+              alt={name}
+              width={90}
+              height={90}
+              className="object-contain cursor-pointer"
+              onClick={() => handleSocialLogin(providerId)}
+            />
+          </div>
+        </div>
       ))}
     </div>
   );
