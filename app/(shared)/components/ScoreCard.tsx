@@ -1,61 +1,29 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import ModalPortal from './modal-portal';
 import { useUserStore } from '../stores/user-store';
+import { SNACK_GRADES } from '../constants/snack-grades';
 
-const SNACK_GRADES = [
-  {
-    icon: '🥚',
-    name: '새싹 스낵이',
-    range: '스낵 점수 0 ~ 49',
-    min: 0,
-    max: 49,
-  },
-  {
-    icon: '🍌',
-    name: '초급 스낵이',
-    range: '스낵 점수 50 ~ 99',
-    min: 50,
-    max: 99,
-  },
-  {
-    icon: '🍞',
-    name: '숙련 스낵이',
-    range: '스낵 점수 100 ~ 299',
-    min: 100,
-    max: 299,
-  },
-  {
-    icon: '🍊',
-    name: '능숙 스낵이',
-    range: '스낵 점수 300 ~ 499',
-    min: 300,
-    max: 499,
-  },
-  {
-    icon: '🥐',
-    name: '고급 스낵이',
-    range: '스낵 점수 500 ~ 799',
-    min: 500,
-    max: 799,
-  },
-  {
-    icon: '🌈',
-    name: '전설의 스낵이',
-    range: '스낵 점수 800 ~ 999',
-    min: 800,
-    max: 999,
-  },
-];
-
+/**
+ * @author 이승우
+ * @description 스코어 카드 컴포넌트
+ */
 export default function ScoreCard() {
   const { profile } = useUserStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const score = 185;
+
+  // 실제 스코어는 API나 store에서 가져와야 함 (현재는 예시)
+  const score = 185; // profile?.score || 185;
   const maxScore = 500;
+
+  // 현재 등급 계산
+  const currentGrade =
+    SNACK_GRADES.find((grade) => score >= grade.min && score <= grade.max) ||
+    SNACK_GRADES[0];
 
   // 클릭 외부 감지
   useEffect(() => {
@@ -97,8 +65,28 @@ export default function ScoreCard() {
     <section className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
       {/* User Profile Section */}
       <div className="mb-6">
-        <div className="font-bold text-2xl text-black mb-1">
-          {profile?.nickname || '사용자'}
+        <div className="flex items-center justify-between mb-1">
+          <div className="font-bold text-2xl text-black">
+            {profile?.nickname || '사용자'}
+          </div>
+          <button
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors"
+            onClick={() => {
+              // 단골 목록 모달 열기
+              const event = new CustomEvent('openFavoriteModal');
+              window.dispatchEvent(event);
+            }}
+          >
+            <span className="font-bold text-lg">20</span>
+            <span className="text-sm">단골 목록</span>
+            <Image
+              src="/chevron-down.svg"
+              alt="오른쪽 화살표"
+              width={20}
+              height={20}
+              className="inline-block -rotate-90 text-gray-400"
+            />
+          </button>
         </div>
         <div className="text-gray-600 text-base">
           {profile?.birthDate
@@ -120,7 +108,15 @@ export default function ScoreCard() {
               스낵 포인트 • 머니
             </span>
           </div>
-          <span className="text-gray-400 text-sm">▶</span>
+          <span className="text-gray-400 text-sm">
+            <Image
+              src="/chevron-down.svg"
+              alt="오른쪽 화살표"
+              width={20}
+              height={20}
+              className="inline-block -rotate-90 text-gray-400"
+            />
+          </span>
         </button>
       </div>
 
@@ -175,17 +171,30 @@ export default function ScoreCard() {
         </div>
       </div>
 
-      {/* 새싹 스낵이 Section */}
+      {/* 현재 등급 Section */}
       <button
         className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
         onClick={() => setModalOpen(true)}
         type="button"
       >
         <div className="flex items-center gap-3">
-          <span className="text-yellow-600 text-xl">🥚</span>
-          <span className="font-medium text-gray-800">새싹 스낵이</span>
+          <Image
+            src={currentGrade.icon}
+            alt={currentGrade.name}
+            width={24}
+            height={24}
+          />
+          <span className="font-medium text-gray-800">{currentGrade.name}</span>
         </div>
-        <span className="text-gray-400">▶</span>
+        <span className="text-gray-400">
+          <Image
+            src="/chevron-down.svg"
+            alt="오른쪽 화살표"
+            width={20}
+            height={20}
+            className="inline-block -rotate-90 text-gray-400"
+          />
+        </span>
       </button>
 
       <ModalPortal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
@@ -218,11 +227,13 @@ export default function ScoreCard() {
                     key={grade.name}
                     className={`flex items-center gap-3 rounded-xl px-4 py-2 ${isCurrent ? 'bg-orange-50' : 'bg-white'}`}
                   >
-                    <span
-                      className={`text-2xl ${isCurrent ? 'text-orange-500' : 'text-gray-600'}`}
-                    >
-                      {grade.icon}
-                    </span>
+                    <Image
+                      src={grade.icon}
+                      alt={grade.name}
+                      width={24}
+                      height={24}
+                      className={isCurrent ? 'opacity-100' : 'opacity-60'}
+                    />
                     <div>
                       <div
                         className={`font-bold text-base ${isCurrent ? 'text-orange-500' : 'text-gray-900'}`}
