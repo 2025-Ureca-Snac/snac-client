@@ -3,19 +3,17 @@
 import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
-import type { DataItemCardProps } from '../types/data-item-card';
 
-/**
- * @author 이승우
- * @description 데이터 아이템 카드 컴포넌트{@link DataItemCardProps(imageUrl, title, price, isNew, newBadgeText, buyButtonText, onClickBuy)}
- * @param {string} imageUrl 이미지 URL
- * @param {string} title 제목
- * @param {number} price 가격
- * @param {boolean} isNew 새로운 아이템 여부
- * @param {string} newBadgeText 새로운 아이템 뱃지 텍스트
- * @param {string} buyButtonText 구매 버튼 텍스트
- * @param {Function} onClickBuy 구매 버튼 클릭 함수
- */
+interface DataItemCardProps {
+  imageUrl: string;
+  title: string;
+  price: number;
+  onClickBuy: () => void;
+  isNew?: boolean;
+  newBadgeText?: string;
+  buyButtonText?: string;
+}
+
 export const DataItemCard = ({
   imageUrl,
   title,
