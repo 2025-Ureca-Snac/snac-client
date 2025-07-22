@@ -189,9 +189,6 @@ export default function SignUp() {
     } catch (error) {
       console.error('이메일 인증코드 확인 오류', error);
     }
-
-    setIsEmailVerified(true);
-    setShowEmailVerification(false);
   }, [formData.emailVerificationCode, formData.email]);
 
   /**
