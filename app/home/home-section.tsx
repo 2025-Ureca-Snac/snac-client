@@ -2,8 +2,7 @@
 
 import { DataItemCard } from '../(shared)/components/DataItemCard';
 import { isToday } from '@/app/(shared)/utils/';
-
-type PriceUnit = 'snack' | 'won';
+import { PriceUnit } from '@/app/(shared)/types';
 
 interface DataItem {
   id: number;

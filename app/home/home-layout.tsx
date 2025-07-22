@@ -8,8 +8,7 @@ import HomeSection from './home-section';
 import Image from 'next/image';
 import { Toaster } from 'sonner';
 import { Pagination } from '@/app/(shared)/components/Pagination';
-
-type PriceUnit = 'snack' | 'won';
+import { PriceUnit } from '@/app/(shared)/types';
 
 interface Card {
   id: number;

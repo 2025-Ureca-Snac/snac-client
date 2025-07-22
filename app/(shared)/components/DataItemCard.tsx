@@ -3,8 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
-
-type PriceUnit = 'snack' | 'won';
+import { PriceUnit } from '@/app/(shared)/types';
 
 interface DataItemCardProps {
   imageUrl: string;
