@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import axios from 'axios';
@@ -19,15 +19,18 @@ export function DataAvg() {
   const [index, setIndex] = useState(0);
   const [dataList, setDataList] = useState<DisplayData[]>([]);
 
+  const fallbackMap = useMemo<Record<string, DisplayData>>(
+    () => ({
+      SKT: { displayCarrier: 'SKT', averagePrice: 1200 },
+      KT: { displayCarrier: 'KT', averagePrice: 1100 },
+      LG: { displayCarrier: 'LG U+', averagePrice: 950 },
+    }),
+    []
+  );
+
   useEffect(() => {
     const fetchData = async () => {
       const carriers = ['SKT', 'KT', 'LG'];
-      const fallbackMap: Record<string, DisplayData> = {
-        SKT: { displayCarrier: 'SKT', averagePrice: 1200 },
-        KT: { displayCarrier: 'KT', averagePrice: 1100 },
-        LG: { displayCarrier: 'LG U+', averagePrice: 950 },
-      };
-
       const results: DisplayData[] = [];
 
       for (const carrier of carriers) {
@@ -44,18 +47,22 @@ export function DataAvg() {
             averagePrice: data.avgPricePerGb,
           });
         } catch (error) {
-          console.warn(` ${carrier} 불러오기 실패 → fallback 사용`, error);
+          console.warn(`${carrier} 불러오기 실패 → fallback 사용`, error);
           results.push(fallbackMap[carrier]);
         }
       }
 
-      setDataList(results);
+      if (results.length > 0) {
+        setDataList(results);
+      }
     };
 
     fetchData();
-  }, []);
+  }, [fallbackMap]);
 
   useEffect(() => {
+    if (dataList.length === 0) return;
+
     const intervalId = setInterval(() => {
       setIndex((i) => (i + 1) % dataList.length);
     }, 3000);
