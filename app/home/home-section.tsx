@@ -1,11 +1,13 @@
 'use client';
 
-import { DataItemCard } from './DataItemCard';
-import { isToday } from '@/app/(shared)/utils';
+import { DataItemCard } from '../(shared)/components/DataItemCard';
+import { isToday } from '@/app/(shared)/utils/';
 
 interface DataItem {
   id: number;
   name: string;
+  createdAt: string;
+  email: string;
   sellStatus: string;
   cardCategory: string;
   carrier: string;
@@ -14,11 +16,10 @@ interface DataItem {
   updatedAt: string;
 }
 
-interface HomePageClientProps {
+interface HomeSectionProps {
   cards: DataItem[];
 }
 
-// carrier에 따른 이미지 URL 매핑
 const getCarrierImageUrl = (carrier: string): string => {
   switch (carrier) {
     case 'SKT':
@@ -28,12 +29,11 @@ const getCarrierImageUrl = (carrier: string): string => {
     case 'LGU+':
       return '/LGU+.svg';
     default:
-      return '/SKT.svg'; // 기본값
+      return '/SKT.svg';
   }
 };
 
-// alert 임시
-export const HomePageClient = ({ cards }: HomePageClientProps) => {
+export default function HomeSection({ cards }: HomeSectionProps) {
   const handleBuy = (title: string) => {
     alert(`"${title}" 구매하기 클릭됨!`);
   };
@@ -50,7 +50,7 @@ export const HomePageClient = ({ cards }: HomePageClientProps) => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 md:w-[765px]">
       {cards.map((item) => (
         <DataItemCard
           key={item.id}
@@ -61,8 +61,10 @@ export const HomePageClient = ({ cards }: HomePageClientProps) => {
           onClickBuy={() =>
             handleBuy(`${item.carrier} 데이터 ${item.dataAmount}MB`)
           }
+          email={item.email}
+          createdAt={item.createdAt}
         />
       ))}
     </div>
   );
-};
+}
