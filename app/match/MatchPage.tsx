@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
@@ -8,60 +8,47 @@ import FilterSection, {
   SellerRegistrationInfo,
 } from './components/FilterSection';
 import ResultSection from './components/ResultSection';
+import IncomingRequestsPanel from './components/IncomingRequestsPanel';
+import MatchSuccessPanel from './components/MatchSuccessPanel';
+import TestPanel from './components/TestPanel';
 import { Filters } from './types';
-import { User } from './types/match';
+import { User, TradeRequest } from './types/match';
 import { useMatchStore } from '../(shared)/stores/match-store';
 import { useRealTimeMatching } from '../(shared)/utils/realtime';
+import { useUserFiltering } from './hooks/useUserFiltering';
+import { useMatchingEvents } from './hooks/useMatchingEvents';
 
-// 실시간 매칭 상태 타입
+// 타입 정의
 type MatchingStatus = 'idle' | 'requesting' | 'requested' | 'matched';
 
-interface TradeRequest {
-  id: string;
-  buyerId: string;
-  buyerName: string;
-  sellerId: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  createdAt: string;
-}
-
-// 샘플 유저 데이터
+// 샘플 유저 데이터 (사용자가 빈 배열로 설정함)
 const ALL_USERS: User[] = [];
 
 export default function MatchPage() {
   const router = useRouter();
   const { foundMatch } = useMatchStore();
   const {
-    connect,
-    disconnect,
-    addEventListener,
-    removeEventListener,
     triggerMockTradeRequest,
     triggerMockTradeResponse,
     triggerMockSellerUpdate,
   } = useRealTimeMatching();
 
-  // 필터링 상태
+  // 상태 관리
   const [pendingFilters, setPendingFilters] = useState<Filters>({
     transactionType: [],
     carrier: [],
     dataAmount: [],
     price: [],
   });
-
   const [appliedFilters, setAppliedFilters] = useState<Filters>({
     transactionType: [],
     carrier: [],
     dataAmount: [],
     price: [],
   });
-
-  // 실시간 매칭 상태
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
   const [activeSellers, setActiveSellers] = useState<User[]>([]);
   const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([]);
-
-  // 판매자 등록 정보
   const [sellerInfo, setSellerInfo] = useState<SellerRegistrationInfo>({
     dataAmount: 1,
     price: 1500,
@@ -69,146 +56,42 @@ export default function MatchPage() {
     isActive: false,
   });
 
-  // 현재 사용자 역할
+  // 커스텀 훅 사용
+  const filteredUsers = useUserFiltering(
+    appliedFilters,
+    activeSellers,
+    ALL_USERS
+  );
   const userRole =
     appliedFilters.transactionType[0] === '구매자'
       ? 'buyer'
       : appliedFilters.transactionType[0] === '판매자'
         ? 'seller'
         : null;
+  const userClickHandler =
+    userRole === 'buyer' ? handleSendTradeRequest : undefined;
 
-  // 필터링된 유저 목록
-  const filteredUsers = useMemo(() => {
-    if (appliedFilters.transactionType.includes('__RESET__')) {
-      return [];
-    }
-
-    const sourceUsers = activeSellers.length > 0 ? activeSellers : ALL_USERS;
-
-    return sourceUsers.filter((user) => {
-      // 거래 방식 필터
-      if (appliedFilters.transactionType.length > 0) {
-        const userType = user.type === 'buyer' ? '구매자' : '판매자';
-        if (!appliedFilters.transactionType.includes(userType)) {
-          return false;
-        }
-      }
-
-      // 통신사 필터
-      if (appliedFilters.carrier.length > 0) {
-        if (!appliedFilters.carrier.includes(user.carrier)) {
-          return false;
-        }
-      }
-
-      // 데이터량 필터
-      if (appliedFilters.dataAmount.length > 0) {
-        const userData = user.data;
-        const matchesDataFilter = appliedFilters.dataAmount.some((filter) => {
-          if (filter === '1GB 미만') return userData < 1;
-          if (filter === '1GB 이상') return userData >= 1;
-          if (filter === '2GB 이상') return userData >= 2;
-          return false;
-        });
-        if (!matchesDataFilter) return false;
-      }
-
-      // 가격 필터
-      if (appliedFilters.price.length > 0) {
-        const userPrice = user.price;
-        const matchesPriceFilter = appliedFilters.price.some((filter) => {
-          if (filter === '0 - 999') return userPrice >= 0 && userPrice <= 999;
-          if (filter === '1,000 - 1,499')
-            return userPrice >= 1000 && userPrice <= 1499;
-          if (filter === '1,500 - 1,999')
-            return userPrice >= 1500 && userPrice <= 1999;
-          if (filter === '2,000 - 2,499')
-            return userPrice >= 2000 && userPrice <= 2499;
-          if (filter === '2,500 이상') return userPrice >= 2500;
-          return false;
-        });
-        if (!matchesPriceFilter) return false;
-      }
-
-      return true;
-    });
-  }, [appliedFilters, activeSellers]);
-
-  // 실시간 연결 설정
-  useEffect(() => {
-    const userId = 'user_123';
-    connect(userId);
-
-    const handleTradeRequest = (event: { data: Record<string, unknown> }) => {
-      const request = event.data as unknown as TradeRequest;
-      if (userRole === 'seller') {
-        setIncomingRequests((prev) => [...prev, request]);
-      }
-    };
-
-    const handleTradeResponse = (event: { data: Record<string, unknown> }) => {
-      const { status, matchData } = event.data as {
-        status: string;
-        matchData: Record<string, unknown>;
-      };
-      if (status === 'accepted') {
-        setMatchingStatus('matched');
-        foundMatch({
-          id: String(matchData.partnerId || ''),
-          name: String(matchData.partnerName || ''),
-          carrier: String(matchData.carrier || 'SKT'),
-          data: Number(matchData.dataAmount || 1),
-          price: Number(matchData.price || 0),
-          rating: Number(matchData.rating || 4.5),
-          transactionCount: Number(matchData.transactionCount || 0),
-          type: userRole === 'seller' ? 'buyer' : 'seller',
-        });
-        setTimeout(() => router.push('/match/trading'), 1000);
-      } else if (status === 'rejected') {
-        setMatchingStatus('idle');
-        alert('거래 요청이 거부되었습니다.');
-      }
-    };
-
-    const handleSellerUpdate = (event: { data: Record<string, unknown> }) => {
-      const updatedSellers = event.data as unknown as User[];
-      setActiveSellers(updatedSellers);
-    };
-
-    addEventListener('trade_request', handleTradeRequest);
-    addEventListener('trade_response', handleTradeResponse);
-    addEventListener('seller_update', handleSellerUpdate);
-
-    return () => {
-      removeEventListener('trade_request', handleTradeRequest);
-      removeEventListener('trade_response', handleTradeResponse);
-      removeEventListener('seller_update', handleSellerUpdate);
-      disconnect();
-    };
-  }, [
+  // 실시간 이벤트 처리
+  useMatchingEvents({
     userRole,
-    connect,
-    disconnect,
-    addEventListener,
-    removeEventListener,
-    foundMatch,
-    router,
-  ]);
+    appliedFilters,
+    setIncomingRequests,
+    setActiveSellers,
+    setMatchingStatus,
+  });
 
   // 필터 핸들러
-  const handleFilterChange = (filters: Filters) => {
-    setPendingFilters(filters);
-  };
+  const handleFilterChange = (filters: Filters) => setPendingFilters(filters);
 
   const handleApplyFilters = () => {
-    // 구매자의 경우 모든 필터 조건 확인
     if (pendingFilters.transactionType[0] === '구매자') {
-      const hasTransactionType = pendingFilters.transactionType.length > 0;
-      const hasCarrier = pendingFilters.carrier.length > 0;
-      const hasDataAmount = pendingFilters.dataAmount.length > 0;
-      const hasPrice = pendingFilters.price.length > 0;
+      const hasRequired =
+        pendingFilters.transactionType.length > 0 &&
+        pendingFilters.carrier.length > 0 &&
+        pendingFilters.dataAmount.length > 0 &&
+        pendingFilters.price.length > 0;
 
-      if (!hasTransactionType || !hasCarrier || !hasDataAmount || !hasPrice) {
+      if (!hasRequired) {
         alert('모든 필터 조건을 선택해주세요.');
         return;
       }
@@ -216,7 +99,6 @@ export default function MatchPage() {
 
     setAppliedFilters(pendingFilters);
 
-    // 실시간 판매자 목록 시뮬레이션 (구매자인 경우)
     if (pendingFilters.transactionType[0] === '구매자') {
       setActiveSellers(ALL_USERS.filter((user) => user.type === 'seller'));
     }
@@ -239,20 +121,30 @@ export default function MatchPage() {
     setActiveSellers([]);
   };
 
-  // 판매자 정보 변경 핸들러
+  // 판매자 정보 관리
   const handleSellerInfoChange = (info: SellerRegistrationInfo) => {
     setSellerInfo(info);
-    // 실제 API 호출
-    // await updateSellerStatus(info);
   };
 
   const handleToggleSellerStatus = () => {
-    // 실제 API 호출
-    // await toggleSellerStatus();
+    const newInfo = { ...sellerInfo, isActive: !sellerInfo.isActive };
+    setSellerInfo(newInfo);
+
+    console.log('🔥 판매자 상태 변경:', newInfo);
+
+    if (newInfo.isActive) {
+      console.log('📢 새로운 판매자 등록됨! 구매자들에게 알림 발송');
+      alert('판매 상태가 활성화되었습니다! 구매자들이 볼 수 있습니다.');
+
+      setTimeout(() => triggerMockSellerUpdate(), 500);
+    } else {
+      console.log('📢 판매자가 비활성화됨');
+      alert('판매 상태가 비활성화되었습니다.');
+    }
   };
 
   // 거래 요청 발송 (구매자용)
-  const handleSendTradeRequest = async (seller: User) => {
+  async function handleSendTradeRequest(seller: User) {
     if (userRole !== 'buyer') {
       alert('구매자만 거래를 요청할 수 있습니다.');
       return;
@@ -265,7 +157,6 @@ export default function MatchPage() {
 
     setMatchingStatus('requesting');
 
-    // 실제로는 API 호출하겠지만, 지금은 mock으로 시뮬레이션
     console.log('🔥 거래 요청 발송:', {
       buyerId: 'user_123',
       sellerId: seller.id,
@@ -276,7 +167,7 @@ export default function MatchPage() {
 
     alert(`${seller.name}님에게 거래 요청을 보냈습니다!`);
 
-    // Mock: 2초 후 자동 수락 시뮬레이션 (테스트용)
+    // Mock: 2초 후 자동 수락 시뮬레이션
     setTimeout(() => {
       setMatchingStatus('matched');
       foundMatch({
@@ -291,7 +182,7 @@ export default function MatchPage() {
       });
       setTimeout(() => router.push('/match/trading'), 1000);
     }, 2000);
-  };
+  }
 
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = async (
@@ -320,15 +211,11 @@ export default function MatchPage() {
     }
   };
 
-  // 사용자 클릭 핸들러 (구매자 모드에서만)
-  const userClickHandler =
-    userRole === 'buyer' ? handleSendTradeRequest : undefined;
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
-        {/* 개선된 FilterSection */}
+        {/* 필터 섹션 */}
         <FilterSection
           onFilterChange={handleFilterChange}
           onApply={handleApplyFilters}
@@ -339,130 +226,28 @@ export default function MatchPage() {
           sellerInfo={sellerInfo}
         />
 
-        {/* 판매자 모드: 들어온 거래 요청 표시 */}
-        {userRole === 'seller' && incomingRequests.length > 0 && (
-          <div className="px-4 py-6">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-yellow-800 mb-4">
-                  📩 거래 요청 ({incomingRequests.length}개)
-                </h3>
-                <div className="space-y-3">
-                  {incomingRequests.map((request) => (
-                    <div
-                      key={request.id}
-                      className="bg-white border border-yellow-200 rounded-lg p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-800">
-                            {request.buyerName}님의 거래 요청
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {sellerInfo.dataAmount}GB •{' '}
-                            {sellerInfo.price.toLocaleString()}원
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(request.createdAt).toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() =>
-                              handleTradeRequestResponse(request.id, true)
-                            }
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                          >
-                            수락
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleTradeRequestResponse(request.id, false)
-                            }
-                            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-                          >
-                            거부
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* 판매자 모드: 들어온 거래 요청 */}
+        {userRole === 'seller' && (
+          <IncomingRequestsPanel
+            requests={incomingRequests}
+            sellerInfo={sellerInfo}
+            onRequestResponse={handleTradeRequestResponse}
+          />
         )}
 
         {/* 매칭 완료 상태 */}
-        {matchingStatus === 'matched' && (
-          <div className="px-4 py-6">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                <div className="animate-bounce mb-4">
-                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
-                    <span className="text-2xl">🎉</span>
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-green-800 mb-2">
-                  매칭 완료!
-                </h3>
-                <p className="text-green-700">거래 페이지로 이동합니다...</p>
-              </div>
-            </div>
-          </div>
-        )}
+        <MatchSuccessPanel isVisible={matchingStatus === 'matched'} />
 
         {/* 결과 섹션 */}
         <ResultSection users={filteredUsers} onUserClick={userClickHandler} />
 
-        {/* 테스트용 버튼들 (개발 모드에서만 표시) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
-              <h4 className="text-white text-sm font-medium mb-3">
-                🔧 테스트 버튼
-              </h4>
-              <div className="space-y-2">
-                <button
-                  onClick={() => triggerMockTradeRequest()}
-                  className="block w-full bg-blue-600 text-white px-3 py-2 rounded text-xs hover:bg-blue-700"
-                >
-                  거래 요청 테스트 (판매자용)
-                </button>
-                <button
-                  onClick={() => triggerMockTradeResponse(true)}
-                  className="block w-full bg-green-600 text-white px-3 py-2 rounded text-xs hover:bg-green-700"
-                >
-                  거래 수락 테스트
-                </button>
-                <button
-                  onClick={() => triggerMockTradeResponse(false)}
-                  className="block w-full bg-red-600 text-white px-3 py-2 rounded text-xs hover:bg-red-700"
-                >
-                  거래 거부 테스트
-                </button>
-                <button
-                  onClick={() => triggerMockSellerUpdate()}
-                  className="block w-full bg-purple-600 text-white px-3 py-2 rounded text-xs hover:bg-purple-700"
-                >
-                  판매자 업데이트
-                </button>
-                <button
-                  onClick={() => router.push('/match/trading')}
-                  className="block w-full bg-yellow-600 text-white px-3 py-2 rounded text-xs hover:bg-yellow-700"
-                >
-                  거래 페이지로
-                </button>
-                <button
-                  onClick={() => router.push('/match/complete')}
-                  className="block w-full bg-indigo-600 text-white px-3 py-2 rounded text-xs hover:bg-indigo-700"
-                >
-                  완료 페이지로
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* 테스트 패널 */}
+        <TestPanel
+          userRole={userRole}
+          onTriggerMockTradeRequest={triggerMockTradeRequest}
+          onTriggerMockSellerUpdate={triggerMockSellerUpdate}
+          onTriggerMockTradeResponse={triggerMockTradeResponse}
+        />
       </main>
       <Footer />
     </div>
