@@ -89,7 +89,11 @@ export default function TradingPage() {
   }
 
   // 이제 partner는 항상 유효함
-  const partnerInfo = partner!;
+  const partnerInfo = {
+    ...partner!,
+    rating: partner!.rating ?? 4.5, // 기본값 설정
+    transactionCount: partner!.transactionCount ?? 0, // 기본값 설정
+  };
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);

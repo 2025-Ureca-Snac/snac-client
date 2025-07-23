@@ -123,8 +123,6 @@ export function useMatchingEvents({
     carrier: card.carrier,
     data: card.dataAmount,
     price: card.price,
-    rating: 4.5, // 기본값
-    transactionCount: 0, // 기본값
     cardId: card.id, // cardId 명시적 추가
   });
 
@@ -343,8 +341,6 @@ export function useMatchingEvents({
             carrier: tradeData.carrier,
             data: tradeData.dataAmount,
             price: tradeData.priceGb || 0,
-            rating: 4.5,
-            transactionCount: 0,
             type: 'buyer',
           });
           setTimeout(() => router.push('/match/trading'), 1000);

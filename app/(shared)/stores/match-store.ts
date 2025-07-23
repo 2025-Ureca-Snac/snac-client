@@ -14,8 +14,8 @@ export interface MatchPartner {
   carrier: string;
   data: number;
   price: number;
-  rating: number;
-  transactionCount: number;
+  rating?: number; // 서버에서 제공되지 않을 수 있음
+  transactionCount?: number; // 서버에서 제공되지 않을 수 있음
   type: 'buyer' | 'seller';
 }
 

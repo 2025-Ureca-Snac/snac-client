@@ -72,7 +72,7 @@ export interface User {
   carrier: string;
   data: number;
   price: number;
-  rating: number;
-  transactionCount: number;
+  rating?: number; // 서버에서 제공되지 않을 수 있음
+  transactionCount?: number; // 서버에서 제공되지 않을 수 있음
   cardId?: number; // 서버의 카드 ID (거래 생성 시 사용)
 }
