@@ -14,6 +14,14 @@ import VerificationStep from './components/VerificationStep';
 
 type TradingStep = 'confirmation' | 'payment' | 'transfer' | 'verification';
 
+// 거래 단계 상수 (매 렌더링마다 재생성 방지)
+const TRADING_STEPS: TradingStep[] = [
+  'confirmation',
+  'payment',
+  'transfer',
+  'verification',
+];
+
 export default function TradingPage() {
   const router = useRouter();
   const { partner } = useMatchStore();
@@ -84,16 +92,10 @@ export default function TradingPage() {
   const partnerInfo = partner!;
 
   const handleNextStep = () => {
-    const steps: TradingStep[] = [
-      'confirmation',
-      'payment',
-      'transfer',
-      'verification',
-    ];
-    const currentIndex = steps.indexOf(currentStep);
+    const currentIndex = TRADING_STEPS.indexOf(currentStep);
 
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1]);
+    if (currentIndex < TRADING_STEPS.length - 1) {
+      setCurrentStep(TRADING_STEPS[currentIndex + 1]);
     } else {
       // 거래 완료
       router.push('/match/complete');
