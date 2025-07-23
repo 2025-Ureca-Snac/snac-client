@@ -91,13 +91,11 @@ export default function SignUp() {
       const { value } = e.target;
       const selectedDate = new Date(value);
 
-      // 유효한 날짜인지 확인
-      if (!isNaN(selectedDate.getTime())) {
-        setFormData((prev) => ({
-          ...prev,
-          birthDate: selectedDate,
-        }));
-      }
+      // 유효성 검사 없이 바로 상태 업데이트 (Invalid Date도 허용)
+      setFormData((prev) => ({
+        ...prev,
+        birthDate: selectedDate,
+      }));
     },
     []
   );

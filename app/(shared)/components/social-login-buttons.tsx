@@ -19,8 +19,6 @@ export default function SocialLoginButtons() {
       if (success) {
         console.log('소셜 로그인 성공');
         router.push('/');
-      } else {
-        console.log('소셜 로그인 취소됨');
       }
     } catch (error) {
       console.error('소셜 로그인 실패:', error);
