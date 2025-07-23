@@ -1,15 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
 import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
-import { useMatchStore } from '../(shared)/stores/match-store';
 import { useMatchingEvents } from './hooks/useMatchingEvents';
+
+// ServerTradeData 타입 정의 (useMatchingEvents와 동일)
+interface ServerTradeData {
+  id: number;
+  cardId: number;
+  status: string;
+  seller: string;
+  buyer: string;
+  carrier: string;
+  dataAmount: number;
+  priceGb?: number;
+  point?: number;
+  phone?: string;
+  cancelReason?: string;
+}
 
 // 타입 정의
 type MatchingStatus =
@@ -20,22 +33,15 @@ type MatchingStatus =
   | 'matched';
 
 export default function MatchPage() {
-  const router = useRouter();
-  const { foundMatch } = useMatchStore();
-
   // 상태 관리
-  const [pendingFilters, setPendingFilters] = useState<Filters>({
+  const initialFilters: Filters = {
     transactionType: [],
     carrier: [],
     dataAmount: [],
     price: [],
-  });
-  const [appliedFilters, setAppliedFilters] = useState<Filters>({
-    transactionType: [],
-    carrier: [],
-    dataAmount: [],
-    price: [],
-  });
+  };
+  const [pendingFilters, setPendingFilters] = useState<Filters>(initialFilters);
+  const [appliedFilters, setAppliedFilters] = useState<Filters>(initialFilters);
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
   const [activeSellers, setActiveSellers] = useState<User[]>([]);
   const [hasStartedSearch, setHasStartedSearch] = useState(false); // 검색 시작 여부 추적
@@ -51,6 +57,9 @@ export default function MatchPage() {
   // 거래 확인 모달 상태
   const [selectedSeller, setSelectedSeller] = useState<User | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [currentTradeStatus, setCurrentTradeStatus] = useState<string | null>(
+    null
+  );
 
   // 커스텀 훅 사용 - 로컬 필터링 제거, 서버 결과만 사용
   // const filteredUsers = useUserFiltering(
@@ -77,12 +86,31 @@ export default function MatchPage() {
         ? handleSellerClick
         : undefined;
 
+  // 거래 상태 변경 핸들러
+  const handleTradeStatusChange = (
+    status: string,
+    tradeData: ServerTradeData
+  ) => {
+    console.log('🔄 거래 상태 변경:', status, tradeData);
+    setCurrentTradeStatus(status);
+
+    if (status === 'ACCEPTED') {
+      // 거래 수락 시 2초 후 모달 닫고 거래 페이지로 이동
+      setTimeout(() => {
+        setShowConfirmModal(false);
+        setSelectedSeller(null);
+        setCurrentTradeStatus(null);
+      }, 2000);
+    }
+  };
+
   // 실시간 이벤트 처리 (새로운 WebSocket 훅)
   const {
     isConnected,
     registerSellerCard,
     registerBuyerFilter,
     respondToTrade,
+    createTrade,
   } = useMatchingEvents({
     userRole,
     appliedFilters,
@@ -90,6 +118,7 @@ export default function MatchPage() {
     setActiveSellers,
     setMatchingStatus,
     setConnectedUsers,
+    onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
   });
 
   // 필터 핸들러
@@ -240,37 +269,6 @@ export default function MatchPage() {
     setShowConfirmModal(true);
   }
 
-  // 거래 확인 모달에서 확인 버튼 클릭
-  const handleConfirmTrade = async () => {
-    if (!selectedSeller) return;
-    setShowConfirmModal(false);
-    setMatchingStatus('requesting');
-
-    // Mock: 2초 후 자동 수락 시뮬레이션
-    setTimeout(() => {
-      setMatchingStatus('matched');
-      foundMatch({
-        id: String(selectedSeller.id),
-        name: selectedSeller.name,
-        carrier: selectedSeller.carrier,
-        data: selectedSeller.data,
-        price: selectedSeller.price,
-        rating: selectedSeller.rating || 4.5,
-        transactionCount: selectedSeller.transactionCount || 0,
-        type: 'seller',
-      });
-      setTimeout(() => router.push('/match/trading'), 100);
-    }, 1000);
-
-    setSelectedSeller(null);
-  };
-
-  // 거래 확인 모달에서 취소 버튼 클릭
-  const handleCancelTrade = () => {
-    setShowConfirmModal(false);
-    setSelectedSeller(null);
-  };
-
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = async (
     requestId: string,
@@ -311,8 +309,18 @@ export default function MatchPage() {
         <TradeConfirmationModal
           isOpen={showConfirmModal}
           seller={selectedSeller}
-          onConfirm={handleConfirmTrade}
-          onCancel={handleCancelTrade}
+          onConfirm={() => {
+            setShowConfirmModal(false);
+            setSelectedSeller(null);
+            setCurrentTradeStatus(null);
+          }}
+          onCancel={() => {
+            setShowConfirmModal(false);
+            setSelectedSeller(null);
+            setCurrentTradeStatus(null);
+          }}
+          createTrade={createTrade}
+          tradeStatus={currentTradeStatus}
         />
 
         {/* 테스트 패널 - 개발 모드에서만 표시 */}
@@ -463,6 +471,20 @@ export default function MatchPage() {
                           if (price.includes('2,500 이상')) return 'P2500_PLUS';
                           return 'ALL';
                         })()}
+                        <br />
+                        <strong>현재 거래:</strong>
+                        <br />
+                        {currentTradeStatus ? (
+                          <div className="mt-1 p-1 bg-purple-800 rounded">
+                            상태: {currentTradeStatus}
+                            <br />
+                            {selectedSeller && `대상: ${selectedSeller.name}`}
+                          </div>
+                        ) : (
+                          <div className="text-gray-400">
+                            진행중인 거래 없음
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -493,6 +515,27 @@ export default function MatchPage() {
                       dataAmount: {sellerInfo.dataAmount}
                       <br />
                       price: {sellerInfo.price}
+                      <br />
+                      <strong>거래 요청:</strong>
+                      <br />
+                      {incomingRequests.length > 0 ? (
+                        incomingRequests.map((req, idx) => (
+                          <div
+                            key={req.id}
+                            className="mt-1 p-1 bg-yellow-800 rounded"
+                          >
+                            요청 #{idx + 1}: {req.buyerName}
+                            <br />
+                            ID: {req.id}
+                            <br />
+                            상태: {req.status}
+                            <br />
+                            시간: {new Date(req.createdAt).toLocaleTimeString()}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-gray-400">거래 요청 없음</div>
+                      )}
                     </div>
                   </div>
                 )}

@@ -12,6 +12,8 @@ interface TradeConfirmationModalProps {
   seller: User | null;
   onConfirm: () => void;
   onCancel: () => void;
+  createTrade: (cardId: number) => void;
+  tradeStatus: string | null;
 }
 
 // 모달 상태 타입
@@ -22,6 +24,8 @@ export default function TradeConfirmationModal({
   seller,
   onConfirm,
   onCancel,
+  createTrade,
+  tradeStatus,
 }: TradeConfirmationModalProps) {
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
@@ -55,6 +59,19 @@ export default function TradeConfirmationModal({
     }
   }, [isOpen]);
 
+  // 거래 상태 변경 감지
+  useEffect(() => {
+    if (tradeStatus === 'ACCEPTED') {
+      setModalState('success');
+      // 2초 후 onConfirm 호출
+      setTimeout(() => {
+        onConfirm();
+      }, 2000);
+    } else if (tradeStatus === 'REJECTED' || tradeStatus === 'CANCELLED') {
+      setModalState('timeout');
+    }
+  }, [tradeStatus, onConfirm]);
+
   // 대기 상태에서 타이머 관리 (취소 버튼 활성화용)
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -80,7 +97,10 @@ export default function TradeConfirmationModal({
     setTimeLeft(3);
     setCanCancel(false);
 
+    const cardId = seller.cardId || seller.id; // cardId 우선, 없으면 id 사용
+
     console.log('🔥 거래 요청 발송:', {
+      cardId: cardId,
       buyerId: 'user_123',
       sellerId: seller.id,
       sellerName: seller.name,
@@ -88,25 +108,16 @@ export default function TradeConfirmationModal({
       price: seller.price,
     });
 
-    // Mock: 랜덤하게 응답 시뮬레이션
-    const responseTime = Math.random() * 8000 + 2000; // 2-10초 사이
-    setTimeout(() => {
-      // ref를 통해 현재 modalState 확인
-      if (modalStateRef.current === 'waiting') {
-        const isAccepted = Math.random() > 0.2; // 80% 수락 확률
-        console.log('🎲 랜덤 응답 결과:', isAccepted ? '수락' : '거부');
+    // 실제 서버에 거래 생성 요청 (HTML 예제와 동일)
+    createTrade(cardId);
 
-        if (isAccepted) {
-          setModalState('success');
-          // 2초 후 실제 거래 페이지로 이동
-          setTimeout(() => {
-            onConfirm();
-          }, 2000);
-        } else {
-          setModalState('timeout');
-        }
+    // 서버 응답 타임아웃 (30초)
+    setTimeout(() => {
+      if (modalStateRef.current === 'waiting') {
+        console.log('⏰ 거래 요청 타임아웃');
+        setModalState('timeout');
       }
-    }, responseTime);
+    }, 30000); // 30초 타임아웃
   };
 
   // 거래 취소 핸들러

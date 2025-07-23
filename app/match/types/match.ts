@@ -74,4 +74,5 @@ export interface User {
   price: number;
   rating: number;
   transactionCount: number;
+  cardId?: number; // 서버의 카드 ID (거래 생성 시 사용)
 }
