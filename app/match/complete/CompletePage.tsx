@@ -13,16 +13,22 @@ export default function CompletePage() {
   const { partner } = useMatchStore();
 
   // 거래 상대방 정보 (store에서 가져오거나 기본값)
-  const partnerInfo = partner || {
-    id: 'partner_789',
-    name: 'user07',
-    carrier: 'KT',
-    data: 2,
-    price: 2000,
-    rating: 4.9,
-    transactionCount: 156,
-    type: 'seller',
-  };
+  const partnerInfo = partner
+    ? {
+        ...partner,
+        rating: partner.rating ?? 4.5,
+        transactionCount: partner.transactionCount ?? 0,
+      }
+    : {
+        id: 'partner_789',
+        name: 'user07',
+        carrier: 'KT',
+        data: 2,
+        price: 2000,
+        rating: 4.9,
+        transactionCount: 156,
+        type: 'seller',
+      };
 
   // 거래 정보
   const transactionId = 'TXN-' + Date.now();
