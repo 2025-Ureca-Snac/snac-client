@@ -10,9 +10,9 @@ import { BlogDetailModal } from '../components/BlogDetailModal';
 import { BLOG_POSTS, ExtendedBlogPost } from '../data/blogPosts';
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function BlogPostPage({ params }: BlogPostPageProps) {
@@ -21,19 +21,32 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const postId = parseInt(params.id);
-    const post = BLOG_POSTS.find((p) => p.id === postId);
+    const loadPost = async () => {
+      try {
+        const { id } = await params;
+        const postId = parseInt(id);
+        const post = BLOG_POSTS.find((p) => p.id === postId);
 
-    if (post) {
-      setSelectedPost(post);
-      setIsModalOpen(true);
-    } else {
-      // 해당 ID의 포스트가 없으면 메인 블로그 페이지로 리다이렉트
-      router.replace('/blog');
-    }
-  }, [params.id, router]);
+        if (post) {
+          setSelectedPost(post);
+          setIsModalOpen(true);
+        } else {
+          // 해당 ID의 포스트가 없으면 메인 블로그 페이지로 리다이렉트
+          router.replace('/blog');
+        }
+      } catch (error) {
+        console.error('Error loading post:', error);
+        router.replace('/blog');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPost();
+  }, [params, router]);
 
   const handleShowMore = () => {
     console.log('Show more clicked!');
@@ -61,6 +74,23 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     // 관련 포스트에서 다른 포스트 선택 시
     router.push(`/blog/${post.id}`);
   };
+
+  // 로딩 중일 때는 기본 레이아웃만 보여줌
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <BlogHero />
+        <BlogContent
+          posts={BLOG_POSTS}
+          onShowMore={handleShowMore}
+          onSortChange={handleSortChange}
+          onPostClick={handlePostClick}
+        />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
