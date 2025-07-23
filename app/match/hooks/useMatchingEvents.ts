@@ -21,6 +21,7 @@ interface UseMatchingEventsProps {
   setIncomingRequests: Dispatch<SetStateAction<TradeRequest[]>>;
   setActiveSellers: Dispatch<SetStateAction<User[]>>;
   setMatchingStatus: Dispatch<SetStateAction<MatchingStatus>>;
+  setConnectedUsers?: Dispatch<SetStateAction<number>>; // 접속자 수 상태 추가
 }
 
 // 서버에서 받는 카드 데이터 타입
@@ -54,10 +55,10 @@ interface ServerTradeData {
 
 export function useMatchingEvents({
   userRole,
-  appliedFilters,
   setIncomingRequests,
   setActiveSellers,
   setMatchingStatus,
+  setConnectedUsers,
 }: UseMatchingEventsProps) {
   const router = useRouter();
   const { foundMatch } = useMatchStore();
@@ -191,6 +192,29 @@ export function useMatchingEvents({
   const setupSubscriptions = () => {
     if (!stompClient.current?.connected) return;
 
+    console.log('🔗 WebSocket 구독 설정 중...');
+
+    // HTML 예제에 따른 접속자 수 구독
+    stompClient.current.subscribe('/topic/connected-users', (frame) => {
+      console.log('👥 전체 접속자 수:', frame.body);
+      if (setConnectedUsers) {
+        setConnectedUsers(parseInt(frame.body) || 0);
+      }
+    });
+
+    stompClient.current.subscribe('/user/queue/connected-users', (frame) => {
+      console.log('👥 개인 접속자 수:', frame.body);
+      if (setConnectedUsers) {
+        setConnectedUsers(parseInt(frame.body) || 0);
+      }
+    });
+
+    // 접속자 수 요청 (HTML 예제와 동일)
+    stompClient.current.publish({
+      destination: '/app/connected-users',
+      body: '',
+    });
+
     // 1. 매칭 알림 구독 (구매자용)
     if (userRole === 'buyer') {
       stompClient.current.subscribe('/user/queue/matching', (frame) => {
@@ -198,10 +222,20 @@ export function useMatchingEvents({
         try {
           const cardData: ServerCardData = JSON.parse(frame.body);
           const user = convertServerCardToUser(cardData);
+
+          // 매칭 결과 추가
           setActiveSellers((prev) => {
             // 중복 제거하고 추가
             const filtered = prev.filter((u) => u.id !== user.id);
-            return [...filtered, user];
+            const updated = [...filtered, user];
+
+            // 첫 번째 매칭 결과를 받았을 때 검색 상태 해제
+            if (prev.length === 0 && updated.length > 0) {
+              console.log('✅ 첫 매칭 결과 수신 - 검색 상태 해제');
+              setMatchingStatus('idle');
+            }
+
+            return updated;
           });
         } catch (error) {
           console.error('매칭 알림 파싱 오류:', error);
@@ -255,20 +289,15 @@ export function useMatchingEvents({
       console.error('❗ 서버 에러:', frame.body);
       alert('서버 에러: ' + frame.body);
     });
-
-    // 4. 접속자 수 구독 (선택사항)
-    stompClient.current.subscribe('/topic/connected-users', (frame) => {
-      console.log('👥 접속자 수:', frame.body);
-    });
   };
 
   // 구매자 필터 등록
   const registerBuyerFilter = (filters: Filters) => {
     if (!stompClient.current?.connected || userRole !== 'buyer') return;
 
-    // 필터 데이터 변환
+    // HTML 예제와 동일한 형식으로 변환
     const filterData = {
-      carrier: filters.carrier[0] || 'ALL',
+      carrier: convertCarrierToServer(filters.carrier[0]) || 'ALL',
       dataAmount: parseInt(
         filters.dataAmount[0]?.replace(/[^0-9]/g, '') || '1'
       ),
@@ -291,8 +320,9 @@ export function useMatchingEvents({
   }) => {
     if (!stompClient.current?.connected || userRole !== 'seller') return;
 
+    // HTML 예제와 동일한 형식
     const cardData = {
-      carrier: sellerInfo.carrier,
+      carrier: convertCarrierToServer(sellerInfo.carrier),
       dataAmount: sellerInfo.dataAmount,
       price: sellerInfo.price,
     };
@@ -305,11 +335,26 @@ export function useMatchingEvents({
     });
   };
 
-  // 가격 필터 변환
+  // 통신사 이름을 서버 형식으로 변환 (HTML과 동일)
+  const convertCarrierToServer = (carrier: string): string => {
+    switch (carrier) {
+      case 'LGU+':
+        return 'LG'; // HTML에서는 LG 사용
+      case 'SKT':
+        return 'SKT';
+      case 'KT':
+        return 'KT';
+      default:
+        return carrier;
+    }
+  };
+
+  // 가격 필터 변환 (HTML과 정확히 동일)
   const convertPriceFilter = (priceFilters: string[]): string => {
     if (priceFilters.length === 0) return 'ALL';
 
     const firstFilter = priceFilters[0];
+    // HTML의 정확한 값들과 매칭
     if (firstFilter.includes('0 - 999')) return 'P0_999';
     if (firstFilter.includes('1,000 - 1,499')) return 'P1000_1499';
     if (firstFilter.includes('1,500 - 1,999')) return 'P1500_1999';
@@ -348,27 +393,24 @@ export function useMatchingEvents({
     };
   }, [userRole]);
 
-  // 필터 변경 시 등록
-  useEffect(() => {
-    if (
-      userRole === 'buyer' &&
-      appliedFilters.transactionType.includes('구매자')
-    ) {
-      const hasFilters =
-        appliedFilters.carrier.length > 0 ||
-        appliedFilters.dataAmount.length > 0 ||
-        appliedFilters.price.length > 0;
+  // 필터 변경 시 등록 → 수동 등록으로 변경
+  // useEffect(() => {
+  //   if (userRole === 'buyer' && appliedFilters.transactionType.includes('구매자')) {
+  //     const hasFilters = appliedFilters.carrier.length > 0 ||
+  //                       appliedFilters.dataAmount.length > 0 ||
+  //                       appliedFilters.price.length > 0;
 
-      if (hasFilters) {
-        setTimeout(() => registerBuyerFilter(appliedFilters), 1000);
-      }
-    }
-  }, [appliedFilters, userRole]);
+  //     if (hasFilters) {
+  //       setTimeout(() => registerBuyerFilter(appliedFilters), 1000);
+  //     }
+  //   }
+  // }, [appliedFilters, userRole]);
 
   // 외부에서 사용할 수 있는 함수들 반환
   return {
     isConnected: isConnected.current,
     registerSellerCard,
+    registerBuyerFilter, // 수동 등록을 위해 추가
     respondToTrade,
   };
 }
