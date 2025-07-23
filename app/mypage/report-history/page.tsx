@@ -6,45 +6,58 @@ import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
 import Link from 'next/link';
 
-interface SalesItem {
+interface ReportItem {
   id: number;
   date: string;
   title: string;
   price: number;
-  status: 'selling' | 'completed';
+  reason?: string;
 }
 
-export default function SalesHistoryPage() {
-  const [activeTab, setActiveTab] = useState<'all' | 'selling' | 'completed'>(
-    'all'
+export default function ReportHistoryPage() {
+  const [activeTab, setActiveTab] = useState<'reported' | 'received'>(
+    'reported'
   );
 
-  const salesHistory: SalesItem[] = [
+  const reportedTransactions: ReportItem[] = [
     {
       id: 1,
       date: '2025.07.03',
       title: '통신사 2GB',
       price: 2000,
-      status: 'selling',
+    },
+  ];
+
+  const receivedReports: ReportItem[] = [
+    {
+      id: 1,
+      date: '2025.07.03',
+      title: '통신사 2GB',
+      price: 2000,
+      reason: '실시간 거래에서 이탈했어요',
     },
     {
       id: 2,
       date: '2025.07.03',
       title: '통신사 2GB',
       price: 2000,
-      status: 'completed',
+      reason: '데이터를 전송하지 않았어요',
+    },
+    {
+      id: 3,
+      date: '2025.07.03',
+      title: '통신사 2GB',
+      price: 2000,
+      reason: '수신확정을 누르지 않았어요',
     },
   ];
 
-  const filteredSales = salesHistory.filter((item) => {
-    if (activeTab === 'all') return true;
-    return item.status === activeTab;
-  });
+  const filteredReports =
+    activeTab === 'reported' ? reportedTransactions : receivedReports;
 
   const tabs = [
-    { id: 'all', label: '전체' },
-    { id: 'selling', label: '판매 중' },
-    { id: 'completed', label: '판매 완료' },
+    { id: 'reported', label: '신고한 거래' },
+    { id: 'received', label: '신고 받은 거래' },
   ];
 
   // PC 헤더
@@ -59,14 +72,14 @@ export default function SalesHistoryPage() {
           마이페이지
         </Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">판매 내역</span>
+        <span className="text-gray-900 font-medium">신고 내역</span>
       </div>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">판매 내역</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">신고 내역</h1>
         <p className="text-gray-600 text-lg">
-          내가 판매한 상품들의 내역을 확인하세요
+          신고한 거래와 신고 받은 거래 내역을 확인하세요
         </p>
       </div>
     </div>
@@ -84,11 +97,11 @@ export default function SalesHistoryPage() {
           마이페이지
         </Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">판매 내역</span>
+        <span className="text-gray-900 font-medium">신고 내역</span>
       </div>
 
       {/* 제목 */}
-      <h1 className="text-xl font-bold text-gray-900">판매 내역</h1>
+      <h1 className="text-xl font-bold text-gray-900">신고 내역</h1>
     </div>
   );
 
@@ -97,7 +110,7 @@ export default function SalesHistoryPage() {
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
-          <SideMenu onFavoriteClick={() => {}} />
+          <SideMenu />
         </div>
 
         {/* 메인 컨텐츠 */}
@@ -115,7 +128,7 @@ export default function SalesHistoryPage() {
                 <TabNavigation
                   tabs={tabs}
                   activeTab={activeTab}
-                  onTabChange={(tabId) =>
+                  onTabChange={(tabId: string) =>
                     setActiveTab(tabId as typeof activeTab)
                   }
                   activeTextColor="text-green-600"
@@ -123,12 +136,12 @@ export default function SalesHistoryPage() {
                   underlineColor="bg-green-600"
                 />
 
-                {/* 판매 내역 리스트 */}
+                {/* 신고 내역 리스트 */}
                 <AnimatedTabContent key={activeTab}>
                   <div className="p-6">
-                    {filteredSales.length > 0 ? (
+                    {filteredReports.length > 0 ? (
                       <div className="space-y-4">
-                        {filteredSales.map((item) => (
+                        {filteredReports.map((item) => (
                           <div
                             key={item.id}
                             className="bg-gray-50 rounded-lg p-4 flex items-start gap-3"
@@ -141,7 +154,7 @@ export default function SalesHistoryPage() {
                             </div>
 
                             {/* 내용 */}
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1">
                               <div className="text-sm text-gray-500 mb-1">
                                 {item.date}
                               </div>
@@ -149,26 +162,26 @@ export default function SalesHistoryPage() {
                                 {item.title}
                               </div>
                               <div className="flex items-center gap-2">
-                                {item.status === 'completed' && (
-                                  <span className="bg-black text-white text-xs px-2 py-1 rounded">
-                                    거래완료
-                                  </span>
-                                )}
                                 <span className="text-gray-900">
                                   {item.price.toLocaleString()}원
                                 </span>
                               </div>
+
+                              {/* 신고 받은 거래인 경우 신고 사유 표시 */}
+                              {activeTab === 'received' && item.reason && (
+                                <div className="mt-2 text-sm text-red-600">
+                                  신고 사유: {item.reason}
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-500">
-                        {activeTab === 'all'
-                          ? '판매 내역이 없습니다.'
-                          : activeTab === 'selling'
-                            ? '판매 중인 상품이 없습니다.'
-                            : '판매 완료된 상품이 없습니다.'}
+                        {activeTab === 'reported'
+                          ? '신고한 거래가 없습니다.'
+                          : '신고 받은 거래가 없습니다.'}
                       </div>
                     )}
                   </div>

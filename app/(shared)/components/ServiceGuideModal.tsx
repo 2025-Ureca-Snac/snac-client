@@ -1,11 +1,13 @@
 import React from 'react';
 import ModalPortal from './modal-portal';
+import type { ServiceGuideModalProps } from '../types/service-guide-modal';
 
-interface ServiceGuideModalProps {
-  open: boolean;
-  onClose: () => void;
-}
-
+/**
+ * @author 이승우
+ * @description 서비스 가이드 모달 컴포넌트{@link ServiceGuideModalProps(open, onClose)}
+ * @param {boolean} open 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ */
 export default function ServiceGuideModal({
   open,
   onClose,
@@ -20,7 +22,7 @@ export default function ServiceGuideModal({
         role="dialog"
       >
         <div
-          className="bg-white rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-white rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 타이틀 및 닫기 */}

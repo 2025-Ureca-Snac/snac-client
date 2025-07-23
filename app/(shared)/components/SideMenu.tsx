@@ -1,35 +1,26 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { menuItems, type MenuItem } from '../constants/side-menu-data';
 
-const menuItems = [
-  '구매 정보',
-  '판매 내역',
-  '구매 내역',
-  '단골 목록',
-  '포인트',
-];
-
-interface SideMenuProps {
-  onFavoriteClick?: () => void;
-}
-
-export default function SideMenu({ onFavoriteClick }: SideMenuProps) {
+/**
+ * @author 이승우
+ * @description 사이드 메뉴 컴포넌트{@link menuItems ( 구매 정보, 판매 내역, 신고 내역, 포인트 )}
+ */
+export default function SideMenu() {
   const router = useRouter();
+  const pathname = usePathname();
 
-  const handleMenuClick = (item: string) => {
-    if (item === '단골 목록') {
-      onFavoriteClick?.();
-    } else if (item === '포인트') {
-      router.push('/mypage/point');
-    } else if (item === '판매 내역') {
-      router.push('/mypage/sales-history');
-    } else if (item === '구매 내역') {
-      router.push('/mypage/purchase-history');
-    } else if (item === '구매 정보') {
-      router.push('/mypage/purchase-history');
-    }
+  // 현재 활성 메뉴 아이템 확인
+  const isActiveMenu = (item: MenuItem) => {
+    return pathname === item.path;
+  };
+
+  // 메뉴 클릭 핸들러
+  const handleMenuClick = (item: MenuItem) => {
+    if (item.disabled) return;
+    router.push(item.path);
   };
 
   return (
@@ -46,16 +37,31 @@ export default function SideMenu({ onFavoriteClick }: SideMenuProps) {
         </h2>
       </button>
       <nav className="flex flex-col gap-0">
-        {menuItems.map((item) => (
-          <button
-            key={item}
-            className="text-left py-2 px-2 rounded text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-            onClick={() => handleMenuClick(item)}
-            type="button"
-          >
-            {item}
-          </button>
-        ))}
+        {menuItems.map((item) => {
+          const isActive = isActiveMenu(item);
+          return (
+            <button
+              key={item.id}
+              className={`text-left py-2 px-2 rounded text-base font-medium transition-colors ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={() => handleMenuClick(item)}
+              disabled={item.disabled}
+              type="button"
+            >
+              <div className="flex items-center justify-between">
+                <span>{item.label}</span>
+                {item.badge && (
+                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </nav>
     </aside>
   );

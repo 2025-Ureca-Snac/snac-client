@@ -6,8 +6,11 @@ import { ModalPortalProps } from '../types/modal-portal';
 
 /**
  * @author 이승우
- * @description 모달 포탈 컴포넌트
- * @param props 컴포넌트 속성 {@link ModalPortalProps}(children, isOpen, onClose, className)
+ * @description 모달 포탈 컴포넌트{@link ModalPortalProps(children, isOpen, onClose, className)}
+ * @param {React.ReactNode} children 자식 요소
+ * @param {boolean} isOpen 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ * @param {string} className 클래스 이름
  */
 export default function ModalPortal({
   children,
