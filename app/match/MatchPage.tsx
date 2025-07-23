@@ -10,6 +10,8 @@ import FilterSection, {
 import ResultSection from './components/ResultSection';
 import IncomingRequestsPanel from './components/IncomingRequestsPanel';
 import MatchSuccessPanel from './components/MatchSuccessPanel';
+import BuyerMatchingStatus from './components/BuyerMatchingStatus';
+import TradeConfirmationModal from './components/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
 import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
@@ -92,6 +94,10 @@ export default function MatchPage() {
     isActive: false,
   });
 
+  // 거래 확인 모달 상태
+  const [selectedSeller, setSelectedSeller] = useState<User | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   // 커스텀 훅 사용
   const filteredUsers = useUserFiltering(
     appliedFilters,
@@ -104,8 +110,14 @@ export default function MatchPage() {
       : appliedFilters.transactionType[0] === '판매자'
         ? 'seller'
         : null;
+
+  // 클릭 핸들러 - 더 유연하게 수정
   const userClickHandler =
-    userRole === 'buyer' ? handleSendTradeRequest : undefined;
+    userRole === 'buyer'
+      ? handleSellerClick
+      : process.env.NODE_ENV === 'development'
+        ? handleSellerClick
+        : undefined;
 
   // 실시간 이벤트 처리
   useMatchingEvents({
@@ -131,12 +143,20 @@ export default function MatchPage() {
         alert('모든 필터 조건을 선택해주세요.');
         return;
       }
-    }
 
-    setAppliedFilters(pendingFilters);
+      // 구매자 검색 시작
+      setMatchingStatus('searching');
+      setAppliedFilters(pendingFilters);
 
-    if (pendingFilters.transactionType[0] === '구매자') {
-      setActiveSellers(ALL_USERS.filter((user) => user.type === 'seller'));
+      // 2초 후 검색 완료 (Mock)
+      setTimeout(() => {
+        setActiveSellers(ALL_USERS.filter((user) => user.type === 'seller'));
+        setMatchingStatus('idle');
+        // Mock: 실시간 판매자 목록 업데이트
+        triggerMockSellerUpdate();
+      }, 2000);
+    } else {
+      setAppliedFilters(pendingFilters);
     }
   };
 
@@ -155,6 +175,22 @@ export default function MatchPage() {
       price: [],
     });
     setActiveSellers([]);
+    setMatchingStatus('idle');
+  };
+
+  // 구매자 매칭 상태에서 뒤로가기
+  const handleGoBackToSearch = () => {
+    // 검색 결과 초기화하고 필터 섹션으로 돌아가기
+    const emptyFilters = {
+      transactionType: [],
+      carrier: [],
+      dataAmount: [],
+      price: [],
+    };
+    setAppliedFilters(emptyFilters);
+    setActiveSellers([]);
+    setMatchingStatus('idle');
+    // pendingFilters는 유지해서 사용자가 이전 선택을 볼 수 있도록 함
   };
 
   // 판매자 정보 관리
@@ -179,46 +215,61 @@ export default function MatchPage() {
     }
   };
 
-  // 거래 요청 발송 (구매자용)
-  async function handleSendTradeRequest(seller: User) {
-    if (userRole !== 'buyer') {
-      alert('구매자만 거래를 요청할 수 있습니다.');
-      return;
-    }
+  // 판매자 클릭 처리 (구매자용)
+  async function handleSellerClick(seller: User) {
+    console.log('🔥 판매자 클릭됨:', seller);
 
     if (seller.type !== 'seller') {
       alert('판매자에게만 거래 요청이 가능합니다.');
       return;
     }
 
+    // 거래 확인 모달 표시
+    setSelectedSeller(seller);
+    setShowConfirmModal(true);
+  }
+
+  // 거래 확인 모달에서 확인 버튼 클릭
+  const handleConfirmTrade = async () => {
+    if (!selectedSeller) return;
+
+    setShowConfirmModal(false);
     setMatchingStatus('requesting');
 
     console.log('🔥 거래 요청 발송:', {
       buyerId: 'user_123',
-      sellerId: seller.id,
-      sellerName: seller.name,
-      dataAmount: seller.data,
-      price: seller.price,
+      sellerId: selectedSeller.id,
+      sellerName: selectedSeller.name,
+      dataAmount: selectedSeller.data,
+      price: selectedSeller.price,
     });
 
-    alert(`${seller.name}님에게 거래 요청을 보냈습니다!`);
+    alert(`${selectedSeller.name}님에게 거래 요청을 보냈습니다!`);
 
     // Mock: 2초 후 자동 수락 시뮬레이션
     setTimeout(() => {
       setMatchingStatus('matched');
       foundMatch({
-        id: String(seller.id),
-        name: seller.name,
-        carrier: seller.carrier,
-        data: seller.data,
-        price: seller.price,
-        rating: seller.rating || 4.5,
-        transactionCount: seller.transactionCount || 0,
+        id: String(selectedSeller.id),
+        name: selectedSeller.name,
+        carrier: selectedSeller.carrier,
+        data: selectedSeller.data,
+        price: selectedSeller.price,
+        rating: selectedSeller.rating || 4.5,
+        transactionCount: selectedSeller.transactionCount || 0,
         type: 'seller',
       });
       setTimeout(() => router.push('/match/trading'), 1000);
     }, 2000);
-  }
+
+    setSelectedSeller(null);
+  };
+
+  // 거래 확인 모달에서 취소 버튼 클릭
+  const handleCancelTrade = () => {
+    setShowConfirmModal(false);
+    setSelectedSeller(null);
+  };
 
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = async (
@@ -251,15 +302,27 @@ export default function MatchPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
-        {/* 필터 섹션 */}
-        <FilterSection
-          onFilterChange={handleFilterChange}
-          onApply={handleApplyFilters}
-          onReset={handleResetFilters}
-          currentFilters={pendingFilters}
-          onSellerInfoChange={handleSellerInfoChange}
-          onToggleSellerStatus={handleToggleSellerStatus}
-          sellerInfo={sellerInfo}
+        {/* 필터 섹션 (판매자 모드이거나 구매자가 아직 검색하지 않았을 때만 표시) */}
+        {(userRole === 'seller' ||
+          userRole !== 'buyer' ||
+          appliedFilters.transactionType.length === 0) && (
+          <FilterSection
+            onFilterChange={handleFilterChange}
+            onApply={handleApplyFilters}
+            onReset={handleResetFilters}
+            currentFilters={pendingFilters}
+            onSellerInfoChange={handleSellerInfoChange}
+            onToggleSellerStatus={handleToggleSellerStatus}
+            sellerInfo={sellerInfo}
+          />
+        )}
+
+        {/* 구매자 매칭 상태 */}
+        <BuyerMatchingStatus
+          appliedFilters={appliedFilters}
+          isSearching={matchingStatus === 'searching'}
+          foundUsersCount={filteredUsers.length}
+          onGoBack={handleGoBackToSearch}
         />
 
         {/* 판매자 모드: 들어온 거래 요청 */}
@@ -274,8 +337,15 @@ export default function MatchPage() {
         {/* 매칭 완료 상태 */}
         <MatchSuccessPanel isVisible={matchingStatus === 'matched'} />
 
-        {/* 결과 섹션 */}
-        <ResultSection users={filteredUsers} onUserClick={userClickHandler} />
+        {<ResultSection users={filteredUsers} onUserClick={userClickHandler} />}
+
+        {/* 거래 확인 모달 */}
+        <TradeConfirmationModal
+          isOpen={showConfirmModal}
+          seller={selectedSeller}
+          onConfirm={handleConfirmTrade}
+          onCancel={handleCancelTrade}
+        />
 
         {/* 테스트 패널 */}
         <TestPanel
@@ -284,6 +354,21 @@ export default function MatchPage() {
           onTriggerMockSellerUpdate={triggerMockSellerUpdate}
           onTriggerMockTradeResponse={triggerMockTradeResponse}
         />
+
+        {/* 개발 모드에서 모달 테스트 버튼 */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="fixed bottom-4 left-4 z-50">
+            <button
+              onClick={() => {
+                setSelectedSeller(ALL_USERS[0]);
+                setShowConfirmModal(true);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+            >
+              🔧 모달 테스트
+            </button>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
