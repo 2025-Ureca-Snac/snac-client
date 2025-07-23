@@ -120,8 +120,6 @@ export const Modal = () => {
     console.log('서버로 전송하는 최종 데이터:', cards);
 
     try {
-      // cards 객체를 서버로 전송합니다.
-      // const response = await api.get('/health');
       await api.post('/cards', cards);
       toast.success('상품이 성공적으로 등록되었습니다.');
       handleClose();
