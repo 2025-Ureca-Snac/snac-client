@@ -36,7 +36,7 @@ export default function SignUp() {
     nickname: '',
     email: '',
     phoneNumber: '',
-    birthDate: new Date(),
+    birthDate: new Date('1990-01-01'), // 유효한 기본 날짜로 설정
     password: '',
     passwordConfirm: '',
     emailVerificationCode: '',
@@ -66,6 +66,7 @@ export default function SignUp() {
       formData.email.trim() !== '' &&
       formData.phoneNumber.trim() !== '' &&
       formData.birthDate &&
+      !isNaN(formData.birthDate.getTime()) && // 유효한 날짜인지 확인
       formData.password.trim() !== '' &&
       formData.passwordConfirm.trim() !== '' &&
       isEmailVerified &&
@@ -88,10 +89,15 @@ export default function SignUp() {
   const handleDateChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        birthDate: new Date(value),
-      }));
+      const selectedDate = new Date(value);
+
+      // 유효한 날짜인지 확인
+      if (!isNaN(selectedDate.getTime())) {
+        setFormData((prev) => ({
+          ...prev,
+          birthDate: selectedDate,
+        }));
+      }
     },
     []
   );
@@ -239,7 +245,7 @@ export default function SignUp() {
 
       const response = await api.post('/join', data);
 
-      if ((response.data as { status?: string })?.status === 'OK') {
+      if ((response.data as { status?: string })?.status === 'CREATED') {
         alert('회원가입이 완료되었습니다.');
         router.push('/login');
       } else {
@@ -373,7 +379,11 @@ export default function SignUp() {
             type="date"
             id="birthDate"
             name="birthDate"
-            value={formData.birthDate.toISOString().split('T')[0]}
+            value={
+              formData.birthDate && !isNaN(formData.birthDate.getTime())
+                ? formData.birthDate.toISOString().split('T')[0]
+                : ''
+            }
             onChange={handleDateChange}
             required
           />
