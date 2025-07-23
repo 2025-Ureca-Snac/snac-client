@@ -47,7 +47,7 @@ export default function SellerStatusToggle({
             ) : (
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             )}
-            <span className="text-green-800 font-medium">
+            <span className="text-gray-950 font-medium">
               구매자를 찾고 있습니다
             </span>
           </div>

@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import FilterGroup from './FilterGroup';
-import FilterButtons from './FilterButtons';
-import SellerRegistrationForm from './seller/SellerRegistrationForm';
+import FilterGroup from './filter/FilterGroup';
+import TransactionTypeForm from './TransactionTypeForm';
 import { Filters } from '../types';
 
 interface FilterSectionProps {
@@ -198,51 +197,22 @@ export default function FilterSection({
             multiSelect={false}
           />
 
-          {/* 구매자 모드: 필터 옵션들 */}
-          {isBuyer && (
-            <>
-              <FilterGroup
-                title="통신사"
-                options={FILTER_OPTIONS.carrier}
-                selectedValues={selectedFilters.carrier}
-                onValueChange={(value) =>
-                  handleFilterChange('carrier', value, true)
-                }
-                multiSelect={true}
-              />
-
-              <FilterGroup
-                title="데이터량"
-                options={FILTER_OPTIONS.dataAmount}
-                selectedValues={selectedFilters.dataAmount}
-                onValueChange={(value) =>
-                  handleFilterChange('dataAmount', value, true)
-                }
-                multiSelect={true}
-              />
-
-              <FilterGroup
-                title="가격"
-                options={FILTER_OPTIONS.price}
-                selectedValues={selectedFilters.price}
-                onValueChange={(value) =>
-                  handleFilterChange('price', value, true)
-                }
-                multiSelect={true}
-              />
-
-              <FilterButtons onReset={resetFilters} onApply={applyFilters} />
-            </>
-          )}
-
-          {/* 판매자 모드: 등록 폼 */}
-          {isSeller && (
-            <SellerRegistrationForm
-              sellerInfo={internalSellerInfo}
-              onSellerInfoChange={handleSellerInfoChange}
-              onToggleStatus={handleToggleSellerStatus}
-            />
-          )}
+          {/* 거래 방식에 따른 폼 */}
+          <TransactionTypeForm
+            transactionType={currentTransactionType as '구매자' | '판매자' | ''}
+            filterOptions={{
+              carrier: FILTER_OPTIONS.carrier,
+              dataAmount: FILTER_OPTIONS.dataAmount,
+              price: FILTER_OPTIONS.price,
+            }}
+            selectedFilters={selectedFilters}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+            onApply={applyFilters}
+            sellerInfo={internalSellerInfo}
+            onSellerInfoChange={handleSellerInfoChange}
+            onToggleSellerStatus={handleToggleSellerStatus}
+          />
 
           {/* 거래 방식을 선택하지 않았을 때 */}
           {!isBuyer && !isSeller && (

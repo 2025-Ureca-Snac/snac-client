@@ -9,9 +9,8 @@ import FilterSection, {
 } from './components/FilterSection';
 import ResultSection from './components/ResultSection';
 import IncomingRequestsPanel from './components/IncomingRequestsPanel';
-import MatchSuccessPanel from './components/MatchSuccessPanel';
-import BuyerMatchingStatus from './components/BuyerMatchingStatus';
-import TradeConfirmationModal from './components/TradeConfirmationModal';
+import BuyerMatchingStatus from './components/buyer/BuyerMatchingStatus';
+import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
 import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
@@ -86,7 +85,33 @@ export default function MatchPage() {
   });
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
   const [activeSellers, setActiveSellers] = useState<User[]>([]);
-  const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([]);
+  const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([
+    // 임시 Mock 거래 요청 데이터 (테스트용)
+    {
+      id: 'mock_request_1',
+      buyerId: 'buyer_001',
+      buyerName: '김구매',
+      sellerId: 'seller_123',
+      status: 'pending',
+      createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5분 전
+    },
+    {
+      id: 'mock_request_2',
+      buyerId: 'buyer_002',
+      buyerName: '이구매',
+      sellerId: 'seller_123',
+      status: 'pending',
+      createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(), // 2분 전
+    },
+    {
+      id: 'mock_request_3',
+      buyerId: 'buyer_003',
+      buyerName: '박구매',
+      sellerId: 'seller_123',
+      status: 'pending',
+      createdAt: new Date(Date.now() - 30 * 1000).toISOString(), // 30초 전
+    },
+  ]);
   const [sellerInfo, setSellerInfo] = useState<SellerRegistrationInfo>({
     dataAmount: 1,
     price: 1500,
@@ -244,8 +269,6 @@ export default function MatchPage() {
       price: selectedSeller.price,
     });
 
-    alert(`${selectedSeller.name}님에게 거래 요청을 보냈습니다!`);
-
     // Mock: 2초 후 자동 수락 시뮬레이션
     setTimeout(() => {
       setMatchingStatus('matched');
@@ -259,8 +282,8 @@ export default function MatchPage() {
         transactionCount: selectedSeller.transactionCount || 0,
         type: 'seller',
       });
-      setTimeout(() => router.push('/match/trading'), 1000);
-    }, 2000);
+      setTimeout(() => router.push('/match/trading'), 100);
+    }, 1000);
 
     setSelectedSeller(null);
   };
@@ -333,9 +356,6 @@ export default function MatchPage() {
             onRequestResponse={handleTradeRequestResponse}
           />
         )}
-
-        {/* 매칭 완료 상태 */}
-        <MatchSuccessPanel isVisible={matchingStatus === 'matched'} />
 
         {<ResultSection users={filteredUsers} onUserClick={userClickHandler} />}
 

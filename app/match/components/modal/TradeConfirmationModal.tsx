@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { User } from '../types/match';
+import { User } from '../../types/match';
 
 // Lottie Player를 동적으로 import (SSR 문제 방지)
 const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
@@ -27,6 +27,14 @@ export default function TradeConfirmationModal({
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
   const [animationData, setAnimationData] = useState(null);
+
+  // modalState를 ref로 관리하여 클로저 문제 해결
+  const modalStateRef = useRef<ModalState>(modalState);
+
+  // modalState가 변경될 때마다 ref 업데이트
+  useEffect(() => {
+    modalStateRef.current = modalState;
+  }, [modalState]);
 
   // Lottie 애니메이션 데이터 로드
   useEffect(() => {
@@ -83,8 +91,11 @@ export default function TradeConfirmationModal({
     // Mock: 랜덤하게 응답 시뮬레이션
     const responseTime = Math.random() * 8000 + 2000; // 2-10초 사이
     setTimeout(() => {
-      if (modalState === 'waiting') {
+      // ref를 통해 현재 modalState 확인
+      if (modalStateRef.current === 'waiting') {
         const isAccepted = Math.random() > 0.2; // 80% 수락 확률
+        console.log('🎲 랜덤 응답 결과:', isAccepted ? '수락' : '거부');
+
         if (isAccepted) {
           setModalState('success');
           // 2초 후 실제 거래 페이지로 이동

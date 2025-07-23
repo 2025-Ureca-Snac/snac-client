@@ -65,9 +65,7 @@ export default function DataAmountInput({
 
   // 빠른 선택 옵션들
   const quickOptions = [
-    { value: 0.5, label: '0.5GB' },
     { value: 1, label: '1GB' },
-    { value: 1.5, label: '1.5GB' },
     { value: 2, label: '2GB' },
   ];
 
