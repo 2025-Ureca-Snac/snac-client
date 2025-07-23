@@ -12,6 +12,7 @@
  * @property {boolean} required 필수 여부(선택)
  * @property {boolean} disabled 비활성화 여부(선택)
  * @property {string} className 클래스 이름(선택)
+ * @property {string} max 최대값(선택)
  */
 export interface InputFieldProps {
   label: string;
@@ -24,6 +25,7 @@ export interface InputFieldProps {
   required?: boolean;
   disabled?: boolean;
   className?: string;
+  max?: string;
 }
 
 /**

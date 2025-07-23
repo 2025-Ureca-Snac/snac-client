@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 /**
@@ -27,13 +28,15 @@ export default function UserLogo() {
         background: `linear-gradient(to bottom right, #000000 ${percent}, #384838 100%)`,
       }}
     >
-      <Image
-        src="/logo.png"
-        alt="logo"
-        width={300}
-        height={300}
-        className="w-48 h-48 md:w-[300px] md:h-[300px] object-contain"
-      />
+      <Link href="/">
+        <Image
+          src="/logo.png"
+          alt="logo"
+          width={300}
+          height={300}
+          className="w-48 h-48 md:w-[300px] md:h-[300px] object-contain cursor-pointer"
+        />
+      </Link>
     </div>
   );
 }
