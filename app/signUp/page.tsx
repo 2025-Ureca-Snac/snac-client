@@ -36,7 +36,7 @@ export default function SignUp() {
     nickname: '',
     email: '',
     phoneNumber: '',
-    birthDate: new Date(),
+    birthDate: new Date('1990-01-01'), // 유효한 기본 날짜로 설정
     password: '',
     passwordConfirm: '',
     emailVerificationCode: '',
@@ -66,6 +66,7 @@ export default function SignUp() {
       formData.email.trim() !== '' &&
       formData.phoneNumber.trim() !== '' &&
       formData.birthDate &&
+      !isNaN(formData.birthDate.getTime()) && // 유효한 날짜인지 확인
       formData.password.trim() !== '' &&
       formData.passwordConfirm.trim() !== '' &&
       isEmailVerified &&
@@ -88,9 +89,19 @@ export default function SignUp() {
   const handleDateChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
+      const selectedDate = new Date(value);
+      const today = new Date();
+
+      // 오늘 날짜 이상은 선택 불가
+      if (selectedDate >= today) {
+        alert('오늘 날짜 이상은 선택할 수 없습니다.');
+        return;
+      }
+
+      // 유효성 검사 없이 바로 상태 업데이트 (Invalid Date도 허용)
       setFormData((prev) => ({
         ...prev,
-        birthDate: new Date(value),
+        birthDate: selectedDate,
       }));
     },
     []
@@ -239,7 +250,7 @@ export default function SignUp() {
 
       const response = await api.post('/join', data);
 
-      if ((response.data as { status?: string })?.status === 'OK') {
+      if ((response.data as { status?: string })?.status === 'CREATED') {
         alert('회원가입이 완료되었습니다.');
         router.push('/login');
       } else {
@@ -373,9 +384,14 @@ export default function SignUp() {
             type="date"
             id="birthDate"
             name="birthDate"
-            value={formData.birthDate.toISOString().split('T')[0]}
+            value={
+              formData.birthDate && !isNaN(formData.birthDate.getTime())
+                ? formData.birthDate.toISOString().split('T')[0]
+                : ''
+            }
             onChange={handleDateChange}
             required
+            max={new Date().toISOString().split('T')[0]}
           />
 
           <InputWithButton
