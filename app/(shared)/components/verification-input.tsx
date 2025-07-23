@@ -3,7 +3,18 @@ import type { VerificationInputProps } from '../types/formComponents';
 /**
  * @author 이승우
  * @description 인증코드 입력 필드 컴포넌트
- * @param props 컴포넌트 속성 {@link VerificationInputProps}(label, id, name, value, onChange, placeholder=인증코드, required=false, disabled=false, onVerify, verifyDisabled=false, helpText, showHelpText=false)
+ * @param {string} label 라벨
+ * @param {string} id ID
+ * @param {string} name 이름
+ * @param {string} value 값
+ * @param {Function} onChange 변경 함수
+ * @param {string} placeholder 플레이스홀더
+ * @param {boolean} required 필수 여부
+ * @param {boolean} disabled 비활성화 여부
+ * @param {Function} onVerify 인증 함수
+ * @param {boolean} verifyDisabled 인증 비활성화 여부
+ * @param {string} helpText 도움말 텍스트
+ * @param {boolean} showHelpText 도움말 표시 여부
  */
 export default function VerificationInput({
   label,

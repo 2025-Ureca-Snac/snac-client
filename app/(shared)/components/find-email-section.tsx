@@ -6,8 +6,20 @@ import type { FindEmailSectionProps } from '../types/find-section';
 /**
  *
  * @author 이승우
- * @description 이메일 찾기 섹션
- * @param props 컴포넌트 속성 {@link FindEmailSectionProps}(foundEmail, formHeight, formRef, idFormData, isIdVerified, showIdVerification, isIdSent, idTimer, handleIdFormChange, handleIdVerification, handleIdVerificationCheck, handleFindId, goToLogin)
+ * @description 이메일 찾기 섹션{@link FindEmailSectionProps(foundEmail, formHeight, formRef, idFormData, isIdVerified, showIdVerification, isIdSent, idTimer, handleIdFormChange, handleIdVerification, handleIdVerificationCheck, handleFindId, goToLogin)}
+ * @param {string} foundEmail 찾은 이메일
+ * @param {number} formHeight 폼 높이
+ * @param {React.RefObject<HTMLFormElement>} formRef 폼 참조
+ * @param {FindEmailSectionFormData} idFormData 아이디 폼 데이터
+ * @param {boolean} isIdVerified 아이디 인증 여부
+ * @param {boolean} showIdVerification 아이디 인증 표시 여부
+ * @param {boolean} isIdSent 아이디 인증 전송 여부
+ * @param {Timer} idTimer 아이디 인증 타이머
+ * @param {Function} handleIdFormChange 아이디 폼 변경 함수
+ * @param {Function} handleIdVerification 아이디 인증 함수
+ * @param {Function} handleIdVerificationCheck 아이디 인증 확인 함수
+ * @param {Function} handleFindId 아이디 찾기 함수
+ * @param {Function} goToLogin 로그인 페이지로 이동 함수
  */
 export default function FindEmailSection({
   foundEmail,

@@ -6,13 +6,14 @@ import { TabNavigationProps } from '../types';
 /**
  * 탭 네비게이션 컴포넌트
  * @author 이승우
- * @param tabs - 탭 목록
- * @param activeTab - 현재 활성화된 탭 ID
- * @param onTabChange - 탭 변경 핸들러
- * @param className - 추가 클래스 이름
- * @param activeTextColor - 활성 탭 텍스트 색상
- * @param inactiveTextColor - 비활성 탭 텍스트 색상
- * @param underlineColor - 밑줄 색상
+ * @description 탭 네비게이션 컴포넌트{@link TabNavigationProps(tabs, activeTab, onTabChange, className, activeTextColor, inactiveTextColor, underlineColor)}
+ * @param {Tab[]} tabs - 탭 목록
+ * @param {string} activeTab - 현재 활성화된 탭 ID
+ * @param {Function} onTabChange - 탭 변경 핸들러
+ * @param {string} className - 추가 클래스 이름
+ * @param {string} activeTextColor - 활성 탭 텍스트 색상
+ * @param {string} inactiveTextColor - 비활성 탭 텍스트 색상
+ * @param {string} underlineColor - 밑줄 색상
  */
 export default function TabNavigation({
   tabs,

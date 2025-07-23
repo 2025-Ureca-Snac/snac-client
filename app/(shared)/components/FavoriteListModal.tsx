@@ -1,12 +1,14 @@
 import ModalPortal from './modal-portal';
 import React from 'react';
+import type { FavoriteListModalProps } from '../types/favorite-list-modal';
 
-interface FavoriteListModalProps {
-  open: boolean;
-  onClose: () => void;
-  favorites: string[];
-}
-
+/**
+ * @author 이승우
+ * @description 단골 목록 모달 컴포넌트{@link FavoriteListModalProps(open, onClose, favorites)}
+ * @param {boolean} open 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ * @param {string[]} favorites 단골 목록
+ */
 export default function FavoriteListModal({
   open,
   onClose,

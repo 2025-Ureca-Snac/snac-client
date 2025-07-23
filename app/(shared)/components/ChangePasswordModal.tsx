@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import ModalPortal from './modal-portal';
+import type { ChangePasswordModalProps } from '../types/change-password-modal';
 
-interface ChangePasswordModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit?: (current: string, next: string, confirm: string) => void;
-}
-
+/**
+ * @author 이승우
+ * @description 비밀번호 변경 모달 컴포넌트{@link ChangePasswordModalProps(open, onClose, onSubmit)}
+ * @param {boolean} open 모달 열림 상태
+ * @param {Function} onClose 모달 닫기 함수
+ * @param {Function} onSubmit 비밀번호 변경 함수
+ */
 export default function ChangePasswordModal({
   open,
   onClose,
