@@ -163,7 +163,7 @@ export default function PointPage() {
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
-          <SideMenu onFavoriteClick={() => {}} />
+          <SideMenu />
         </div>
 
         {/* 메인 컨텐츠 */}
