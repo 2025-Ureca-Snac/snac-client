@@ -4,12 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
-import FilterSection, {
-  SellerRegistrationInfo,
-} from './components/FilterSection';
-import ResultSection from './components/ResultSection';
-import IncomingRequestsPanel from './components/IncomingRequestsPanel';
-import BuyerMatchingStatus from './components/buyer/BuyerMatchingStatus';
+import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
 import { Filters } from './types';
@@ -113,7 +108,7 @@ export default function MatchPage() {
       createdAt: new Date(Date.now() - 30 * 1000).toISOString(), // 30초 전
     },
   ]);
-  const [sellerInfo, setSellerInfo] = useState<SellerRegistrationInfo>({
+  const [sellerInfo, setSellerInfo] = useState({
     dataAmount: 1,
     price: 1500,
     carrier: 'SKT',
@@ -231,7 +226,12 @@ export default function MatchPage() {
   };
 
   // 판매자 정보 관리
-  const handleSellerInfoChange = (info: SellerRegistrationInfo) => {
+  const handleSellerInfoChange = (info: {
+    dataAmount: number;
+    price: number;
+    carrier: string;
+    isActive: boolean;
+  }) => {
     setSellerInfo(info);
   };
 
@@ -261,17 +261,8 @@ export default function MatchPage() {
   // 거래 확인 모달에서 확인 버튼 클릭
   const handleConfirmTrade = async () => {
     if (!selectedSeller) return;
-
     setShowConfirmModal(false);
     setMatchingStatus('requesting');
-
-    console.log('🔥 거래 요청 발송:', {
-      buyerId: 'user_123',
-      sellerId: selectedSeller.id,
-      sellerName: selectedSeller.name,
-      dataAmount: selectedSeller.data,
-      price: selectedSeller.price,
-    });
 
     // Mock: 2초 후 자동 수락 시뮬레이션
     setTimeout(() => {
@@ -328,43 +319,24 @@ export default function MatchPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
-        {/* 필터 섹션 (검색을 시작하지 않았을 때만 표시) */}
-        {(userRole === 'seller' ||
-          (userRole === 'buyer' && !hasStartedSearch) ||
-          appliedFilters.transactionType.length === 0) && (
-          <FilterSection
-            onFilterChange={handleFilterChange}
-            onApply={handleApplyFilters}
-            onReset={handleResetFilters}
-            currentFilters={pendingFilters}
-            onSellerInfoChange={handleSellerInfoChange}
-            onToggleSellerStatus={handleToggleSellerStatus}
-            sellerInfo={sellerInfo}
-          />
-        )}
-
-        {/* 구매자 매칭 상태 (검색을 시작한 후에만 표시) */}
-        {userRole === 'buyer' &&
-          appliedFilters.transactionType.includes('구매자') &&
-          hasStartedSearch && ( // 검색을 실제로 시작했을 때만 표시
-            <BuyerMatchingStatus
-              appliedFilters={appliedFilters}
-              isSearching={matchingStatus === 'searching'}
-              foundUsersCount={filteredUsers.length}
-              onGoBack={handleGoBackToSearch}
-            />
-          )}
-
-        {/* 판매자 모드: 들어온 거래 요청 */}
-        {userRole === 'seller' && (
-          <IncomingRequestsPanel
-            requests={incomingRequests}
-            sellerInfo={sellerInfo}
-            onRequestResponse={handleTradeRequestResponse}
-          />
-        )}
-
-        {<ResultSection users={filteredUsers} onUserClick={userClickHandler} />}
+        <MatchContent
+          userRole={userRole}
+          appliedFilters={appliedFilters}
+          pendingFilters={pendingFilters}
+          onFilterChange={handleFilterChange}
+          onApply={handleApplyFilters}
+          onReset={handleResetFilters}
+          onSellerInfoChange={handleSellerInfoChange}
+          onToggleSellerStatus={handleToggleSellerStatus}
+          sellerInfo={sellerInfo}
+          matchingStatus={matchingStatus}
+          hasStartedSearch={hasStartedSearch}
+          onGoBackToSearch={handleGoBackToSearch}
+          filteredUsers={filteredUsers}
+          onUserClick={userClickHandler}
+          incomingRequests={incomingRequests}
+          onRequestResponse={handleTradeRequestResponse}
+        />
 
         {/* 거래 확인 모달 */}
         <TradeConfirmationModal
