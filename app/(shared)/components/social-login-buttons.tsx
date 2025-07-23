@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { useAuthStore } from '../stores/auth-store';
 import { SOCIALS } from '../constants/social-login-data';
+import { useRouter } from 'next/navigation';
 
 /**
  * @author 이승우
@@ -8,13 +9,18 @@ import { SOCIALS } from '../constants/social-login-data';
  */
 export default function SocialLoginButtons() {
   const { linkSocialAccount } = useAuthStore();
+  const router = useRouter();
 
   const handleSocialLogin = async (providerId: string) => {
     try {
       // auth-store의 소셜 로그인 기능 사용
       const success = await linkSocialAccount(providerId);
+
       if (success) {
         console.log('소셜 로그인 성공');
+        router.push('/');
+      } else {
+        console.log('소셜 로그인 취소됨');
       }
     } catch (error) {
       console.error('소셜 로그인 실패:', error);
