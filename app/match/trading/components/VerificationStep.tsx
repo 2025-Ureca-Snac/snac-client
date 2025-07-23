@@ -16,6 +16,9 @@ export default function VerificationStep({
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
 
+  // 전송 완료 시간을 컴포넌트 마운트 시점에 고정
+  const [completionTime] = useState(() => new Date().toLocaleTimeString());
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -56,9 +59,7 @@ export default function VerificationStep({
             </div>
             <div className="flex justify-between">
               <span>전송 시간:</span>
-              <span className="font-medium">
-                {new Date().toLocaleTimeString()}
-              </span>
+              <span className="font-medium">{completionTime}</span>
             </div>
             <div className="flex justify-between">
               <span>잔여 시간:</span>

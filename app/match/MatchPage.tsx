@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
 import MatchContent from './components/MatchContent';
@@ -78,6 +78,18 @@ export default function MatchPage() {
         ? 'seller'
         : null;
 
+  // 판매자 클릭 처리 (구매자용) - 먼저 정의
+  const handleSellerClick = useCallback(async (seller: User) => {
+    if (seller.type !== 'seller') {
+      alert('판매자에게만 거래 요청이 가능합니다.');
+      return;
+    }
+
+    // 거래 확인 모달 표시
+    setSelectedSeller(seller);
+    setShowConfirmModal(true);
+  }, []);
+
   // 클릭 핸들러 - 더 유연하게 수정
   const userClickHandler =
     userRole === 'buyer'
@@ -87,22 +99,22 @@ export default function MatchPage() {
         : undefined;
 
   // 거래 상태 변경 핸들러
-  const handleTradeStatusChange = (
-    status: string,
-    tradeData: ServerTradeData
-  ) => {
-    console.log('🔄 거래 상태 변경:', status, tradeData);
-    setCurrentTradeStatus(status);
+  const handleTradeStatusChange = useCallback(
+    (status: string, tradeData: ServerTradeData) => {
+      console.log('🔄 거래 상태 변경:', status, tradeData);
+      setCurrentTradeStatus(status);
 
-    if (status === 'ACCEPTED') {
-      // 거래 수락 시 2초 후 모달 닫고 거래 페이지로 이동
-      setTimeout(() => {
-        setShowConfirmModal(false);
-        setSelectedSeller(null);
-        setCurrentTradeStatus(null);
-      }, 2000);
-    }
-  };
+      if (status === 'ACCEPTED') {
+        // 거래 수락 시 2초 후 모달 닫고 거래 페이지로 이동
+        setTimeout(() => {
+          setShowConfirmModal(false);
+          setSelectedSeller(null);
+          setCurrentTradeStatus(null);
+        }, 2000);
+      }
+    },
+    []
+  );
 
   // 실시간 이벤트 처리 (새로운 WebSocket 훅)
   const {
@@ -122,16 +134,16 @@ export default function MatchPage() {
   });
 
   // 필터 핸들러
-  const handleFilterChange = (filters: Filters) => {
+  const handleFilterChange = useCallback((filters: Filters) => {
     setPendingFilters(filters);
 
     // 거래 방식이 변경되면 바로 appliedFilters도 업데이트
     if (filters.transactionType.length > 0) {
       setAppliedFilters(filters);
     }
-  };
+  }, []);
 
-  const handleApplyFilters = () => {
+  const handleApplyFilters = useCallback(() => {
     if (pendingFilters.transactionType[0] === '구매자') {
       const hasRequired =
         pendingFilters.transactionType.length > 0 &&
@@ -187,9 +199,9 @@ export default function MatchPage() {
       // 판매자 모드일 때도 appliedFilters 업데이트
       setAppliedFilters(pendingFilters);
     }
-  };
+  }, [pendingFilters, matchingStatus, registerBuyerFilter]);
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     const emptyFilters = {
       transactionType: [],
       carrier: [],
@@ -206,10 +218,10 @@ export default function MatchPage() {
     setActiveSellers([]);
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
-  };
+  }, []);
 
   // 구매자 매칭 상태에서 뒤로가기
-  const handleGoBackToSearch = () => {
+  const handleGoBackToSearch = useCallback(() => {
     // 검색 결과 초기화하고 필터 섹션으로 돌아가기
     const emptyFilters = {
       transactionType: [],
@@ -222,19 +234,22 @@ export default function MatchPage() {
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
     // pendingFilters는 유지해서 사용자가 이전 선택을 볼 수 있도록 함
-  };
+  }, []);
 
   // 판매자 정보 관리
-  const handleSellerInfoChange = (info: {
-    dataAmount: number;
-    price: number;
-    carrier: string;
-    isActive: boolean;
-  }) => {
-    setSellerInfo(info);
-  };
+  const handleSellerInfoChange = useCallback(
+    (info: {
+      dataAmount: number;
+      price: number;
+      carrier: string;
+      isActive: boolean;
+    }) => {
+      setSellerInfo(info);
+    },
+    []
+  );
 
-  const handleToggleSellerStatus = () => {
+  const handleToggleSellerStatus = useCallback(() => {
     const newInfo = { ...sellerInfo, isActive: !sellerInfo.isActive };
     setSellerInfo(newInfo);
 
@@ -255,33 +270,21 @@ export default function MatchPage() {
     } else {
       console.log('판매 상태가 비활성화되었습니다.');
     }
-  };
-
-  // 판매자 클릭 처리 (구매자용)
-  async function handleSellerClick(seller: User) {
-    if (seller.type !== 'seller') {
-      alert('판매자에게만 거래 요청이 가능합니다.');
-      return;
-    }
-
-    // 거래 확인 모달 표시
-    setSelectedSeller(seller);
-    setShowConfirmModal(true);
-  }
+  }, [sellerInfo, registerSellerCard]);
 
   // 거래 요청 응답 (판매자용)
-  const handleTradeRequestResponse = async (
-    requestId: string,
-    accept: boolean
-  ) => {
-    const request = incomingRequests.find((req) => req.id === requestId);
-    if (!request) return;
+  const handleTradeRequestResponse = useCallback(
+    async (requestId: string, accept: boolean) => {
+      const request = incomingRequests.find((req) => req.id === requestId);
+      if (!request) return;
 
-    setIncomingRequests((prev) => prev.filter((req) => req.id !== requestId));
+      setIncomingRequests((prev) => prev.filter((req) => req.id !== requestId));
 
-    // 실제 서버에 응답 전송
-    respondToTrade(requestId, accept);
-  };
+      // 실제 서버에 응답 전송
+      respondToTrade(requestId, accept);
+    },
+    [incomingRequests, respondToTrade]
+  );
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />

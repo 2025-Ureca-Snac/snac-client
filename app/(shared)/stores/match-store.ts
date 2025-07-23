@@ -80,7 +80,7 @@ export const useMatchStore = create<MatchState>()(
         set({
           status: 'searching',
           partner: null,
-          transactionId: `tx_${Date.now()}`,
+          transactionId: `tx_${crypto.randomUUID()}`,
         }),
 
       foundMatch: (partner) =>

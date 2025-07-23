@@ -19,19 +19,36 @@ export default function TradingPage() {
   const { partner } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
+  const [isValidPartner, setIsValidPartner] = useState(false);
 
-  // 거래 상대방 정보 (store에서 가져오거나 기본값)
-  const partnerInfo = partner || {
-    id: 'partner_789',
-    name: 'user07',
-    carrier: 'KT',
-    data: 2,
-    price: 2000,
-    rating: 4.9,
-    transactionCount: 156,
-    type: 'seller',
-  };
+  // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
+  useEffect(() => {
+    if (!partner) {
+      console.warn('❌ 유효하지 않은 거래 정보: partner 정보가 없습니다.');
+      alert('유효하지 않은 거래 정보입니다. 매칭 페이지로 이동합니다.');
+      router.push('/match');
+      return;
+    }
 
+    // partner 정보 유효성 검증
+    if (
+      !partner.id ||
+      !partner.name ||
+      !partner.carrier ||
+      !partner.data ||
+      !partner.price
+    ) {
+      console.warn('❌ 불완전한 거래 정보:', partner);
+      alert('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
+      router.push('/match');
+      return;
+    }
+
+    console.log('✅ 유효한 거래 정보 확인:', partner);
+    setIsValidPartner(true);
+  }, [partner, router]);
+
+  // 거래 시간 제한 처리
   useEffect(() => {
     if (timeLeft <= 0) {
       // 시간 초과 시 매칭 취소
@@ -46,6 +63,25 @@ export default function TradingPage() {
 
     return () => clearInterval(timer);
   }, [timeLeft, router]);
+
+  // partner 정보가 유효하지 않으면 로딩 표시
+  if (!isValidPartner) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">거래 정보를 확인하는 중...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // 이제 partner는 항상 유효함
+  const partnerInfo = partner!;
 
   const handleNextStep = () => {
     const steps: TradingStep[] = [
