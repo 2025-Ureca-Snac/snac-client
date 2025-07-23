@@ -114,15 +114,17 @@ export const MobileFooter = () => {
         <div className="flex justify-center gap-1">
           <Image
             src="/bcPayment.svg"
-            alt="유튜브 바로가기"
+            alt="BC카드 결제"
             width={48}
             height={32}
+            style={{ width: 'auto', height: '32px' }}
           />
           <Image
             src="/tossPayment.svg"
-            alt="유튜브 바로가기"
+            alt="토스 결제"
             width={48}
             height={32}
+            style={{ width: 'auto', height: '32px' }}
           />
         </div>
         {/* 저작권 및 약관 */}
