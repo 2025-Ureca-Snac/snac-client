@@ -88,7 +88,7 @@ export default function Home() {
     <>
       <Header />
       <Banner />
-      <DataAvg providers={['SKT', 'KT', 'LG U+']} averagePrice={1754} />
+      <DataAvg />
 
       <div className="flex items-center justify-center">
         {loading ? (
