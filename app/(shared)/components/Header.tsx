@@ -18,7 +18,7 @@ export const Header: FC = () => {
 
       <div className="flex gap-4 items-center">
         <MenuLink
-          href="/matching"
+          href="/match"
           imgSrc="/matching.svg"
           alt="실시간 매칭"
           text="실시간 매칭"
