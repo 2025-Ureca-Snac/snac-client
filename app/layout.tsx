@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
-import WwwRedirect from './components/www-redirect';
+import WwwRedirect from './(shared)/components/www-redirect';
 
 const notoSansKr = Noto_Sans_KR({
   weight: ['400', '500', '700'],
