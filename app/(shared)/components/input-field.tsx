@@ -25,6 +25,7 @@ export default function InputField({
   required = false,
   disabled = false,
   className = '',
+  max,
 }: InputFieldProps) {
   return (
     <div>
@@ -43,6 +44,7 @@ export default function InputField({
         placeholder={placeholder}
         required={required}
         disabled={disabled}
+        max={max}
         className={`w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${className}`}
       />
       <div className="min-h-[20px] mt-2"></div>

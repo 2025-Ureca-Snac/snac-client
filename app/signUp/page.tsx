@@ -90,6 +90,13 @@ export default function SignUp() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       const selectedDate = new Date(value);
+      const today = new Date();
+
+      // 오늘 날짜 이상은 선택 불가
+      if (selectedDate >= today) {
+        alert('오늘 날짜 이상은 선택할 수 없습니다.');
+        return;
+      }
 
       // 유효성 검사 없이 바로 상태 업데이트 (Invalid Date도 허용)
       setFormData((prev) => ({
@@ -384,6 +391,7 @@ export default function SignUp() {
             }
             onChange={handleDateChange}
             required
+            max={new Date().toISOString().split('T')[0]}
           />
 
           <InputWithButton
