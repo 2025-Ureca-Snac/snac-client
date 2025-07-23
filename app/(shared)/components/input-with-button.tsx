@@ -2,9 +2,19 @@ import type { InputWithButtonProps } from '../types/formComponents';
 
 /**
  * @author 이승우
- * @description {@link InputField} 컴포넌트와 버튼을 결합한 컴포넌트
- * @param props 컴포넌트 속성 {@link InputWithButtonProps}(label, type='text', id, name, value, onChange, placeholder, required=false, disabled=false, buttonText, onButtonClick, buttonDisabled=false)
- * @returns 버튼 입력 필드 컴포넌트
+ * @description {@link InputField} 컴포넌트와 버튼을 결합한 컴포넌트{@link InputWithButtonProps(label, type='text', id, name, value, onChange, placeholder, required=false, disabled=false, buttonText, onButtonClick, buttonDisabled=false)}
+ * @param {string} label 라벨
+ * @param {string} type 타입
+ * @param {string} id ID
+ * @param {string} name 이름
+ * @param {string} value 값
+ * @param {Function} onChange 변경 함수
+ * @param {string} placeholder 플레이스홀더
+ * @param {boolean} required 필수 여부
+ * @param {boolean} disabled 비활성화 여부
+ * @param {string} buttonText 버튼 텍스트
+ * @param {Function} onButtonClick 버튼 클릭 함수
+ * @param {boolean} buttonDisabled 버튼 비활성화 여부
  */
 export default function InputWithButton({
   label,

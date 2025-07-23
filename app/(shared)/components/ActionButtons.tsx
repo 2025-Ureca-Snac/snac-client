@@ -1,32 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
+import { actionButtons } from '../constants/action-buttons';
 
-const actions = [
-  {
-    label: '판매 내역',
-    icon: '📄',
-    hasNotification: true,
-    href: '/mypage/sales-history',
-  },
-  {
-    label: '구매 내역',
-    icon: '📄',
-    hasNotification: false,
-    href: '/mypage/purchase-history',
-  },
-  {
-    label: '신고 내역',
-    icon: '⚠️',
-    hasNotification: false,
-    href: '/report-history',
-  },
-];
-
+/**
+ * @author 이승우
+ * @description 액션 버튼 컴포넌트{@link actionButtons(판매 내역, 구매 내역, 신고 내역)}
+ */
 export default function ActionButtons() {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
       <div className="flex justify-between gap-4">
-        {actions.map((action) => (
+        {actionButtons.map((action) => (
           <Link
             key={action.label}
             href={action.href}

@@ -34,6 +34,10 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   const [isPasswordVerified, setIsPasswordVerified] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const passwordTimer = useTimer();
+  // 이메일/휴대폰 토글 상태 추가
+  const [passwordAuthType, setPasswordAuthType] = useState<'email' | 'phone'>(
+    'email'
+  );
 
   // 폼 데이터
   const [idFormData, setIdFormData] = useState({
@@ -41,7 +45,8 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     verificationCode: '',
   });
   const [passwordFormData, setPasswordFormData] = useState({
-    emailOrPhone: '',
+    email: '',
+    phone: '',
     verificationCode: '',
     password: '',
     passwordConfirm: '',
@@ -67,7 +72,8 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     passwordTimer.stop();
     setIdFormData({ phone: '', verificationCode: '' });
     setPasswordFormData({
-      emailOrPhone: '',
+      email: '',
+      phone: '',
       verificationCode: '',
       password: '',
       passwordConfirm: '',
@@ -91,14 +97,19 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     console.log('아이디 찾기 인증 요청', idFormData.phone);
 
     try {
-      const response = await api.post('/send-verification-code', {
+      const response = await api.post('/sns/send-verification-code', {
         phone: idFormData.phone,
       });
 
       console.log('아이디 찾기 인증 요청 응답', response);
-      setShowIdVerification(true);
-      setIsIdSent(true);
-      idTimer.start(300); // 5분 = 300초
+
+      if ((response.data as { status?: string })?.status === 'OK') {
+        setShowIdVerification(true);
+        setIsIdSent(true);
+        idTimer.start(300); // 5분 = 300초
+      } else {
+        alert('인증코드 전송에 실패했습니다.');
+      }
     } catch (error) {
       console.error('아이디 찾기 인증 요청 오류', error);
     }
@@ -106,26 +117,58 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
 
   // 비밀번호 찾기 인증 요청
   const handlePasswordVerification = useCallback(async () => {
-    if (!passwordFormData.emailOrPhone) {
-      alert('이메일 또는 휴대폰 번호를 입력해주세요.');
-      return;
+    const email = passwordFormData.email;
+    const phone = passwordFormData.phone;
+
+    if (passwordAuthType === 'email') {
+      if (!email) {
+        alert('이메일을 입력해주세요.');
+        return;
+      }
+      try {
+        const response = await api.post('/email/send-verification-code', {
+          email,
+        });
+        console.log('비밀번호 찾기 이메일 인증 요청 응답', response);
+        if ((response.data as { status?: string })?.status === 'OK') {
+          setShowPasswordVerification(true);
+          setIsPasswordSent(true);
+          passwordTimer.start(300); // 5분 = 300초
+        } else {
+          alert('인증코드 전송에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('비밀번호 찾기 이메일 인증 요청 오류', error);
+        alert(`인증코드 전송에 실패했습니다. ${error}`);
+      }
+    } else {
+      if (!phone) {
+        alert('휴대폰 번호를 입력해주세요.');
+        return;
+      }
+      try {
+        const response = await api.post('/sns/send-verification-code', {
+          phone,
+        });
+        console.log('비밀번호 찾기 휴대폰 인증 요청 응답', response);
+        if ((response.data as { status?: string })?.status === 'OK') {
+          setShowPasswordVerification(true);
+          setIsPasswordSent(true);
+          passwordTimer.start(300); // 5분 = 300초
+        } else {
+          alert('인증코드 전송에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('비밀번호 찾기 휴대폰 인증 요청 오류', error);
+        alert(`인증코드 전송에 실패했습니다. ${error}`);
+      }
     }
-
-    console.log('비밀번호 찾기 인증 요청', passwordFormData.emailOrPhone);
-
-    try {
-      const response = await api.post('/auth/send-verification-code', {
-        phone: passwordFormData.emailOrPhone,
-      });
-
-      console.log('비밀번호 찾기 인증 요청 응답', response);
-      setShowPasswordVerification(true);
-      setIsPasswordSent(true);
-      passwordTimer.start(300); // 5분 = 300초
-    } catch (error) {
-      console.error('비밀번호 찾기 인증 요청 오류', error);
-    }
-  }, [passwordFormData.emailOrPhone, passwordTimer]);
+  }, [
+    passwordFormData.email,
+    passwordFormData.phone,
+    passwordAuthType,
+    passwordTimer,
+  ]);
 
   // 아이디 찾기 인증코드 확인
   const handleIdVerificationCheck = useCallback(() => {
@@ -135,15 +178,49 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   }, [idFormData.verificationCode]);
 
   // 비밀번호 찾기 인증코드 확인
-  const handlePasswordVerificationCheck = useCallback(() => {
-    console.log(
-      '비밀번호 찾기 인증코드 확인',
-      passwordFormData.verificationCode
-    );
-    setIsPasswordVerified(true);
-    setShowPasswordVerification(false);
-    setIsVerified(true);
-  }, [passwordFormData.verificationCode]);
+  const handlePasswordVerificationCheck = useCallback(async () => {
+    const email = passwordFormData.email;
+    const phone = passwordFormData.phone;
+    const verificationCode = passwordFormData.verificationCode;
+
+    try {
+      if (passwordAuthType === 'email') {
+        const response = await api.post('/email/verify-code', {
+          email,
+          code: verificationCode,
+        });
+        if ((response.data as { status?: string })?.status === 'OK') {
+          console.log('비밀번호 찾기 이메일 인증코드 확인 성공');
+          setIsPasswordVerified(true);
+          setShowPasswordVerification(false);
+          setIsVerified(true);
+        } else {
+          alert('인증코드가 일치하지 않습니다.');
+        }
+      } else {
+        const response = await api.post('/sns/verify-code', {
+          phone,
+          code: verificationCode,
+        });
+        if ((response.data as { status?: string })?.status === 'OK') {
+          console.log('비밀번호 찾기 휴대폰 인증코드 확인 성공');
+          setIsPasswordVerified(true);
+          setShowPasswordVerification(false);
+          setIsVerified(true);
+        } else {
+          alert('인증코드가 일치하지 않습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('비밀번호 찾기 인증코드 확인 오류', error);
+      alert(`인증코드 확인에 실패했습니다. ${error}`);
+    }
+  }, [
+    passwordFormData.email,
+    passwordFormData.phone,
+    passwordFormData.verificationCode,
+    passwordAuthType,
+  ]);
 
   // 입력 필드 변경 핸들러
   const handleIdFormChange =
@@ -179,6 +256,24 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   const goToLogin = () => {
     setIsOpen(null);
   };
+
+  // 비밀번호 찾기 토글 변경 핸들러
+  const handlePasswordAuthTypeChange = useCallback(
+    (newAuthType: 'email' | 'phone') => {
+      setPasswordAuthType(newAuthType);
+      // 관련 상태들 초기화
+      setPasswordFormData((prev) => ({
+        ...prev,
+        verificationCode: '',
+      }));
+      setIsPasswordSent(false);
+      setIsPasswordVerified(false);
+      setShowPasswordVerification(false);
+      setIsVerified(false);
+      passwordTimer.stop();
+    },
+    [passwordTimer]
+  );
 
   return (
     <ModalPortal isOpen={!!isOpen} onClose={() => setIsOpen(null)}>
@@ -234,6 +329,8 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
                 handlePasswordVerificationCheck={
                   handlePasswordVerificationCheck
                 }
+                passwordAuthType={passwordAuthType}
+                handlePasswordAuthTypeChange={handlePasswordAuthTypeChange}
               />
             )}
           </AnimatePresence>

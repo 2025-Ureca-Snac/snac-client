@@ -6,12 +6,6 @@ export interface User {
   createdAt: Date;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-}
-
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
 export interface VerificationInputProps {
@@ -46,6 +40,18 @@ export interface Tab {
   label: string;
 }
 
+/**
+ * @author 이승우
+ * @description 탭 네비게이션 컴포넌트 타입
+ * @interface TabNavigationProps
+ * @property {Tab[]} tabs 탭 목록
+ * @property {string} activeTab 현재 활성화된 탭 ID
+ * @property {Function} onTabChange 탭 변경 핸들러
+ * @property {string} className 추가 클래스 이름
+ * @property {string} activeTextColor 활성 탭 텍스트 색상
+ * @property {string} inactiveTextColor 비활성 탭 텍스트 색상
+ * @property {string} underlineColor 언더라인 색상
+ */
 export interface TabNavigationProps {
   tabs: Tab[];
   activeTab: string;

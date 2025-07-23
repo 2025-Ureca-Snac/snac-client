@@ -4,61 +4,60 @@ import { useState } from 'react';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
+import HistoryDetailModal from '@/app/(shared)/components/HistoryDetailModal';
+import { HistoryItem } from '@/app/(shared)/components/HistoryCard';
 import Link from 'next/link';
 
-interface PurchaseItem {
-  id: number;
-  date: string;
-  title: string;
-  price: number;
-  status: 'purchasing' | 'completed';
-}
+export default function SalesHistoryPage() {
+  const [activeTab, setActiveTab] = useState<'all' | 'selling' | 'completed'>(
+    'all'
+  );
+  const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-export default function PurchaseHistoryPage() {
-  const [activeTab, setActiveTab] = useState<
-    'all' | 'purchasing' | 'completed'
-  >('all');
-
-  const purchaseHistory: PurchaseItem[] = [
+  const salesHistory: HistoryItem[] = [
     {
       id: 1,
+      date: '2025.07.04',
+      title: '통신사 2GB',
+      price: 2000,
+      status: 'selling',
+      transactionNumber: '#0123_45678',
+      carrier: 'SKT',
+      dataAmount: '2GB',
+      phoneNumber: '010-0000-0000',
+    },
+    {
+      id: 2,
       date: '2025.07.03',
       title: '통신사 2GB',
       price: 2000,
       status: 'completed',
-    },
-    {
-      id: 2,
-      date: '2025.07.02',
-      title: '통신사 5GB',
-      price: 5000,
-      status: 'purchasing',
-    },
-    {
-      id: 3,
-      date: '2025.07.01',
-      title: '통신사 1GB',
-      price: 1000,
-      status: 'completed',
-    },
-    {
-      id: 4,
-      date: '2025.06.30',
-      title: '통신사 3GB',
-      price: 3000,
-      status: 'completed',
+      transactionNumber: '#0123_45679',
+      carrier: 'SKT',
+      dataAmount: '2GB',
     },
   ];
 
-  const filteredPurchases = purchaseHistory.filter((item) => {
+  const filteredSales = salesHistory.filter((item) => {
     if (activeTab === 'all') return true;
     return item.status === activeTab;
   });
 
+  const handleCardClick = (item: HistoryItem) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
   const tabs = [
     { id: 'all', label: '전체' },
-    { id: 'purchasing', label: '구매 중' },
-    { id: 'completed', label: '구매 완료' },
+    { id: 'selling', label: '판매 중' },
+    { id: 'completed', label: '판매 완료' },
   ];
 
   // PC 헤더
@@ -73,14 +72,14 @@ export default function PurchaseHistoryPage() {
           마이페이지
         </Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">구매 내역</span>
+        <span className="text-gray-900 font-medium">판매 내역</span>
       </div>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">구매 내역</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">판매 내역</h1>
         <p className="text-gray-600 text-lg">
-          내가 구매한 상품들의 내역을 확인하세요
+          내가 판매한 상품들의 내역을 확인하세요
         </p>
       </div>
     </div>
@@ -98,11 +97,11 @@ export default function PurchaseHistoryPage() {
           마이페이지
         </Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">구매 내역</span>
+        <span className="text-gray-900 font-medium">판매 내역</span>
       </div>
 
       {/* 제목 */}
-      <h1 className="text-xl font-bold text-gray-900">구매 내역</h1>
+      <h1 className="text-xl font-bold text-gray-900">판매 내역</h1>
     </div>
   );
 
@@ -111,7 +110,7 @@ export default function PurchaseHistoryPage() {
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
-          <SideMenu onFavoriteClick={() => {}} />
+          <SideMenu />
         </div>
 
         {/* 메인 컨텐츠 */}
@@ -129,23 +128,24 @@ export default function PurchaseHistoryPage() {
                 <TabNavigation
                   tabs={tabs}
                   activeTab={activeTab}
-                  onTabChange={(tabId) =>
+                  onTabChange={(tabId: string) =>
                     setActiveTab(tabId as typeof activeTab)
                   }
-                  activeTextColor="text-blue-600"
+                  activeTextColor="text-green-600"
                   inactiveTextColor="text-gray-500"
-                  underlineColor="bg-blue-600"
+                  underlineColor="bg-green-600"
                 />
 
-                {/* 구매 내역 리스트 */}
+                {/* 판매 내역 리스트 */}
                 <AnimatedTabContent key={activeTab}>
                   <div className="p-6">
-                    {filteredPurchases.length > 0 ? (
+                    {filteredSales.length > 0 ? (
                       <div className="space-y-4">
-                        {filteredPurchases.map((item) => (
+                        {filteredSales.map((item) => (
                           <div
                             key={item.id}
-                            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3"
+                            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                            onClick={() => handleCardClick(item)}
                           >
                             {/* 아이콘 */}
                             <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -155,7 +155,7 @@ export default function PurchaseHistoryPage() {
                             </div>
 
                             {/* 내용 */}
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1">
                               <div className="text-sm text-gray-500 mb-1">
                                 {item.date}
                               </div>
@@ -163,16 +163,17 @@ export default function PurchaseHistoryPage() {
                                 {item.title}
                               </div>
                               <div className="flex items-center gap-2">
-                                {item.status === 'completed' && (
-                                  <span className="bg-black text-white text-xs px-2 py-1 rounded">
-                                    거래완료
-                                  </span>
-                                )}
-                                {item.status === 'purchasing' && (
-                                  <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                                    구매중
-                                  </span>
-                                )}
+                                <span
+                                  className={`text-white text-xs px-2 py-1 rounded ${
+                                    item.status === 'completed'
+                                      ? 'bg-black'
+                                      : 'bg-green-500'
+                                  }`}
+                                >
+                                  {item.status === 'completed'
+                                    ? '거래완료'
+                                    : '판매중'}
+                                </span>
                                 <span className="text-gray-900">
                                   {item.price.toLocaleString()}원
                                 </span>
@@ -184,10 +185,10 @@ export default function PurchaseHistoryPage() {
                     ) : (
                       <div className="text-center py-8 text-gray-500">
                         {activeTab === 'all'
-                          ? '구매 내역이 없습니다.'
-                          : activeTab === 'purchasing'
-                            ? '구매 중인 상품이 없습니다.'
-                            : '구매 완료된 상품이 없습니다.'}
+                          ? '판매 내역이 없습니다.'
+                          : activeTab === 'selling'
+                            ? '판매 중인 상품이 없습니다.'
+                            : '판매 완료된 상품이 없습니다.'}
                       </div>
                     )}
                   </div>
@@ -197,6 +198,14 @@ export default function PurchaseHistoryPage() {
           </div>
         </main>
       </div>
+
+      {/* 상세 정보 모달 */}
+      <HistoryDetailModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        item={selectedItem}
+        type="sales"
+      />
     </div>
   );
 }

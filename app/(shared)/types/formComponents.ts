@@ -1,16 +1,17 @@
 /**
  * @author 이승우
  * @description 일반 입력 필드 컴포넌트 타입
- * @property label 라벨
- * @property type 타입(선택)
- * @property id 아이디
- * @property name 이름
- * @property value 값
- * @property onChange 변경 이벤트
- * @property placeholder 플레이스홀더(선택)
- * @property required 필수 여부(선택)
- * @property disabled 비활성화 여부(선택)
- * @property className 클래스 이름(선택)
+ * @interface InputFieldProps
+ * @property {string} label 라벨
+ * @property {string} type 타입(선택)
+ * @property {string} id 아이디
+ * @property {string} name 이름
+ * @property {string} value 값
+ * @property {Function} onChange 변경 이벤트
+ * @property {string} placeholder 플레이스홀더(선택)
+ * @property {boolean} required 필수 여부(선택)
+ * @property {boolean} disabled 비활성화 여부(선택)
+ * @property {string} className 클래스 이름(선택)
  */
 export interface InputFieldProps {
   label: string;

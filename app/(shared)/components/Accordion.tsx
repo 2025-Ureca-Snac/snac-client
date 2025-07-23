@@ -1,6 +1,11 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
 
+/**
+ * @author 이승우
+ * @description 거래 후기 컴포넌트
+ */
 export default function Accordion() {
   const [open, setOpen] = useState(false);
   return (
@@ -11,8 +16,14 @@ export default function Accordion() {
         type="button"
       >
         거래 후기
-        <span className={`transition-transform ${open ? 'rotate-180' : ''}`}>
-          ▼
+        <span className={`transition-transform ${open ? 'rotate-90' : ''}`}>
+          <Image
+            src="/chevron-down.svg"
+            alt="펼치기/접기"
+            width={24}
+            height={24}
+            className="inline-block -rotate-90"
+          />
         </span>
       </button>
       {open && (
