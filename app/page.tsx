@@ -90,7 +90,7 @@ export default function Home() {
     <>
       <Header />
       <Banner />
-      <DataAvg providers={['SKT', 'KT', 'LG U+']} averagePrice={1754} />
+      <DataAvg />
       <button
         onClick={actions.toggleCreateModal}
         className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all
