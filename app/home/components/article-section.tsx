@@ -61,7 +61,7 @@ export const ArticleSection = () => (
         <ArticleCard
           key={post.id}
           title={post.title}
-          link={`/articles/${post.id}`}
+          link={`/blog/${post.id}`}
           imageUrl={post.image}
         />
       ))}
