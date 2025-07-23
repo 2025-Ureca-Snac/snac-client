@@ -226,22 +226,59 @@ export function useMatchingEvents({
           const cardData: ServerCardData = JSON.parse(frame.body);
           const user = convertServerCardToUser(cardData);
 
-          // 매칭 결과 추가
+          // 매칭 결과 처리 (중복 검출 및 스마트 업데이트)
           setActiveSellers((prev) => {
-            // 중복 제거하고 추가
-            const filtered = prev.filter((u) => u.id !== user.id);
-            const updated = [...filtered, user];
+            // 1. 기존 카드 중에서 동일한 판매자 찾기 (id, name, carrier, data, price로 식별)
+            const existingIndex = prev.findIndex(
+              (existing) =>
+                existing.id === user.id ||
+                (existing.name === user.name &&
+                  existing.carrier === user.carrier &&
+                  existing.data === user.data &&
+                  existing.price === user.price)
+            );
 
-            // 첫 번째 매칭 결과를 받았을 때 검색 상태 해제
-            if (prev.length === 0 && updated.length > 0) {
-              console.log('✅ 첫 매칭 결과 수신 - 검색 상태 해제');
-              setMatchingStatus('idle');
+            if (existingIndex !== -1) {
+              // 기존 카드가 있으면 업데이트 (정보 변경 가능성 대비)
+              console.log('🔄 기존 판매자 카드 업데이트:', {
+                기존: prev[existingIndex].name,
+                새로운: user.name,
+                id: user.id,
+              });
+
+              const updated = [...prev];
+              updated[existingIndex] = {
+                ...updated[existingIndex],
+                ...user, // 새로운 정보로 업데이트
+                rating: updated[existingIndex].rating, // 기존 평점 유지
+                transactionCount: updated[existingIndex].transactionCount, // 기존 거래 수 유지
+              };
+
+              return updated;
+            } else {
+              // 새로운 카드 추가
+              console.log('➕ 새로운 판매자 카드 추가:', {
+                이름: user.name,
+                통신사: user.carrier,
+                데이터: user.data,
+                가격: user.price,
+                id: user.id,
+              });
+
+              const updated = [...prev, user];
+
+              // 첫 번째 매칭 결과를 받았을 때 검색 상태 해제
+              if (prev.length === 0 && updated.length > 0) {
+                console.log('✅ 첫 매칭 결과 수신 - 검색 상태 해제');
+                setMatchingStatus('idle');
+              }
+
+              return updated;
             }
-
-            return updated;
           });
         } catch (error) {
-          console.error('매칭 알림 파싱 오류:', error);
+          console.error('❌ 매칭 알림 파싱 오류:', error);
+          console.error('❌ 원본 데이터:', frame.body);
         }
       });
     }

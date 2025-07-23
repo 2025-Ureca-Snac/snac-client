@@ -254,6 +254,8 @@ export default function MatchPage() {
     setSellerInfo(newInfo);
 
     if (newInfo.isActive) {
+      setActiveSellers([]);
+
       // 실제 서버에 판매자 카드 등록
       console.log('💰 판매자 카드 서버 등록 중...');
       console.log('🏪 판매자 원본 데이터:', newInfo);
@@ -270,7 +272,7 @@ export default function MatchPage() {
     } else {
       console.log('판매 상태가 비활성화되었습니다.');
     }
-  }, [sellerInfo, registerSellerCard]);
+  }, [sellerInfo, registerSellerCard, setActiveSellers]);
 
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = useCallback(
