@@ -85,6 +85,7 @@ export default function MatchPage() {
   });
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
   const [activeSellers, setActiveSellers] = useState<User[]>([]);
+  const [hasStartedSearch, setHasStartedSearch] = useState(false); // 검색 시작 여부 추적
   const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([
     // 임시 Mock 거래 요청 데이터 (테스트용)
     {
@@ -154,7 +155,14 @@ export default function MatchPage() {
   });
 
   // 필터 핸들러
-  const handleFilterChange = (filters: Filters) => setPendingFilters(filters);
+  const handleFilterChange = (filters: Filters) => {
+    setPendingFilters(filters);
+
+    // 거래 방식이 변경되면 바로 appliedFilters도 업데이트
+    if (filters.transactionType.length > 0) {
+      setAppliedFilters(filters);
+    }
+  };
 
   const handleApplyFilters = () => {
     if (pendingFilters.transactionType[0] === '구매자') {
@@ -172,6 +180,7 @@ export default function MatchPage() {
       // 구매자 검색 시작
       setMatchingStatus('searching');
       setAppliedFilters(pendingFilters);
+      setHasStartedSearch(true); // 검색 시작 표시
 
       // 2초 후 검색 완료 (Mock)
       setTimeout(() => {
@@ -180,7 +189,8 @@ export default function MatchPage() {
         // Mock: 실시간 판매자 목록 업데이트
         triggerMockSellerUpdate();
       }, 2000);
-    } else {
+    } else if (pendingFilters.transactionType[0] === '판매자') {
+      // 판매자 모드일 때도 appliedFilters 업데이트
       setAppliedFilters(pendingFilters);
     }
   };
@@ -201,6 +211,7 @@ export default function MatchPage() {
     });
     setActiveSellers([]);
     setMatchingStatus('idle');
+    setHasStartedSearch(false); // 검색 시작 상태 초기화
   };
 
   // 구매자 매칭 상태에서 뒤로가기
@@ -215,6 +226,7 @@ export default function MatchPage() {
     setAppliedFilters(emptyFilters);
     setActiveSellers([]);
     setMatchingStatus('idle');
+    setHasStartedSearch(false); // 검색 시작 상태 초기화
     // pendingFilters는 유지해서 사용자가 이전 선택을 볼 수 있도록 함
   };
 
@@ -227,23 +239,15 @@ export default function MatchPage() {
     const newInfo = { ...sellerInfo, isActive: !sellerInfo.isActive };
     setSellerInfo(newInfo);
 
-    console.log('🔥 판매자 상태 변경:', newInfo);
-
     if (newInfo.isActive) {
-      console.log('📢 새로운 판매자 등록됨! 구매자들에게 알림 발송');
-      alert('판매 상태가 활성화되었습니다! 구매자들이 볼 수 있습니다.');
-
       setTimeout(() => triggerMockSellerUpdate(), 500);
     } else {
-      console.log('📢 판매자가 비활성화됨');
       alert('판매 상태가 비활성화되었습니다.');
     }
   };
 
   // 판매자 클릭 처리 (구매자용)
   async function handleSellerClick(seller: User) {
-    console.log('🔥 판매자 클릭됨:', seller);
-
     if (seller.type !== 'seller') {
       alert('판매자에게만 거래 요청이 가능합니다.');
       return;
@@ -320,14 +324,13 @@ export default function MatchPage() {
       setTimeout(() => router.push('/match/trading'), 1000);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
       <main className="flex-1">
-        {/* 필터 섹션 (판매자 모드이거나 구매자가 아직 검색하지 않았을 때만 표시) */}
+        {/* 필터 섹션 (검색을 시작하지 않았을 때만 표시) */}
         {(userRole === 'seller' ||
-          userRole !== 'buyer' ||
+          (userRole === 'buyer' && !hasStartedSearch) ||
           appliedFilters.transactionType.length === 0) && (
           <FilterSection
             onFilterChange={handleFilterChange}
@@ -340,13 +343,17 @@ export default function MatchPage() {
           />
         )}
 
-        {/* 구매자 매칭 상태 */}
-        <BuyerMatchingStatus
-          appliedFilters={appliedFilters}
-          isSearching={matchingStatus === 'searching'}
-          foundUsersCount={filteredUsers.length}
-          onGoBack={handleGoBackToSearch}
-        />
+        {/* 구매자 매칭 상태 (검색을 시작한 후에만 표시) */}
+        {userRole === 'buyer' &&
+          appliedFilters.transactionType.includes('구매자') &&
+          hasStartedSearch && ( // 검색을 실제로 시작했을 때만 표시
+            <BuyerMatchingStatus
+              appliedFilters={appliedFilters}
+              isSearching={matchingStatus === 'searching'}
+              foundUsersCount={filteredUsers.length}
+              onGoBack={handleGoBackToSearch}
+            />
+          )}
 
         {/* 판매자 모드: 들어온 거래 요청 */}
         {userRole === 'seller' && (

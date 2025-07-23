@@ -97,10 +97,6 @@ class RealTimeMatchingService {
   // SSE 연결 시작
   connect(userId: string, transactionId?: string): void {
     if (MOCK_MODE) {
-      console.log('🔧 Mock 모드: SSE 연결 시뮬레이션', {
-        userId,
-        transactionId,
-      });
       return;
     }
 
@@ -141,7 +137,6 @@ class RealTimeMatchingService {
   // 연결 종료
   disconnect(): void {
     if (MOCK_MODE) {
-      console.log('🔧 Mock 모드: SSE 연결 해제 시뮬레이션');
       return;
     }
 

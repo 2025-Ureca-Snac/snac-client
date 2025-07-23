@@ -82,10 +82,6 @@ export function useMatchingEvents({
       const updatedSellers = event.data as unknown as User[];
       console.log('📥 구매자: 새로운 판매자 목록 받음', updatedSellers);
       setActiveSellers(updatedSellers);
-
-      if (userRole === 'buyer') {
-        alert('새로운 판매자가 등록되었습니다! 목록을 확인해보세요.');
-      }
     };
 
     // 이벤트 리스너 등록
@@ -96,9 +92,7 @@ export function useMatchingEvents({
     // 구매자 모드 자동 업데이트 설정
     let intervalId: NodeJS.Timeout;
     if (userRole === 'buyer' && appliedFilters.transactionType.length > 0) {
-      console.log('🔄 구매자 모드: 자동 판매자 목록 업데이트 시작');
       intervalId = setInterval(() => {
-        console.log('🔄 자동으로 판매자 목록 업데이트 중...');
         triggerMockSellerUpdate();
       }, 30000);
     }
