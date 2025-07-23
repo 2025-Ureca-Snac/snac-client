@@ -9,8 +9,10 @@ export type SortBy =
   | '가격 낮은 순';
 type TransactionStatus = 'All' | '거래 전' | '거래 완료' | null;
 type PriceRange = string;
+type CardCategory = 'SELL' | 'BUY' | null;
 
 interface HomeState {
+  cardCategory: CardCategory;
   isFilterOpen: boolean;
   isCreateModalOpen: boolean;
   category: Category;
@@ -19,6 +21,7 @@ interface HomeState {
   priceRanges: PriceRange[];
   showRegularsOnly: boolean;
   actions: {
+    setCardCategory: (category: CardCategory) => void;
     toggleFilter: () => void;
     toggleCreateModal: () => void;
     setCategory: (category: Category) => void;
@@ -32,6 +35,7 @@ interface HomeState {
 }
 
 export const homeInitialState = {
+  cardCategory: 'SELL' as CardCategory,
   isFilterOpen: false,
   isCreateModalOpen: false,
   category: null,
@@ -44,6 +48,7 @@ export const homeInitialState = {
 export const useHomeStore = create<HomeState>((set) => ({
   ...homeInitialState,
   actions: {
+    setCardCategory: (category) => set({ cardCategory: category }),
     toggleFilter: () => set((state) => ({ isFilterOpen: !state.isFilterOpen })),
     toggleCreateModal: () =>
       set((state) => ({ isCreateModalOpen: !state.isCreateModalOpen })),

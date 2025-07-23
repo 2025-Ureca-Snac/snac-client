@@ -10,6 +10,7 @@ import { Toaster } from 'sonner';
 import { Pagination } from '@/app/(shared)/components/Pagination';
 import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
+import TabNavigation from '@/app/(shared)/components/TabNavigation';
 
 interface Card {
   id: number;
@@ -39,9 +40,20 @@ export default function HomeLayout({
   totalPages,
   onPageChange,
 }: HomeLayoutProps) {
-  const { actions } = useHomeStore();
+  const { actions, cardCategory } = useHomeStore();
   const [currentUnit, setCurrentUnit] = useState<PriceUnit>('snack');
 
+  const tabs = [
+    { id: 'SELL', label: '팝니다' },
+    { id: 'BUY', label: '삽니다' },
+  ];
+
+  const handleTabChange = (tabId: string) => {
+    if (tabId === 'SELL' || tabId === 'BUY') {
+      actions.setCardCategory(tabId);
+      onPageChange(1);
+    }
+  };
   return (
     <div className="flex w-full flex-col md:flex-row">
       <Filter />
@@ -95,6 +107,11 @@ export default function HomeLayout({
               />
             </div>
           </div>
+          <TabNavigation
+            tabs={tabs}
+            activeTab={cardCategory || 'SELL'}
+            onTabChange={handleTabChange}
+          />
 
           {/* PC */}
           <div className="hidden md:flex justify-between items-center mb-4">
