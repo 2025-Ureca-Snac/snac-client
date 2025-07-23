@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 /**
  * @author 이승우
@@ -8,6 +9,7 @@ import { useEffect, useState } from 'react';
  */
 export default function UserLogo() {
   const [percent, setPercent] = useState('40%'); // SSR 기본값
+  const router = useRouter();
 
   useEffect(() => {
     const updatePercent = () => {
@@ -19,6 +21,10 @@ export default function UserLogo() {
     window.addEventListener('resize', updatePercent);
     return () => window.removeEventListener('resize', updatePercent);
   }, []);
+
+  const handleLogoClick = () => {
+    router.push('/');
+  };
 
   return (
     <div
@@ -32,7 +38,8 @@ export default function UserLogo() {
         alt="logo"
         width={300}
         height={300}
-        className="w-48 h-48 md:w-[300px] md:h-[300px] object-contain"
+        className="w-48 h-48 md:w-[300px] md:h-[300px] object-contain cursor-pointer"
+        onClick={handleLogoClick}
       />
     </div>
   );
