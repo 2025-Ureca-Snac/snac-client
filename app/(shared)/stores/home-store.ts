@@ -27,6 +27,7 @@ interface HomeState {
     togglePriceRange: (price: PriceRange) => void;
     toggleShowRegularsOnly: () => void;
     resetFilters: () => void;
+    resetAll: () => void;
   };
 }
 
@@ -36,7 +37,7 @@ export const homeInitialState = {
   category: null,
   sortBy: '최신순' as SortBy,
   transactionStatus: null as TransactionStatus,
-  priceRanges: [],
+  priceRanges: [] as PriceRange[],
   showRegularsOnly: false,
 };
 
@@ -55,7 +56,6 @@ export const useHomeStore = create<HomeState>((set) => ({
           ? state.priceRanges.filter((r) => r !== price)
           : [...state.priceRanges, price],
       })),
-
     toggleShowRegularsOnly: () =>
       set((state) => ({ showRegularsOnly: !state.showRegularsOnly })),
     resetFilters: () =>
@@ -66,5 +66,6 @@ export const useHomeStore = create<HomeState>((set) => ({
         priceRanges: homeInitialState.priceRanges,
         showRegularsOnly: homeInitialState.showRegularsOnly,
       })),
+    resetAll: () => set(() => ({ ...homeInitialState })),
   },
 }));

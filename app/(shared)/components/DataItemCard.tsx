@@ -3,12 +3,13 @@
 import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
+import { PriceUnit } from '@/app/(shared)/types';
 
-// email과 createdAt은 props로 받지만, 화면에는 표시하지 않습니다.
 interface DataItemCardProps {
   imageUrl: string;
   title: string;
   price: number;
+  unit: PriceUnit;
   email: string;
   createdAt: string;
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
@@ -20,14 +21,30 @@ interface DataItemCardProps {
 export const DataItemCard = ({
   imageUrl,
   title,
+  unit,
   price,
-  email, // 데이터는 받지만 사용하지 않음
-  createdAt, // 데이터는 받지만 사용하지 않음
+  email,
+  createdAt,
   isNew,
   newBadgeText = 'NEW',
   buyButtonText = '구매하기',
   onClickBuy,
 }: DataItemCardProps) => {
+  const displayPrice =
+    unit === 'snack' ? (
+      <span className="inline-flex items-center">
+        <Image
+          src="/snac-price.svg"
+          alt="스낵 단위 아이콘"
+          width={18}
+          height={18}
+          className="mr-1"
+        />
+        {price.toLocaleString()}
+      </span>
+    ) : (
+      <>₩{price.toLocaleString()}</>
+    );
   return (
     <div className="transition-transform duration-300 hover:-translate-y-[2px] hover:scale-[1.03] relative bg-[#F3F5F7] rounded-2xl shadow-md w-card-sm h-card-sm md:w-card-md md:h-card-md flex flex-col p-3">
       {isNew && (
@@ -49,8 +66,8 @@ export const DataItemCard = ({
         <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718]">
           {title}
         </h3>
-        <p className="text-medium-sm md:text-medium-sm text-gray-900">
-          ₩{price.toLocaleString()}
+        <p className="text-medium-sm md:text-medium-sm text-gray-900 h-6 flex items-center">
+          {displayPrice}
         </p>
       </div>
 
