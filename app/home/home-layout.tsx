@@ -1,5 +1,5 @@
 'use client';
-
+import React, { useState } from 'react';
 import { Filter } from './components/filter';
 import { Sort } from './components/sort';
 import { Modal } from './components/modal';
@@ -8,6 +8,8 @@ import HomeSection from './home-section';
 import Image from 'next/image';
 import { Toaster } from 'sonner';
 import { Pagination } from '@/app/(shared)/components/Pagination';
+import { PriceUnit } from '@/app/(shared)/types';
+import { PriceUnitToggle } from './components/price-unit-toggle';
 
 interface Card {
   id: number;
@@ -38,6 +40,7 @@ export default function HomeLayout({
   onPageChange,
 }: HomeLayoutProps) {
   const { actions } = useHomeStore();
+  const [currentUnit, setCurrentUnit] = useState<PriceUnit>('snack');
 
   return (
     <div className="flex w-full flex-col md:flex-row">
@@ -65,27 +68,34 @@ export default function HomeLayout({
               </button>
             </div>
             <div className="flex justify-between items-center">
-              <Sort />
-              <button
-                onClick={() => window.location.reload()}
-                aria-label="새로고침"
-              >
-                <Image
-                  src="/refresh.svg"
-                  alt="새로고침"
-                  width={18}
-                  height={18}
-                  className="cursor-pointer"
-                />
-              </button>
-              <button
-                onClick={actions.toggleCreateModal}
-                className="px-4 py-2 w-[100px] border rounded-lg text-medium-sm font-semibold hover:bg-gray-50 bg-white shadow-sm"
-              >
-                + 등록하기
-              </button>
+              <div className="flex items-center gap-4">
+                <Sort />
+
+                <button
+                  onClick={() => {
+                    actions.resetAll();
+                    onPageChange(1);
+                  }}
+                  aria-label="새로고침"
+                >
+                  <Image
+                    src="/refresh.svg"
+                    alt="새로고침"
+                    width={18}
+                    height={18}
+                    className="cursor-pointer"
+                  />
+                </button>
+              </div>
+
+              <PriceUnitToggle
+                currentUnit={currentUnit}
+                setCurrentUnit={setCurrentUnit}
+                isMobile
+              />
             </div>
           </div>
+
           {/* PC */}
           <div className="hidden md:flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
@@ -103,12 +113,11 @@ export default function HomeLayout({
                 />
               </button>
             </div>
-            <button
-              onClick={actions.toggleCreateModal}
-              className="px-4 py-2 w-[93px] md:w-[110px] border rounded-lg text-medium-md font-semibold hover:bg-gray-50 bg-white shadow-sm"
-            >
-              + 등록하기
-            </button>
+
+            <PriceUnitToggle
+              currentUnit={currentUnit}
+              setCurrentUnit={setCurrentUnit}
+            />
           </div>
         </div>
 
@@ -116,11 +125,11 @@ export default function HomeLayout({
           {isLoading ? (
             <div className="text-center py-10">로딩 중...</div>
           ) : (
-            <HomeSection cards={cards} />
+            <HomeSection cards={cards} unit={currentUnit} />
           )}
         </div>
 
-        <div className="mt-0">
+        <div className="mt-5">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

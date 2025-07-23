@@ -2,6 +2,7 @@
 
 import { DataItemCard } from '../(shared)/components/DataItemCard';
 import { isToday } from '@/app/(shared)/utils/';
+import { PriceUnit } from '@/app/(shared)/types';
 
 interface DataItem {
   id: number;
@@ -18,24 +19,27 @@ interface DataItem {
 
 interface HomeSectionProps {
   cards: DataItem[];
+  unit: PriceUnit;
 }
 
 const getCarrierImageUrl = (carrier: string): string => {
   switch (carrier) {
     case 'SKT':
-      return '/SKT.svg';
+      return '/SKT.png';
     case 'KT':
-      return '/KT.svg';
+      return '/KT.png';
     case 'LGU+':
-      return '/LGU+.svg';
+      return '/LGU+.png';
     default:
-      return '/SKT.svg';
+      return '/SKT.png';
   }
 };
 
-export default function HomeSection({ cards }: HomeSectionProps) {
-  const handleBuy = (title: string) => {
-    alert(`"${title}" 구매하기 클릭됨!`);
+export default function HomeSection({ cards, unit }: HomeSectionProps) {
+  const handleBuy = (meta: { email: string; createdAt: string }) => {
+    console.log(
+      `구매하기 클릭됨!\n판매자 이메일: ${meta.email}\n작성 시간: ${meta.createdAt}`
+    );
   };
 
   if (!cards || cards.length === 0) {
@@ -58,11 +62,10 @@ export default function HomeSection({ cards }: HomeSectionProps) {
           imageUrl={getCarrierImageUrl(item.carrier)}
           price={item.price}
           isNew={isToday(item.updatedAt)}
-          onClickBuy={() =>
-            handleBuy(`${item.carrier} 데이터 ${item.dataAmount}MB`)
-          }
+          unit={unit}
           email={item.email}
           createdAt={item.createdAt}
+          onClickBuy={handleBuy}
         />
       ))}
     </div>
