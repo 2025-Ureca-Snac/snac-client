@@ -49,7 +49,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    const { code } = error.response?.data;
+    const code = error.response?.data?.code;
 
     // 401 에러이고 아직 재시도하지 않은 요청인 경우
     if (code === 'TOKEN_EXPIRED_401' && !originalRequest._retry) {
@@ -93,7 +93,7 @@ api.interceptors.response.use(
 
         // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
         if (typeof window !== 'undefined') {
-          window.location.href = '/';
+          window.location.href = '/login';
         }
 
         return Promise.reject(error);

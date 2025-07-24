@@ -14,6 +14,11 @@ export const useAuthStore = create<AuthState>()(
       tokenExp: null,
       isLoading: false,
 
+      // 초기화 함수
+      resetAuthState: () => {
+        set({ user: null, role: null, token: null, tokenExp: null });
+      },
+
       // 로그인 액션
       login: async (email: string, password: string) => {
         try {
@@ -28,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
           const token = response.headers.get('Authorization')?.split(' ')[1];
           if (token) {
             const decoded: JwtPayload = jwtDecode(token);
-            console.log('decoded', decoded);
+
             set({
               user: decoded?.username,
               role: decoded?.role,
@@ -37,7 +42,7 @@ export const useAuthStore = create<AuthState>()(
             });
           }
         } catch (error) {
-          set({ user: null, role: null, token: null, tokenExp: null });
+          useAuthStore.getState().resetAuthState();
           console.log(handleApiError(error));
         } finally {
           set({ isLoading: false });
@@ -101,12 +106,7 @@ export const useAuthStore = create<AuthState>()(
                     console.log('소셜 로그인 성공:', response);
                     resolve(true);
                   } else {
-                    set({
-                      user: null,
-                      role: null,
-                      token: null,
-                      tokenExp: null,
-                    });
+                    useAuthStore.getState().resetAuthState();
                     reject(new Error('소셜 로그인에 실패했습니다.'));
                   }
                 } catch (error) {
@@ -155,7 +155,7 @@ export const useAuthStore = create<AuthState>()(
 
         console.log(response);
 
-        set({ user: null, role: null, token: null, tokenExp: null });
+        useAuthStore.getState().resetAuthState();
       },
 
       // 토큰 갱신
@@ -187,7 +187,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           // /reissue 실패 시 로그아웃
           console.error('토큰 갱신 실패:', error);
-          set({ user: null, role: null, token: null, tokenExp: null });
+          useAuthStore.getState().resetAuthState();
           return false;
         }
       },
