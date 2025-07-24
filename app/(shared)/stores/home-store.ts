@@ -56,7 +56,11 @@ export const homeInitialState = {
 export const useHomeStore = create<HomeState>((set) => ({
   ...homeInitialState,
   actions: {
-    setCardCategory: (category) => set({ cardCategory: category }),
+    setCardCategory: (category) =>
+      set((state) => ({
+        cardCategory: category,
+        refetchTrigger: state.refetchTrigger + 1,
+      })),
     toggleFilter: () => set((state) => ({ isFilterOpen: !state.isFilterOpen })),
     toggleCreateModal: () =>
       set((state) => ({ isCreateModalOpen: !state.isCreateModalOpen })),
