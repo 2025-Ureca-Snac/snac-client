@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
@@ -12,6 +12,8 @@ import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
 import { useMatchingEvents } from './hooks/useMatchingEvents';
 import { useMatchStore } from '../(shared)/stores/match-store';
+import { useAuthStore } from '../(shared)/stores/auth-store';
+import { useUserStore } from '../(shared)/stores/user-store';
 
 // ServerTradeData 타입 정의 (useMatchingEvents와 동일)
 interface ServerTradeData {
@@ -39,6 +41,8 @@ type MatchingStatus =
 export default function MatchPage() {
   const router = useRouter();
   const { foundMatch } = useMatchStore();
+  const { user } = useAuthStore();
+  const { profile } = useUserStore();
 
   // 상태 관리
   const initialFilters: Filters = {
@@ -123,6 +127,8 @@ export default function MatchPage() {
     []
   );
 
+  const { setWebSocketFunctions } = useMatchStore();
+
   // 실시간 이벤트 처리 (새로운 WebSocket 훅)
   const {
     isConnected,
@@ -130,6 +136,8 @@ export default function MatchPage() {
     registerBuyerFilter,
     respondToTrade,
     createTrade,
+    sendPayment,
+    sendTradeConfirm,
   } = useMatchingEvents({
     userRole,
     appliedFilters,
@@ -139,6 +147,11 @@ export default function MatchPage() {
     setConnectedUsers,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
   });
+
+  // WebSocket 함수들을 store에 저장
+  useEffect(() => {
+    setWebSocketFunctions({ sendPayment, sendTradeConfirm });
+  }, [sendPayment, sendTradeConfirm, setWebSocketFunctions]);
 
   // 필터 핸들러
   const handleFilterChange = useCallback((filters: Filters) => {
@@ -283,7 +296,7 @@ export default function MatchPage() {
 
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = useCallback(
-    async (requestId: string, accept: boolean) => {
+    async (requestId: number, accept: boolean) => {
       const request = incomingRequests.find((req) => req.id === requestId);
       if (!request) return;
 
@@ -295,12 +308,20 @@ export default function MatchPage() {
       // 거래를 수락한 경우 trading 페이지로 이동
       if (accept) {
         // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
+        console.log('요청:', request, '셀러인포:', sellerInfo);
         const buyerInfo = {
-          id: request.buyerId.toString(),
-          name: request.buyerName,
+          id: request.id,
+          buyer: request.buyerName, // 구매자 이메일
+          seller: user || profile?.email || 'unknown_seller', // 현재 판매자 이메일
+          cardId: request.id, // 거래 ID를 카드 ID로 사용
           carrier: sellerInfo.carrier,
-          data: sellerInfo.dataAmount,
-          price: sellerInfo.price,
+          dataAmount: sellerInfo.dataAmount,
+          phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
+          point: profile?.points || 0, // 현재 사용자 포인트
+          priceGb: sellerInfo.price,
+          sellerRatingScore: 1000, // TODO: 실제 평점 (서버에서 받아야 함)
+          status: 'ACCEPTED',
+          cancelReason: null,
           type: 'buyer' as const,
         };
 

@@ -56,12 +56,13 @@ export interface RatingData {
 
 // TradeRequest 타입 추가 (공통 사용)
 export interface TradeRequest {
-  id: string;
+  id: number;
   buyerId: string;
   buyerName: string;
   sellerId: string;
   status: 'pending' | 'accepted' | 'rejected';
   createdAt: string;
+  ratingData?: number; // 판매자 평점
 }
 
 // User 인터페이스에 rating과 transactionCount 추가된 버전
@@ -75,4 +76,6 @@ export interface User {
   rating?: number; // 서버에서 제공되지 않을 수 있음
   transactionCount?: number; // 서버에서 제공되지 않을 수 있음
   cardId?: number; // 서버의 카드 ID (거래 생성 시 사용)
+  email?: string; // 이메일
+  phone?: string; // 핸드폰번호
 }

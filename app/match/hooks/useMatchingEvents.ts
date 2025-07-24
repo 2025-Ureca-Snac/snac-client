@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useRef, Dispatch, SetStateAction } from 'react';
+import {
+  useEffect,
+  useRef,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { Client as StompClient } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -52,6 +58,7 @@ interface ServerTradeData {
   point?: number;
   phone?: string;
   cancelReason?: string;
+  sellerRatingScore?: number;
 }
 
 export function useMatchingEvents({
@@ -304,7 +311,7 @@ export function useMatchingEvents({
         if (onTradeStatusChange) {
           onTradeStatusChange(clientStatus, tradeData);
         }
-
+        console.log('트레이드데이터:', tradeData);
         // 판매자용: 거래 요청인 경우 (BUY_REQUESTED → PENDING)
         if (userRole === 'seller' && tradeData.status === 'BUY_REQUESTED') {
           console.log('📩 판매자에게 거래 요청 도착:', {
@@ -315,12 +322,13 @@ export function useMatchingEvents({
           });
 
           const request: TradeRequest = {
-            id: `trade_${tradeData.id}`,
+            id: tradeData.id,
             buyerId: tradeData.buyer,
             buyerName: tradeData.buyer, // 구매자 이메일/ID
             sellerId: tradeData.seller,
             status: 'pending',
             createdAt: new Date().toISOString(),
+            ratingData: tradeData.sellerRatingScore,
           };
 
           console.log('📝 생성된 거래 요청 객체:', request);
@@ -338,12 +346,19 @@ export function useMatchingEvents({
 
           // 판매자 정보를 store에 저장 (구매자 입장에서 상대방은 판매자)
           foundMatch({
-            id: tradeData.seller,
-            name: tradeData.seller, // 서버에서 판매자 이름을 제공해야 함
+            id: tradeData.id,
+            buyer: tradeData.buyer,
+            seller: tradeData.seller,
+            cardId: tradeData.cardId,
             carrier: tradeData.carrier,
-            data: tradeData.dataAmount,
-            price: tradeData.priceGb || 0,
-            type: 'seller',
+            dataAmount: tradeData.dataAmount,
+            phone: tradeData.phone || '010-0000-0000',
+            point: tradeData.point || 0,
+            priceGb: tradeData.priceGb || 0,
+            sellerRatingScore: tradeData.sellerRatingScore || 1000,
+            status: tradeData.status,
+            cancelReason: tradeData.cancelReason || null,
+            type: 'seller' as const,
           });
 
           setTimeout(() => router.push('/match/trading'), 1000);
@@ -441,20 +456,18 @@ export function useMatchingEvents({
   };
 
   // 거래 응답 (판매자용)
-  const respondToTrade = (tradeId: string, accept: boolean) => {
+  const respondToTrade = (tradeId: number, accept: boolean) => {
     if (!stompClient.current?.connected) return;
 
-    const numericTradeId = parseInt(tradeId.replace('trade_', ''));
-
     if (accept) {
-      console.log('✅ 거래 수락 전송:', { tradeId: numericTradeId });
+      console.log('✅ 거래 수락 전송:', { tradeId });
       stompClient.current.publish({
         destination: '/app/trade/approve',
-        body: JSON.stringify({ tradeId: numericTradeId }),
+        body: JSON.stringify({ tradeId }),
       });
     } else {
       // 거래 거부 로직 (필요시 추가)
-      console.log('❌ 거래 거부:', numericTradeId);
+      console.log('❌ 거래 거부:', tradeId);
     }
   };
 
@@ -468,6 +481,43 @@ export function useMatchingEvents({
       body: JSON.stringify({ cardId }),
     });
   };
+
+  // 결제 메시지 전송 (거래 페이지용)
+  const sendPayment = useCallback(
+    (tradeId: number, money: number, point: number) => {
+      if (!stompClient.current?.connected) {
+        console.error('❌ WebSocket이 연결되지 않았습니다.');
+        return false;
+      }
+
+      console.log('💰 결제 메시지 전송:', { tradeId, money, point });
+
+      stompClient.current.publish({
+        destination: '/app/trade/payment',
+        body: JSON.stringify({ tradeId, money, point }),
+      });
+
+      return true;
+    },
+    []
+  );
+
+  // 거래 확정 메시지 전송
+  const sendTradeConfirm = useCallback((tradeId: number) => {
+    if (!stompClient.current?.connected) {
+      console.error('❌ WebSocket이 연결되지 않았습니다.');
+      return false;
+    }
+
+    console.log('✅ 거래 확정 메시지 전송:', { tradeId });
+
+    stompClient.current.publish({
+      destination: '/app/trade/confirm',
+      body: JSON.stringify({ tradeId }),
+    });
+
+    return true;
+  }, []);
 
   // 연결 및 정리
   useEffect(() => {
@@ -501,5 +551,7 @@ export function useMatchingEvents({
     registerBuyerFilter, // 수동 등록을 위해 추가
     respondToTrade,
     createTrade, // 거래 생성 함수 추가
+    sendPayment, // 결제 메시지 전송 함수 추가
+    sendTradeConfirm, // 거래 확정 메시지 전송 함수 추가
   };
 }

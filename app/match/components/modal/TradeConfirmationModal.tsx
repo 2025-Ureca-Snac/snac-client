@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { User } from '../../types/match';
 import { useMatchStore } from '@/app/(shared)/stores/match-store';
+import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { useUserStore } from '@/app/(shared)/stores/user-store';
 
 // Lottie Player를 동적으로 import (SSR 문제 방지)
 const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
@@ -29,6 +31,8 @@ export default function TradeConfirmationModal({
 }: TradeConfirmationModalProps) {
   const router = useRouter();
   const { foundMatch } = useMatchStore();
+  const { user } = useAuthStore();
+  const { profile } = useUserStore();
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
@@ -69,11 +73,18 @@ export default function TradeConfirmationModal({
       // 상대방 정보를 store에 저장하고 trading 페이지로 이동
       if (seller) {
         const partnerInfo = {
-          id: seller.id.toString(),
-          name: seller.name,
+          id: seller.id,
+          buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
+          seller: seller.email || profile?.email || 'unknown_seller', // 판매자 이메일
+          cardId: seller.cardId || seller.id,
           carrier: seller.carrier,
-          data: seller.data,
-          price: seller.price,
+          dataAmount: seller.data,
+          phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
+          point: profile?.points || 0, // 현재 사용자 포인트
+          priceGb: seller.price,
+          sellerRatingScore: seller.rating || 1000,
+          status: 'ACCEPTED',
+          cancelReason: null,
           type: 'seller' as const,
         };
 

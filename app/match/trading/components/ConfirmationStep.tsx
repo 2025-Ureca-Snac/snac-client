@@ -1,19 +1,10 @@
 'use client';
 
 import React from 'react';
-
-interface Partner {
-  id: string;
-  name: string;
-  carrier: string;
-  data: number;
-  price: number;
-  rating: number;
-  transactionCount: number;
-}
+import { MatchPartner } from '@/app/(shared)/stores/match-store';
 
 interface ConfirmationStepProps {
-  partner: Partner;
+  partner: MatchPartner;
   onNext: () => void;
   onCancel: () => void;
 }
@@ -33,7 +24,9 @@ export default function ConfirmationStep({
         <div className="space-y-4 mb-6">
           <div className="flex justify-between items-center py-3 border-b">
             <span className="text-gray-600">거래 상대방</span>
-            <span className="font-medium">{partner.name}</span>
+            <span className="font-medium">
+              {partner.type === 'seller' ? partner.buyer : partner.seller}
+            </span>
           </div>
 
           <div className="flex justify-between items-center py-3 border-b">
@@ -43,13 +36,13 @@ export default function ConfirmationStep({
 
           <div className="flex justify-between items-center py-3 border-b">
             <span className="text-gray-600">데이터량</span>
-            <span className="font-medium">{partner.data}GB</span>
+            <span className="font-medium">{partner.dataAmount}GB</span>
           </div>
 
           <div className="flex justify-between items-center py-3 border-b">
             <span className="text-gray-600">거래 금액</span>
             <span className="font-medium text-blue-600 text-lg">
-              {partner.price.toLocaleString()}원
+              {partner.priceGb.toLocaleString()}원
             </span>
           </div>
 
@@ -57,10 +50,8 @@ export default function ConfirmationStep({
             <span className="text-gray-600">상대방 평점</span>
             <div className="flex items-center space-x-2">
               <span className="text-yellow-500">⭐</span>
-              <span className="font-medium">{partner.rating}</span>
-              <span className="text-sm text-gray-500">
-                ({partner.transactionCount}회 거래)
-              </span>
+              <span className="font-medium">{partner.sellerRatingScore}</span>
+              <span className="text-sm text-gray-500">(거래 완료)</span>
             </div>
           </div>
         </div>

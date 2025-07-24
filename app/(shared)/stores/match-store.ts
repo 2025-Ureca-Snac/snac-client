@@ -9,13 +9,18 @@ export interface MatchFilters {
 }
 
 export interface MatchPartner {
-  id: string;
-  name: string;
+  id: number;
+  buyer: string;
+  seller: string;
+  cardId: number;
   carrier: string;
-  data: number;
-  price: number;
-  rating?: number; // 서버에서 제공되지 않을 수 있음
-  transactionCount?: number; // 서버에서 제공되지 않을 수 있음
+  dataAmount: number;
+  phone: string;
+  point: number;
+  priceGb: number;
+  sellerRatingScore: number;
+  status: string;
+  cancelReason: string | null;
   type: 'buyer' | 'seller';
 }
 
@@ -43,6 +48,10 @@ interface MatchState {
   timeLeft: number;
   transactionId: string | null;
 
+  // WebSocket 함수들
+  sendPayment?: (tradeId: number, money: number, point: number) => boolean;
+  sendTradeConfirm?: (tradeId: number) => boolean;
+
   // 액션
   setFilters: (filters: MatchFilters) => void;
   startMatching: () => void;
@@ -52,6 +61,10 @@ interface MatchState {
   setTimeLeft: (time: number) => void;
   completeTransaction: () => void;
   cancelTransaction: () => void;
+  setWebSocketFunctions: (functions: {
+    sendPayment: (tradeId: number, money: number, point: number) => boolean;
+    sendTradeConfirm: (tradeId: number) => boolean;
+  }) => void;
   reset: () => void;
 }
 
@@ -110,6 +123,12 @@ export const useMatchStore = create<MatchState>()(
           transactionId: null,
           tradingStep: 'confirmation',
           timeLeft: 300,
+        }),
+
+      setWebSocketFunctions: (functions) =>
+        set({
+          sendPayment: functions.sendPayment,
+          sendTradeConfirm: functions.sendTradeConfirm,
         }),
 
       reset: () =>

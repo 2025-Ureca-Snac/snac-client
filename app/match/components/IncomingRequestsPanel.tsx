@@ -7,7 +7,7 @@ import { TradeRequest } from '../types/match';
 interface IncomingRequestsPanelProps {
   requests: TradeRequest[];
   sellerInfo: SellerRegistrationInfo;
-  onRequestResponse: (requestId: string, accept: boolean) => void;
+  onRequestResponse: (requestId: number, accept: boolean) => void;
 }
 
 export default function IncomingRequestsPanel({
@@ -48,7 +48,7 @@ function RequestCard({
 }: {
   request: TradeRequest;
   sellerInfo: SellerRegistrationInfo;
-  onRequestResponse: (requestId: string, accept: boolean) => void;
+  onRequestResponse: (requestId: number, accept: boolean) => void;
 }) {
   return (
     <div className="bg-white border border-yellow-200 rounded-lg p-4">
@@ -92,9 +92,7 @@ function RequestCard({
           </div>
 
           {/* 거래 ID */}
-          <p className="text-xs text-gray-500">
-            거래 ID: {request.id.replace('trade_', '')}
-          </p>
+          <p className="text-xs text-gray-500">거래 ID: {request.id}</p>
         </div>
 
         {/* 액션 버튼 */}

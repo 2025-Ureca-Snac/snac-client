@@ -41,10 +41,9 @@ export default function TradingPage() {
     // partner 정보 유효성 검증
     if (
       !partner.id ||
-      !partner.name ||
       !partner.carrier ||
-      !partner.data ||
-      !partner.price
+      !partner.dataAmount ||
+      !partner.priceGb
     ) {
       console.warn('❌ 불완전한 거래 정보:', partner);
       alert('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
@@ -88,12 +87,8 @@ export default function TradingPage() {
     );
   }
 
-  // 이제 partner는 항상 유효함
-  const partnerInfo = {
-    ...partner!,
-    rating: partner!.rating ?? 4.5, // 기본값 설정
-    transactionCount: partner!.transactionCount ?? 0, // 기본값 설정
-  };
+  // 이제 partner는 항상 유효함 (MatchPartner 타입 그대로 사용)
+  const partnerInfo = partner!;
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);
