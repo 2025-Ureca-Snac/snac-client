@@ -133,11 +133,13 @@ export const Modal = () => {
 
     setIsLoading(true);
 
+    const carrierForApi = carrier === 'LGU+' ? 'LG' : carrier;
+
     const dataAmountInMB =
       dataUnit === 'GB' ? numericDataAmount * 1024 : numericDataAmount;
     const cards = {
       cardCategory: cardCategory,
-      carrier: carrier,
+      carrier: carrierForApi,
       dataAmount: Math.round(dataAmountInMB),
       price: Number(price),
     };

@@ -29,10 +29,18 @@ const getCarrierImageUrl = (carrier: string): string => {
     case 'KT':
       return '/KT.png';
     case 'LGU+':
+    case 'LG':
       return '/LG.png';
     default:
       return '/SKT.png';
   }
+};
+
+const formatCarrierName = (carrier: string): string => {
+  if (carrier === 'LG') {
+    return 'LGU+';
+  }
+  return carrier;
 };
 
 export default function HomeSection({ cards, unit }: HomeSectionProps) {
@@ -54,7 +62,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
       {cards.map((item) => (
         <DataItemCard
           key={item.id}
-          title={`${item.carrier} 데이터 ${formatDataAmount(item.dataAmount)}`}
+          title={`${formatCarrierName(item.carrier)} 데이터 ${formatDataAmount(item.dataAmount)}`}
           imageUrl={getCarrierImageUrl(item.carrier)}
           price={item.price}
           isNew={isToday(item.updatedAt)}
