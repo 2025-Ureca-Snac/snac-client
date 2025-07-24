@@ -43,7 +43,7 @@ const SELLER_TRADING_STEPS: TradingStep[] = [
 
 export default function TradingPage() {
   const router = useRouter();
-  const { partner, sendPayment, sendTradeConfirm } = useMatchStore();
+  const { partner, sendTradeConfirm } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
@@ -195,7 +195,6 @@ export default function TradingPage() {
             <PaymentStep
               amount={partnerInfo.priceGb}
               tradeId={tradeId || 1} // 임시로 1 사용
-              sendPayment={sendPayment}
               onNext={handleNextStep}
             />
           );

@@ -6,20 +6,15 @@ import { useTradingWebSocket } from '../hooks/useTradingWebSocket';
 interface PaymentStepProps {
   amount: number;
   tradeId?: number; // 거래 ID 추가
-  sendPayment?: (tradeId: number, money: number, point: number) => boolean;
   onNext: () => void;
 }
 
 export default function PaymentStep({
   amount,
   tradeId,
-  sendPayment: propSendPayment,
   onNext,
 }: PaymentStepProps) {
   const { sendPayment: wsSendPayment, isConnected } = useTradingWebSocket();
-
-  // props로 받은 함수가 있으면 사용, 없으면 WebSocket 훅의 함수 사용
-  const sendPaymentFunction = propSendPayment || wsSendPayment;
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayment = async () => {
@@ -37,7 +32,7 @@ export default function PaymentStep({
 
     try {
       // 결제 메시지 전송 (전액을 money로 처리)
-      const success = sendPaymentFunction(tradeId, amount, 0);
+      const success = wsSendPayment(tradeId, amount, 0);
 
       if (success) {
         console.log('✅ 결제 메시지 전송 성공');
