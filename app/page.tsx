@@ -1,22 +1,21 @@
 'use client';
-
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Header } from './(shared)/components/Header';
 import Banner from './home/banner';
-
 import { DataAvg } from './home/data-avgs';
 import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
+
 import type {
   CardCategory,
   SellStatus,
   PriceRange,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
-import Image from 'next/image';
 
 interface Card {
   id: number;
