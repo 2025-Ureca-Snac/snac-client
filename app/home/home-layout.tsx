@@ -137,12 +137,20 @@ export default function HomeLayout({
             />
           </div>
         </div>
-
         <div className="flex-grow">
           {isLoading ? (
             <div className="text-center py-10">로딩 중...</div>
           ) : (
-            <HomeSection cards={cards} unit={currentUnit} />
+            <>
+              <p>HomeLayout이 받은 카드 개수: {cards.length}</p>
+              {cards.length === 0 && (
+                <p className="text-center text-gray-500 py-10">
+                  표시할 데이터가 없습니다.
+                </p>
+              )}
+
+              <HomeSection cards={cards} unit={currentUnit} />
+            </>
           )}
         </div>
 
