@@ -4,11 +4,19 @@ import { useEffect, useState } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Header } from './(shared)/components/Header';
 import Banner from './home/banner';
+import { Modal } from '@/app/home/components/modal';
+
 import { DataAvg } from './home/data-avgs';
 import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
+import type {
+  CardCategory,
+  SellStatus,
+  PriceRange,
+  Carrier,
+} from '@/app/(shared)/utils/generateQueryParams';
 import Image from 'next/image';
 
 interface Card {
@@ -31,53 +39,75 @@ interface CardApiResponse {
   };
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Home() {
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const { actions } = useHomeStore();
 
-  const { category, transactionStatus, priceRanges, sortBy } = useHomeStore();
+  const { category, transactionStatus, priceRanges, sortBy, carrier, actions } =
+    useHomeStore();
+
+  const priceRangeKey = priceRanges.join(',');
+
   useEffect(() => {
-    async function fetchScrollCards() {
+    console.log('[디버깅] 필터 상태:', {
+      category,
+      transactionStatus,
+      priceRanges,
+      sortBy,
+      carrier,
+    });
+
+    const fetchScrollCards = async () => {
       setLoading(true);
       try {
+        const highRatingFirst = sortBy === 'RATING';
         const queryString = generateQueryParams({
-          category,
-          transactionStatus,
-          priceRanges,
-          sortBy,
-          page: currentPage,
+          cardCategory: (category || 'BUY') as CardCategory,
+          sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
+          priceRanges:
+            priceRanges.length === 0 ? ['ALL'] : (priceRanges as PriceRange[]),
+          highRatingFirst,
           size: 54,
+          carrier: carrier === '--' ? undefined : (carrier as Carrier),
         });
 
-        const res = await fetch(`/api/cards/scroll?${queryString}`, {
+        const fullUrl = `${API_BASE}/cards/scroll?${queryString}`;
+        console.log('[✅ 요청 URL 확인]', fullUrl);
+
+        const res = await fetch(fullUrl, {
           cache: 'no-store',
         });
 
         if (!res.ok) {
-          throw new Error(`데이터를 가져오는데 실패했습니다: ${res.status}`);
+          console.error('❌ Failed to fetch data:', res.status, res.statusText);
+          setCards([]);
+          return;
         }
 
         const json: CardApiResponse = await res.json();
         setCards(json.data.cardResponseList);
+        console.log('✅ 응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {
-        console.error('카드 스크롤 조회 실패:', err);
+        console.error('❌ 카드 스크롤 조회 실패:', err);
         setCards([]);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchScrollCards();
   }, [
     currentPage,
     category,
     transactionStatus,
-    JSON.stringify(priceRanges),
+    priceRangeKey,
     sortBy,
+    carrier,
   ]);
 
   const handlePageChange = (page: number) => {
@@ -91,10 +121,11 @@ export default function Home() {
       <Header />
       <Banner />
       <DataAvg />
+      <Modal />
       <button
         onClick={actions.toggleCreateModal}
         className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all
-      bg-gradient-to-br from-[#98FF58] to-[#38CB89] hover:brightness-90"
+          bg-gradient-to-br from-[#98FF58] to-[#38CB89] hover:brightness-90"
         aria-label="글 등록하기"
       >
         <Image src="/write.svg" alt="글쓰기" width={24} height={24} />
@@ -103,6 +134,8 @@ export default function Home() {
       <div className="flex items-center justify-center">
         {loading ? (
           <p>로딩 중…</p>
+        ) : cards.length === 0 ? (
+          <p>조건에 맞는 카드가 없어요 😢</p>
         ) : (
           <HomeLayout
             cards={cards}
@@ -117,6 +150,7 @@ export default function Home() {
       <div className="w-full">
         <ArticleSection />
       </div>
+
       <Footer />
     </>
   );
