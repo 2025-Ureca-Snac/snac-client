@@ -46,8 +46,16 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { category, transactionStatus, priceRanges, sortBy, carrier, actions } =
-    useHomeStore();
+  const {
+    category,
+    cardCategory,
+    transactionStatus,
+    priceRanges,
+    sortBy,
+    carrier,
+    actions,
+    refetchTrigger,
+  } = useHomeStore();
 
   const priceRangeKey = priceRanges.join(',');
 
@@ -65,7 +73,7 @@ export default function Home() {
       try {
         const highRatingFirst = sortBy === 'RATING';
         const queryString = generateQueryParams({
-          cardCategory: (category || 'BUY') as CardCategory,
+          cardCategory: (cardCategory || 'BUY') as CardCategory,
           sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
           priceRanges:
             priceRanges.length === 0 ? ['ALL'] : (priceRanges as PriceRange[]),
@@ -74,25 +82,25 @@ export default function Home() {
           carrier: carrier === '--' ? undefined : (carrier as Carrier),
         });
 
-        const fullUrl = `${API_BASE}/cards/scroll?${queryString}`;
-        console.log('[✅ 요청 URL 확인]', fullUrl);
+        const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
+        console.log('[ 요청 URL 확인]', fullUrl);
 
         const res = await fetch(fullUrl, {
           cache: 'no-store',
         });
 
         if (!res.ok) {
-          console.error('❌ Failed to fetch data:', res.status, res.statusText);
+          console.error('fetch data 실패:', res.status, res.statusText);
           setCards([]);
           return;
         }
 
         const json: CardApiResponse = await res.json();
         setCards(json.data.cardResponseList);
-        console.log('✅ 응답 데이터:', json);
+        console.log('응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {
-        console.error('❌ 카드 스크롤 조회 실패:', err);
+        console.error('카드 스크롤 조회 실패:', err);
         setCards([]);
       } finally {
         setLoading(false);
@@ -103,10 +111,12 @@ export default function Home() {
   }, [
     currentPage,
     category,
+    cardCategory,
     transactionStatus,
     priceRangeKey,
     sortBy,
     carrier,
+    refetchTrigger,
   ]);
 
   const handlePageChange = (page: number) => {
