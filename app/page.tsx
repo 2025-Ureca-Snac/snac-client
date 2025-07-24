@@ -57,8 +57,6 @@ export default function Home() {
     refetchTrigger,
   } = useHomeStore();
 
-  const priceRangeKey = priceRanges.join(',');
-
   useEffect(() => {
     console.log('[디버깅] 필터 상태:', {
       category,
@@ -111,7 +109,7 @@ export default function Home() {
     };
 
     fetchScrollCards();
-  }, [currentPage, refetchTrigger]);
+  }, [currentPage, refetchTrigger, priceRanges.join(',')]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
