@@ -5,16 +5,21 @@ import React, { useState } from 'react';
 interface VerificationStepProps {
   dataAmount: number;
   timeLeft: number;
+  tradeId?: number;
+  sendTradeConfirm?: (tradeId: number) => boolean;
   onNext: () => void;
 }
 
 export default function VerificationStep({
   dataAmount,
   timeLeft,
+  tradeId,
+  sendTradeConfirm,
   onNext,
 }: VerificationStepProps) {
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   // 전송 완료 시간을 컴포넌트 마운트 시점에 고정
   const [completionTime] = useState(() => new Date().toLocaleTimeString());
@@ -115,10 +120,37 @@ export default function VerificationStep({
         </div>
 
         <button
-          onClick={onNext}
-          className="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-medium hover:bg-green-700 transition-colors"
+          onClick={async () => {
+            if (sendTradeConfirm && tradeId) {
+              setIsConfirming(true);
+              try {
+                const success = sendTradeConfirm(tradeId);
+                if (success) {
+                  console.log('✅ 거래 확정 메시지 전송 성공');
+                  setTimeout(() => {
+                    onNext();
+                  }, 1000);
+                } else {
+                  alert('거래 확정 메시지 전송에 실패했습니다.');
+                }
+              } catch (error) {
+                console.error('거래 확정 오류:', error);
+                alert('거래 확정 중 오류가 발생했습니다.');
+              } finally {
+                setIsConfirming(false);
+              }
+            } else {
+              onNext();
+            }
+          }}
+          disabled={isConfirming}
+          className={`w-full py-4 px-6 rounded-lg font-medium transition-colors ${
+            isConfirming
+              ? 'bg-gray-400 text-white cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+          }`}
         >
-          거래 완료
+          {isConfirming ? '거래 확정 중...' : '거래 완료'}
         </button>
       </div>
     </div>

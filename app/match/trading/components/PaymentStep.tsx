@@ -1,13 +1,61 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useTradingWebSocket } from '../hooks/useTradingWebSocket';
 
 interface PaymentStepProps {
   amount: number;
+  tradeId?: number; // 거래 ID 추가
+  sendPayment?: (tradeId: number, money: number, point: number) => boolean;
   onNext: () => void;
 }
 
-export default function PaymentStep({ amount, onNext }: PaymentStepProps) {
+export default function PaymentStep({
+  amount,
+  tradeId,
+  sendPayment: propSendPayment,
+  onNext,
+}: PaymentStepProps) {
+  const { sendPayment: wsSendPayment, isConnected } = useTradingWebSocket();
+
+  // props로 받은 함수가 있으면 사용, 없으면 WebSocket 훅의 함수 사용
+  const sendPaymentFunction = propSendPayment || wsSendPayment;
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePayment = async () => {
+    if (!tradeId) {
+      alert('거래 ID가 없습니다.');
+      return;
+    }
+
+    if (!isConnected) {
+      alert('WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // 결제 메시지 전송 (전액을 money로 처리)
+      const success = sendPaymentFunction(tradeId, amount, 0);
+
+      if (success) {
+        console.log('✅ 결제 메시지 전송 성공');
+        // 잠시 후 다음 단계로 이동
+        setTimeout(() => {
+          onNext();
+        }, 1000);
+      } else {
+        alert('결제 메시지 전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('결제 처리 오류:', error);
+      alert('결제 처리 중 오류가 발생했습니다.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-6">
@@ -66,10 +114,15 @@ export default function PaymentStep({ amount, onNext }: PaymentStepProps) {
         </div>
 
         <button
-          onClick={onNext}
-          className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          onClick={handlePayment}
+          disabled={isProcessing}
+          className={`w-full py-4 px-6 rounded-lg font-medium transition-colors ${
+            isProcessing
+              ? 'bg-gray-400 text-white cursor-not-allowed'
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          }`}
         >
-          결제 완료 (시뮬레이션)
+          {isProcessing ? '결제 처리 중...' : '결제 완료'}
         </button>
       </div>
     </div>
