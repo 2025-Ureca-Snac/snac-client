@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Header } from './(shared)/components/Header';
 import Banner from './home/banner';
-import { Modal } from '@/app/home/components/modal';
 
 import { DataAvg } from './home/data-avgs';
 import HomeLayout from './home/home-layout';
@@ -121,7 +120,7 @@ export default function Home() {
       <Header />
       <Banner />
       <DataAvg />
-      <Modal />
+
       <button
         onClick={actions.toggleCreateModal}
         className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all
