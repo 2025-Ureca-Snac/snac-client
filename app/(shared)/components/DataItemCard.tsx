@@ -4,7 +4,6 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 import { PriceUnit } from '@/app/(shared)/types';
-import { useHomeStore } from '@/app/(shared)/stores/home-store';
 
 interface DataItemCardProps {
   imageUrl: string;
@@ -27,13 +26,12 @@ export const DataItemCard = ({
   price,
   email,
   createdAt,
+  cardCategory,
   isNew,
   newBadgeText = 'NEW',
   buyButtonText,
   onClickBuy,
 }: DataItemCardProps) => {
-  const { cardCategory } = useHomeStore();
-
   const displayPrice =
     unit === 'snack' ? (
       <span className="inline-flex items-center">
