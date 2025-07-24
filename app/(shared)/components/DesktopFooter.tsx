@@ -102,12 +102,6 @@ export const DesktopFooter = () => {
         {/* 결제 아이콘 */}
         <div className="flex gap-1 pr-[190px]">
           <Image
-            src="/bcPayment.svg"
-            alt="BC카드 결제"
-            width={48}
-            height={32}
-          />
-          <Image
             src="/tossPayment.svg"
             alt="토스페이먼츠"
             width={48}
