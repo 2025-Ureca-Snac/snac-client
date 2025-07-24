@@ -243,7 +243,7 @@ export const Modal = () => {
                       </RadioGroup.Option>
                     </div>
                   </RadioGroup>
-                  <p>현재 선택: {cardCategory}</p>
+
                   <RadioGroup value={carrier} onChange={setCarrier}>
                     <RadioGroup.Label className="block text-regular-sm text-gray-700 mb-3">
                       통신사
