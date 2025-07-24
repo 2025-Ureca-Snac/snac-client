@@ -49,7 +49,7 @@ export const DataItemCard = ({
     );
 
   const finalButtonText =
-    buyButtonText ?? (cardCategory === 'SELL' ? '구매하기' : '판매하기');
+    buyButtonText ?? (cardCategory === 'BUY' ? '판매하기' : '구매하기');
 
   const isSellingMode = finalButtonText === '판매하기';
   const buttonColorClass = isSellingMode
