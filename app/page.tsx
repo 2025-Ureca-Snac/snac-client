@@ -72,6 +72,9 @@ export default function Home() {
       setLoading(true);
       try {
         const highRatingFirst = sortBy === 'RATING';
+        const carrierForQuery: Carrier | undefined =
+          category === 'LGU+' ? 'LG' : (category ?? undefined);
+
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,
           sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
@@ -79,7 +82,7 @@ export default function Home() {
             priceRanges.length === 0 ? ['ALL'] : (priceRanges as PriceRange[]),
           highRatingFirst,
           size: 54,
-          carrier: carrier === '--' ? undefined : (carrier as Carrier),
+          carrier: carrierForQuery,
         });
 
         const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
@@ -108,16 +111,7 @@ export default function Home() {
     };
 
     fetchScrollCards();
-  }, [
-    currentPage,
-    category,
-    cardCategory,
-    transactionStatus,
-    priceRangeKey,
-    sortBy,
-    carrier,
-    refetchTrigger,
-  ]);
+  }, [currentPage, refetchTrigger]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {

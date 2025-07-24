@@ -1,3 +1,4 @@
+// app/(shared)/components/Filter.tsx
 'use client';
 
 import {
@@ -8,13 +9,17 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
 
+// 통신사 카테고리 (기존)
 const displayCategories = ['SKT', 'KT', 'LGU+'] as const;
-const transactionOptions = [
-  { label: '모든 거래', value: null },
-  { label: '거래 전', value: '거래 전' },
-  { label: '거래 완료', value: '거래 완료' },
-] as const;
 
+// 거래 상태 매핑 (스토어 TransactionStatus 타입에 맞춤)
+const transactionOptions = [
+  { label: '모든 거래', value: 'ALL' as const },
+  { label: '거래 전', value: 'SELLING' as const },
+  { label: '거래 완료', value: 'SOLD_OUT' as const },
+];
+
+// 가격 레이블 (기존)
 const price_ranges = [
   '모든 가격',
   '₩ 0 - 999',
@@ -23,6 +28,19 @@ const price_ranges = [
   '₩ 2,000 - 2,499',
   '₩ 2,500+',
 ] as const;
+
+// 레이블 → 스토어 PriceRange 타입 매핑
+const priceValueMap: Record<
+  (typeof price_ranges)[number],
+  'ALL' | 'P0_999' | 'P1000_1499' | 'P1500_1999' | 'P2000_2499' | 'P2500_PLUS'
+> = {
+  '모든 가격': 'ALL',
+  '₩ 0 - 999': 'P0_999',
+  '₩ 1,000 - 1,499': 'P1000_1499',
+  '₩ 1,500 - 1,999': 'P1500_1999',
+  '₩ 2,000 - 2,499': 'P2000_2499',
+  '₩ 2,500+': 'P2500_PLUS',
+};
 
 export const Filter = () => {
   const {
@@ -41,12 +59,15 @@ export const Filter = () => {
       JSON.stringify(homeInitialState.priceRanges) ||
     showRegularsOnly !== homeInitialState.showRegularsOnly;
 
+  // 적용하기 시 refetch 트리거 + 모달 닫기
   const closeAndApply = () => {
+    actions.triggerRefetch();
     actions.toggleFilter();
   };
 
   const FilterView = ({ isMobile = false }) => (
     <div className="flex flex-col max-h-[85vh] md:w-[288px] md:h-[729px] bg-white md:max-h-full md:rounded-2xl shadow-light">
+      {/* 헤더 */}
       <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
         <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
           <Image
@@ -69,7 +90,9 @@ export const Filter = () => {
         )}
       </div>
 
+      {/* 본문 */}
       <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide ">
+        {/* 카테고리 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             카테고리
@@ -94,6 +117,7 @@ export const Filter = () => {
           </div>
         </div>
 
+        {/* 거래 상태 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             거래 상태
@@ -101,7 +125,6 @@ export const Filter = () => {
           <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
             {transactionOptions.map((option) => {
               const isSelected = transactionStatus === option.value;
-
               return (
                 <button
                   key={option.value}
@@ -119,6 +142,7 @@ export const Filter = () => {
           </div>
         </div>
 
+        {/* 단골만 보기 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             판매자 필터
@@ -136,31 +160,36 @@ export const Filter = () => {
           </label>
         </div>
 
+        {/* 가격 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             가격
           </h3>
           <div className="space-y-2">
-            {price_ranges.map((item) => (
-              <label
-                key={item}
-                className="flex items-center space-x-3 cursor-pointer p-1"
-              >
-                <span className="text-gray-500 mr-auto md:text-medium-sm text-medium-sm">
-                  {item}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={priceRanges.includes(item)}
-                  onChange={() => actions.togglePriceRange(item)}
-                  className="h-6 w-6 rounded border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
-                />
-              </label>
-            ))}
+            {price_ranges.map((item) => {
+              const value = priceValueMap[item];
+              return (
+                <label
+                  key={item}
+                  className="flex items-center space-x-3 cursor-pointer p-1"
+                >
+                  <span className="text-gray-500 mr-auto md:text-medium-sm text-medium-sm">
+                    {item}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={priceRanges.includes(value)}
+                    onChange={() => actions.togglePriceRange(value)}
+                    className="h-6 w-6 rounded border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
+                  />
+                </label>
+              );
+            })}
           </div>
         </div>
       </div>
 
+      {/* 푸터 */}
       <div className="flex-shrink-0 grid grid-cols-2 gap-4 p-4 ">
         <button
           onClick={actions.resetFilters}
@@ -201,7 +230,7 @@ export const Filter = () => {
 
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <div className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
-              <FilterView isMobile={true} />
+              <FilterView isMobile />
             </div>
           </div>
         </Dialog>
