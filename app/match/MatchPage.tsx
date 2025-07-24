@@ -88,7 +88,6 @@ export default function MatchPage() {
       : appliedFilters.transactionType[0] === '판매자'
         ? 'seller'
         : 'buyer';
-  console.log(userRole, 'userRole', appliedFilters.transactionType);
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {

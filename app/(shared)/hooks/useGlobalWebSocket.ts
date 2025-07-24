@@ -70,7 +70,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const [userRole, setUserRole] = useState<'buyer' | 'seller' | null>(
     globalUserRole
   );
-  console.log(userRole, '안쪽의 userRole');
   // JWT 토큰 가져오기
   const getToken = () => {
     if (typeof window === 'undefined') return null;
@@ -297,7 +296,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         });
 
         if (
-          userRole === 'seller' &&
           tradeData.status === 'BUY_REQUESTED' &&
           props?.setIncomingRequests
         ) {
