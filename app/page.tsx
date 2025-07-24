@@ -125,8 +125,7 @@ export default function Home() {
 
       <button
         onClick={actions.toggleCreateModal}
-        className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all
-          bg-gradient-to-br from-[#98FF58] to-[#38CB89] hover:brightness-90"
+        className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all bg-gradient-to-br from-burst-lime to-[#38CB89] hover:brightness-90"
         aria-label="글 등록하기"
       >
         <Image src="/write.svg" alt="글쓰기" width={24} height={24} />
