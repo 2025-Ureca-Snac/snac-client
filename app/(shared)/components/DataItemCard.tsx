@@ -13,6 +13,7 @@ interface DataItemCardProps {
   unit: PriceUnit;
   email: string;
   createdAt: string;
+  cardCategory: 'BUY' | 'SELL';
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
   isNew?: boolean;
   newBadgeText?: string;
