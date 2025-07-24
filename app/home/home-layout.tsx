@@ -6,7 +6,7 @@ import { Modal } from './components/modal';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import HomeSection from './home-section';
 import Image from 'next/image';
-import { Toaster } from 'sonner';
+
 import { Pagination } from '@/app/(shared)/components/Pagination';
 import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
@@ -58,7 +58,6 @@ export default function HomeLayout({
     <div className="flex w-full flex-col md:flex-row">
       <Filter />
       <Modal />
-      <Toaster richColors position="top-center" />
 
       <main className="flex flex-1 flex-col p-4">
         <div>

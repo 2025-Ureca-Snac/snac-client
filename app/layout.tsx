@@ -6,7 +6,6 @@ import { Toaster } from 'sonner';
 
 import WwwRedirect from './(shared)/components/www-redirect';
 
-
 const notoSansKr = Noto_Sans_KR({
   weight: ['400', '500', '700'],
   display: 'swap',
@@ -26,10 +25,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${notoSansKr.className} antialiased`}>
-
         <WwwRedirect />
-        <div className="w-full  md:max-w-[1440px] mx-auto ">{children}  <Toaster richColors position="top-center" /></div>
-
+        <div className="w-full  md:max-w-[1440px] mx-auto ">
+          {children} <Toaster richColors position="top-center" />
+        </div>
       </body>
     </html>
   );
