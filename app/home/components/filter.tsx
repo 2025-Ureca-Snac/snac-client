@@ -1,4 +1,3 @@
-// app/(shared)/components/Filter.tsx
 'use client';
 
 import {
@@ -9,7 +8,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
 
-const displayCategories = ['SKT', 'KT', 'LGU+'] as const;
+const DISPLAY_CATEGORIES = ['SKT', 'KT', 'LGU+'] as const;
 
 const transactionOptions = [
   { label: '모든 거래', value: 'ALL' as const },
@@ -62,7 +61,6 @@ export const Filter = () => {
 
   const FilterView = ({ isMobile = false }) => (
     <div className="flex flex-col max-h-[85vh] md:w-[288px] md:h-[729px] bg-white md:max-h-full md:rounded-2xl shadow-light">
-      {/* 헤더 */}
       <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
         <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
           <Image
@@ -85,15 +83,13 @@ export const Filter = () => {
         )}
       </div>
 
-      {/* 본문 */}
       <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide ">
-        {/* 카테고리 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             카테고리
           </h3>
           <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
-            {displayCategories.map((item) => {
+            {DISPLAY_CATEGORIES.map((item) => {
               const isSelected = category === item;
               return (
                 <button
@@ -112,7 +108,6 @@ export const Filter = () => {
           </div>
         </div>
 
-        {/* 거래 상태 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             거래 상태
@@ -137,7 +132,6 @@ export const Filter = () => {
           </div>
         </div>
 
-        {/* 단골만 보기 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             판매자 필터
@@ -155,7 +149,6 @@ export const Filter = () => {
           </label>
         </div>
 
-        {/* 가격 */}
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             가격
@@ -184,7 +177,6 @@ export const Filter = () => {
         </div>
       </div>
 
-      {/* 푸터 */}
       <div className="flex-shrink-0 grid grid-cols-2 gap-4 p-4 ">
         <button
           onClick={actions.resetFilters}
