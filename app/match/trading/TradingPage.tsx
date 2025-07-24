@@ -11,23 +11,48 @@ import ConfirmationStep from './components/ConfirmationStep';
 import PaymentStep from './components/PaymentStep';
 import TransferStep from './components/TransferStep';
 import VerificationStep from './components/VerificationStep';
+import WaitingPaymentStep from './components/WaitingPaymentStep';
+import ShowPhoneStep from './components/ShowPhoneStep';
+import UploadDataStep from './components/UploadDataStep';
 
-type TradingStep = 'confirmation' | 'payment' | 'transfer' | 'verification';
+type TradingStep =
+  | 'confirmation'
+  | 'payment'
+  | 'transfer'
+  | 'verification'
+  | 'waiting_payment' // 구매자 결제 대기 (판매자용)
+  | 'show_phone' // 구매자 핸드폰번호 표시 (판매자용)
+  | 'upload_data'; // 데이터 전송 (판매자용)
 
-// 거래 단계 상수 (매 렌더링마다 재생성 방지)
-const TRADING_STEPS: TradingStep[] = [
+// 구매자용 거래 단계
+const BUYER_TRADING_STEPS: TradingStep[] = [
   'confirmation',
   'payment',
   'transfer',
   'verification',
 ];
 
+// 판매자용 거래 단계
+const SELLER_TRADING_STEPS: TradingStep[] = [
+  'confirmation',
+  'waiting_payment', // 구매자 결제 대기
+  'show_phone', // 구매자 핸드폰번호 표시
+  'upload_data', // 데이터 전송 (스크린샷 업로드)
+  'verification', // 거래 완료 확인
+];
+
 export default function TradingPage() {
   const router = useRouter();
-  const { partner } = useMatchStore();
+  const { partner, sendPayment, sendTradeConfirm } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
+  const [tradeId] = useState<number | null>(1); // 거래 ID (임시로 1 사용)
+
+  // 현재 사용자가 판매자인지 구매자인지 판단
+  const isSeller = partner?.type === 'seller';
+  // 사용자 역할에 따른 거래 단계 설정
+  const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
 
   // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
   useEffect(() => {
@@ -37,7 +62,7 @@ export default function TradingPage() {
       router.push('/match');
       return;
     }
-
+    console.log(partner, '뭐냐?');
     // partner 정보 유효성 검증
     if (
       !partner.id ||
@@ -108,35 +133,90 @@ export default function TradingPage() {
   };
 
   const renderStepContent = () => {
-    switch (currentStep) {
-      case 'confirmation':
-        return (
-          <ConfirmationStep
-            partner={partnerInfo}
-            onNext={handleNextStep}
-            onCancel={handleCancel}
-          />
-        );
+    // 판매자인 경우
+    if (isSeller) {
+      switch (currentStep) {
+        case 'confirmation':
+          return (
+            <ConfirmationStep
+              partner={partnerInfo}
+              onNext={handleNextStep}
+              onCancel={handleCancel}
+            />
+          );
 
-      case 'payment':
-        return (
-          <PaymentStep amount={partnerInfo.price} onNext={handleNextStep} />
-        );
+        case 'waiting_payment':
+          return <WaitingPaymentStep partner={partnerInfo} />;
 
-      case 'transfer':
-        return <TransferStep onNext={handleNextStep} />;
+        case 'show_phone':
+          return (
+            <ShowPhoneStep
+              partner={partnerInfo}
+              buyerPhone="010-1234-5678" // TODO: 실제 구매자 핸드폰번호
+              onNext={handleNextStep}
+            />
+          );
 
-      case 'verification':
-        return (
-          <VerificationStep
-            dataAmount={partnerInfo.data}
-            timeLeft={timeLeft}
-            onNext={handleNextStep}
-          />
-        );
+        case 'upload_data':
+          return (
+            <UploadDataStep partner={partnerInfo} onNext={handleNextStep} />
+          );
 
-      default:
-        return null;
+        case 'verification':
+          return (
+            <VerificationStep
+              dataAmount={partnerInfo.dataAmount}
+              timeLeft={timeLeft}
+              tradeId={tradeId || 1}
+              sendTradeConfirm={sendTradeConfirm}
+              onNext={handleNextStep}
+            />
+          );
+
+        default:
+          return null;
+      }
+    }
+
+    // 구매자인 경우 (기존 로직)
+    else {
+      switch (currentStep) {
+        case 'confirmation':
+          return (
+            <ConfirmationStep
+              partner={partnerInfo}
+              onNext={handleNextStep}
+              onCancel={handleCancel}
+            />
+          );
+
+        case 'payment':
+          return (
+            <PaymentStep
+              amount={partnerInfo.priceGb}
+              tradeId={tradeId || 1} // 임시로 1 사용
+              sendPayment={sendPayment}
+              onNext={handleNextStep}
+            />
+          );
+
+        case 'transfer':
+          return <TransferStep onNext={handleNextStep} />;
+
+        case 'verification':
+          return (
+            <VerificationStep
+              dataAmount={partnerInfo.dataAmount}
+              timeLeft={timeLeft}
+              tradeId={tradeId || 1}
+              sendTradeConfirm={sendTradeConfirm}
+              onNext={handleNextStep}
+            />
+          );
+
+        default:
+          return null;
+      }
     }
   };
 
@@ -169,49 +249,108 @@ export default function TradingPage() {
           <div className="fixed bottom-4 right-4 z-50">
             <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
               <h4 className="text-white text-sm font-medium mb-3">
-                🔧 테스트 단계
+                🔧 테스트 단계 ({isSeller ? '판매자' : '구매자'})
               </h4>
               <div className="space-y-2">
-                <button
-                  onClick={() => setCurrentStep('confirmation')}
-                  className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
-                    currentStep === 'confirmation'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                  }`}
-                >
-                  거래 확인
-                </button>
-                <button
-                  onClick={() => setCurrentStep('payment')}
-                  className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
-                    currentStep === 'payment'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                  }`}
-                >
-                  결제
-                </button>
-                <button
-                  onClick={() => setCurrentStep('transfer')}
-                  className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
-                    currentStep === 'transfer'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                  }`}
-                >
-                  이체
-                </button>
-                <button
-                  onClick={() => setCurrentStep('verification')}
-                  className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
-                    currentStep === 'verification'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                  }`}
-                >
-                  인증
-                </button>
+                {isSeller ? (
+                  // 판매자용 테스트 버튼
+                  <>
+                    <button
+                      onClick={() => setCurrentStep('confirmation')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'confirmation'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      거래 확인
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('waiting_payment')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'waiting_payment'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      결제 대기
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('show_phone')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'show_phone'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      핸드폰번호 표시
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('upload_data')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'upload_data'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      데이터 업로드
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('verification')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'verification'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      거래 완료
+                    </button>
+                  </>
+                ) : (
+                  // 구매자용 테스트 버튼
+                  <>
+                    <button
+                      onClick={() => setCurrentStep('confirmation')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'confirmation'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      거래 확인
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('payment')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'payment'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      결제
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('transfer')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'transfer'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      이체
+                    </button>
+                    <button
+                      onClick={() => setCurrentStep('verification')}
+                      className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
+                        currentStep === 'verification'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      인증
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
