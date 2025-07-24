@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Header } from '../../(shared)/components/Header';
 import { Footer } from '../../(shared)/components/Footer';
 import { useMatchStore } from '../../(shared)/stores/match-store';
+import { useGlobalWebSocket } from '../../(shared)/hooks/useGlobalWebSocket';
 import TradingHeader from './components/TradingHeader';
 import TradingSteps from './components/TradingSteps';
 import ConfirmationStep from './components/ConfirmationStep';
@@ -48,6 +49,9 @@ export default function TradingPage() {
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
   const [tradeId] = useState<number | null>(1); // 거래 ID (임시로 1 사용)
+
+  // 전역 WebSocket 연결 유지
+  useGlobalWebSocket();
 
   // 현재 사용자가 판매자인지 구매자인지 판단
   const isSeller = partner?.type === 'seller';

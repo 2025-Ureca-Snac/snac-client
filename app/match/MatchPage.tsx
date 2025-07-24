@@ -10,7 +10,7 @@ import TestPanel from './components/TestPanel';
 import TestButton from './components/TestButton';
 import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
-import { useMatchingEvents } from './hooks/useMatchingEvents';
+import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import { useUserStore } from '../(shared)/stores/user-store';
@@ -87,7 +87,8 @@ export default function MatchPage() {
       ? 'buyer'
       : appliedFilters.transactionType[0] === '판매자'
         ? 'seller'
-        : null;
+        : 'buyer';
+  console.log(userRole, 'userRole', appliedFilters.transactionType);
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
@@ -129,7 +130,7 @@ export default function MatchPage() {
 
   const { setWebSocketFunctions } = useMatchStore();
 
-  // 실시간 이벤트 처리 (새로운 WebSocket 훅)
+  // 실시간 이벤트 처리 (전역 WebSocket 훅)
   const {
     isConnected,
     registerSellerCard,
@@ -138,8 +139,8 @@ export default function MatchPage() {
     createTrade,
     sendPayment,
     sendTradeConfirm,
-  } = useMatchingEvents({
-    userRole,
+    updateUserRole,
+  } = useGlobalWebSocket({
     appliedFilters,
     setIncomingRequests,
     setActiveSellers,
@@ -153,15 +154,40 @@ export default function MatchPage() {
     setWebSocketFunctions({ sendPayment, sendTradeConfirm });
   }, [sendPayment, sendTradeConfirm, setWebSocketFunctions]);
 
-  // 필터 핸들러
-  const handleFilterChange = useCallback((filters: Filters) => {
-    setPendingFilters(filters);
-
-    // 거래 방식이 변경되면 바로 appliedFilters도 업데이트
-    if (filters.transactionType.length > 0) {
-      setAppliedFilters(filters);
+  // userRole이 변경될 때마다 전역 소켓에 업데이트
+  useEffect(() => {
+    console.log('🔄 MatchPage useEffect 실행:', {
+      userRole,
+      updateUserRole: !!updateUserRole,
+    });
+    if (updateUserRole) {
+      console.log('여기서 실행되냐?');
+      updateUserRole(userRole);
     }
-  }, []);
+  }, [userRole]); // updateUserRole 의존성 제거
+
+  // 필터 핸들러
+  const handleFilterChange = useCallback(
+    (filters: Filters) => {
+      setPendingFilters(filters);
+
+      // 거래 방식이 변경되면 바로 appliedFilters도 업데이트
+      if (filters.transactionType.length > 0) {
+        setAppliedFilters(filters);
+
+        // userRole이 변경될 때마다 전역 소켓에 즉시 업데이트
+        const newUserRole =
+          filters.transactionType[0] === '구매자'
+            ? 'buyer'
+            : filters.transactionType[0] === '판매자'
+              ? 'seller'
+              : null;
+        console.log('🎯 필터 변경 시 userRole 업데이트:', newUserRole);
+        updateUserRole(newUserRole);
+      }
+    },
+    [updateUserRole]
+  );
 
   const handleApplyFilters = useCallback(() => {
     if (pendingFilters.transactionType[0] === '구매자') {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useTradingWebSocket } from '../hooks/useTradingWebSocket';
+import { useGlobalWebSocket } from '../../../(shared)/hooks/useGlobalWebSocket';
 
 interface PaymentStepProps {
   amount: number;
@@ -14,7 +14,7 @@ export default function PaymentStep({
   tradeId,
   onNext,
 }: PaymentStepProps) {
-  const { sendPayment: wsSendPayment, isConnected } = useTradingWebSocket();
+  const { sendPayment: wsSendPayment, isConnected } = useGlobalWebSocket();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayment = async () => {
