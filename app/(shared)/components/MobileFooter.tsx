@@ -113,13 +113,6 @@ export const MobileFooter = () => {
       <div className="py-6 ">
         <div className="flex justify-center gap-1">
           <Image
-            src="/bcPayment.svg"
-            alt="BC카드 결제"
-            width={48}
-            height={32}
-            style={{ width: 'auto', height: '32px' }}
-          />
-          <Image
             src="/tossPayment.svg"
             alt="토스 결제"
             width={48}
