@@ -16,18 +16,31 @@ export default function CompletePage() {
   const partnerInfo = partner
     ? {
         ...partner,
-        rating: partner.rating ?? 4.5,
-        transactionCount: partner.transactionCount ?? 0,
+        name: partner.type === 'seller' ? partner.buyer : partner.seller, // 상대방 이름
+        data: partner.dataAmount, // dataAmount를 data로 매핑
+        price: partner.priceGb, // priceGb를 price로 매핑
+        rating: partner.sellerRatingScore,
+        transactionCount: partner.id.toString(),
       }
     : {
-        id: 'partner_789',
-        name: 'user07',
+        id: 789,
+        buyer: 'buyer@example.com',
+        seller: 'seller@example.com',
+        cardId: 789,
         carrier: 'KT',
+        dataAmount: 2,
+        phone: '010-0000-0000',
+        point: 0,
+        priceGb: 2000,
+        sellerRatingScore: 4.9,
+        status: 'COMPLETED',
+        cancelReason: null,
+        type: 'seller' as const,
+        name: 'user07',
         data: 2,
         price: 2000,
         rating: 4.9,
-        transactionCount: 156,
-        type: 'seller',
+        transactionCount: '156',
       };
 
   // 거래 정보

@@ -152,7 +152,7 @@ export default function TradingPage() {
           return (
             <ShowPhoneStep
               partner={partnerInfo}
-              buyerPhone="010-1234-5678" // TODO: 실제 구매자 핸드폰번호
+              buyerPhone={partnerInfo.phone}
               onNext={handleNextStep}
             />
           );
