@@ -29,7 +29,7 @@ const getCarrierImageUrl = (carrier: string): string => {
     case 'KT':
       return '/KT.png';
     case 'LGU+':
-      return '/LGU+.png';
+      return '/LG.png';
     default:
       return '/SKT.png';
   }
