@@ -109,7 +109,7 @@ export default function Home() {
     };
 
     fetchScrollCards();
-  }, [currentPage, refetchTrigger, priceRanges.join(',')]);
+  }, [currentPage, refetchTrigger]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -135,8 +135,6 @@ export default function Home() {
       <div className="flex items-center justify-center">
         {loading ? (
           <p>로딩 중…</p>
-        ) : cards.length === 0 ? (
-          <p>조건에 맞는 카드가 없어요 😢</p>
         ) : (
           <HomeLayout
             cards={cards}
