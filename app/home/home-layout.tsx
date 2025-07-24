@@ -18,7 +18,7 @@ interface Card {
   createdAt: string;
   email: string;
   sellStatus: string;
-  cardCategory: string;
+  cardCategory: 'SELL' | 'BUY';
   carrier: string;
   dataAmount: number;
   price: number;
@@ -142,7 +142,6 @@ export default function HomeLayout({
             <div className="text-center py-10">로딩 중...</div>
           ) : (
             <>
-              <p>HomeLayout이 받은 카드 개수: {cards.length}</p>
               {cards.length === 0 && (
                 <p className="text-center text-gray-500 py-10">
                   표시할 데이터가 없습니다.
