@@ -1,14 +1,16 @@
 import { create } from 'zustand';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | null;
-export type SortBy =
-  | '최신순'
-  | '인기순'
-  | '오래된순'
-  | '가격 높은 순'
-  | '가격 낮은 순';
-type TransactionStatus = 'All' | '거래 전' | '거래 완료' | null;
-type PriceRange = string;
+export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--'; // '--'는 "선택 안 함"
+export type SortBy = 'LATEST' | 'RATING';
+type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT' | null;
+type PriceRange =
+  | 'ALL'
+  | 'P0_999'
+  | 'P1000_1499'
+  | 'P1500_1999'
+  | 'P2000_2499'
+  | 'P2500_PLUS';
 type CardCategory = 'SELL' | 'BUY' | null;
 
 interface HomeState {
@@ -16,6 +18,7 @@ interface HomeState {
   isFilterOpen: boolean;
   isCreateModalOpen: boolean;
   category: Category;
+  carrier: Carrier;
   sortBy: SortBy;
   transactionStatus: TransactionStatus;
   priceRanges: PriceRange[];
@@ -25,6 +28,7 @@ interface HomeState {
     toggleFilter: () => void;
     toggleCreateModal: () => void;
     setCategory: (category: Category) => void;
+    setCarrier: (carrier: Carrier) => void;
     setSortBy: (sortBy: SortBy) => void;
     setTransactionStatus: (status: TransactionStatus) => void;
     togglePriceRange: (price: PriceRange) => void;
@@ -39,9 +43,10 @@ export const homeInitialState = {
   isFilterOpen: false,
   isCreateModalOpen: false,
   category: null,
-  sortBy: '최신순' as SortBy,
-  transactionStatus: null as TransactionStatus,
-  priceRanges: [] as PriceRange[],
+  carrier: '--' as Carrier,
+  sortBy: 'LATEST' as SortBy,
+  transactionStatus: 'ALL' as TransactionStatus,
+  priceRanges: ['ALL'] as PriceRange[],
   showRegularsOnly: false,
 };
 
@@ -53,6 +58,7 @@ export const useHomeStore = create<HomeState>((set) => ({
     toggleCreateModal: () =>
       set((state) => ({ isCreateModalOpen: !state.isCreateModalOpen })),
     setCategory: (category) => set({ category }),
+    setCarrier: (carrier) => set({ carrier }),
     setSortBy: (sortBy) => set({ sortBy }),
     setTransactionStatus: (status) => set({ transactionStatus: status }),
     togglePriceRange: (price) =>
@@ -70,7 +76,9 @@ export const useHomeStore = create<HomeState>((set) => ({
         transactionStatus: homeInitialState.transactionStatus,
         priceRanges: homeInitialState.priceRanges,
         showRegularsOnly: homeInitialState.showRegularsOnly,
+        carrier: homeInitialState.carrier,
       })),
+
     resetAll: () => set(() => ({ ...homeInitialState })),
   },
 }));
