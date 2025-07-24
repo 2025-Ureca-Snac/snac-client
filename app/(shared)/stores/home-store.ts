@@ -11,7 +11,7 @@ type PriceRange =
   | 'P1500_1999'
   | 'P2000_2499'
   | 'P2500_PLUS';
-type CardCategory = 'SELL' | 'BUY' | null;
+type CardCategory = 'SELL' | 'BUY';
 
 interface HomeState {
   cardCategory: CardCategory;
