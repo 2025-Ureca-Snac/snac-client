@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { PaymentMethodsProps } from '../types/payment-methods';
+import { PAYMENT_METHODS } from '../constants/payment';
 
 /**
  * @author 이승우
@@ -19,10 +20,10 @@ export default function PaymentMethods({
         type="button"
         onClick={() => {
           console.log('토스페이먼츠 선택');
-          onPaymentMethodChange('toss');
+          onPaymentMethodChange(PAYMENT_METHODS.TOSS);
         }}
         className={`w-full p-3 border rounded-lg flex items-center justify-center transition-colors ${
-          paymentMethod === 'toss'
+          paymentMethod === PAYMENT_METHODS.TOSS
             ? 'border-blue-500 bg-blue-50'
             : 'border-gray-300 hover:border-gray-400'
         }`}
@@ -40,10 +41,10 @@ export default function PaymentMethods({
         type="button"
         onClick={() => {
           console.log('스낵 포인트 선택');
-          onPaymentMethodChange('snack');
+          onPaymentMethodChange(PAYMENT_METHODS.SNACK);
         }}
         className={`w-full p-3 border rounded-lg flex items-center justify-center transition-colors ${
-          paymentMethod === 'snack'
+          paymentMethod === PAYMENT_METHODS.SNACK
             ? 'border-blue-500 bg-blue-50'
             : 'border-gray-300 hover:border-gray-400'
         }`}

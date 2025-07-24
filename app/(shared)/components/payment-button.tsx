@@ -1,4 +1,5 @@
 import { PaymentButtonProps } from '../types/payment-button';
+import { getTotalAvailable } from '../utils/payment-calculations';
 
 /**
  * @author 이승우
@@ -12,7 +13,7 @@ export default function PaymentButton({
   showSnackPayment,
   onPaymentClick,
 }: PaymentButtonProps) {
-  const totalAvailable = snackMoney + snackPoints;
+  const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
   const isInsufficient = showSnackPayment && totalAvailable < finalAmount;
 
   return (

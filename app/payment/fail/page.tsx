@@ -21,7 +21,7 @@ export default function PaymentFailPage() {
         orderId: orderId,
         amount: amount,
       },
-      '*'
+      window.location.origin
     );
 
     // 3초 후 창 닫기

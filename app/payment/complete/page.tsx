@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { PAYMENT_TYPES } from '../../(shared)/constants/payment';
 
 /**
  * @author 이승우
@@ -9,6 +10,8 @@ import Image from 'next/image';
  * @params pay: 결제 유형 (buy: 구매, sell: 판매)
  * @params orderId: 주문 번호
  * @params amount: 결제 금액
+ * @params snackMoneyUsed: 사용된 스낵 머니
+ * @params snackPointsUsed: 사용된 스낵 포인트
  */
 export default function PaymentCompletePage() {
   const searchParams = useSearchParams();
@@ -17,13 +20,49 @@ export default function PaymentCompletePage() {
     const orderId = searchParams.get('orderId');
     const amount = searchParams.get('amount');
     const pay = searchParams.get('pay');
+    const snackMoneyUsed = parseInt(searchParams.get('snackMoneyUsed') || '0');
+    const snackPointsUsed = parseInt(
+      searchParams.get('snackPointsUsed') || '0'
+    );
 
-    console.log('결제 완료 페이지 파라미터:', { orderId, amount, pay });
+    console.log('결제 완료 페이지 파라미터:', {
+      orderId,
+      amount,
+      pay,
+      snackMoneyUsed,
+      snackPointsUsed,
+    });
 
-    // 결제 완료 처리 (예: 포인트 차감, 주문 상태 업데이트 등)
     if (orderId && amount) {
-      // 여기서 실제 결제 완료 처리를 할 수 있습니다
-      console.log('결제 완료 처리:', { orderId, amount, pay });
+      // 결제 완료 확인 API 호출
+      const verifyPayment = async () => {
+        try {
+          // 실제 결제 성공 여부를 확인하는 API 호출
+          // const response = await api.get(`/payment/verify?orderId=${orderId}`);
+          // const responseData = response.data as Record<string, unknown>;
+
+          // 임시로 성공으로 가정 (실제로는 API 응답에 따라 처리)
+          const isPaymentSuccess = true; // responseData.status === 'OK'
+
+          if (isPaymentSuccess) {
+            // 결제 성공이 확인된 경우에만 차감
+            console.log('결제 성공 확인됨, 차감 처리:', {
+              snackMoneyUsed,
+              snackPointsUsed,
+            });
+            // setSnackMoney((prev) => prev - snackMoneyUsed);
+            // setSnackPoints((prev) => prev - snackPointsUsed);
+          } else {
+            console.error('결제 실패 확인됨');
+            // 결제 실패 시 처리 (예: 에러 페이지로 리다이렉트)
+          }
+        } catch (error) {
+          console.error('결제 확인 중 오류:', error);
+          // 오류 시 처리
+        }
+      };
+
+      verifyPayment();
     }
   }, [searchParams]);
 
@@ -79,12 +118,12 @@ export default function PaymentCompletePage() {
           {/* Success Message */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {pay === 'buy'
+              {pay === PAYMENT_TYPES.BUY
                 ? '구매 글이 등록되었습니다!'
                 : '구매요청이 전송되었습니다!'}
             </h2>
             <p className="text-gray-600 flex items-center justify-center">
-              {pay === 'buy'
+              {pay === PAYMENT_TYPES.BUY
                 ? '판매자가 구매요청을 보낼 때까지 기다려주세요.'
                 : '판매자가 빠른 시일 내에 데이터를 보내줄 예정입니다.'}
               <span className="ml-2 text-2xl">🎉</span>
@@ -132,7 +171,7 @@ export default function PaymentCompletePage() {
           {/* History Button */}
           <div className="text-center">
             <button className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-              {pay === 'buy' ? '구매 내역' : '판매 내역'}
+              {pay === PAYMENT_TYPES.BUY ? '구매 내역' : '판매 내역'}
             </button>
           </div>
         </div>

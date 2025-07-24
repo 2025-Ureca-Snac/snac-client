@@ -88,7 +88,7 @@ export default function RechargeModal({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [onClose, onRechargeSuccess, selectedAmount]);
 
   const handleRecharge = async () => {
     if (selectedAmount && selectedAmount >= 1000) {

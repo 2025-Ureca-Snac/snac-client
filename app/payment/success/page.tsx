@@ -23,7 +23,7 @@ export default function PaymentSuccessPage() {
         amount: amount,
         paymentKey: paymentKey,
       },
-      '*'
+      window.location.origin
     );
 
     // 3초 후 창 닫기

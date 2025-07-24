@@ -9,6 +9,16 @@ import PaymentMethods from '../(shared)/components/payment-methods';
 import PaymentSummary from '../(shared)/components/payment-summary';
 import PaymentButton from '../(shared)/components/payment-button';
 import api from '../(shared)/utils/api';
+import {
+  PAYMENT_METHODS,
+  PAYMENT_TYPES,
+  PaymentMethod,
+} from '../(shared)/constants/payment';
+import {
+  getFinalAmount,
+  getTotalAvailable,
+  getShortageAmount,
+} from '../(shared)/utils/payment-calculations';
 
 /**
  * @author 이승우
@@ -21,13 +31,15 @@ export default function PaymentPage() {
     useState(false);
   const [shortageAmount, setShortageAmount] = useState(0);
   const [snackMoney, setSnackMoney] = useState(3000); // 스낵 머니 3,000
-  const [snackPoints, setSnackPoints] = useState(1500); // 스낵 포인트 1,500 (테스트용)
-  const [paymentMethod, setPaymentMethod] = useState('toss');
+  const [snackPoints] = useState(1500); // 스낵 포인트 1,500 (테스트용)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PAYMENT_METHODS.TOSS
+  );
   const [snackPointsToUse, setSnackPointsToUse] = useState(0);
   const [showSnackPayment, setShowSnackPayment] = useState(false);
 
   const productPrice = 2000;
-  const finalAmount = Math.max(0, productPrice - snackPointsToUse);
+  const finalAmount = getFinalAmount(productPrice, snackPointsToUse);
 
   // 디버깅용 로그
   console.log('현재 상태:', {
@@ -53,13 +65,19 @@ export default function PaymentPage() {
 
       // INSERT_YOUR_CODE
       // pay 파라미터에 따라 API 엔드포인트 분기
-      // pay 값은 sell 또는 buy가 될 수 있음
-      // pay 값을 파라미터에서 받아오도록 수정
       const searchParams = new URLSearchParams(window.location.search);
       const pay = searchParams.get('pay'); // 기본값은 'sell'
 
       const apiEndpoint =
-        pay === 'sell' ? '/trades/sell' : pay === 'buy' ? '/trades/buy' : '';
+        pay === PAYMENT_TYPES.SELL
+          ? '/trades/sell'
+          : pay === PAYMENT_TYPES.BUY
+            ? '/trades/buy'
+            : null;
+
+      if (!apiEndpoint) {
+        throw new Error('잘못된 요청 파라미터입니다.');
+      }
 
       const response = await api.post(apiEndpoint, {
         cardId: orderId,
@@ -69,12 +87,8 @@ export default function PaymentPage() {
 
       const responseData = response.data as Record<string, unknown>;
       if (responseData.status === 'OK') {
-        // 결제 성공 시 사용한 스낵 머니와 스낵 포인트 차감
-        setSnackMoney((prev) => prev - amount);
-        setSnackPoints((prev) => prev - snackPointsToUse);
-
         router.push(
-          `/payment/complete?pay=${pay}&orderId=${orderId}&amount=${amount}`
+          `/payment/complete?pay=${pay}&orderId=${orderId}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}`
         );
       } else {
         alert('결제가 실패했습니다. 다시 시도해주세요.');
@@ -96,7 +110,7 @@ export default function PaymentPage() {
 
     if (showSnackPayment) {
       // 스낵 결제 화면에서 실제 결제 처리
-      const totalAvailable = snackMoney + snackPoints;
+      const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
 
       if (finalAmount === 0) {
         // 스낵 포인트로 전액 결제
@@ -109,7 +123,7 @@ export default function PaymentPage() {
       } else {
         console.log('포인트 부족');
         // 스낵 머니 + 스낵 포인트가 부족한 경우 충전 확인
-        const shortage = finalAmount - totalAvailable;
+        const shortage = getShortageAmount(finalAmount, totalAvailable);
         setShortageAmount(shortage);
         setRechargeConfirmModalOpen(true);
       }
@@ -120,25 +134,25 @@ export default function PaymentPage() {
         console.log('토스페이먼츠 결제 선택');
 
         // 충분한 금액이 있는지 확인
-        const totalAvailable = snackMoney + snackPoints;
+        const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
         if (totalAvailable >= productPrice) {
           // 충분한 경우: 주문 금액으로 설정
           setShortageAmount(productPrice);
         } else {
           // 부족한 경우: 부족한 금액으로 설정
-          const shortage = productPrice - totalAvailable;
+          const shortage = getShortageAmount(productPrice, totalAvailable);
           setShortageAmount(shortage);
         }
 
         setRechargeModalOpen(true);
-      } else if (paymentMethod === 'snack') {
+      } else if (paymentMethod === PAYMENT_METHODS.SNACK) {
         // 스낵 포인트로 결제 화면 표시
         console.log('스낵 포인트 결제 화면 표시');
 
         // 스낵 머니 + 스낵 포인트가 주문 금액보다 작으면 바로 충전 확인 모달 열기
-        const totalAvailable = snackMoney + snackPoints;
+        const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
         if (totalAvailable < productPrice) {
-          const shortage = productPrice - totalAvailable;
+          const shortage = getShortageAmount(productPrice, totalAvailable);
           console.log('스낵 선택 시 shortage 계산:', {
             totalAvailable,
             productPrice,
@@ -156,7 +170,7 @@ export default function PaymentPage() {
     }
   };
 
-  const handlePaymentMethodChange = (method: string) => {
+  const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
     setSnackPointsToUse(0); // 초기화
   };

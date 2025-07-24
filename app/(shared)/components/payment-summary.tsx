@@ -1,5 +1,10 @@
 import Image from 'next/image';
 import { PaymentSummaryProps } from '../types/payment-summary';
+import {
+  getMaxUsableSnackPoints,
+  getRemainingSnackMoney,
+  getRemainingSnackPoints,
+} from '../utils/payment-calculations';
 
 /**
  * @author 이승우
@@ -40,8 +45,12 @@ export default function PaymentSummary({
             <div>
               <span className="text-gray-600">스낵 포인트</span>
               <div className="text-xs text-gray-400 mt-1">
-                최대 {Math.min(snackPoints, productPrice).toLocaleString()} 사용
-                가능
+                최대{' '}
+                {getMaxUsableSnackPoints(
+                  snackPoints,
+                  productPrice
+                ).toLocaleString()}{' '}
+                사용 가능
               </div>
             </div>
             <div className="flex items-center">
@@ -49,10 +58,13 @@ export default function PaymentSummary({
                 type="number"
                 value={snackPointsToUse === 0 ? '' : snackPointsToUse}
                 min="0"
-                max={Math.min(snackPoints, productPrice)}
+                max={getMaxUsableSnackPoints(snackPoints, productPrice)}
                 onChange={(e) => {
                   const inputValue = parseInt(e.target.value) || 0;
-                  const maxValue = Math.min(snackPoints, productPrice);
+                  const maxValue = getMaxUsableSnackPoints(
+                    snackPoints,
+                    productPrice
+                  );
                   const clampedValue = Math.min(
                     Math.max(0, inputValue),
                     maxValue
@@ -61,7 +73,10 @@ export default function PaymentSummary({
                 }}
                 onBlur={(e) => {
                   const inputValue = parseInt(e.target.value) || 0;
-                  const maxValue = Math.min(snackPoints, productPrice);
+                  const maxValue = getMaxUsableSnackPoints(
+                    snackPoints,
+                    productPrice
+                  );
                   if (inputValue > maxValue) {
                     onSnackPointsChange(maxValue);
                   }
@@ -106,7 +121,10 @@ export default function PaymentSummary({
                 <span className="text-sm text-green-700">스낵 머니</span>
                 <div className="flex items-center">
                   <span className="font-medium text-green-900">
-                    {(snackMoney - finalAmount).toLocaleString()}
+                    {getRemainingSnackMoney(
+                      snackMoney,
+                      finalAmount
+                    ).toLocaleString()}
                   </span>
                   <Image
                     src="/snac-price.svg"
@@ -121,7 +139,10 @@ export default function PaymentSummary({
                 <span className="text-sm text-green-700">스낵 포인트</span>
                 <div className="flex items-center">
                   <span className="font-medium text-green-900">
-                    {(snackPoints - snackPointsToUse).toLocaleString()}
+                    {getRemainingSnackPoints(
+                      snackPoints,
+                      snackPointsToUse
+                    ).toLocaleString()}
                   </span>
                   <Image
                     src="/snac-price.svg"
