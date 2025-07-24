@@ -49,10 +49,10 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    console.log('error', error);
+    const { code } = error.response?.data;
 
     // 401 에러이고 아직 재시도하지 않은 요청인 경우
-    if (error.response?.code === 401 && !originalRequest._retry) {
+    if (code === 'TOKEN_EXPIRED_401' && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
