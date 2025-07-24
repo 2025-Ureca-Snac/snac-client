@@ -52,20 +52,11 @@ export default function Home() {
     transactionStatus,
     priceRanges,
     sortBy,
-    carrier,
     actions,
     refetchTrigger,
   } = useHomeStore();
 
   useEffect(() => {
-    console.log('[디버깅] 필터 상태:', {
-      category,
-      transactionStatus,
-      priceRanges,
-      sortBy,
-      carrier,
-    });
-
     const fetchScrollCards = async () => {
       setLoading(true);
       try {
@@ -84,7 +75,6 @@ export default function Home() {
         });
 
         const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
-        console.log('[ 요청 URL 확인]', fullUrl);
 
         const res = await fetch(fullUrl, {
           cache: 'no-store',
@@ -98,7 +88,7 @@ export default function Home() {
 
         const json: CardApiResponse = await res.json();
         setCards(json.data.cardResponseList);
-        console.log('응답 데이터:', json);
+
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {
         console.error('카드 스크롤 조회 실패:', err);
