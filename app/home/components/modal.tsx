@@ -13,9 +13,9 @@ type Carrier = 'SKT' | 'KT' | 'LGU+' | '';
 type DataUnit = 'MB' | 'GB';
 
 const carrierOptions: { name: Carrier; imageUrl: string }[] = [
-  { name: 'SKT', imageUrl: '/SKT.svg' },
-  { name: 'KT', imageUrl: '/KT.svg' },
-  { name: 'LGU+', imageUrl: '/LGU+.svg' },
+  { name: 'SKT', imageUrl: '/SKT.png' },
+  { name: 'KT', imageUrl: '/KT.png' },
+  { name: 'LGU+', imageUrl: '/LG.png' },
 ];
 
 const dataPresets = ['500MB', '1GB', '2GB'];
