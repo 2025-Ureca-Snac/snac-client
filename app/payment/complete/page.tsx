@@ -1,19 +1,24 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { PAYMENT_TYPES } from '../../(shared)/constants/payment';
+
+// 결제 유형 상수
+const PAYMENT_TYPES = {
+  BUY: 'buy',
+  SELL: 'sell',
+} as const;
 
 /**
  * @author 이승우
- * @description 결제 완료 페이지
+ * @description 결제 완료 컴포넌트
  * @params pay: 결제 유형 (buy: 구매, sell: 판매)
  * @params orderId: 주문 번호
  * @params amount: 결제 금액
  * @params snackMoneyUsed: 사용된 스낵 머니
  * @params snackPointsUsed: 사용된 스낵 포인트
  */
-export default function PaymentCompletePage() {
+function PaymentCompleteComponent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -177,5 +182,26 @@ export default function PaymentCompletePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+/**
+ * @author 이승우
+ * @description 결제 완료 페이지
+ */
+export default function PaymentCompletePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">로딩 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <PaymentCompleteComponent />
+    </Suspense>
   );
 }

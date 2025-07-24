@@ -1,13 +1,13 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 
 /**
  * @author 이승우
- * @description 토스 결제 처리 페이지
+ * @description 토스 결제 처리 컴포넌트
  */
-export default function PaymentProcessPage() {
+function PaymentProcessComponent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -80,5 +80,26 @@ export default function PaymentProcessPage() {
         <p className="text-gray-600">결제창을 여는 중입니다...</p>
       </div>
     </div>
+  );
+}
+
+/**
+ * @author 이승우
+ * @description 토스 결제 처리 페이지
+ */
+export default function PaymentProcessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">로딩 중...</p>
+          </div>
+        </div>
+      }
+    >
+      <PaymentProcessComponent />
+    </Suspense>
   );
 }
