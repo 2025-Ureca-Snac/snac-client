@@ -12,7 +12,7 @@ type CardCategory = 'SELL' | 'BUY' | '';
 type Carrier = 'SKT' | 'KT' | 'LGU+' | '';
 type DataUnit = 'MB' | 'GB';
 
-const carrierOptions: { name: Carrier; imageUrl: string }[] = [
+const CARRIER_OPTIONS: { name: Carrier; imageUrl: string }[] = [
   { name: 'SKT', imageUrl: '/SKT.png' },
   { name: 'KT', imageUrl: '/KT.png' },
   { name: 'LGU+', imageUrl: '/LG.png' },
@@ -249,7 +249,7 @@ export const Modal = () => {
                       통신사
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-4">
-                      {carrierOptions.map((option) => (
+                      {CARRIER_OPTIONS.map((option) => (
                         <RadioGroup.Option
                           key={option.name}
                           value={option.name}
