@@ -48,14 +48,13 @@ export const DataItemCard = ({
       <>₩{price.toLocaleString()}</>
     );
 
+  const isBuyView = cardCategory === 'BUY';
   const finalButtonText =
-    buyButtonText ?? (cardCategory === 'BUY' ? '판매하기' : '구매하기');
+    buyButtonText ?? (isBuyView ? '판매하기' : '구매하기');
 
-  const isSellingMode = finalButtonText === '판매하기';
-  const buttonColorClass = isSellingMode
+  const buttonColorClass = isBuyView
     ? 'bg-candy-pink hover:bg-[#ff93c4]'
     : 'bg-gray-900 hover:bg-gray-800';
-
   return (
     <div className="transition-transform duration-300 hover:-translate-y-[2px] hover:scale-[1.03] relative bg-[#F3F5F7] rounded-2xl shadow-md w-card-sm h-card-sm md:w-card-md md:h-card-md flex flex-col p-3">
       {isNew && (
