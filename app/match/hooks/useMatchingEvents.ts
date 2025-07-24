@@ -335,14 +335,17 @@ export function useMatchingEvents({
         if (userRole === 'buyer' && tradeData.status === 'SELL_APPROVED') {
           console.log('🎉 구매자에게 거래 수락 알림:', tradeData);
           setMatchingStatus('matched');
+
+          // 판매자 정보를 store에 저장 (구매자 입장에서 상대방은 판매자)
           foundMatch({
-            id: tradeData.buyer,
-            name: tradeData.buyer,
+            id: tradeData.seller,
+            name: tradeData.seller, // 서버에서 판매자 이름을 제공해야 함
             carrier: tradeData.carrier,
             data: tradeData.dataAmount,
             price: tradeData.priceGb || 0,
-            type: 'buyer',
+            type: 'seller',
           });
+
           setTimeout(() => router.push('/match/trading'), 1000);
         }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
 import MatchContent from './components/MatchContent';
@@ -10,6 +11,7 @@ import TestButton from './components/TestButton';
 import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
 import { useMatchingEvents } from './hooks/useMatchingEvents';
+import { useMatchStore } from '../(shared)/stores/match-store';
 
 // ServerTradeData 타입 정의 (useMatchingEvents와 동일)
 interface ServerTradeData {
@@ -35,6 +37,9 @@ type MatchingStatus =
   | 'matched';
 
 export default function MatchPage() {
+  const router = useRouter();
+  const { foundMatch } = useMatchStore();
+
   // 상태 관리
   const initialFilters: Filters = {
     transactionType: [],
@@ -286,8 +291,28 @@ export default function MatchPage() {
 
       // 실제 서버에 응답 전송
       respondToTrade(requestId, accept);
+
+      // 거래를 수락한 경우 trading 페이지로 이동
+      if (accept) {
+        // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
+        const buyerInfo = {
+          id: request.buyerId.toString(),
+          name: request.buyerName,
+          carrier: sellerInfo.carrier,
+          data: sellerInfo.dataAmount,
+          price: sellerInfo.price,
+          type: 'buyer' as const,
+        };
+
+        foundMatch(buyerInfo);
+
+        // 1초 후 trading 페이지로 이동
+        setTimeout(() => {
+          router.push('/match/trading');
+        }, 1000);
+      }
     },
-    [incomingRequests, respondToTrade]
+    [incomingRequests, respondToTrade, sellerInfo, foundMatch, router]
   );
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -316,11 +341,6 @@ export default function MatchPage() {
         <TradeConfirmationModal
           isOpen={showConfirmModal}
           seller={selectedSeller}
-          onConfirm={() => {
-            setShowConfirmModal(false);
-            setSelectedSeller(null);
-            setCurrentTradeStatus(null);
-          }}
           onCancel={() => {
             setShowConfirmModal(false);
             setSelectedSeller(null);

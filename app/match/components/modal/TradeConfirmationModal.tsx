@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { User } from '../../types/match';
+import { useMatchStore } from '@/app/(shared)/stores/match-store';
 
 // Lottie Player를 동적으로 import (SSR 문제 방지)
 const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
@@ -10,7 +12,6 @@ const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
 interface TradeConfirmationModalProps {
   isOpen: boolean;
   seller: User | null;
-  onConfirm: () => void;
   onCancel: () => void;
   createTrade: (cardId: number) => void;
   tradeStatus: string | null;
@@ -22,11 +23,12 @@ type ModalState = 'confirm' | 'waiting' | 'success' | 'timeout';
 export default function TradeConfirmationModal({
   isOpen,
   seller,
-  onConfirm,
   onCancel,
   createTrade,
   tradeStatus,
 }: TradeConfirmationModalProps) {
+  const router = useRouter();
+  const { foundMatch } = useMatchStore();
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
@@ -63,14 +65,30 @@ export default function TradeConfirmationModal({
   useEffect(() => {
     if (tradeStatus === 'ACCEPTED') {
       setModalState('success');
-      // 2초 후 onConfirm 호출
-      setTimeout(() => {
-        onConfirm();
-      }, 2000);
+
+      // 상대방 정보를 store에 저장하고 trading 페이지로 이동
+      if (seller) {
+        const partnerInfo = {
+          id: seller.id.toString(),
+          name: seller.name,
+          carrier: seller.carrier,
+          data: seller.data,
+          price: seller.price,
+          type: 'seller' as const,
+        };
+
+        foundMatch(partnerInfo);
+
+        // 2초 후 trading 페이지로 이동
+        setTimeout(() => {
+          onCancel(); // 모달 닫기
+          router.push('/match/trading');
+        }, 2000);
+      }
     } else if (tradeStatus === 'REJECTED' || tradeStatus === 'CANCELLED') {
       setModalState('timeout');
     }
-  }, [tradeStatus, onConfirm]);
+  }, [tradeStatus, seller]); // foundMatch, router, onCancel 제거
 
   // 대기 상태에서 타이머 관리 (취소 버튼 활성화용)
   useEffect(() => {
