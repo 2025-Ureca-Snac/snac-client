@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 import { PriceUnit } from '@/app/(shared)/types';
+import { useHomeStore } from '@/app/(shared)/stores/home-store';
 
 interface DataItemCardProps {
   imageUrl: string;
@@ -27,9 +28,11 @@ export const DataItemCard = ({
   createdAt,
   isNew,
   newBadgeText = 'NEW',
-  buyButtonText = '구매하기',
+  buyButtonText,
   onClickBuy,
 }: DataItemCardProps) => {
+  const { cardCategory } = useHomeStore();
+
   const displayPrice =
     unit === 'snack' ? (
       <span className="inline-flex items-center">
@@ -45,6 +48,15 @@ export const DataItemCard = ({
     ) : (
       <>₩{price.toLocaleString()}</>
     );
+
+  const finalButtonText =
+    buyButtonText ?? (cardCategory === 'BUY' ? '판매하기' : '구매하기');
+
+  const isSellingMode = finalButtonText === '판매하기';
+  const buttonColorClass = isSellingMode
+    ? 'bg-candy-pink hover:bg-[#ff93c4]'
+    : 'bg-gray-900 hover:bg-gray-800';
+
   return (
     <div className="transition-transform duration-300 hover:-translate-y-[2px] hover:scale-[1.03] relative bg-[#F3F5F7] rounded-2xl shadow-md w-card-sm h-card-sm md:w-card-md md:h-card-md flex flex-col p-3">
       {isNew && (
@@ -76,9 +88,9 @@ export const DataItemCard = ({
           onClick={() => {
             onClickBuy({ email, createdAt });
           }}
-          className="w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md bg-gray-900 hover:bg-gray-800 transition text-regular-md border rounded-lg flex items-center justify-center"
+          className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition text-regular-md border rounded-lg flex items-center justify-center`}
         >
-          {buyButtonText}
+          {finalButtonText}
         </Button>
       </div>
     </div>
