@@ -9,17 +9,14 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
 
-// 통신사 카테고리 (기존)
 const displayCategories = ['SKT', 'KT', 'LGU+'] as const;
 
-// 거래 상태 매핑 (스토어 TransactionStatus 타입에 맞춤)
 const transactionOptions = [
   { label: '모든 거래', value: 'ALL' as const },
   { label: '거래 전', value: 'SELLING' as const },
   { label: '거래 완료', value: 'SOLD_OUT' as const },
 ];
 
-// 가격 레이블 (기존)
 const price_ranges = [
   '모든 가격',
   '₩ 0 - 999',
@@ -29,8 +26,7 @@ const price_ranges = [
   '₩ 2,500+',
 ] as const;
 
-// 레이블 → 스토어 PriceRange 타입 매핑
-const priceValueMap: Record<
+const PRICE_VALUE_MAP: Record<
   (typeof price_ranges)[number],
   'ALL' | 'P0_999' | 'P1000_1499' | 'P1500_1999' | 'P2000_2499' | 'P2500_PLUS'
 > = {
@@ -59,7 +55,6 @@ export const Filter = () => {
       JSON.stringify(homeInitialState.priceRanges) ||
     showRegularsOnly !== homeInitialState.showRegularsOnly;
 
-  // 적용하기 시 refetch 트리거 + 모달 닫기
   const closeAndApply = () => {
     actions.triggerRefetch();
     actions.toggleFilter();
@@ -167,7 +162,7 @@ export const Filter = () => {
           </h3>
           <div className="space-y-2">
             {price_ranges.map((item) => {
-              const value = priceValueMap[item];
+              const value = PRICE_VALUE_MAP[item];
               return (
                 <label
                   key={item}
