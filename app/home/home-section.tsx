@@ -42,12 +42,19 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
     );
   };
 
+  const formatDataAmount = (amountInMB: number): string => {
+    if (amountInMB >= 1024 && amountInMB % 1024 === 0) {
+      return `${amountInMB / 1024}GB`;
+    }
+    return `${amountInMB}MB`;
+  };
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 md:w-[765px]">
       {cards.map((item) => (
         <DataItemCard
           key={item.id}
-          title={`${item.carrier} 데이터 ${item.dataAmount}MB`}
+          title={`${item.carrier} 데이터 ${formatDataAmount(item.dataAmount)}`}
           imageUrl={getCarrierImageUrl(item.carrier)}
           price={item.price}
           isNew={isToday(item.updatedAt)}
