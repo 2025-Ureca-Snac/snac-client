@@ -10,7 +10,7 @@ interface DataItem {
   createdAt: string;
   email: string;
   sellStatus: string;
-  cardCategory: string;
+  cardCategory: 'BUY' | 'SELL';
   carrier: string;
   dataAmount: number;
   price: number;
@@ -53,6 +53,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
           isNew={isToday(item.updatedAt)}
           unit={unit}
           email={item.email}
+          cardCategory={item.cardCategory}
           createdAt={item.createdAt}
           onClickBuy={handleBuy}
         />
