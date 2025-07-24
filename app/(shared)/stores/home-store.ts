@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | null;
-export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--'; // '--'는 "선택 안 함"
+export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--';
 export type SortBy = 'LATEST' | 'RATING';
 type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT' | null;
 type PriceRange =
@@ -17,6 +17,7 @@ interface HomeState {
   cardCategory: CardCategory;
   isFilterOpen: boolean;
   isCreateModalOpen: boolean;
+  refetchTrigger: number;
   category: Category;
   carrier: Carrier;
   sortBy: SortBy;
@@ -27,6 +28,7 @@ interface HomeState {
     setCardCategory: (category: CardCategory) => void;
     toggleFilter: () => void;
     toggleCreateModal: () => void;
+    triggerRefetch: () => void;
     setCategory: (category: Category) => void;
     setCarrier: (carrier: Carrier) => void;
     setSortBy: (sortBy: SortBy) => void;
@@ -42,6 +44,7 @@ export const homeInitialState = {
   cardCategory: 'SELL' as CardCategory,
   isFilterOpen: false,
   isCreateModalOpen: false,
+  refetchTrigger: 0,
   category: null,
   carrier: '--' as Carrier,
   sortBy: 'LATEST' as SortBy,
@@ -53,7 +56,11 @@ export const homeInitialState = {
 export const useHomeStore = create<HomeState>((set) => ({
   ...homeInitialState,
   actions: {
-    setCardCategory: (category) => set({ cardCategory: category }),
+    setCardCategory: (category) =>
+      set((state) => ({
+        cardCategory: category,
+        refetchTrigger: state.refetchTrigger + 1,
+      })),
     toggleFilter: () => set((state) => ({ isFilterOpen: !state.isFilterOpen })),
     toggleCreateModal: () =>
       set((state) => ({ isCreateModalOpen: !state.isCreateModalOpen })),
@@ -69,6 +76,8 @@ export const useHomeStore = create<HomeState>((set) => ({
       })),
     toggleShowRegularsOnly: () =>
       set((state) => ({ showRegularsOnly: !state.showRegularsOnly })),
+    triggerRefetch: () =>
+      set((state) => ({ refetchTrigger: state.refetchTrigger + 1 })),
     resetFilters: () =>
       set((state) => ({
         ...state,
