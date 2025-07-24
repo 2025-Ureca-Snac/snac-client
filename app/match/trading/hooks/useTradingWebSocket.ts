@@ -61,6 +61,115 @@ export function useTradingWebSocket() {
       onConnect: () => {
         console.log('✅ 거래 WebSocket 연결 성공');
         isConnected.current = true;
+
+        // 거래 관련 메시지 구독
+        stompClient.current?.subscribe('/user/queue/trade', (message) => {
+          console.log('📨 거래 응답 메시지 수신:', message.body);
+          try {
+            const response = JSON.parse(message.body);
+            console.log('📋 파싱된 응답 데이터:', response);
+          } catch (error) {
+            console.error('❌ 응답 메시지 파싱 실패:', error);
+          }
+        });
+
+        // 연결된 사용자 수 구독
+        stompClient.current?.subscribe('/topic/connected-users', (frame) => {
+          console.log('👥 전체 연결된 사용자 수:', frame.body);
+        });
+
+        stompClient.current?.subscribe(
+          '/user/queue/connected-users',
+          (frame) => {
+            console.log('👤 개인 연결된 사용자 수:', frame.body);
+          }
+        );
+
+        // 필터 정보 구독
+        stompClient.current?.subscribe('/user/queue/filters', (frame) => {
+          console.log('🔍 필터 정보 수신:', frame.body);
+          try {
+            const data = JSON.parse(frame.body);
+            console.log('📋 파싱된 필터 데이터:', data);
+          } catch (error) {
+            console.error('❌ 필터 JSON 파싱 오류:', error);
+          }
+        });
+
+        // 매칭 알림 구독 (cardDto 전용)
+        stompClient.current?.subscribe('/user/queue/matching', (frame) => {
+          console.log('🟢 매칭 알림 수신:', frame.body);
+          try {
+            const msg = JSON.parse(frame.body);
+            console.log('📋 매칭 카드 정보:', {
+              id: msg.id,
+              name: msg.name,
+              email: msg.email,
+              sellStatus: msg.sellStatus,
+              cardCategory: msg.cardCategory,
+              carrier: msg.carrier,
+              dataAmount: msg.dataAmount,
+              price: msg.price,
+              createdAt: msg.createdAt,
+              updatedAt: msg.updatedAt,
+            });
+          } catch (error) {
+            console.error('❌ 매칭 큐 파싱 오류:', error);
+          }
+        });
+
+        // 거래 알림 구독 (tradeDto 전용)
+        stompClient.current?.subscribe('/user/queue/trade', (frame) => {
+          console.log('🔔 거래 알림 수신:', frame.body);
+          try {
+            const msg = JSON.parse(frame.body);
+            console.log('📋 거래 상태 변경:', {
+              id: msg.id,
+              cardId: msg.cardId,
+              status: msg.status,
+              seller: msg.seller,
+              buyer: msg.buyer,
+              carrier: msg.carrier,
+              dataAmount: msg.dataAmount,
+              priceGb: msg.priceGb,
+              point: msg.point,
+              phone: msg.phone,
+              cancelReason: msg.cancelReason,
+            });
+          } catch (error) {
+            console.error('❌ 거래 큐 파싱 오류:', error);
+          }
+        });
+
+        // 에러 메시지 구독
+        stompClient.current?.subscribe('/user/queue/errors', (frame) => {
+          console.error('❗에러 메시지 수신:', frame.body);
+        });
+
+        // 거래 취소 알림 구독
+        stompClient.current?.subscribe('/user/queue/cancel', (frame) => {
+          console.log('⛔️ 거래 취소 알림 수신:', frame.body);
+          try {
+            const msg = JSON.parse(frame.body);
+            const trade = msg.tradeDto || {};
+            console.log('📋 거래 취소 정보:', {
+              id: trade.id,
+              cardId: trade.cardId,
+              seller: trade.seller,
+              buyer: trade.buyer,
+              status: trade.status,
+              cancelReason: trade.cancelReason,
+            });
+          } catch (error) {
+            console.error('❌ 취소 큐 파싱 오류:', error);
+          }
+        });
+
+        // 연결된 사용자 수 요청
+        stompClient.current?.publish({
+          destination: '/app/connected-users',
+          body: '',
+        });
       },
       onStompError: (frame) => {
         console.error('❌ STOMP 오류:', frame);
