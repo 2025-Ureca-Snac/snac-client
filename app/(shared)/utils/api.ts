@@ -41,6 +41,70 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// 응답 인터셉터: 401 에러 시 토큰 갱신 후 재시도
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    console.log('error', error);
+
+    // 401 에러이고 아직 재시도하지 않은 요청인 경우
+    if (error.response?.code === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        console.log('401 에러 감지, 토큰 갱신 시도');
+
+        // 토큰 갱신 시도
+        const { checkAndRefreshToken } = useAuthStore.getState();
+        const isRefreshed = await checkAndRefreshToken();
+
+        if (isRefreshed) {
+          // 토큰 갱신 성공 시 새로운 토큰으로 원래 요청 재시도
+          const newToken = useAuthStore.getState().token;
+          if (newToken && originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+
+          console.log('토큰 갱신 성공, 원래 요청 재시도');
+          return api(originalRequest);
+        } else {
+          // 토큰 갱신 실패 시 로그아웃 처리
+          console.log('토큰 갱신 실패, 로그아웃 처리');
+          const { logout } = useAuthStore.getState();
+          await logout();
+
+          // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+
+          return Promise.reject(error);
+        }
+      } catch (refreshError) {
+        console.error('토큰 갱신 중 오류:', refreshError);
+
+        // 토큰 갱신 중 오류 발생 시 로그아웃 처리
+        const { logout } = useAuthStore.getState();
+        await logout();
+
+        // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+
+        return Promise.reject(error);
+      }
+    }
+
+    // 401이 아닌 다른 에러이거나 이미 재시도한 요청인 경우
+    return Promise.reject(error);
+  }
+);
+
 /**
  * @author 이승우
  * @description 에러 처리 유틸리티
