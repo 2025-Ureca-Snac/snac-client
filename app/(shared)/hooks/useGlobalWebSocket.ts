@@ -297,7 +297,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
 
         // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트
         if (userRole === 'buyer' && props?.setActiveSellers) {
-          console.log('여기가 안오는거같은데 진짜 ??', userRole);
           props.setActiveSellers((prev: User[]) => {
             return prev.map((user) => {
               if (user.cardId === tradeData.cardId) {
@@ -316,6 +315,30 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
             });
           });
         }
+
+        // tradeData 정보로 partner를 바로 설정
+        console.log('🔄 partner 정보를 tradeData로 설정:', {
+          tradeId: tradeData.tradeId,
+          cardId: tradeData.cardId,
+          seller: tradeData.seller,
+          buyer: tradeData.buyer,
+        });
+
+        foundMatch({
+          tradeId: tradeData.tradeId,
+          buyer: tradeData.buyer,
+          seller: tradeData.seller,
+          cardId: tradeData.cardId,
+          carrier: tradeData.carrier || 'unknown',
+          dataAmount: tradeData.dataAmount || 0,
+          phone: tradeData.phone || '010-0000-0000',
+          point: tradeData.point || 0,
+          priceGb: tradeData.priceGb || 0,
+          sellerRatingScore: tradeData.sellerRatingScore || 1000,
+          status: tradeData.status || 'ACCEPTED',
+          cancelReason: tradeData.cancelReason || null,
+          type: 'seller' as const,
+        });
 
         // 서버 상태를 클라이언트 상태로 매핑
         let clientStatus = tradeData.status;

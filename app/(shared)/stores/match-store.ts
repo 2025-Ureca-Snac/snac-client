@@ -56,6 +56,7 @@ interface MatchState {
   setFilters: (filters: MatchFilters) => void;
   startMatching: () => void;
   foundMatch: (partner: MatchPartner) => void;
+  updatePartner: (updates: Partial<MatchPartner>) => void; // partner 업데이트 함수 추가
   startTrading: () => void;
   setTradingStep: (step: TradingStep) => void;
   setTimeLeft: (time: number) => void;
@@ -103,6 +104,11 @@ export const useMatchStore = create<MatchState>()(
           tradingStep: 'confirmation',
           timeLeft: 300,
         }),
+
+      updatePartner: (updates) =>
+        set((state) => ({
+          partner: state.partner ? { ...state.partner, ...updates } : null,
+        })),
 
       startTrading: () => set({ status: 'trading' }),
 

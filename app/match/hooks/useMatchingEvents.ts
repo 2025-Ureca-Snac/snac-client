@@ -345,6 +345,30 @@ export function useMatchingEvents({
           });
         }
 
+        // tradeData 정보로 partner를 바로 설정
+        console.log('🔄 partner 정보를 tradeData로 설정:', {
+          tradeId: tradeData.tradeId,
+          cardId: tradeData.cardId,
+          seller: tradeData.seller,
+          buyer: tradeData.buyer,
+        });
+
+        foundMatch({
+          tradeId: tradeData.tradeId,
+          buyer: tradeData.buyer,
+          seller: tradeData.seller,
+          cardId: tradeData.cardId,
+          carrier: tradeData.carrier || 'unknown',
+          dataAmount: tradeData.dataAmount || 0,
+          phone: tradeData.phone || '010-0000-0000',
+          point: tradeData.point || 0,
+          priceGb: tradeData.priceGb || 0,
+          sellerRatingScore: tradeData.sellerRatingScore || 1000,
+          status: tradeData.status || 'ACCEPTED',
+          cancelReason: tradeData.cancelReason || null,
+          type: 'seller' as const,
+        });
+
         // 서버 상태를 클라이언트 상태로 매핑
         let clientStatus = tradeData.status;
         if (tradeData.status === 'BUY_REQUESTED') {

@@ -65,12 +65,7 @@ export default function TradingPage() {
       return;
     }
     // partner 정보 유효성 검증
-    if (
-      !partner.tradeId ||
-      !partner.carrier ||
-      !partner.dataAmount ||
-      !partner.priceGb
-    ) {
+    if (!partner.carrier || !partner.dataAmount || !partner.priceGb) {
       console.warn('❌ 불완전한 거래 정보:', partner);
       alert('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
       router.push('/match');
