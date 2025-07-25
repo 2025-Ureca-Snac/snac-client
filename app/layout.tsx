@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
+
+import { Toaster } from 'sonner';
+
 import WwwRedirect from './(shared)/components/www-redirect';
 
 const notoSansKr = Noto_Sans_KR({
@@ -23,7 +26,9 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${notoSansKr.className} antialiased`}>
         <WwwRedirect />
-        <div className="w-full  md:max-w-[1440px] mx-auto ">{children}</div>
+        <div className="w-full  md:max-w-[1440px] mx-auto ">
+          {children} <Toaster richColors position="top-center" />
+        </div>
       </body>
     </html>
   );

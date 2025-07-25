@@ -11,7 +11,13 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       role: null,
+      tokenExp: null,
       isLoading: false,
+
+      // 초기화 함수
+      resetAuthState: () => {
+        set({ user: null, role: null, token: null, tokenExp: null });
+      },
 
       // 로그인 액션
       login: async (email: string, password: string) => {
@@ -27,10 +33,16 @@ export const useAuthStore = create<AuthState>()(
           const token = response.headers.get('Authorization')?.split(' ')[1];
           if (token) {
             const decoded: JwtPayload = jwtDecode(token);
-            set({ user: decoded?.username, role: decoded?.role, token: token });
+
+            set({
+              user: decoded?.username,
+              role: decoded?.role,
+              token: token,
+              tokenExp: decoded?.exp, // 토큰 만료 시간 저장
+            });
           }
         } catch (error) {
-          set({ user: null, role: null, token: null });
+          useAuthStore.getState().resetAuthState();
           console.log(handleApiError(error));
         } finally {
           set({ isLoading: false });
@@ -89,11 +101,12 @@ export const useAuthStore = create<AuthState>()(
                       user: decoded?.username,
                       role: decoded?.role,
                       token: token,
+                      tokenExp: decoded?.exp, // 토큰 만료 시간 저장
                     });
                     console.log('소셜 로그인 성공:', response);
                     resolve(true);
                   } else {
-                    set({ user: null, role: null, token: null });
+                    useAuthStore.getState().resetAuthState();
                     reject(new Error('소셜 로그인에 실패했습니다.'));
                   }
                 } catch (error) {
@@ -142,7 +155,44 @@ export const useAuthStore = create<AuthState>()(
 
         console.log(response);
 
-        set({ user: null, role: null, token: null });
+        useAuthStore.getState().resetAuthState();
+        const { useUserStore } = await import('../stores/user-store');
+        useUserStore.getState().clearProfile();
+        
+      },
+
+      // 토큰 갱신
+      checkAndRefreshToken: async () => {
+        const { token } = useAuthStore.getState();
+        if (!token) return false;
+
+        try {
+          // 만료시간 상관없이 항상 /reissue 호출
+          console.log('토큰 갱신 요청');
+          const response = await api.post('/reissue');
+
+          // 새로운 토큰이 헤더에 포함되어 있는지 확인
+          const newToken = response.headers.get('Authorization')?.split(' ')[1];
+          if (newToken) {
+            // 새로운 토큰이 발급된 경우 저장
+            const decoded: JwtPayload = jwtDecode(newToken);
+            set({
+              token: newToken,
+              tokenExp: decoded?.exp,
+            });
+            console.log('새로운 토큰으로 갱신 완료');
+            return true;
+          } else {
+            // 새로운 토큰이 없는 경우 기존 토큰 유지
+            console.log('새로운 토큰이 발급되지 않음, 기존 토큰 유지');
+            return true;
+          }
+        } catch (error) {
+          // /reissue 실패 시 로그아웃
+          console.error('토큰 갱신 실패:', error);
+          useAuthStore.getState().resetAuthState();
+          return false;
+        }
       },
 
       // 로딩 상태 설정
@@ -157,6 +207,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         token: state.token,
         role: state.role,
+        tokenExp: state.tokenExp,
       }),
     }
   )

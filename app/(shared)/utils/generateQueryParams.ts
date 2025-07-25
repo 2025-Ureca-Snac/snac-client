@@ -1,43 +1,48 @@
-interface GenerateQueryParamsOptions {
-  category?: string | null;
-  transactionStatus?: string | null;
-  priceRanges: string[];
-  sortBy?: string;
-  page?: number;
-  size?: number;
+export type CardCategory = 'BUY' | 'SELL';
+export type PriceRange =
+  | 'ALL'
+  | 'P0_999'
+  | 'P1000_1499'
+  | 'P1500_1999'
+  | 'P2000_2499'
+  | 'P2500_PLUS';
+export type SellStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
+export type Carrier = 'SKT' | 'KT' | 'LG';
+
+export interface GenerateQueryParamsOptions {
+  cardCategory: CardCategory; // 필수
+  priceRanges: PriceRange[]; // 필수
+  sellStatusFilter: SellStatus; // 필수
+  highRatingFirst?: boolean; // 선택
+  size?: number; // 선택
+  carrier?: Carrier; // 선택
+  lastCardId?: number; // 선택
+  lastUpdatedAt?: string; // 선택
 }
 
 export function generateQueryParams({
-  category,
-  transactionStatus,
+  cardCategory,
   priceRanges,
-  sortBy,
-  page = 1,
+  sellStatusFilter,
+  highRatingFirst = true,
   size = 54,
+  carrier,
+  lastCardId,
+  lastUpdatedAt,
 }: GenerateQueryParamsOptions): string {
   const params = new URLSearchParams();
 
-  if (category) params.append('cardCategory', category);
-  if (transactionStatus) params.append('sellStatusFilter', transactionStatus);
-  if (sortBy) params.append('sortBy', sortBy);
-  if (page) params.append('page', page.toString());
-  if (size) params.append('size', size.toString());
+  params.append('cardCategory', cardCategory);
+  priceRanges.forEach((range) => params.append('priceRanges', range));
+  params.append('sellStatusFilter', sellStatusFilter);
 
-  if (priceRanges.length > 0 && !priceRanges.includes('모든 가격')) {
-    const parsedRanges = priceRanges
-      .map((range) => {
-        if (range === '₩ 0 - 999') return '0-999';
-        if (range === '₩ 1,000 - 1,499') return '1000-1499';
-        if (range === '₩ 1,500 - 1,999') return '1500-1999';
-        if (range === '₩ 2,000 - 2,499') return '2000-2499';
-        if (range === '₩ 2,500+') return '2500-';
-        return '';
-      })
-      .filter(Boolean)
-      .join(',');
+  params.append('highRatingFirst', highRatingFirst.toString());
+  params.append('size', size.toString());
 
-    params.append('priceRanges', parsedRanges);
-  }
+  if (carrier) params.append('carrier', carrier);
+  if (lastCardId !== undefined)
+    params.append('lastCardId', lastCardId.toString());
+  if (lastUpdatedAt) params.append('lastUpdatedAt', lastUpdatedAt);
 
   return params.toString();
 }
