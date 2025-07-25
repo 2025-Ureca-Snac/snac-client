@@ -132,7 +132,7 @@ export const Filter = () => {
           </div>
         </div>
 
-        <div className="space-y-3">
+        {/* <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
             판매자 필터
           </h3>
@@ -147,7 +147,7 @@ export const Filter = () => {
               className="h-6 w-6 rounded border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
             />
           </label>
-        </div>
+        </div> */}
 
         <div className="space-y-3">
           <h3 className="text-regular-md md:text-medium-md text-midnight-black">
