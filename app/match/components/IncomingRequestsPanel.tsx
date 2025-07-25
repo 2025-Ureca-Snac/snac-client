@@ -7,7 +7,7 @@ import { TradeRequest } from '../types/match';
 interface IncomingRequestsPanelProps {
   requests: TradeRequest[];
   sellerInfo: SellerRegistrationInfo;
-  onRequestResponse: (requestId: string, accept: boolean) => void;
+  onRequestResponse: (requestId: number, accept: boolean) => void;
 }
 
 export default function IncomingRequestsPanel({
@@ -27,7 +27,7 @@ export default function IncomingRequestsPanel({
           <div className="space-y-3">
             {requests.map((request) => (
               <RequestCard
-                key={request.id}
+                key={request.tradeId}
                 request={request}
                 sellerInfo={sellerInfo}
                 onRequestResponse={onRequestResponse}
@@ -48,7 +48,7 @@ function RequestCard({
 }: {
   request: TradeRequest;
   sellerInfo: SellerRegistrationInfo;
-  onRequestResponse: (requestId: string, accept: boolean) => void;
+  onRequestResponse: (requestId: number, accept: boolean) => void;
 }) {
   return (
     <div className="bg-white border border-yellow-200 rounded-lg p-4">
@@ -92,21 +92,19 @@ function RequestCard({
           </div>
 
           {/* 거래 ID */}
-          <p className="text-xs text-gray-500">
-            거래 ID: {request.id.replace('trade_', '')}
-          </p>
+          <p className="text-xs text-gray-500">거래 ID: {request.tradeId}</p>
         </div>
 
         {/* 액션 버튼 */}
         <div className="flex flex-col space-y-2 ml-4">
           <button
-            onClick={() => onRequestResponse(request.id, true)}
+            onClick={() => onRequestResponse(request.tradeId, true)}
             className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
           >
             ✅ 수락
           </button>
           <button
-            onClick={() => onRequestResponse(request.id, false)}
+            onClick={() => onRequestResponse(request.tradeId, false)}
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
           >
             ❌ 거부

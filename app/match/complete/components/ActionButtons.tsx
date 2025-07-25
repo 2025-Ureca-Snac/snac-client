@@ -42,7 +42,7 @@ export default function ActionButtons() {
           마이페이지에서 모든 거래 내역을 확인할 수 있습니다.
         </p>
         <button
-          onClick={() => router.push('/myPage')}
+          onClick={() => router.push('/mypage')}
           className="mt-3 text-sm text-blue-600 hover:text-blue-700 hover:underline"
         >
           거래 내역 보기 →

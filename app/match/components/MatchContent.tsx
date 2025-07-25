@@ -27,7 +27,7 @@ interface MatchContentProps {
   onToggleSellerStatus: () => void;
   onGoBackToSearch: () => void;
   onUserClick: ((user: User) => void) | undefined;
-  onRequestResponse: (requestId: string, accept: boolean) => void;
+  onRequestResponse: (requestId: number, accept: boolean) => void;
 }
 
 export default function MatchContent({
