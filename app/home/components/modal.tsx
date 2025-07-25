@@ -3,7 +3,7 @@
 import { useState, Fragment } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Dialog, Transition, RadioGroup } from '@headlessui/react';
-import { useRouter } from 'next/navigation';
+
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
@@ -12,13 +12,13 @@ type CardCategory = 'SELL' | 'BUY' | '';
 type Carrier = 'SKT' | 'KT' | 'LGU+' | '';
 type DataUnit = 'MB' | 'GB';
 
-const carrierOptions: { name: Carrier; imageUrl: string }[] = [
-  { name: 'SKT', imageUrl: '/SKT.svg' },
-  { name: 'KT', imageUrl: '/KT.svg' },
-  { name: 'LGU+', imageUrl: '/LGU+.svg' },
+const CARRIER_OPTIONS: { name: Carrier; imageUrl: string }[] = [
+  { name: 'SKT', imageUrl: '/SKT.png' },
+  { name: 'KT', imageUrl: '/KT.png' },
+  { name: 'LGU+', imageUrl: '/LG.png' },
 ];
 
-const dataPresets = ['500MB', '1GB', '2GB'];
+const dataPresets = ['1GB', '2GB'];
 
 const CheckboxIcon = ({ checked }: { checked: boolean }) => (
   <div
@@ -42,7 +42,6 @@ const CheckboxIcon = ({ checked }: { checked: boolean }) => (
 
 export const Modal = () => {
   const { isCreateModalOpen, actions } = useHomeStore();
-  const router = useRouter();
 
   const [cardCategory, setCardCategory] = useState<CardCategory>('');
   const [carrier, setCarrier] = useState<Carrier>('');
@@ -81,6 +80,32 @@ export const Modal = () => {
     setDataUnit(unit);
   };
 
+  const handleDataUnitChange = (newUnit: DataUnit) => {
+    // 입력값이 비어있으면 단위만 변경합니다.
+    if (dataAmount === '') {
+      setDataUnit(newUnit);
+      return;
+    }
+
+    const currentAmount = parseFloat(dataAmount);
+
+    // 유효한 숫자가 아니거나 0이면 단위만 변경합니다.
+    if (isNaN(currentAmount) || currentAmount === 0) {
+      setDataUnit(newUnit);
+      return;
+    }
+
+    let newAmount = currentAmount;
+    if (dataUnit === 'GB' && newUnit === 'MB') {
+      newAmount = currentAmount * 1024; // GB -> MB
+    } else if (dataUnit === 'MB' && newUnit === 'GB') {
+      newAmount = Math.round((currentAmount / 1024) * 1000) / 1000; // MB -> GB, 소수점 3자리까지 반올림
+    }
+
+    setDataAmount(String(newAmount));
+    setDataUnit(newUnit);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -108,24 +133,25 @@ export const Modal = () => {
 
     setIsLoading(true);
 
-    const dataAmountInGB =
-      dataUnit === 'MB' ? numericDataAmount / 1024 : numericDataAmount;
+    const carrierForApi = carrier === 'LGU+' ? 'LG' : carrier;
+
+    const dataAmountInMB =
+      dataUnit === 'GB' ? numericDataAmount * 1024 : numericDataAmount;
     const cards = {
       cardCategory: cardCategory,
-      carrier: carrier === 'LGU+' ? 'LG' : carrier,
-      dataAmount: Math.round(dataAmountInGB),
+      carrier: carrierForApi,
+      dataAmount: Math.round(dataAmountInMB),
       price: Number(price),
     };
 
     console.log('서버로 전송하는 최종 데이터:', cards);
 
     try {
-      // cards 객체를 서버로 전송합니다.
-      // const response = await api.get('/health');
       await api.post('/cards', cards);
       toast.success('상품이 성공적으로 등록되었습니다.');
+
+      actions.triggerRefetch();
       handleClose();
-      router.refresh();
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -201,18 +227,18 @@ export const Modal = () => {
                         className="cursor-pointer"
                       >
                         {({ checked }) => (
-                          <label className="flex items-center">
+                          <span className="flex items-center">
                             <CheckboxIcon checked={checked} />
                             <span className="ml-2 text-regular-sm">팝니다</span>
-                          </label>
+                          </span>
                         )}
                       </RadioGroup.Option>
                       <RadioGroup.Option value="BUY" className="cursor-pointer">
                         {({ checked }) => (
-                          <label className="flex items-center">
+                          <span className="flex items-center">
                             <CheckboxIcon checked={checked} />
                             <span className="ml-2 text-regular-sm">삽니다</span>
-                          </label>
+                          </span>
                         )}
                       </RadioGroup.Option>
                     </div>
@@ -223,14 +249,14 @@ export const Modal = () => {
                       통신사
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-4">
-                      {carrierOptions.map((option) => (
+                      {CARRIER_OPTIONS.map((option) => (
                         <RadioGroup.Option
                           key={option.name}
                           value={option.name}
                           className="cursor-pointer"
                         >
                           {({ checked }) => (
-                            <label className="flex items-center">
+                            <span className="flex items-center">
                               <CheckboxIcon checked={checked} />
                               <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ml-2">
                                 <Image
@@ -243,7 +269,7 @@ export const Modal = () => {
                               <span className="ml-1 text-regular-sm">
                                 {option.name}
                               </span>
-                            </label>
+                            </span>
                           )}
                         </RadioGroup.Option>
                       ))}
@@ -291,7 +317,7 @@ export const Modal = () => {
                       <select
                         value={dataUnit}
                         onChange={(e) =>
-                          setDataUnit(e.target.value as DataUnit)
+                          handleDataUnitChange(e.target.value as DataUnit)
                         }
                         className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                         aria-label="데이터 단위 선택"

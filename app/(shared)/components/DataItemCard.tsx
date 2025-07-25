@@ -12,6 +12,7 @@ interface DataItemCardProps {
   unit: PriceUnit;
   email: string;
   createdAt: string;
+  cardCategory: 'BUY' | 'SELL';
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
   isNew?: boolean;
   newBadgeText?: string;
@@ -25,9 +26,10 @@ export const DataItemCard = ({
   price,
   email,
   createdAt,
+  cardCategory,
   isNew,
   newBadgeText = 'NEW',
-  buyButtonText = '구매하기',
+  buyButtonText,
   onClickBuy,
 }: DataItemCardProps) => {
   const displayPrice =
@@ -45,6 +47,14 @@ export const DataItemCard = ({
     ) : (
       <>₩{price.toLocaleString()}</>
     );
+
+  const isBuyView = cardCategory === 'BUY';
+  const finalButtonText =
+    buyButtonText ?? (isBuyView ? '판매하기' : '구매하기');
+
+  const buttonColorClass = isBuyView
+    ? 'bg-candy-pink hover:bg-[#ff93c4]'
+    : 'bg-gray-900 hover:bg-gray-800';
   return (
     <div className="transition-transform duration-300 hover:-translate-y-[2px] hover:scale-[1.03] relative bg-[#F3F5F7] rounded-2xl shadow-md w-card-sm h-card-sm md:w-card-md md:h-card-md flex flex-col p-3">
       {isNew && (
@@ -76,9 +86,9 @@ export const DataItemCard = ({
           onClick={() => {
             onClickBuy({ email, createdAt });
           }}
-          className="w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md bg-gray-900 hover:bg-gray-800 transition text-regular-md border rounded-lg flex items-center justify-center"
+          className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition text-regular-md border rounded-lg flex items-center justify-center`}
         >
-          {buyButtonText}
+          {finalButtonText}
         </Button>
       </div>
     </div>
