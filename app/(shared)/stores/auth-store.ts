@@ -142,7 +142,12 @@ export const useAuthStore = create<AuthState>()(
 
         console.log(response);
 
+        // auth-store 초기화
         set({ user: null, role: null, token: null });
+
+        // user-store 초기화
+        const { useUserStore } = await import('../stores/user-store');
+        useUserStore.getState().clearProfile();
       },
 
       // 로딩 상태 설정
