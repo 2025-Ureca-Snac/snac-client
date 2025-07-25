@@ -98,6 +98,10 @@ export default function TradeConfirmationModal({
       setModalState('success');
 
       // 상대방 정보를 store에 저장하고 trading 페이지로 이동
+      console.log(partner, 'partner');
+      console.log(seller, 'seller');
+
+      // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
         console.log('🔍 partner 객체 정보:', {
           tradeId: partner.tradeId,
@@ -124,6 +128,44 @@ export default function TradeConfirmationModal({
           point: profile?.points || 0, // 현재 사용자 포인트
           priceGb: partner.priceGb,
           sellerRatingScore: partner.sellerRatingScore,
+          status: 'ACCEPTED',
+          cancelReason: null,
+          type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
+        };
+
+        console.log('🔥 partnerInfo:', partnerInfo);
+        foundMatch(partnerInfo);
+
+        // 1초 후 trading 페이지로 이동
+        setTimeout(() => {
+          router.push('/match/trading');
+        }, 1000);
+      } else if (seller) {
+        console.log('🔍 seller 객체 정보:', {
+          tradeId: seller.tradeId,
+          cardId: seller.cardId,
+          name: seller.name,
+          email: seller.email,
+          전체_데이터: seller,
+        });
+        console.log('🔍 profile 정보:', {
+          email: profile?.email,
+          phone: profile?.phone,
+          points: profile?.points,
+          전체_데이터: profile,
+        });
+        console.log(seller, profile, '아아다닷');
+        const partnerInfo = {
+          tradeId: seller.tradeId,
+          buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
+          seller: seller.email || seller.name || 'unknown_seller', // 판매자 이메일
+          cardId: seller.cardId, // cardId
+          carrier: seller.carrier,
+          dataAmount: seller.data,
+          phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
+          point: profile?.points || 0, // 현재 사용자 포인트
+          priceGb: seller.price,
+          sellerRatingScore: seller.rating || 1000,
           status: 'ACCEPTED',
           cancelReason: null,
           type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
