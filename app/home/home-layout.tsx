@@ -23,6 +23,7 @@ interface Card {
   dataAmount: number;
   price: number;
   updatedAt: string;
+  ratingScore: number;
 }
 
 interface HomeLayoutProps {
