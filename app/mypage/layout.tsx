@@ -3,6 +3,10 @@
 import { Header } from '../(shared)/components/Header';
 import { usePathname, useRouter } from 'next/navigation';
 
+/**
+ * @author 이승우
+ * @description 마이페이지 레이아웃
+ */
 export default function MyPageLayout({
   children,
 }: {

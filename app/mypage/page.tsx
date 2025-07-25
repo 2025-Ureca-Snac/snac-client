@@ -15,13 +15,32 @@ import ThemeModal from '../(shared)/components/ThemeModal';
 import React, { useEffect } from 'react';
 import { useUserStore } from '../(shared)/stores/user-store';
 import { useModalStore } from '../(shared)/stores/modal-store';
+import { useAuthStore } from '../(shared)/stores/auth-store';
+import { useRouter } from 'next/navigation';
 
 const FAVORITES = Array(12).fill('데이터바삭이');
 
+/**
+ * @author 이승우
+ * @description 마이페이지 페이지
+ */
 export default function MyPage() {
   const { profile, updatePreferences, updateProfile, setProfile } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();
+  const { logout } = useAuthStore();
+  const router = useRouter();
+
+  // 로그아웃 핸들러
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      alert('로그아웃 중 오류가 발생했습니다.');
+    }
+  };
 
   // 테스트용 사용자 데이터 설정
   useEffect(() => {
@@ -88,7 +107,10 @@ export default function MyPage() {
               <SettingList onItemClick={handleSettingClick} />
               {/* 하단 버튼들 */}
               <div className="flex flex-col gap-3 mt-6">
-                <button className="w-full py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg hover:bg-yellow-700 transition-colors">
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg hover:bg-yellow-700 transition-colors"
+                >
                   로그아웃
                 </button>
                 <button className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg">
