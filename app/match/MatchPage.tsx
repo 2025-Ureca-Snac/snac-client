@@ -74,12 +74,8 @@ export default function MatchPage() {
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
 
-  const userRole =
-    appliedFilters.transactionType[0] === '구매자'
-      ? 'buyer'
-      : appliedFilters.transactionType[0] === '판매자'
-        ? 'seller'
-        : 'buyer';
+  // store에서 userRole 가져오기
+  const { userRole, setUserRole } = useMatchStore();
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
@@ -130,7 +126,8 @@ export default function MatchPage() {
     createTrade,
     sendPayment,
     sendTradeConfirm,
-    updateUserRole,
+    activatePage,
+    deactivatePage,
   } = useGlobalWebSocket({
     appliedFilters,
     setIncomingRequests,
@@ -140,21 +137,28 @@ export default function MatchPage() {
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
   });
 
+  // MatchPage 활성화
+  useEffect(() => {
+    activatePage('match', handleTradeStatusChange);
+    return () => {
+      deactivatePage('match');
+    };
+  }, [activatePage, deactivatePage, handleTradeStatusChange]);
+
   // WebSocket 함수들을 store에 저장
   useEffect(() => {
     setWebSocketFunctions({ sendPayment, sendTradeConfirm });
   }, [sendPayment, sendTradeConfirm, setWebSocketFunctions]);
 
-  // userRole이 변경될 때마다 전역 소켓에 업데이트
+  // userRole이 변경될 때마다 로그 출력
   useEffect(() => {
-    console.log('🔄 MatchPage useEffect 실행:', {
+    console.log(
+      '🔄 MatchPage userRole 변경:',
       userRole,
-      updateUserRole: !!updateUserRole,
-    });
-    if (updateUserRole) {
-      updateUserRole(userRole);
-    }
-  }, [userRole]); // updateUserRole 의존성 제거
+      '타입:',
+      typeof userRole
+    );
+  }, [userRole]);
 
   // 필터 핸들러
   const handleFilterChange = useCallback(
@@ -165,7 +169,7 @@ export default function MatchPage() {
       if (filters.transactionType.length > 0) {
         setAppliedFilters(filters);
 
-        // userRole이 변경될 때마다 전역 소켓에 즉시 업데이트
+        // userRole이 변경될 때마다 store에 즉시 업데이트
         const newUserRole =
           filters.transactionType[0] === '구매자'
             ? 'buyer'
@@ -173,10 +177,10 @@ export default function MatchPage() {
               ? 'seller'
               : null;
         console.log('🎯 필터 변경 시 userRole 업데이트:', newUserRole);
-        updateUserRole(newUserRole);
+        setUserRole(newUserRole);
       }
     },
-    [updateUserRole]
+    [setUserRole]
   );
 
   const handleApplyFilters = useCallback(() => {
@@ -333,7 +337,6 @@ export default function MatchPage() {
       <Header />
       <main className="flex-1">
         <MatchContent
-          userRole={userRole}
           appliedFilters={appliedFilters}
           pendingFilters={pendingFilters}
           onFilterChange={handleFilterChange}

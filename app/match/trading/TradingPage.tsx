@@ -45,19 +45,81 @@ const SELLER_TRADING_STEPS: TradingStep[] = [
 
 export default function TradingPage() {
   const router = useRouter();
-  const { partner, sendTradeConfirm } = useMatchStore();
+  const { partner, sendTradeConfirm, setUserRole, userRole } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
-  // 전역 WebSocket 연결 유지
-  useGlobalWebSocket();
 
   // 현재 사용자가 판매자인지 구매자인지 판단
   // partner.buyer가 현재 사용자라면 구매자, partner.seller가 현재 사용자라면 판매자
   const { user } = useAuthStore();
   const isSeller = partner?.seller === user;
+
+  // 전역 WebSocket 연결 유지
+  const { activatePage, deactivatePage } = useGlobalWebSocket({
+    onTradeStatusChange: (status, tradeData) => {
+      console.log('🔔 거래 상태 변경 오는거맞냐:', {
+        status,
+        tradeData,
+        userRole,
+        isSeller,
+      });
+      console.log('userRole확인!!!:', userRole);
+      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동
+      if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
+        console.log('💰 결제 확인됨 - show_phone 단계로 이동');
+        setCurrentStep('show_phone');
+      } else {
+        console.log('❌ 조건 불일치:', {
+          status,
+          userRole,
+          isSeller,
+          isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
+          isSellerRole: userRole === 'seller',
+        });
+      }
+    },
+  });
+
+  // TradingPage 활성화
+  useEffect(() => {
+    activatePage('trading', (status, tradeData) => {
+      console.log('🔔 거래 상태 변경 오는거맞냐:', {
+        status,
+        tradeData,
+        userRole,
+        isSeller,
+      });
+      console.log('userRole확인!!!:', userRole);
+      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동
+      if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
+        console.log('💰 결제 확인됨 - show_phone 단계로 이동');
+        setCurrentStep('show_phone');
+      } else {
+        console.log('❌ 조건 불일치:', {
+          status,
+          userRole,
+          isSeller,
+          isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
+          isSellerRole: userRole === 'seller',
+        });
+      }
+    });
+    return () => {
+      deactivatePage('trading');
+    };
+  }, [activatePage, deactivatePage, userRole, isSeller, setCurrentStep]);
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
+
+  // userRole 설정
+  useEffect(() => {
+    if (partner) {
+      const role = isSeller ? 'seller' : 'buyer';
+      setUserRole(role);
+      console.log('🔄 userRole 설정:', role);
+    }
+  }, [partner, isSeller, setUserRole]);
 
   // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
   useEffect(() => {
