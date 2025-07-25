@@ -27,9 +27,9 @@ export default function Login() {
   useEffect(() => {
     // 이미 로그인된 상태라면 메인 페이지로 리다이렉트
     if (user) {
-      //router.push('/');
+      router.push('/');
     }
-  }, [user]);
+  }, [user, router]);
 
   const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setId(e.target.value);
@@ -48,7 +48,7 @@ export default function Login() {
     try {
       await login(id, password);
       // 로그인 성공 시 메인 페이지로 이동
-      router.push('/');
+      //router.push('/');
     } catch (error) {
       // 에러는 스토어에서 처리됨
       console.error('로그인 실패:', error);
