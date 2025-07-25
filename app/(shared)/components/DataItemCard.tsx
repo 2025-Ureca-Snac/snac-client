@@ -68,7 +68,7 @@ export const DataItemCard = ({
         </span>
       )}
       {isMyPost && (
-        <span className="absolute top-3 right-3 z-10 bg-gray-400   text-white text-regular-2xs md:text-regular-xs  w-[47px]  md:w-[57px] h-[20px] md:h-[24px]  rounded-[16px] font-bold px-1 py-1 flex items-center justify-center ">
+        <span className="absolute top-3 right-3 z-10 bg-gray-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center ">
           작성자
         </span>
       )}
