@@ -15,6 +15,7 @@ interface DataItemCardProps {
   createdAt: string;
   cardCategory: 'BUY' | 'SELL';
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
+  ratingScore: number;
   isNew?: boolean;
   newBadgeText?: string;
   buyButtonText?: string;
@@ -28,6 +29,7 @@ export const DataItemCard = ({
   email,
   createdAt,
   cardCategory,
+  ratingScore,
   isNew,
   newBadgeText = 'NEW',
   buyButtonText,
@@ -85,6 +87,9 @@ export const DataItemCard = ({
         </h3>
         <p className="text-medium-sm md:text-medium-sm text-gray-900 h-6 flex items-center">
           {displayPrice}
+        </p>
+        <p className="text-regular-2xs text-gray-500">
+          바삭스코어 {ratingScore}
         </p>
       </div>
 
