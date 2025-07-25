@@ -1,10 +1,10 @@
 'use client';
 
+import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 import { PriceUnit } from '@/app/(shared)/types';
-import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 
 interface DataItemCardProps {
   imageUrl: string;
