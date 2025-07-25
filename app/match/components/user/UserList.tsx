@@ -24,7 +24,7 @@ export default function UserList({ users, onUserClick }: UserListProps) {
   return (
     <div className="space-y-4">
       {users.map((user) => (
-        <UserCard key={user.id} user={user} onClick={onUserClick} />
+        <UserCard key={user.tradeId} user={user} onClick={onUserClick} />
       ))}
     </div>
   );

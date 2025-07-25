@@ -1,19 +1,16 @@
 'use client';
 
 import React from 'react';
-
-interface Partner {
-  id: string;
-  name: string;
-  carrier: string;
-  data: number;
-  price: number;
-  rating: number;
-  transactionCount: number;
-}
+import { MatchPartner } from '@/app/(shared)/stores/match-store';
 
 interface TransactionSummaryProps {
-  partner: Partner;
+  partner: MatchPartner & {
+    name: string;
+    data: number;
+    price: number;
+    rating: number;
+    transactionCount: string;
+  };
   transactionId: string;
   completedAt: string;
 }
