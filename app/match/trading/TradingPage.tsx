@@ -72,7 +72,6 @@ export default function TradingPage() {
       return;
     }
 
-    console.log('✅ 유효한 거래 정보 확인:', partner);
     setIsValidPartner(true);
   }, [partner, router]);
 

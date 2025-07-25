@@ -80,7 +80,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       if (authStorage) {
         const parsed = JSON.parse(authStorage);
         if (parsed.state?.token) {
-          console.log('✅ auth-storage에서 토큰 발견');
           return parsed.state.token;
         }
       }
@@ -92,7 +91,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         localStorage.getItem('jwt');
 
       if (fallbackToken) {
-        console.log('✅ fallback 위치에서 토큰 발견');
         return fallbackToken;
       }
 
@@ -238,7 +236,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         console.log(user, '야여기2');
 
         if (userRole === 'buyer' && props?.setActiveSellers) {
-          console.log('실행되냐?');
           props.setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
@@ -316,14 +313,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           });
         }
 
-        // tradeData 정보로 partner를 바로 설정
-        console.log('🔄 partner 정보를 tradeData로 설정:', {
-          tradeId: tradeData.tradeId,
-          cardId: tradeData.cardId,
-          seller: tradeData.seller,
-          buyer: tradeData.buyer,
-        });
-
         foundMatch({
           tradeId: tradeData.tradeId,
           buyer: tradeData.buyer,
@@ -386,13 +375,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
 
         // 구매자용: 거래 수락인 경우
-        console.log('여기오냐1');
         if (userRole === 'buyer' && tradeData.status === 'SELL_APPROVED') {
           if (props?.setMatchingStatus) {
             props.setMatchingStatus('matched');
           }
-          console.log('여기오냐2');
-          console.log(tradeData, 'tradeData');
           // null/undefined 체킹 후 안전하게 foundMatch 호출
           if (
             tradeData &&
@@ -561,7 +547,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const registerSellerCard = useCallback(
     (sellerInfo: { carrier: string; dataAmount: number; price: number }) => {
       if (!globalStompClient?.connected || userRole !== 'seller') {
-        console.log('여기서 걸리냐?', userRole, globalStompClient);
         return;
       }
 

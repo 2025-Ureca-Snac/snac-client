@@ -152,7 +152,6 @@ export default function MatchPage() {
       updateUserRole: !!updateUserRole,
     });
     if (updateUserRole) {
-      console.log('여기서 실행되냐?');
       updateUserRole(userRole);
     }
   }, [userRole]); // updateUserRole 의존성 제거
@@ -199,29 +198,6 @@ export default function MatchPage() {
       setHasStartedSearch(true);
       setActiveSellers([]); // 🔧 기존 판매자 목록 초기화
 
-      // 실제 서버에 구매자 필터 등록
-      console.log('📡 구매자 필터 서버 등록 중...');
-      console.log('🔍 필터 원본 데이터:', pendingFilters);
-      console.log('🔧 변환된 서버 데이터:', {
-        carrier: (() => {
-          const carrier = pendingFilters.carrier[0];
-          return carrier === 'LGU+' ? 'LG' : carrier || 'ALL';
-        })(),
-        dataAmount: parseInt(
-          pendingFilters.dataAmount[0]?.replace(/[^0-9]/g, '') || '1'
-        ),
-        priceRange: (() => {
-          const price = pendingFilters.price[0];
-          if (!price) return 'ALL';
-          if (price.includes('0 - 999')) return 'P0_999';
-          if (price.includes('1,000 - 1,499')) return 'P1000_1499';
-          if (price.includes('1,500 - 1,999')) return 'P1500_1999';
-          if (price.includes('2,000 - 2,499')) return 'P2000_2499';
-          if (price.includes('2,500 이상')) return 'P2500_PLUS';
-          return 'ALL';
-        })(),
-      });
-
       // 서버에 필터 등록 후 WebSocket을 통해 매칭 결과 수신 대기
       registerBuyerFilter(pendingFilters);
 
@@ -229,7 +205,6 @@ export default function MatchPage() {
       setTimeout(() => {
         if (matchingStatus === 'searching') {
           setMatchingStatus('idle');
-          console.log('⏰ 매칭 검색 타임아웃 - 서버 응답 대기 중');
         }
       }, 5000); // 5초 타임아웃
     } else if (pendingFilters.transactionType[0] === '판매자') {
@@ -327,7 +302,6 @@ export default function MatchPage() {
       // 거래를 수락한 경우 trading 페이지로 이동
       if (accept) {
         // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
-        console.log('요청:', request, '셀러인포:', sellerInfo);
         const buyerInfo = {
           tradeId: request.tradeId,
           buyer: request.buyerName, // 구매자 이메일
