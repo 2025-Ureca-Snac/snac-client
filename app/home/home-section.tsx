@@ -5,6 +5,7 @@ import { DataItemCard } from '../(shared)/components/DataItemCard';
 import { isToday } from '@/app/(shared)/utils/';
 import { PriceUnit } from '@/app/(shared)/types';
 import ModalPortal from '@/app/(shared)/components/modal-portal';
+import { useRouter } from 'next/navigation';
 
 interface DataItem {
   id: number;
@@ -48,7 +49,7 @@ const formatDataAmount = (amountInMB: number): string =>
 
 export default function HomeSection({ cards, unit }: HomeSectionProps) {
   const [modalItem, setModalItem] = useState<DataItem | null>(null);
-
+  const router = useRouter();
   return (
     <>
       {/* 카드 그리드 */}
@@ -97,21 +98,35 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
             <div className="mt-6 flex flex-col space-y-2">
               <button
                 onClick={() => {
-                  console.log(
-                    modalItem.cardCategory === 'BUY'
-                      ? '판매 확정:'
-                      : '구매 확정:',
-                    modalItem
-                  );
+                  if (modalItem.cardCategory === 'SELL') {
+                    const queryParams = new URLSearchParams({
+                      email: modalItem.email,
+                      createdAt: modalItem.createdAt,
+                      carrier: modalItem.carrier,
+                      dataAmount: modalItem.dataAmount.toString(),
+                      price: modalItem.price.toString(),
+                      unit: unit,
+                      pay: 'sell',
+                    });
+
+                    router.push(`/payment?${queryParams.toString()}`);
+                  } else {
+                    const confirmed = window.confirm('판매하시겠습니까?');
+                    if (confirmed) {
+                      console.log('판매 확정:', modalItem);
+                      // TODO: 구매자 로직 추가
+                    }
+                  }
+
                   setModalItem(null);
                 }}
                 className={`w-full py-2 rounded ${
-                  modalItem.cardCategory === 'BUY'
-                    ? 'bg-candy-pink text-white'
-                    : 'bg-midnight-black text-white'
+                  modalItem.cardCategory === 'SELL'
+                    ? 'bg-midnight-black text-white'
+                    : 'bg-candy-pink text-white'
                 }`}
               >
-                {modalItem.cardCategory === 'BUY' ? '판매하기' : '구매하기'}
+                {modalItem.cardCategory === 'SELL' ? '구매하기' : '판매하기'}
               </button>
 
               <button
