@@ -125,16 +125,51 @@ export function useMatchingEvents({
   };
 
   // 서버 카드 데이터를 클라이언트 User 타입으로 변환
-  const convertServerCardToUser = (card: ServerCardData): User => ({
-    tradeId: partner?.tradeId || card.cardId, // partner의 id를 tradeId로 사용, 없으면 cardId 사용
-    type: 'seller' as const,
-    name: card.name,
-    email: card.email, // email 필드 추가
-    carrier: card.carrier,
-    data: card.dataAmount,
-    price: card.price,
-    cardId: card.cardId, // 서버의 cardId 필드 사용
-  });
+  const convertServerCardToUser = (card: ServerCardData): User => {
+    // null/undefined 체킹 후 안전하게 User 객체 생성
+    if (!card || !card.cardId || !card.name || !card.carrier) {
+      console.error('❌ convertServerCardToUser 실패: 필수 카드 데이터 누락', {
+        card,
+        cardId: card?.cardId,
+        name: card?.name,
+        carrier: card?.carrier,
+      });
+      // 기본값으로 fallback
+      return {
+        tradeId: partner?.tradeId || 0,
+        cardId: card?.cardId || 0,
+        type: 'seller' as const,
+        name: card?.name || 'unknown_seller',
+        email: card?.email || 'unknown@example.com',
+        carrier: card?.carrier || 'unknown',
+        data: card?.dataAmount || 0,
+        price: card?.price || 0,
+      };
+    }
+
+    const user = {
+      tradeId: partner?.tradeId || card.cardId, // partner의 id를 tradeId로 사용, 없으면 cardId 사용
+      type: 'seller' as const,
+      name: card.name,
+      email: card.email || 'unknown@example.com', // email이 없으면 기본값
+      carrier: card.carrier,
+      data: card.dataAmount || 0, // dataAmount가 없으면 0
+      price: card.price || 0, // price가 없으면 0
+      cardId: card.cardId, // 서버의 cardId 필드 사용
+    };
+
+    console.log('🔄 서버 카드 데이터 변환:', {
+      서버_cardId: card.cardId,
+      서버_email: card.email,
+      partner_tradeId: partner?.tradeId,
+      변환된_tradeId: user.tradeId,
+      변환된_cardId: user.cardId,
+      변환된_email: user.email,
+      전체_데이터: user,
+    });
+
+    return user;
+  };
 
   // WebSocket 연결
   const connectWebSocket = () => {
@@ -360,22 +395,45 @@ export function useMatchingEvents({
           console.log('🎉 구매자에게 거래 수락 알림:', tradeData);
           setMatchingStatus('matched');
 
-          // 판매자 정보를 store에 저장 (구매자 입장에서 상대방은 판매자)
-          foundMatch({
-            tradeId: tradeData.tradeId, // tradeId를 id로 사용
-            buyer: tradeData.buyer,
-            seller: tradeData.seller,
-            cardId: tradeData.cardId,
-            carrier: tradeData.carrier,
-            dataAmount: tradeData.dataAmount,
-            phone: tradeData.phone || '010-0000-0000',
-            point: tradeData.point || 0,
-            priceGb: tradeData.priceGb || 0,
-            sellerRatingScore: tradeData.sellerRatingScore || 1000,
-            status: tradeData.status,
-            cancelReason: tradeData.cancelReason || null,
-            type: 'seller' as const,
-          });
+          // null/undefined 체킹 후 안전하게 foundMatch 호출
+          if (
+            tradeData &&
+            tradeData.tradeId &&
+            tradeData.buyer &&
+            tradeData.seller &&
+            tradeData.cardId
+          ) {
+            console.log('✅ foundMatch 호출 전 데이터 검증 완료:', {
+              tradeId: tradeData.tradeId,
+              buyer: tradeData.buyer,
+              seller: tradeData.seller,
+              cardId: tradeData.cardId,
+            });
+
+            foundMatch({
+              tradeId: tradeData.tradeId, // tradeId를 id로 사용
+              buyer: tradeData.buyer,
+              seller: tradeData.seller,
+              cardId: tradeData.cardId,
+              carrier: tradeData.carrier || 'unknown',
+              dataAmount: tradeData.dataAmount || 0,
+              phone: tradeData.phone || '010-0000-0000',
+              point: tradeData.point || 0,
+              priceGb: tradeData.priceGb || 0,
+              sellerRatingScore: tradeData.sellerRatingScore || 1000,
+              status: tradeData.status || 'ACCEPTED',
+              cancelReason: tradeData.cancelReason || null,
+              type: 'seller' as const,
+            });
+          } else {
+            console.error('❌ foundMatch 호출 실패: 필수 데이터 누락', {
+              tradeData,
+              tradeId: tradeData?.tradeId,
+              buyer: tradeData?.buyer,
+              seller: tradeData?.seller,
+              cardId: tradeData?.cardId,
+            });
+          }
 
           setTimeout(() => router.push('/match/trading'), 1000);
         }
