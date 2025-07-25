@@ -15,9 +15,8 @@ import { useMatchStore } from '../(shared)/stores/match-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import { useUserStore } from '../(shared)/stores/user-store';
 
-// ServerTradeData 타입 정의 (useMatchingEvents와 동일)
 interface ServerTradeData {
-  id: number;
+  tradeId: number;
   cardId: number;
   status: string;
   seller: string;
@@ -71,13 +70,6 @@ export default function MatchPage() {
   const [currentTradeStatus, setCurrentTradeStatus] = useState<string | null>(
     null
   );
-
-  // 커스텀 훅 사용 - 로컬 필터링 제거, 서버 결과만 사용
-  // const filteredUsers = useUserFiltering(
-  //   appliedFilters,
-  //   activeSellers,
-  //   [] // 빈 배열로 변경 (서버에서 실시간으로 받는 데이터만 사용)
-  // );
 
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
@@ -322,10 +314,12 @@ export default function MatchPage() {
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = useCallback(
     async (requestId: number, accept: boolean) => {
-      const request = incomingRequests.find((req) => req.id === requestId);
+      const request = incomingRequests.find((req) => req.tradeId === requestId);
       if (!request) return;
 
-      setIncomingRequests((prev) => prev.filter((req) => req.id !== requestId));
+      setIncomingRequests((prev) =>
+        prev.filter((req) => req.tradeId !== requestId)
+      );
 
       // 실제 서버에 응답 전송
       respondToTrade(requestId, accept);
@@ -335,10 +329,10 @@ export default function MatchPage() {
         // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
         console.log('요청:', request, '셀러인포:', sellerInfo);
         const buyerInfo = {
-          id: request.id,
+          tradeId: request.tradeId,
           buyer: request.buyerName, // 구매자 이메일
           seller: user || profile?.email || 'unknown_seller', // 현재 판매자 이메일
-          cardId: request.id, // 거래 ID를 카드 ID로 사용
+          cardId: request.cardId,
           carrier: sellerInfo.carrier,
           dataAmount: sellerInfo.dataAmount,
           phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호

@@ -9,7 +9,7 @@ export interface MatchFilters {
 }
 
 export interface MatchPartner {
-  id: number;
+  tradeId: number;
   buyer: string;
   seller: string;
   cardId: number;

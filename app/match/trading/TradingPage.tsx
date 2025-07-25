@@ -48,13 +48,11 @@ export default function TradingPage() {
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
-  const [tradeId] = useState<number | null>(1); // 거래 ID (임시로 1 사용)
-
   // 전역 WebSocket 연결 유지
   useGlobalWebSocket();
 
   // 현재 사용자가 판매자인지 구매자인지 판단
-  const isSeller = partner?.type === 'seller';
+  const isSeller = partner?.type === 'buyer';
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
 
@@ -66,10 +64,9 @@ export default function TradingPage() {
       router.push('/match');
       return;
     }
-    console.log(partner, '뭐냐?');
     // partner 정보 유효성 검증
     if (
-      !partner.id ||
+      !partner.tradeId ||
       !partner.carrier ||
       !partner.dataAmount ||
       !partner.priceGb
@@ -118,6 +115,7 @@ export default function TradingPage() {
 
   // 이제 partner는 항상 유효함 (MatchPartner 타입 그대로 사용)
   const partnerInfo = partner!;
+  console.log(partnerInfo, 'partnerInfo');
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);
@@ -171,7 +169,7 @@ export default function TradingPage() {
             <VerificationStep
               dataAmount={partnerInfo.dataAmount}
               timeLeft={timeLeft}
-              tradeId={tradeId || 1}
+              tradeId={partnerInfo.tradeId}
               sendTradeConfirm={sendTradeConfirm}
               onNext={handleNextStep}
             />
@@ -198,7 +196,7 @@ export default function TradingPage() {
           return (
             <PaymentStep
               amount={partnerInfo.priceGb}
-              tradeId={tradeId || 1} // 임시로 1 사용
+              tradeId={partnerInfo.tradeId}
               onNext={handleNextStep}
             />
           );
@@ -211,7 +209,7 @@ export default function TradingPage() {
             <VerificationStep
               dataAmount={partnerInfo.dataAmount}
               timeLeft={timeLeft}
-              tradeId={tradeId || 1}
+              tradeId={partnerInfo.tradeId}
               sendTradeConfirm={sendTradeConfirm}
               onNext={handleNextStep}
             />

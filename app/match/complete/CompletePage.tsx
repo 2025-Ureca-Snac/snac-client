@@ -20,10 +20,10 @@ export default function CompletePage() {
         data: partner.dataAmount, // dataAmount를 data로 매핑
         price: partner.priceGb, // priceGb를 price로 매핑
         rating: partner.sellerRatingScore,
-        transactionCount: partner.id.toString(),
+        transactionCount: partner.tradeId.toString(),
       }
     : {
-        id: 789,
+        tradeId: 789,
         buyer: 'buyer@example.com',
         seller: 'seller@example.com',
         cardId: 789,

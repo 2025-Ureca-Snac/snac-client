@@ -239,12 +239,12 @@ export default function TestPanel({
                 {incomingRequests.length > 0 ? (
                   incomingRequests.map((req, idx) => (
                     <div
-                      key={req.id}
+                      key={req.tradeId}
                       className="mt-1 p-1 bg-yellow-800 rounded"
                     >
                       요청 #{idx + 1}: {req.buyerName}
                       <br />
-                      ID: {req.id}
+                      ID: {req.tradeId}
                       <br />
                       상태: {req.status}
                       <br />

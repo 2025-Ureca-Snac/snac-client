@@ -30,9 +30,36 @@ export default function TradeConfirmationModal({
   tradeStatus,
 }: TradeConfirmationModalProps) {
   const router = useRouter();
-  const { foundMatch } = useMatchStore();
+  const { foundMatch, partner } = useMatchStore();
   const { user } = useAuthStore();
-  const { profile } = useUserStore();
+  const { profile, setProfile } = useUserStore();
+
+  // profile이 없으면 테스트용 데이터 설정
+  useEffect(() => {
+    if (!profile) {
+      setProfile({
+        id: '1',
+        email: user || 'test@example.com',
+        name: '테스트 사용자',
+        nickname: '테스트 사용자',
+        phone: '010-1234-5678',
+        birthDate: new Date('1999-05-02'),
+        points: 100,
+        money: 5000,
+        preferences: {
+          theme: 'light',
+          language: 'ko',
+          notifications: {
+            email: true,
+            push: true,
+            sms: false,
+          },
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+  }, [profile, setProfile, user]);
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
@@ -71,23 +98,47 @@ export default function TradeConfirmationModal({
       setModalState('success');
 
       // 상대방 정보를 store에 저장하고 trading 페이지로 이동
-      if (seller) {
+      if (partner) {
+        console.log('🔍 partner 객체 정보:', {
+          tradeId: partner.tradeId,
+          cardId: partner.cardId,
+          name: partner.seller,
+          email: partner.seller,
+          전체_데이터: partner,
+        });
+        console.log('🔍 profile 정보:', {
+          email: profile?.email,
+          phone: profile?.phone,
+          points: profile?.points,
+          전체_데이터: profile,
+        });
+        console.log(partner, profile, '아아다닷');
         const partnerInfo = {
-          id: seller.id,
+          tradeId: partner.tradeId,
           buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
-          seller: seller.email || profile?.email || 'unknown_seller', // 판매자 이메일
-          cardId: seller.cardId || seller.id,
-          carrier: seller.carrier,
-          dataAmount: seller.data,
+          seller: partner.seller, // partner에서 판매자 이메일 가져오기
+          cardId: partner.cardId, // partner에서 cardId 가져오기
+          carrier: partner.carrier,
+          dataAmount: partner.dataAmount,
           phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
           point: profile?.points || 0, // 현재 사용자 포인트
-          priceGb: seller.price,
-          sellerRatingScore: seller.rating || 1000,
+          priceGb: partner.priceGb,
+          sellerRatingScore: partner.sellerRatingScore,
           status: 'ACCEPTED',
           cancelReason: null,
-          type: 'seller' as const,
+          type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
         };
 
+        console.log('🔍 최종 partnerInfo:', {
+          buyer: partnerInfo.buyer,
+          seller: partnerInfo.seller,
+          cardId: partnerInfo.cardId,
+          phone: partnerInfo.phone,
+          point: partnerInfo.point,
+          type: partnerInfo.type,
+        });
+
+        console.log('으아악 여기야2', partnerInfo);
         foundMatch(partnerInfo);
 
         // 2초 후 trading 페이지로 이동
@@ -126,15 +177,18 @@ export default function TradeConfirmationModal({
     setTimeLeft(3);
     setCanCancel(false);
 
-    const cardId = seller.cardId || seller.id; // cardId 우선, 없으면 id 사용
+    // partner가 있으면 partner의 cardId 사용, 없으면 seller의 cardId 사용
+    const cardId = partner?.cardId || seller?.cardId || 999;
 
     console.log('🔥 거래 요청 발송:', {
       cardId: cardId,
+      seller_cardId: partner?.cardId || seller?.cardId,
+      seller_id: partner?.tradeId || seller?.tradeId,
       buyerId: 'user_123',
-      sellerId: seller.id,
-      sellerName: seller.name,
-      dataAmount: seller.data,
-      price: seller.price,
+      sellerId: partner?.tradeId || seller?.tradeId,
+      sellerName: partner?.seller || seller?.name,
+      dataAmount: partner?.dataAmount || seller?.data,
+      price: partner?.priceGb || seller?.price,
     });
 
     // 실제 서버에 거래 생성 요청 (HTML 예제와 동일)

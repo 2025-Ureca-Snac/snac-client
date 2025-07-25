@@ -10,8 +10,9 @@ export default function TestButton({ onTestModal }: TestButtonProps) {
   const handleTestModal = () => {
     // 임시 테스트 판매자 데이터 생성
     const testSeller: User = {
-      id: 999,
+      tradeId: 999,
       type: 'seller',
+      cardId: 999,
       name: 'Test Seller',
       carrier: 'SKT',
       data: 1,

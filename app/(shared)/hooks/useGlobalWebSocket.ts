@@ -22,7 +22,7 @@ type MatchingStatus =
 
 // 서버에서 받는 카드 데이터 타입
 interface ServerCardData {
-  id: number;
+  cardId: number;
   name: string;
   email: string;
   sellStatus: string;
@@ -36,7 +36,7 @@ interface ServerCardData {
 
 // 서버에서 받는 거래 데이터 타입
 interface ServerTradeData {
-  id: number;
+  tradeId: number;
   cardId: number;
   status: string;
   seller: string;
@@ -62,7 +62,7 @@ interface UseGlobalWebSocketProps {
 
 export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const router = useRouter();
-  const { foundMatch, setWebSocketFunctions } = useMatchStore();
+  const { foundMatch, setWebSocketFunctions, partner } = useMatchStore();
   const [isConnected, setIsConnected] = useState(false);
   const connectionId = useRef(++globalConnectionCount);
 
@@ -104,15 +104,20 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   };
 
   // 서버 카드 데이터를 클라이언트 User 타입으로 변환
-  const convertServerCardToUser = (card: ServerCardData): User => ({
-    id: card.id,
-    type: 'seller' as const,
-    name: card.name,
-    carrier: card.carrier,
-    data: card.dataAmount,
-    price: card.price,
-    cardId: card.id,
-  });
+  const convertServerCardToUser = (card: ServerCardData): User => {
+    console.log(partner, 'partner값이없나?');
+    const user = {
+      tradeId: partner?.tradeId || 999, // partner의 id를 tradeId로 사용, 없으면 cardId 사용
+      cardId: card.cardId,
+      type: 'seller' as const,
+      name: card.name,
+      email: card.email, // email 필드 추가
+      carrier: card.carrier,
+      data: card.dataAmount,
+      price: card.price,
+    };
+    return user;
+  };
 
   // WebSocket 연결
   const connectWebSocket = () => {
@@ -140,7 +145,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           process.env.NEXT_PUBLIC_WS_URL || 'https://api.snac-app.com/ws'
         ),
       connectHeaders: { Authorization: 'Bearer ' + token },
-      debug: (str) => console.log(str),
+      // debug: (str) => console.log(str),
       onConnect: () => {
         console.log('✅ 전역 WebSocket 연결 성공');
         setIsConnected(true);
@@ -196,29 +201,16 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       console.log('🟢 매칭 알림 수신:', frame.body);
       try {
         const cardData: ServerCardData = JSON.parse(frame.body);
+        console.log(cardData, '야여기1');
         const user = convertServerCardToUser(cardData);
+        console.log(user, '야여기2');
 
-        console.log('📋 매칭 카드 정보:', {
-          id: cardData.id,
-          name: cardData.name,
-          email: cardData.email,
-          sellStatus: cardData.sellStatus,
-          cardCategory: cardData.cardCategory,
-          carrier: cardData.carrier,
-          dataAmount: cardData.dataAmount,
-          price: cardData.price,
-          createdAt: cardData.createdAt,
-          updatedAt: cardData.updatedAt,
-        });
-
-        // 구매자용 매칭 결과 처리
-        console.log(userRole, 'userRole');
         if (userRole === 'buyer' && props?.setActiveSellers) {
           console.log('실행되냐?');
           props.setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
-                existing.id === user.id ||
+                existing.tradeId === user.tradeId ||
                 (existing.name === user.name &&
                   existing.carrier === user.carrier &&
                   existing.data === user.data &&
@@ -258,7 +250,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       try {
         const tradeData: ServerTradeData = JSON.parse(frame.body);
         console.log('📋 거래 상태 변경:', {
-          id: tradeData.id,
+          tradeId: tradeData.tradeId,
           cardId: tradeData.cardId,
           status: tradeData.status,
           seller: tradeData.seller,
@@ -270,6 +262,28 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           phone: tradeData.phone,
           cancelReason: tradeData.cancelReason,
         });
+
+        // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트
+        if (userRole === 'buyer' && props?.setActiveSellers) {
+          console.log('여기가 안오는거같은데 진짜 ??', userRole);
+          props.setActiveSellers((prev: User[]) => {
+            return prev.map((user) => {
+              if (user.cardId === tradeData.cardId) {
+                console.log('🔄 user tradeId 업데이트:', {
+                  기존_tradeId: user.tradeId,
+                  새로운_tradeId: tradeData.tradeId,
+                  cardId: user.cardId,
+                  이름: user.name,
+                });
+                return {
+                  ...user,
+                  tradeId: tradeData.tradeId, // tradeId 업데이트
+                };
+              }
+              return user;
+            });
+          });
+        }
 
         // 서버 상태를 클라이언트 상태로 매핑
         let clientStatus = tradeData.status;
@@ -300,7 +314,8 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           props?.setIncomingRequests
         ) {
           const request: TradeRequest = {
-            id: tradeData.id,
+            tradeId: tradeData.tradeId,
+            cardId: tradeData.cardId,
             buyerId: tradeData.buyer,
             buyerName: tradeData.buyer,
             sellerId: tradeData.seller,
@@ -316,13 +331,15 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
 
         // 구매자용: 거래 수락인 경우
+        console.log('여기오냐1');
         if (userRole === 'buyer' && tradeData.status === 'SELL_APPROVED') {
           if (props?.setMatchingStatus) {
             props.setMatchingStatus('matched');
           }
-
+          console.log('여기오냐2');
+          console.log(tradeData, 'tradeData');
           foundMatch({
-            id: tradeData.id,
+            tradeId: tradeData.tradeId, // tradeId를 id로 사용
             buyer: tradeData.buyer,
             seller: tradeData.seller,
             cardId: tradeData.cardId,
@@ -334,7 +351,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
             sellerRatingScore: tradeData.sellerRatingScore || 1000,
             status: tradeData.status,
             cancelReason: tradeData.cancelReason || null,
-            type: 'seller' as const,
+            type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
           });
 
           setTimeout(() => router.push('/match/trading'), 1000);

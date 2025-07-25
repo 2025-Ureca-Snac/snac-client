@@ -32,6 +32,7 @@ export default function PaymentStep({
 
     try {
       // 결제 메시지 전송 (전액을 money로 처리)
+      console.log('여기가 맞나?', tradeId, amount);
       const success = wsSendPayment(tradeId, amount, 0);
 
       if (success) {

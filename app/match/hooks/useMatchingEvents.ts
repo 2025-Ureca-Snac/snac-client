@@ -36,6 +36,7 @@ interface ServerCardData {
   id: number;
   name: string;
   email: string;
+  cardId: number; // 서버의 카드 ID 추가
   sellStatus: string;
   cardCategory: string;
   carrier: string;
@@ -47,7 +48,7 @@ interface ServerCardData {
 
 // 서버에서 받는 거래 데이터 타입
 interface ServerTradeData {
-  id: number;
+  tradeId: number; // id 대신 tradeId 사용
   cardId: number;
   status: string;
   seller: string;
@@ -69,6 +70,7 @@ export function useMatchingEvents({
   setConnectedUsers,
   onTradeStatusChange,
 }: UseMatchingEventsProps) {
+  const { partner } = useMatchStore();
   const router = useRouter();
   const { foundMatch } = useMatchStore();
   const stompClient = useRef<StompClient | null>(null);
@@ -124,13 +126,14 @@ export function useMatchingEvents({
 
   // 서버 카드 데이터를 클라이언트 User 타입으로 변환
   const convertServerCardToUser = (card: ServerCardData): User => ({
-    id: card.id, // 이것이 cardId
+    tradeId: partner?.tradeId || card.cardId, // partner의 id를 tradeId로 사용, 없으면 cardId 사용
     type: 'seller' as const,
     name: card.name,
+    email: card.email, // email 필드 추가
     carrier: card.carrier,
     data: card.dataAmount,
     price: card.price,
-    cardId: card.id, // cardId 명시적 추가
+    cardId: card.cardId, // 서버의 cardId 필드 사용
   });
 
   // WebSocket 연결
@@ -236,7 +239,7 @@ export function useMatchingEvents({
             // 1. 기존 카드 중에서 동일한 판매자 찾기 (id, name, carrier, data, price로 식별)
             const existingIndex = prev.findIndex(
               (existing) =>
-                existing.id === user.id ||
+                existing.tradeId === user.tradeId ||
                 (existing.name === user.name &&
                   existing.carrier === user.carrier &&
                   existing.data === user.data &&
@@ -244,11 +247,10 @@ export function useMatchingEvents({
             );
 
             if (existingIndex !== -1) {
-              // 기존 카드가 있으면 업데이트 (정보 변경 가능성 대비)
               console.log('🔄 기존 판매자 카드 업데이트:', {
                 기존: prev[existingIndex].name,
                 새로운: user.name,
-                id: user.id,
+                id: user.tradeId,
               });
 
               const updated = [...prev];
@@ -261,15 +263,6 @@ export function useMatchingEvents({
 
               return updated;
             } else {
-              // 새로운 카드 추가
-              console.log('➕ 새로운 판매자 카드 추가:', {
-                이름: user.name,
-                통신사: user.carrier,
-                데이터: user.data,
-                가격: user.price,
-                id: user.id,
-              });
-
               const updated = [...prev, user];
 
               // 첫 번째 매칭 결과를 받았을 때 검색 상태 해제
@@ -294,6 +287,28 @@ export function useMatchingEvents({
       try {
         const tradeData: ServerTradeData = JSON.parse(frame.body);
         console.log('🔧 파싱된 거래 데이터:', tradeData);
+        console.log(userRole, 'userRole');
+        // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트 (구매자용)
+        if (userRole === 'buyer') {
+          console.log('여기안들어오는거같은데?');
+          setActiveSellers((prev) => {
+            return prev.map((user) => {
+              if (user.cardId === tradeData.cardId) {
+                console.log('🔄 user tradeId 업데이트:', {
+                  기존_tradeId: user.tradeId,
+                  새로운_tradeId: tradeData.tradeId,
+                  cardId: user.cardId,
+                  이름: user.name,
+                });
+                return {
+                  ...user,
+                  tradeId: tradeData.tradeId, // tradeId 업데이트
+                };
+              }
+              return user;
+            });
+          });
+        }
 
         // 서버 상태를 클라이언트 상태로 매핑
         let clientStatus = tradeData.status;
@@ -315,14 +330,15 @@ export function useMatchingEvents({
         // 판매자용: 거래 요청인 경우 (BUY_REQUESTED → PENDING)
         if (userRole === 'seller' && tradeData.status === 'BUY_REQUESTED') {
           console.log('📩 판매자에게 거래 요청 도착:', {
-            tradeId: tradeData.id,
+            tradeId: tradeData.tradeId,
             buyer: tradeData.buyer,
             cardId: tradeData.cardId,
             buyerPhone: tradeData.phone,
           });
 
           const request: TradeRequest = {
-            id: tradeData.id,
+            tradeId: tradeData.tradeId, // tradeId를 id로 사용
+            cardId: tradeData.cardId, // cardId 필드 추가
             buyerId: tradeData.buyer,
             buyerName: tradeData.buyer, // 구매자 이메일/ID
             sellerId: tradeData.seller,
@@ -346,7 +362,7 @@ export function useMatchingEvents({
 
           // 판매자 정보를 store에 저장 (구매자 입장에서 상대방은 판매자)
           foundMatch({
-            id: tradeData.id,
+            tradeId: tradeData.tradeId, // tradeId를 id로 사용
             buyer: tradeData.buyer,
             seller: tradeData.seller,
             cardId: tradeData.cardId,
