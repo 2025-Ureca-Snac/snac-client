@@ -96,9 +96,7 @@ export const DataItemCard = ({
       <div className="flex justify-center ">
         {!isMyPost && (
           <Button
-            onClick={() => {
-              onClickBuy({ email, createdAt });
-            }}
+            onClick={() => onClickBuy({ email, createdAt })}
             className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition text-regular-md border rounded-lg flex items-center justify-center`}
           >
             {finalButtonText}
