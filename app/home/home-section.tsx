@@ -100,12 +100,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
                 onClick={() => {
                   if (modalItem.cardCategory === 'SELL') {
                     const queryParams = new URLSearchParams({
-                      email: modalItem.email,
-                      createdAt: modalItem.createdAt,
-                      carrier: modalItem.carrier,
-                      dataAmount: modalItem.dataAmount.toString(),
-                      price: modalItem.price.toString(),
-                      unit: unit,
+                      id: modalItem.id.toString(),
                       pay: 'sell',
                     });
 
