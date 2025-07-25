@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Header } from '../../(shared)/components/Header';
 import { Footer } from '../../(shared)/components/Footer';
 import { useMatchStore } from '../../(shared)/stores/match-store';
+import { useAuthStore } from '../../(shared)/stores/auth-store';
 import { useGlobalWebSocket } from '../../(shared)/hooks/useGlobalWebSocket';
 import TradingHeader from './components/TradingHeader';
 import TradingSteps from './components/TradingSteps';
@@ -52,7 +53,9 @@ export default function TradingPage() {
   useGlobalWebSocket();
 
   // 현재 사용자가 판매자인지 구매자인지 판단
-  const isSeller = partner?.type === 'buyer';
+  // partner.buyer가 현재 사용자라면 구매자, partner.seller가 현재 사용자라면 판매자
+  const { user } = useAuthStore();
+  const isSeller = partner?.seller === user;
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
 
@@ -109,7 +112,6 @@ export default function TradingPage() {
 
   // 이제 partner는 항상 유효함 (MatchPartner 타입 그대로 사용)
   const partnerInfo = partner!;
-  console.log(partnerInfo, 'partnerInfo');
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);
