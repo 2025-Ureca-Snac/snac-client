@@ -11,19 +11,7 @@ import { Pagination } from '@/app/(shared)/components/Pagination';
 import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
-
-interface Card {
-  id: number;
-  name: string;
-  createdAt: string;
-  email: string;
-  sellStatus: string;
-  cardCategory: 'SELL' | 'BUY';
-  carrier: string;
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-}
+import type { Card } from '@/app/(shared)/types/card';
 
 interface HomeLayoutProps {
   cards: Card[];
