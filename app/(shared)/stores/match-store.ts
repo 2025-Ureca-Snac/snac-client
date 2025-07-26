@@ -42,6 +42,7 @@ interface MatchState {
   status: MatchStatus;
   filters: MatchFilters;
   partner: MatchPartner | null;
+  userRole: 'buyer' | 'seller' | null; // 사용자 역할 추가
 
   // 거래 진행 상태
   tradingStep: TradingStep;
@@ -54,8 +55,10 @@ interface MatchState {
 
   // 액션
   setFilters: (filters: MatchFilters) => void;
+  setUserRole: (role: 'buyer' | 'seller' | null) => void; // userRole 설정 액션 추가
   startMatching: () => void;
   foundMatch: (partner: MatchPartner) => void;
+  updatePartner: (updates: Partial<MatchPartner>) => void; // partner 업데이트 함수 추가
   startTrading: () => void;
   setTradingStep: (step: TradingStep) => void;
   setTimeLeft: (time: number) => void;
@@ -82,12 +85,14 @@ export const useMatchStore = create<MatchState>()(
       status: 'idle',
       filters: initialFilters,
       partner: null,
+      userRole: null,
       tradingStep: 'confirmation',
       timeLeft: 300, // 5분
       transactionId: null,
 
       // 액션들
       setFilters: (filters) => set({ filters }),
+      setUserRole: (role) => set({ userRole: role }),
 
       startMatching: () =>
         set({
@@ -103,6 +108,11 @@ export const useMatchStore = create<MatchState>()(
           tradingStep: 'confirmation',
           timeLeft: 300,
         }),
+
+      updatePartner: (updates) =>
+        set((state) => ({
+          partner: state.partner ? { ...state.partner, ...updates } : null,
+        })),
 
       startTrading: () => set({ status: 'trading' }),
 
@@ -136,6 +146,7 @@ export const useMatchStore = create<MatchState>()(
           status: 'idle',
           filters: initialFilters,
           partner: null,
+          userRole: null,
           tradingStep: 'confirmation',
           timeLeft: 300,
           transactionId: null,

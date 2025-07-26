@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MatchPartner } from '@/app/(shared)/stores/match-store';
-import { useTradingWebSocket } from '../hooks/useTradingWebSocket';
+import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
 
 interface ConfirmationStepProps {
   partner: MatchPartner;
@@ -15,8 +15,8 @@ export default function ConfirmationStep({
   onNext,
   onCancel,
 }: ConfirmationStepProps) {
-  const { isConnected } = useTradingWebSocket();
-  console.log(isConnected, '연결');
+  useGlobalWebSocket();
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg p-6">
