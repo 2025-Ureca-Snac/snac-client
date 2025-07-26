@@ -11,6 +11,7 @@ import { Pagination } from '@/app/(shared)/components/Pagination';
 import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
+import LoadingSpinner from '@/app/(shared)/components/LoadingSpinner';
 
 interface Card {
   id: number;
@@ -55,7 +56,7 @@ export default function HomeLayout({
     }
   };
   return (
-    <div className="flex w-full flex-col md:flex-row">
+    <div className="flex w-full flex-col md:flex-row p-6">
       <Filter />
       <Modal />
 
@@ -138,7 +139,9 @@ export default function HomeLayout({
         </div>
         <div className="flex-grow">
           {isLoading ? (
-            <div className="text-center py-10">로딩 중...</div>
+            <div className="flex items-center justify-center py-20">
+              <LoadingSpinner size="lg" />
+            </div>
           ) : (
             <>
               {cards.length === 0 && (

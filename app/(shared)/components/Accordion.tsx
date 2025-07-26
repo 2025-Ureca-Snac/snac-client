@@ -9,9 +9,9 @@ import Image from 'next/image';
 export default function Accordion() {
   const [open, setOpen] = useState(false);
   return (
-    <section className="bg-white border border-gray-200 rounded-lg mb-8 px-8 py-6">
+    <section className="bg-white border border-gray-200 rounded-lg mb-8 ">
       <button
-        className="w-full flex justify-between items-center py-6 text-lg font-bold text-black focus:outline-none hover:bg-gray-50 transition-colors px-0"
+        className="w-full flex justify-between items-center  text-lg px-8 py-6 font-bold text-black focus:outline-none hover:bg-gray-50 transition-colors px-0"
         onClick={() => setOpen((v) => !v)}
         type="button"
       >

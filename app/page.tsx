@@ -131,17 +131,13 @@ export default function Home() {
       </button>
 
       <div className="flex items-center justify-center">
-        {loading ? (
-          <p>로딩 중…</p>
-        ) : (
-          <HomeLayout
-            cards={cards}
-            isLoading={loading}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
+        <HomeLayout
+          cards={cards}
+          isLoading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="w-full">

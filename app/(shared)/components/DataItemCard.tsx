@@ -56,7 +56,7 @@ export const DataItemCard = ({
     ? 'bg-candy-pink hover:bg-[#ff93c4]'
     : 'bg-gray-900 hover:bg-gray-800';
   return (
-    <div className="transition-transform duration-300 hover:-translate-y-[2px] hover:scale-[1.03] relative bg-[#F3F5F7] rounded-2xl shadow-md w-card-sm h-card-sm md:w-card-md md:h-card-md flex flex-col p-3">
+    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md max-w-[150px] max-h-[203px] md:max-w-[238px] md:max-h-[348px] flex flex-col p-3">
       {isNew && (
         <span className="absolute z-10 bg-red text-white text-regular-sm md:text-regular-md font-bold w-[57px] md:w-[67px] h-[24px]  rounded-[4px] flex items-center justify-center ">
           {newBadgeText}
@@ -86,7 +86,8 @@ export const DataItemCard = ({
           onClick={() => {
             onClickBuy({ email, createdAt });
           }}
-          className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition text-regular-md border rounded-lg flex items-center justify-center`}
+          className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition border rounded-lg flex items-center justify-center whitespace-nowrap`}
+          style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
         >
           {finalButtonText}
         </Button>
