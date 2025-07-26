@@ -49,8 +49,8 @@ export default function CompletePage() {
   const completedAt = new Date().toLocaleString();
 
   // 보상 정보
-  const pointsEarned = 100;
-  const bonusPoints = 50; // 첫 거래 보너스
+  const pointsEarned = 2;
+  const bonusPoints = 5; // 첫 거래 보너스
   const experienceGained = 25;
 
   return (

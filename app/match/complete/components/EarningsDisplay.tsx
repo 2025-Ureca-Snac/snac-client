@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React from 'react';
 
 interface EarningsDisplayProps {
@@ -59,12 +60,18 @@ export default function EarningsDisplay({
         {/* 경험치 */}
         <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-lg">🎯</span>
+            <div className="w-10 h-10 bg-burst-lime rounded-full flex items-center justify-center">
+              <Image
+                src="/logo_mini.png"
+                alt="Snac Logo"
+                width={24}
+                height={24}
+                className="w-6 h-6 object-contain"
+              />
             </div>
             <div>
-              <div className="font-medium text-purple-800">경험치</div>
-              <div className="text-sm text-purple-600">레벨업에 기여</div>
+              <div className="font-medium text-purple-800">스낵 포인트</div>
+              <div className="text-sm text-purple-600">거래 완료 시 획득</div>
             </div>
           </div>
           <div className="text-2xl font-bold text-purple-600">
