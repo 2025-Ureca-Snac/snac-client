@@ -64,6 +64,7 @@ export default function UploadDataStep({
       console.error('업로드 실패:', error);
       const errorInfo = getApiErrorInfo(error);
       setError(errorInfo.userMessage);
+      setSelectedFile(null); // 에러 발생 시 파일 선택 초기화
     } finally {
       setIsUploading(false);
     }

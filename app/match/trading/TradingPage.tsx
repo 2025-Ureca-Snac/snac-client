@@ -65,10 +65,16 @@ export default function TradingPage() {
         isSeller,
       });
       console.log('userRole확인!!!:', userRole);
-      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동
+
+      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동 (판매자용)
       if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
         console.log('💰 결제 확인됨 - show_phone 단계로 이동');
         setCurrentStep('show_phone');
+      }
+      // DATA_SENT 상태일 때 verification 단계로 이동 (구매자용)
+      else if (status === 'DATA_SENT' && userRole === 'buyer') {
+        console.log('📤 데이터 전송됨 - verification 단계로 이동');
+        setCurrentStep('verification');
       } else {
         console.log('❌ 조건 불일치:', {
           status,
@@ -76,6 +82,8 @@ export default function TradingPage() {
           isSeller,
           isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
           isSellerRole: userRole === 'seller',
+          isDataSent: status === 'DATA_SENT',
+          isBuyerRole: userRole === 'buyer',
         });
       }
     },
@@ -91,10 +99,16 @@ export default function TradingPage() {
         isSeller,
       });
       console.log('userRole확인!!!:', userRole);
-      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동
+
+      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동 (판매자용)
       if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
         console.log('💰 결제 확인됨 - show_phone 단계로 이동');
         setCurrentStep('show_phone');
+      }
+      // DATA_SENT 상태일 때 verification 단계로 이동 (구매자용)
+      else if (status === 'DATA_SENT' && userRole === 'buyer') {
+        console.log('📤 데이터 전송됨 - verification 단계로 이동');
+        setCurrentStep('verification');
       } else {
         console.log('❌ 조건 불일치:', {
           status,
@@ -102,6 +116,8 @@ export default function TradingPage() {
           isSeller,
           isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
           isSellerRole: userRole === 'seller',
+          isDataSent: status === 'DATA_SENT',
+          isBuyerRole: userRole === 'buyer',
         });
       }
     });

@@ -4,6 +4,7 @@ export enum ApiErrorType {
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
+  CONFLICT = 409,
   INTERNAL_SERVER_ERROR = 500,
   NETWORK_ERROR = 'NETWORK_ERROR',
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
@@ -42,6 +43,11 @@ export const API_ERROR_MESSAGES: Record<ApiErrorType, ApiErrorInfo> = {
     message: 'Forbidden',
     userMessage: '접근 권한이 없습니다.',
   },
+  [ApiErrorType.CONFLICT]: {
+    type: ApiErrorType.CONFLICT,
+    message: 'Conflict',
+    userMessage: '이미 처리된 요청입니다. 페이지를 새로고침해주세요.',
+  },
   [ApiErrorType.INTERNAL_SERVER_ERROR]: {
     type: ApiErrorType.INTERNAL_SERVER_ERROR,
     message: 'Internal server error',
@@ -79,6 +85,8 @@ export const getApiErrorInfo = (error: unknown): ApiErrorInfo => {
           return API_ERROR_MESSAGES[ApiErrorType.UNAUTHORIZED];
         case 403:
           return API_ERROR_MESSAGES[ApiErrorType.FORBIDDEN];
+        case 409:
+          return API_ERROR_MESSAGES[ApiErrorType.CONFLICT];
         case 500:
           return API_ERROR_MESSAGES[ApiErrorType.INTERNAL_SERVER_ERROR];
         default:
