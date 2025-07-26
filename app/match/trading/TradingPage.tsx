@@ -45,7 +45,7 @@ const SELLER_TRADING_STEPS: TradingStep[] = [
 
 export default function TradingPage() {
   const router = useRouter();
-  const { partner, sendTradeConfirm, setUserRole, userRole } = useMatchStore();
+  const { partner, setUserRole, userRole } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
@@ -75,6 +75,11 @@ export default function TradingPage() {
       else if (status === 'DATA_SENT' && userRole === 'buyer') {
         console.log('📤 데이터 전송됨 - verification 단계로 이동');
         setCurrentStep('verification');
+      }
+      // COMPLETED 상태일 때 거래 완료 페이지로 이동 (모든 사용자)
+      else if (status === 'COMPLETED') {
+        console.log('🎉 거래 완료 - 완료 페이지로 이동');
+        router.push('/match/complete');
       } else {
         console.log('❌ 조건 불일치:', {
           status,
@@ -84,6 +89,7 @@ export default function TradingPage() {
           isSellerRole: userRole === 'seller',
           isDataSent: status === 'DATA_SENT',
           isBuyerRole: userRole === 'buyer',
+          isCompleted: status === 'COMPLETED',
         });
       }
     },
@@ -109,6 +115,11 @@ export default function TradingPage() {
       else if (status === 'DATA_SENT' && userRole === 'buyer') {
         console.log('📤 데이터 전송됨 - verification 단계로 이동');
         setCurrentStep('verification');
+      }
+      // COMPLETED 상태일 때 거래 완료 페이지로 이동 (모든 사용자)
+      else if (status === 'COMPLETED') {
+        console.log('🎉 거래 완료 - 완료 페이지로 이동');
+        router.push('/match/complete');
       } else {
         console.log('❌ 조건 불일치:', {
           status,
@@ -118,6 +129,7 @@ export default function TradingPage() {
           isSellerRole: userRole === 'seller',
           isDataSent: status === 'DATA_SENT',
           isBuyerRole: userRole === 'buyer',
+          isCompleted: status === 'COMPLETED',
         });
       }
     });
@@ -248,7 +260,7 @@ export default function TradingPage() {
               dataAmount={partnerInfo.dataAmount}
               timeLeft={timeLeft}
               tradeId={partnerInfo.tradeId}
-              sendTradeConfirm={sendTradeConfirm}
+              userRole={userRole || 'seller'}
               onNext={handleNextStep}
             />
           );
@@ -288,7 +300,7 @@ export default function TradingPage() {
               dataAmount={partnerInfo.dataAmount}
               timeLeft={timeLeft}
               tradeId={partnerInfo.tradeId}
-              sendTradeConfirm={sendTradeConfirm}
+              userRole={userRole || 'buyer'}
               onNext={handleNextStep}
             />
           );
