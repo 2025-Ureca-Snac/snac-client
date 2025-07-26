@@ -56,44 +56,7 @@ export default function TradingPage() {
   const isSeller = partner?.seller === user;
 
   // 전역 WebSocket 연결 유지
-  const { activatePage, deactivatePage } = useGlobalWebSocket({
-    onTradeStatusChange: (status, tradeData) => {
-      console.log('🔔 거래 상태 변경 오는거맞냐:', {
-        status,
-        tradeData,
-        userRole,
-        isSeller,
-      });
-      console.log('userRole확인!!!:', userRole);
-
-      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동 (판매자용)
-      if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
-        console.log('💰 결제 확인됨 - show_phone 단계로 이동');
-        setCurrentStep('show_phone');
-      }
-      // DATA_SENT 상태일 때 verification 단계로 이동 (구매자용)
-      else if (status === 'DATA_SENT' && userRole === 'buyer') {
-        console.log('📤 데이터 전송됨 - verification 단계로 이동');
-        setCurrentStep('verification');
-      }
-      // COMPLETED 상태일 때 거래 완료 페이지로 이동 (모든 사용자)
-      else if (status === 'COMPLETED') {
-        console.log('🎉 거래 완료 - 완료 페이지로 이동');
-        router.push('/match/complete');
-      } else {
-        console.log('❌ 조건 불일치:', {
-          status,
-          userRole,
-          isSeller,
-          isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
-          isSellerRole: userRole === 'seller',
-          isDataSent: status === 'DATA_SENT',
-          isBuyerRole: userRole === 'buyer',
-          isCompleted: status === 'COMPLETED',
-        });
-      }
-    },
-  });
+  const { activatePage, deactivatePage } = useGlobalWebSocket();
 
   // TradingPage 활성화
   useEffect(() => {

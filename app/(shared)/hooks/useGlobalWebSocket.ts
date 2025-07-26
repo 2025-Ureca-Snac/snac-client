@@ -262,7 +262,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           isBuyer: userRole === 'buyer',
         });
 
-        if (user.type === 'seller' && props?.setActiveSellers) {
+        if (props?.setActiveSellers) {
           props.setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
