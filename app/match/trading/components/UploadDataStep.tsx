@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { MatchPartner } from '@/app/(shared)/stores/match-store';
 import { api } from '@/app/(shared)/utils/api';
+import { getApiErrorInfo } from '@/app/(shared)/types/api-errors';
 
 interface UploadDataStepProps {
   partner: MatchPartner;
@@ -18,22 +19,25 @@ export default function UploadDataStep({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    setError(null); // 에러 초기화
     if (file && file.type.startsWith('image/')) {
       setSelectedFile(file);
     } else {
-      alert('이미지 파일만 선택 가능합니다.');
+      setError('이미지 파일만 선택 가능합니다.');
     }
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      alert('파일을 선택해주세요.');
+      setError('파일을 선택해주세요.');
       return;
     }
 
+    setError(null); // 에러 초기화
     setIsUploading(true);
 
     try {
@@ -58,7 +62,8 @@ export default function UploadDataStep({
       }, 1000);
     } catch (error) {
       console.error('업로드 실패:', error);
-      alert('업로드에 실패했습니다. 다시 시도해주세요.');
+      const errorInfo = getApiErrorInfo(error);
+      setError(errorInfo.userMessage);
     } finally {
       setIsUploading(false);
     }
@@ -158,6 +163,26 @@ export default function UploadDataStep({
             </div>
           )}
         </div>
+
+        {/* 에러 메시지 */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <svg
+                className="w-5 h-5 text-red-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          </div>
+        )}
 
         {/* 업로드 버튼 */}
         <button
