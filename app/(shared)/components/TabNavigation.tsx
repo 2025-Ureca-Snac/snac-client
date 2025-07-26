@@ -32,7 +32,7 @@ export default function TabNavigation({
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          className={`flex-1 py-2 text-center text-base font-semibold relative z-10 ${
+          className={`flex-1 py-3 text-center text-base font-semibold relative z-10 ${
             activeTab === tab.id ? activeTextColor : inactiveTextColor
           }`}
           onClick={() => onTabChange(tab.id)}
