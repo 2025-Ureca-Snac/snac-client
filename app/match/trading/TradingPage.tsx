@@ -219,7 +219,11 @@ export default function TradingPage() {
 
         case 'upload_data':
           return (
-            <UploadDataStep partner={partnerInfo} onNext={handleNextStep} />
+            <UploadDataStep
+              partner={partnerInfo}
+              tradeId={partnerInfo.tradeId}
+              onNext={handleNextStep}
+            />
           );
 
         case 'verification':

@@ -2,14 +2,17 @@
 
 import React, { useState } from 'react';
 import { MatchPartner } from '@/app/(shared)/stores/match-store';
+import { api } from '@/app/(shared)/utils/api';
 
 interface UploadDataStepProps {
   partner: MatchPartner;
+  tradeId: number;
   onNext: () => void;
 }
 
 export default function UploadDataStep({
   partner,
+  tradeId,
   onNext,
 }: UploadDataStepProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -34,17 +37,20 @@ export default function UploadDataStep({
     setIsUploading(true);
 
     try {
-      // TODO: 실제 API 호출
-      // const formData = new FormData();
-      // formData.append('file', selectedFile);
-      //
-      // const response = await fetch(`/api/matching/${tradeId}/send-data`, {
-      //   method: 'PATCH',
-      //   body: formData
-      // });
+      const formData = new FormData();
+      formData.append('file', selectedFile);
 
-      // 임시로 성공 처리
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await api.patch(
+        `/matching/${tradeId}/send-data`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      console.log(response);
 
       setUploadSuccess(true);
       setTimeout(() => {
