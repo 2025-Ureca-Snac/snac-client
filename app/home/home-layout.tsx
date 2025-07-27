@@ -6,10 +6,11 @@ import { Modal } from './components/modal';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import HomeSection from './home-section';
 import Image from 'next/image';
-import { Toaster } from 'sonner';
+
 import { Pagination } from '@/app/(shared)/components/Pagination';
 import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
+import TabNavigation from '@/app/(shared)/components/TabNavigation';
 
 interface Card {
   id: number;
@@ -17,7 +18,7 @@ interface Card {
   createdAt: string;
   email: string;
   sellStatus: string;
-  cardCategory: string;
+  cardCategory: 'SELL' | 'BUY';
   carrier: string;
   dataAmount: number;
   price: number;
@@ -39,14 +40,24 @@ export default function HomeLayout({
   totalPages,
   onPageChange,
 }: HomeLayoutProps) {
-  const { actions } = useHomeStore();
+  const { actions, cardCategory } = useHomeStore();
   const [currentUnit, setCurrentUnit] = useState<PriceUnit>('snack');
 
+  const tabs = [
+    { id: 'SELL', label: '팝니다' },
+    { id: 'BUY', label: '삽니다' },
+  ];
+
+  const handleTabChange = (tabId: string) => {
+    if (tabId === 'SELL' || tabId === 'BUY') {
+      actions.setCardCategory(tabId);
+      onPageChange(1);
+    }
+  };
   return (
     <div className="flex w-full flex-col md:flex-row">
       <Filter />
       <Modal />
-      <Toaster richColors position="top-center" />
 
       <main className="flex flex-1 flex-col p-4">
         <div>
@@ -95,6 +106,11 @@ export default function HomeLayout({
               />
             </div>
           </div>
+          <TabNavigation
+            tabs={tabs}
+            activeTab={cardCategory || 'SELL'}
+            onTabChange={handleTabChange}
+          />
 
           {/* PC */}
           <div className="hidden md:flex justify-between items-center mb-4">
@@ -120,12 +136,19 @@ export default function HomeLayout({
             />
           </div>
         </div>
-
         <div className="flex-grow">
           {isLoading ? (
             <div className="text-center py-10">로딩 중...</div>
           ) : (
-            <HomeSection cards={cards} unit={currentUnit} />
+            <>
+              {cards.length === 0 && (
+                <p className="text-center text-gray-500 py-10">
+                  표시할 데이터가 없습니다.
+                </p>
+              )}
+
+              <HomeSection cards={cards} unit={currentUnit} />
+            </>
           )}
         </div>
 

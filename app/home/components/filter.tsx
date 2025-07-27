@@ -8,12 +8,13 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
 
-const displayCategories = ['SKT', 'KT', 'LGU+'] as const;
+const DISPLAY_CATEGORIES = ['SKT', 'KT', 'LGU+'] as const;
+
 const transactionOptions = [
-  { label: '모든 거래', value: null },
-  { label: '거래 전', value: '거래 전' },
-  { label: '거래 완료', value: '거래 완료' },
-] as const;
+  { label: '모든 거래', value: 'ALL' as const },
+  { label: '거래 전', value: 'SELLING' as const },
+  { label: '거래 완료', value: 'SOLD_OUT' as const },
+];
 
 const price_ranges = [
   '모든 가격',
@@ -23,6 +24,18 @@ const price_ranges = [
   '₩ 2,000 - 2,499',
   '₩ 2,500+',
 ] as const;
+
+const PRICE_VALUE_MAP: Record<
+  (typeof price_ranges)[number],
+  'ALL' | 'P0_999' | 'P1000_1499' | 'P1500_1999' | 'P2000_2499' | 'P2500_PLUS'
+> = {
+  '모든 가격': 'ALL',
+  '₩ 0 - 999': 'P0_999',
+  '₩ 1,000 - 1,499': 'P1000_1499',
+  '₩ 1,500 - 1,999': 'P1500_1999',
+  '₩ 2,000 - 2,499': 'P2000_2499',
+  '₩ 2,500+': 'P2500_PLUS',
+};
 
 export const Filter = () => {
   const {
@@ -42,6 +55,7 @@ export const Filter = () => {
     showRegularsOnly !== homeInitialState.showRegularsOnly;
 
   const closeAndApply = () => {
+    actions.triggerRefetch();
     actions.toggleFilter();
   };
 
@@ -75,7 +89,7 @@ export const Filter = () => {
             카테고리
           </h3>
           <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
-            {displayCategories.map((item) => {
+            {DISPLAY_CATEGORIES.map((item) => {
               const isSelected = category === item;
               return (
                 <button
@@ -101,7 +115,6 @@ export const Filter = () => {
           <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
             {transactionOptions.map((option) => {
               const isSelected = transactionStatus === option.value;
-
               return (
                 <button
                   key={option.value}
@@ -141,22 +154,25 @@ export const Filter = () => {
             가격
           </h3>
           <div className="space-y-2">
-            {price_ranges.map((item) => (
-              <label
-                key={item}
-                className="flex items-center space-x-3 cursor-pointer p-1"
-              >
-                <span className="text-gray-500 mr-auto md:text-medium-sm text-medium-sm">
-                  {item}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={priceRanges.includes(item)}
-                  onChange={() => actions.togglePriceRange(item)}
-                  className="h-6 w-6 rounded border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
-                />
-              </label>
-            ))}
+            {price_ranges.map((item) => {
+              const value = PRICE_VALUE_MAP[item];
+              return (
+                <label
+                  key={item}
+                  className="flex items-center space-x-3 cursor-pointer p-1"
+                >
+                  <span className="text-gray-500 mr-auto md:text-medium-sm text-medium-sm">
+                    {item}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={priceRanges.includes(value)}
+                    onChange={() => actions.togglePriceRange(value)}
+                    className="h-6 w-6 rounded border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
+                  />
+                </label>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -201,7 +217,7 @@ export const Filter = () => {
 
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <div className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
-              <FilterView isMobile={true} />
+              <FilterView isMobile />
             </div>
           </div>
         </Dialog>
