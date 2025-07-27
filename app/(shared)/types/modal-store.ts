@@ -31,6 +31,7 @@ export type ModalType =
   | 'service-guide'
   | 'privacy-policy'
   | 'theme'
+  | 'trade-cancel'
   | null;
 
 /**
