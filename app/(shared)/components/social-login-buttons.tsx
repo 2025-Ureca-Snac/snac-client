@@ -29,14 +29,7 @@ export default function SocialLoginButtons() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, providerId: string) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSocialLogin(providerId);
-    }
-  };
-
-  const handleKeyUp = (e: React.KeyboardEvent, providerId: string) => {
-    if (e.key === ' ') {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleSocialLogin(providerId);
     }
@@ -52,7 +45,6 @@ export default function SocialLoginButtons() {
               className="p-0 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full focus:bg-gray-100 focus:bg-opacity-20"
               onClick={() => handleSocialLogin(providerId)}
               onKeyDown={(e) => handleKeyDown(e, providerId)}
-              onKeyUp={(e) => handleKeyUp(e, providerId)}
               aria-label={`${name}로 로그인`}
               role="button"
               tabIndex={0}
