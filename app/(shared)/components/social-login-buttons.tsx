@@ -28,20 +28,47 @@ export default function SocialLoginButtons() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, providerId: string) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSocialLogin(providerId);
+    }
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent, providerId: string) => {
+    if (e.key === ' ') {
+      e.preventDefault();
+      handleSocialLogin(providerId);
+    }
+  };
+
   return (
-    <div className="flex justify-center space-x-4">
-      {SOCIALS.map(({ name, src, providerId }) => (
-        <div key={name} className="flex flex-col items-center space-y-2">
-          <div className="w-36 h-36 rounded-full flex items-center justify-center">
-            <Image
-              src={src}
-              alt={name}
-              width={90}
-              height={90}
-              className="object-contain cursor-pointer"
+    <div className="flex justify-center">
+      {SOCIALS.map(({ name, src, providerId }, index) => (
+        <div key={name} className="flex items-center">
+          <div className="w-22 h-22 md:w-34 md:h-34 rounded-full flex items-center justify-center">
+            <button
+              type="button"
+              className="p-0 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full focus:bg-gray-100 focus:bg-opacity-20"
               onClick={() => handleSocialLogin(providerId)}
-            />
+              onKeyDown={(e) => handleKeyDown(e, providerId)}
+              onKeyUp={(e) => handleKeyUp(e, providerId)}
+              aria-label={`${name}로 로그인`}
+              role="button"
+              tabIndex={0}
+            >
+              <Image
+                src={src}
+                alt={name}
+                width={90}
+                height={90}
+                className="object-contain w-18 h-18 md:w-[90px] md:h-[90px] pointer-events-none"
+              />
+            </button>
           </div>
+          {index < SOCIALS.length - 1 && (
+            <span className="mx-3 md:mx-5 text-transparent">|</span>
+          )}
         </div>
       ))}
     </div>
