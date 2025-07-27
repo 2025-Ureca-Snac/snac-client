@@ -1,3 +1,4 @@
+import { KeyboardEvent, forwardRef } from 'react';
 import type { VerificationInputProps } from '../types/formComponents';
 
 /**
@@ -16,52 +17,68 @@ import type { VerificationInputProps } from '../types/formComponents';
  * @param {string} helpText 도움말 텍스트
  * @param {boolean} showHelpText 도움말 표시 여부
  */
-export default function VerificationInput({
-  label,
-  id,
-  name,
-  value,
-  onChange,
-  placeholder = '인증코드',
-  required = false,
-  disabled = false,
-  onVerify,
-  verifyDisabled = false,
-  helpText,
-  showHelpText = false,
-}: VerificationInputProps) {
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-2"
-      >
-        {label}
-      </label>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          id={id}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          disabled={disabled}
-          className="flex-1 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
-        />
-        <button
-          type="button"
-          onClick={onVerify}
-          disabled={verifyDisabled}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap h-[48px] flex items-center justify-center"
+const VerificationInput = forwardRef<HTMLInputElement, VerificationInputProps>(
+  (
+    {
+      label,
+      id,
+      name,
+      value,
+      onChange,
+      placeholder = '인증코드',
+      required = false,
+      disabled = false,
+      onVerify,
+      verifyDisabled = false,
+      helpText,
+      showHelpText = false,
+      autoComplete,
+    },
+    ref
+  ) => {
+    return (
+      <div>
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-gray-700 mb-2"
         >
-          확인
-        </button>
+          {label}
+        </label>
+        <div className="flex space-x-2">
+          <input
+            ref={ref}
+            type="text"
+            id={id}
+            name={name}
+            value={value}
+            onChange={onChange}
+            onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter' && !verifyDisabled && onVerify) {
+                e.preventDefault();
+                onVerify();
+              }
+            }}
+            placeholder={placeholder}
+            required={required}
+            disabled={disabled}
+            autoComplete={autoComplete}
+            className="flex-1 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] min-w-0"
+          />
+          <button
+            type="button"
+            onClick={onVerify}
+            disabled={verifyDisabled}
+            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap h-[48px] flex items-center justify-center flex-shrink-0"
+          >
+            확인
+          </button>
+        </div>
+        <p className="text-red-500 text-sm mt-2 min-h-[20px]">
+          {showHelpText && helpText ? helpText : ''}
+        </p>
       </div>
-      <p className="text-red-500 text-sm mt-2 min-h-[20px]">
-        {showHelpText && helpText ? helpText : ''}
-      </p>
-    </div>
-  );
-}
+    );
+  }
+);
+VerificationInput.displayName = 'VerificationInput';
+export default VerificationInput;

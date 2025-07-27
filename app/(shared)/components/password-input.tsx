@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import Image from 'next/image';
 import type { PasswordInputProps } from '../types/formComponents';
 
@@ -17,69 +17,79 @@ import type { PasswordInputProps } from '../types/formComponents';
  * @param {boolean} showHelpText 도움말 표시 여부
  * @param {string} helpTextColor 도움말 색상
  */
-export default function PasswordInput({
-  label,
-  id,
-  name,
-  value,
-  onChange,
-  placeholder,
-  required = false,
-  disabled = false,
-  helpText,
-  showHelpText = false,
-  helpTextColor = 'gray',
-}: PasswordInputProps) {
-  const [showPassword, setShowPassword] = useState(false);
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+  (
+    {
+      label,
+      id,
+      name,
+      value,
+      onChange,
+      placeholder,
+      required = false,
+      disabled = false,
+      helpText,
+      showHelpText = false,
+      helpTextColor = 'gray',
+      ...props
+    },
+    ref
+  ) => {
+    const [showPassword, setShowPassword] = useState(false);
 
-  /**
-   * @author 이승우
-   * @description 레드 : 비밀번호 불일치, 그린 : 비밀번호 일치, 그레이 : 비밀번호 입력 전
-   */
-  const helpTextColorClass: Record<string, string> = {
-    red: 'text-red-500',
-    green: 'text-green-500',
-    gray: 'text-gray-500',
-  };
+    /**
+     * @author 이승우
+     * @description 레드 : 비밀번호 불일치, 그린 : 비밀번호 일치, 그레이 : 비밀번호 입력 전
+     */
+    const helpTextColorClass: Record<string, string> = {
+      red: 'text-red-500',
+      green: 'text-green-500',
+      gray: 'text-gray-500',
+    };
 
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-2"
-      >
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type={showPassword ? 'text' : 'password'}
-          id={id}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          disabled={disabled}
-          className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+    return (
+      <div>
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-gray-700 mb-2"
         >
-          <Image
-            src={showPassword ? '/eye-open.png' : '/eye-closed.png'}
-            alt={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
-            width={20}
-            height={20}
+          {label}
+        </label>
+        <div className="relative">
+          <input
+            ref={ref}
+            type={showPassword ? 'text' : 'password'}
+            id={id}
+            name={name}
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder}
+            required={required}
+            disabled={disabled}
+            className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
+            {...props}
           />
-        </button>
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            <Image
+              src={showPassword ? '/eye-open.png' : '/eye-closed.png'}
+              alt={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+              width={20}
+              height={20}
+            />
+          </button>
+        </div>
+        <p
+          className={`text-sm mt-2 min-h-[20px] ${helpTextColorClass[helpTextColor] || 'text-gray-500'}`}
+        >
+          {showHelpText && helpText ? helpText : ''}
+        </p>
       </div>
-      <p
-        className={`text-sm mt-2 min-h-[20px] ${helpTextColorClass[helpTextColor] || 'text-gray-500'}`}
-      >
-        {showHelpText && helpText ? helpText : ''}
-      </p>
-    </div>
-  );
-}
+    );
+  }
+);
+PasswordInput.displayName = 'PasswordInput';
+export default PasswordInput;

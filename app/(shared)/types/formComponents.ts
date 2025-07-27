@@ -44,6 +44,7 @@ export interface InputFieldProps {
  * @property onButtonClick 버튼 클릭 이벤트
  * @property buttonDisabled 버튼 비활성화 여부(선택)
  * @property className 클래스 이름(선택)
+ * @property autoComplete 자동완성 여부(선택)
  */
 export interface InputWithButtonProps {
   label: string;
@@ -59,6 +60,7 @@ export interface InputWithButtonProps {
   onButtonClick: () => void;
   buttonDisabled?: boolean;
   className?: string;
+  autoComplete?: string;
 }
 
 /**
@@ -76,6 +78,7 @@ export interface InputWithButtonProps {
  * @property verifyDisabled 인증 비활성화 여부(선택)
  * @property helpText 도움말 텍스트(선택)
  * @property showHelpText 도움말 텍스트 표시 여부(선택)
+ * @property autoComplete 자동완성 여부(선택)
  */
 export interface VerificationInputProps {
   label: string;
@@ -90,6 +93,7 @@ export interface VerificationInputProps {
   verifyDisabled?: boolean;
   helpText?: string;
   showHelpText?: boolean;
+  autoComplete?: string;
 }
 
 /**

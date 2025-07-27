@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { SearchModalProps } from '../(shared)/types';
 import { useTimer } from '../(shared)/hooks/useTimer';
@@ -14,8 +14,7 @@ import { api } from '../(shared)/utils/api';
 /**
  * @author 이승우
  * @description 아이디 비밀번호 찾기 모달 컴포넌트
- * @param isOpen 모달 열림 여부
- * @param setIsOpen 모달 열림 여부 설정 함수
+ * @params {@link SearchModalProps}
  */
 export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   // 아이디 찾기 상태
@@ -26,6 +25,9 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   const [foundEmail, setFoundEmail] = useState<string | null>(null);
   const [formHeight, setFormHeight] = useState<number | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const idVerificationRef = useRef<HTMLInputElement>(null);
+  const passwordVerificationRef = useRef<HTMLInputElement>(null);
+  const newPasswordInputRef = useRef<HTMLInputElement>(null);
 
   // 비밀번호 찾기 상태
   const [showPasswordVerification, setShowPasswordVerification] =
@@ -38,6 +40,10 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   const [passwordAuthType, setPasswordAuthType] = useState<'email' | 'phone'>(
     'email'
   );
+
+  // 인증 요청 중복 방지 상태
+  const [isIdVerifying, setIsIdVerifying] = useState(false);
+  const [isPasswordVerifying, setIsPasswordVerifying] = useState(false);
 
   // 폼 데이터
   const [idFormData, setIdFormData] = useState({
@@ -52,15 +58,25 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     passwordConfirm: '',
   });
 
-  // 탭 정의
-  const tabs = [
-    { id: 'id', label: '이메일 찾기' },
-    { id: 'password', label: '비밀번호 찾기' },
-  ];
+  // Escape 키로 모달 닫기
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(null);
+      }
+    };
 
-  // 탭 전환 시 상태 초기화
-  const handleTab = (type: SearchModalProps['isOpen']) => {
-    setIsOpen(type);
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, setIsOpen]);
+
+  // 모달 완전 초기화 함수
+  const resetModal = () => {
     setIsVerified(false);
     setShowIdVerification(false);
     setIsIdSent(false);
@@ -68,6 +84,9 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     setShowPasswordVerification(false);
     setIsPasswordSent(false);
     setIsPasswordVerified(false);
+    setPasswordAuthType('email');
+    setIsIdVerifying(false); // 인증 중 상태 초기화
+    setIsPasswordVerifying(false); // 인증 중 상태 초기화
     idTimer.stop();
     passwordTimer.stop();
     setIdFormData({ phone: '', verificationCode: '' });
@@ -80,6 +99,42 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     });
     setFoundEmail(null);
     setFormHeight(null);
+    setIsOpen(null);
+  };
+
+  // 탭 정의
+  const tabs = [
+    { id: 'id', label: '이메일 찾기' },
+    { id: 'password', label: '비밀번호 찾기' },
+  ];
+
+  // 탭 전환 시 상태 초기화
+  const handleTab = (type: SearchModalProps['isOpen']) => {
+    // 모든 상태 초기화 (모달 닫기는 것만 제외)
+    setIsVerified(false);
+    setShowIdVerification(false);
+    setIsIdSent(false);
+    setIsIdVerified(false);
+    setShowPasswordVerification(false);
+    setIsPasswordSent(false);
+    setIsPasswordVerified(false);
+    setPasswordAuthType('email');
+    setIsIdVerifying(false); // 인증 중 상태 초기화
+    setIsPasswordVerifying(false); // 인증 중 상태 초기화
+    idTimer.stop();
+    passwordTimer.stop();
+    setIdFormData({ phone: '', verificationCode: '' });
+    setPasswordFormData({
+      email: '',
+      phone: '',
+      verificationCode: '',
+      password: '',
+      passwordConfirm: '',
+    });
+    setFoundEmail(null);
+    setFormHeight(null);
+    // 새로운 탭으로 설정
+    setIsOpen(type);
   };
 
   // 탭 변경 핸들러
@@ -87,16 +142,19 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     handleTab(tabId as SearchModalProps['isOpen']);
   };
 
-  // 아이디 찾기 인증 요청
+  // 이메일 찾기 인증 요청
   const handleIdVerification = useCallback(async () => {
+    if (isIdVerifying) return; // 이미 인증 요청 중이면 무시
+
     if (!idFormData.phone) {
       alert('휴대폰 번호를 입력해주세요.');
       return;
     }
 
-    console.log('아이디 찾기 인증 요청', idFormData.phone);
+    console.log('이메일 찾기 인증 요청', idFormData.phone);
 
     try {
+      setIsIdVerifying(true); // 인증 요청 시작
       const response = await api.post('/sns/send-verification-code', {
         phone: idFormData.phone,
       });
@@ -107,16 +165,25 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         setShowIdVerification(true);
         setIsIdSent(true);
         idTimer.start(300); // 5분 = 300초
+        // 인증코드 입력 필드에 포커스
+        setTimeout(() => {
+          idVerificationRef.current?.focus();
+        }, 100);
       } else {
         alert('인증코드 전송에 실패했습니다.');
       }
     } catch (error) {
-      console.error('아이디 찾기 인증 요청 오류', error);
+      console.error('이메일 찾기 인증 요청 오류', error);
+      alert('인증코드 전송에 실패했습니다.');
+    } finally {
+      setIsIdVerifying(false); // 인증 요청 완료
     }
-  }, [idFormData.phone, idTimer]);
+  }, [idFormData.phone, idTimer, isIdVerifying]);
 
   // 비밀번호 찾기 인증 요청
   const handlePasswordVerification = useCallback(async () => {
+    if (isPasswordVerifying) return; // 이미 인증 요청 중이면 무시
+
     const email = passwordFormData.email;
     const phone = passwordFormData.phone;
 
@@ -126,6 +193,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         return;
       }
       try {
+        setIsPasswordVerifying(true); // 인증 요청 시작
         const response = await api.post('/email/send-verification-code', {
           email,
         });
@@ -134,19 +202,27 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           setShowPasswordVerification(true);
           setIsPasswordSent(true);
           passwordTimer.start(300); // 5분 = 300초
+          // 인증코드 입력 필드에 포커스
+          setTimeout(() => {
+            passwordVerificationRef.current?.focus();
+          }, 100);
         } else {
           alert('인증코드 전송에 실패했습니다.');
         }
       } catch (error) {
         console.error('비밀번호 찾기 이메일 인증 요청 오류', error);
         alert(`인증코드 전송에 실패했습니다. ${error}`);
+      } finally {
+        setIsPasswordVerifying(false); // 인증 요청 완료
       }
     } else {
       if (!phone) {
         alert('휴대폰 번호를 입력해주세요.');
         return;
       }
+
       try {
+        setIsPasswordVerifying(true); // 인증 요청 시작
         const response = await api.post('/sns/send-verification-code', {
           phone,
         });
@@ -155,12 +231,18 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           setShowPasswordVerification(true);
           setIsPasswordSent(true);
           passwordTimer.start(300); // 5분 = 300초
+          // 인증코드 입력 필드에 포커스
+          setTimeout(() => {
+            passwordVerificationRef.current?.focus();
+          }, 100);
         } else {
           alert('인증코드 전송에 실패했습니다.');
         }
       } catch (error) {
         console.error('비밀번호 찾기 휴대폰 인증 요청 오류', error);
         alert(`인증코드 전송에 실패했습니다. ${error}`);
+      } finally {
+        setIsPasswordVerifying(false); // 인증 요청 완료
       }
     }
   }, [
@@ -168,14 +250,37 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     passwordFormData.phone,
     passwordAuthType,
     passwordTimer,
+    isPasswordVerifying,
   ]);
 
-  // 아이디 찾기 인증코드 확인
-  const handleIdVerificationCheck = useCallback(() => {
-    console.log('아이디 찾기 인증코드 확인', idFormData.verificationCode);
-    setIsIdVerified(true);
-    setShowIdVerification(false);
-  }, [idFormData.verificationCode]);
+  // 이메일 찾기 인증코드 확인
+  const handleIdVerificationCheck = useCallback(async () => {
+    console.log('이메일 찾기 인증코드 확인', idFormData.verificationCode);
+    try {
+      const response = await api.post<unknown>('/sns/verify-code', {
+        phone: idFormData.phone,
+        code: idFormData.verificationCode,
+      });
+
+      console.log('이메일 찾기 인증코드 확인 응답', response);
+      if ((response.data as { status?: string })?.status === 'OK') {
+        console.log('이메일 찾기 인증코드 확인 성공');
+        setIsIdVerified(true);
+        setShowIdVerification(false);
+        // 아이디 찾기 버튼에 포커스
+        setTimeout(() => {
+          const findIdButton = document.querySelector(
+            '[data-find-id-button]'
+          ) as HTMLButtonElement;
+          findIdButton?.focus();
+        }, 100);
+      } else {
+        alert('인증코드가 일치하지 않습니다.');
+      }
+    } catch (error) {
+      console.error('이메일 찾기 인증코드 확인 오류', error);
+    }
+  }, [idFormData.verificationCode, idFormData.phone]);
 
   // 비밀번호 찾기 인증코드 확인
   const handlePasswordVerificationCheck = useCallback(async () => {
@@ -194,6 +299,18 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           setIsPasswordVerified(true);
           setShowPasswordVerification(false);
           setIsVerified(true);
+          // 새 비밀번호 입력 필드에 포커스
+          setTimeout(() => {
+            if (newPasswordInputRef.current) {
+              newPasswordInputRef.current.focus();
+            } else {
+              // fallback: data 속성으로 찾기
+              const newPasswordInput = document.querySelector(
+                '[data-new-password-input]'
+              ) as HTMLInputElement;
+              newPasswordInput?.focus();
+            }
+          }, 300);
         } else {
           alert('인증코드가 일치하지 않습니다.');
         }
@@ -207,6 +324,18 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           setIsPasswordVerified(true);
           setShowPasswordVerification(false);
           setIsVerified(true);
+          // 새 비밀번호 입력 필드에 포커스
+          setTimeout(() => {
+            if (newPasswordInputRef.current) {
+              newPasswordInputRef.current.focus();
+            } else {
+              // fallback: data 속성으로 찾기
+              const newPasswordInput = document.querySelector(
+                '[data-new-password-input]'
+              ) as HTMLInputElement;
+              newPasswordInput?.focus();
+            }
+          }, 300);
         } else {
           alert('인증코드가 일치하지 않습니다.');
         }
@@ -242,20 +371,94 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         setFormHeight(formRef.current.offsetHeight);
       }
       try {
-        // const response = await axios.post<any>('/api/find-email', { phone: idFormData.phone });
-        // setFoundEmail(response.data.email);
-        setFoundEmail('seungwoo');
+        const response = await api.post<{ data: string }>('member/find-email', {
+          phone: idFormData.phone,
+        });
+        console.log(response);
+        setFoundEmail(response.data.data);
       } catch (error) {
         alert(`이메일을 찾을 수 없습니다. ${error}`);
       }
     },
-    [isIdVerified]
+    [isIdVerified, idFormData.phone]
   );
 
   // 로그인하러 가기
   const goToLogin = () => {
-    setIsOpen(null);
+    resetModal();
   };
+
+  // 이메일 찾기 초기화
+  const handleIdReset = () => {
+    setShowIdVerification(false);
+    setIsIdSent(false);
+    setIsIdVerified(false);
+    idTimer.stop();
+    setIdFormData({ phone: '', verificationCode: '' });
+    setFoundEmail(null);
+    setFormHeight(null);
+  };
+
+  // 비밀번호 찾기 초기화
+  const handlePasswordReset = () => {
+    setShowPasswordVerification(false);
+    setIsPasswordSent(false);
+    setIsPasswordVerified(false);
+    setIsVerified(false);
+    passwordTimer.stop();
+    setPasswordFormData({
+      email: '',
+      phone: '',
+      verificationCode: '',
+      password: '',
+      passwordConfirm: '',
+    });
+  };
+
+  // 비밀번호 변경
+  const handlePasswordChange = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      const { password, passwordConfirm } = passwordFormData;
+
+      // 비밀번호 유효성 검사
+      if (!password || !passwordConfirm) {
+        alert('비밀번호를 입력해주세요.');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
+      try {
+        // 비밀번호 변경 API 호출
+        const response =
+          passwordAuthType === 'email'
+            ? await api.post('/member/find-pwd/email', {
+                email: passwordFormData.email,
+                newPwd: password,
+              })
+            : await api.post('/member/find-pwd/phone', {
+                phone: passwordFormData.phone,
+                newPwd: password,
+              });
+
+        if ((response.data as { status?: string })?.status === 'OK') {
+          alert('비밀번호가 성공적으로 변경되었습니다.');
+          resetModal(); // 모달 닫기
+        } else {
+          alert('비밀번호 변경에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('비밀번호 변경 오류:', error);
+        alert('비밀번호 변경 중 오류가 발생했습니다.');
+      }
+    },
+    [passwordFormData, passwordAuthType, resetModal]
+  );
 
   // 비밀번호 찾기 토글 변경 핸들러
   const handlePasswordAuthTypeChange = useCallback(
@@ -264,6 +467,8 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
       // 관련 상태들 초기화
       setPasswordFormData((prev) => ({
         ...prev,
+        email: '', // 이메일 입력 필드 초기화
+        phone: '', // 휴대폰 번호 입력 필드 초기화
         verificationCode: '',
       }));
       setIsPasswordSent(false);
@@ -276,13 +481,13 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   );
 
   return (
-    <ModalPortal isOpen={!!isOpen} onClose={() => setIsOpen(null)}>
+    <ModalPortal isOpen={!!isOpen} onClose={resetModal}>
       <div className="flex items-center justify-center bg-black bg-opacity-30 h-full">
         <div className="bg-white rounded-xl w-[90%] max-w-[450px] p-6 md:p-8 relative">
           {/* 닫기 버튼 */}
           <button
             className="absolute top-4 right-4 text-2xl"
-            onClick={() => setIsOpen(null)}
+            onClick={resetModal}
             aria-label="닫기"
           >
             <Image src="/close.png" alt="close" width={24} height={24} />
@@ -315,6 +520,9 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
                 handleIdVerificationCheck={handleIdVerificationCheck}
                 handleFindId={handleFindId}
                 goToLogin={goToLogin}
+                onReset={handleIdReset}
+                idVerificationRef={idVerificationRef}
+                isIdVerifying={isIdVerifying}
               />
             ) : (
               <FindPasswordSection
@@ -331,6 +539,11 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
                 }
                 passwordAuthType={passwordAuthType}
                 handlePasswordAuthTypeChange={handlePasswordAuthTypeChange}
+                onReset={handlePasswordReset}
+                onSubmit={handlePasswordChange}
+                passwordVerificationRef={passwordVerificationRef}
+                newPasswordInputRef={newPasswordInputRef}
+                isPasswordVerifying={isPasswordVerifying}
               />
             )}
           </AnimatePresence>

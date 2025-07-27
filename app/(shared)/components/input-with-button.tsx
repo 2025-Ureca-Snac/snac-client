@@ -1,3 +1,4 @@
+import { KeyboardEvent, forwardRef } from 'react';
 import type { InputWithButtonProps } from '../types/formComponents';
 
 /**
@@ -16,50 +17,66 @@ import type { InputWithButtonProps } from '../types/formComponents';
  * @param {Function} onButtonClick 버튼 클릭 함수
  * @param {boolean} buttonDisabled 버튼 비활성화 여부
  */
-export default function InputWithButton({
-  label,
-  type = 'text',
-  id,
-  name,
-  value,
-  onChange,
-  placeholder,
-  required = false,
-  disabled = false,
-  buttonText,
-  onButtonClick,
-  buttonDisabled = false,
-}: InputWithButtonProps) {
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-2"
-      >
-        {label}
-      </label>
-      <div className="flex gap-2">
-        <input
-          type={type}
-          id={id}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          disabled={disabled}
-          className="flex-1 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
-        />
-        <button
-          type="button"
-          onClick={onButtonClick}
-          disabled={buttonDisabled}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap h-[48px] flex items-center justify-center"
+const InputWithButton = forwardRef<HTMLInputElement, InputWithButtonProps>(
+  (
+    {
+      label,
+      type = 'text',
+      id,
+      name,
+      value,
+      onChange,
+      placeholder,
+      required = false,
+      disabled = false,
+      buttonText,
+      onButtonClick,
+      buttonDisabled = false,
+      autoComplete,
+    },
+    ref
+  ) => {
+    return (
+      <div>
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-gray-700 mb-2"
         >
-          {buttonText}
-        </button>
+          {label}
+        </label>
+        <div className="flex space-x-2">
+          <input
+            ref={ref}
+            type={type}
+            id={id}
+            name={name}
+            value={value}
+            onChange={onChange}
+            onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter' && !buttonDisabled && onButtonClick) {
+                e.preventDefault();
+                onButtonClick();
+              }
+            }}
+            placeholder={placeholder}
+            required={required}
+            disabled={disabled}
+            autoComplete={autoComplete}
+            className="flex-1 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] min-w-0"
+          />
+          <button
+            type="button"
+            onClick={onButtonClick}
+            disabled={buttonDisabled}
+            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap h-[48px] flex items-center justify-center flex-shrink-0"
+          >
+            {buttonText}
+          </button>
+        </div>
+        <div className="min-h-[20px] mt-2"></div>
       </div>
-      <div className="min-h-[20px] mt-2"></div>
-    </div>
-  );
-}
+    );
+  }
+);
+InputWithButton.displayName = 'InputWithButton';
+export default InputWithButton;
