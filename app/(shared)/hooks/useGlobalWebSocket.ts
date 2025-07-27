@@ -271,13 +271,14 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         if (cardData.cardId) {
           setCurrentCardId(cardData.cardId);
         }
+        const currentUserRole = useMatchStore.getState().userRole;
         console.log('🔍 매칭 알림 처리 조건 확인:', {
           userRole,
           hasSetActiveSellers: !!props?.setActiveSellers,
           isBuyer: userRole === 'buyer',
         });
 
-        if (props?.setActiveSellers) {
+        if (currentUserRole === 'buyer' && props?.setActiveSellers) {
           props.setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
