@@ -69,11 +69,9 @@ export default function FindEmailSection({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="space-y-4"
+      className="space-y-4 pt-10"
       onSubmit={handleFindId}
     >
-      {/* 비밀번호 찾기와 높이 맞추기 위한 빈 공간 */}
-      <div className="h-10 mb-2"></div>
       <InputWithButton
         label=""
         id="phone"
