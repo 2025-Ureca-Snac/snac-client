@@ -331,7 +331,7 @@ export default function MatchPage() {
         // 1초 후 trading 페이지로 이동
         setTimeout(() => {
           router.push('/match/trading');
-        }, 1000);
+        }, 500);
       }
     },
     [incomingRequests, respondToTrade, sellerInfo, foundMatch, router]

@@ -267,7 +267,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
         const currentUserRole = useMatchStore.getState().userRole;
         console.log('🔍 매칭 알림 처리 조건 확인:', {
-          userRole,
+          currentUserRole,
           hasSetActiveSellers: !!props?.setActiveSellers,
           isBuyer: userRole === 'buyer',
         });
