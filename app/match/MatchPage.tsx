@@ -14,6 +14,7 @@ import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import { useUserStore } from '../(shared)/stores/user-store';
+import TradeCancelModal from '../(shared)/components/TradeCancelModal';
 
 interface ServerTradeData {
   tradeId: number;
@@ -396,6 +397,7 @@ export default function MatchPage() {
           />
         )}
       </main>
+      <TradeCancelModal />
       <Footer />
     </div>
   );

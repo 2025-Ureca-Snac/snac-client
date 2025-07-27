@@ -5,17 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Client as StompClient } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useMatchStore } from '../stores/match-store';
+import { useModalStore } from '../stores/modal-store';
 import { User, Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
-
-// 거래 취소 사유 enum
-export enum CancelReason {
-  BUYER_CHANGE_MIND = 'BUYER_CHANGE_MIND',
-  BUYER_LIMIT_EXCEEDED = 'BUYER_LIMIT_EXCEEDED',
-  SELLER_CHANGE_MIND = 'SELLER_CHANGE_MIND',
-  SELLER_LIMIT_EXCEEDED = 'SELLER_LIMIT_EXCEEDED',
-  NOT_SELECTED = 'NOT_SELECTED',
-}
+import { CancelReason } from '../constants';
 
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
 let globalStompClient: StompClient | null = null;
@@ -98,6 +91,7 @@ interface UseGlobalWebSocketProps {
 
 export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const router = useRouter();
+  const { openModal } = useModalStore();
   const {
     foundMatch,
     setWebSocketFunctions,
@@ -521,6 +515,15 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           status: trade.status,
           cancelReason: trade.cancelReason,
         });
+
+        // 취소 사유가 있으면 모달 표시
+        if (trade.cancelReason) {
+          openModal('trade-cancel', {
+            cancelReason: trade.cancelReason,
+            tradeId: trade.id,
+            cardId: trade.cardId,
+          });
+        }
       } catch (error) {
         console.error('❌ 취소 큐 파싱 오류:', error);
       }
