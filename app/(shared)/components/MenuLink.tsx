@@ -10,7 +10,10 @@ interface MenuLinkProps {
 }
 
 export const MenuLink = ({ href, imgSrc, alt, text }: MenuLinkProps) => (
-  <Link href={href} className="flex items-center gap-2">
+  <Link
+    href={href}
+    className="flex items-center gap-2 transition-opacity hover:opacity-50"
+  >
     <Image src={imgSrc} alt={alt} width={24} height={24} />
     <span className="hidden md:flex text-midnight-black text-regular-sm">
       {text}
