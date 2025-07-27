@@ -18,3 +18,6 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
 } as const;
+
+// 거래 취소 관련 상수
+export * from './trade-cancel-reasons';
