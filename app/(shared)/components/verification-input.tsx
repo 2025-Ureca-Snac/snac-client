@@ -44,7 +44,7 @@ const VerificationInput = forwardRef<HTMLInputElement, VerificationInputProps>(
         >
           {label}
         </label>
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           <input
             ref={ref}
             type="text"
