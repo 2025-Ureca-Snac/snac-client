@@ -126,7 +126,6 @@ export default function Login() {
           <Link
             href="/signUp"
             className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded px-1"
-            tabIndex={0}
           >
             회원가입
           </Link>
