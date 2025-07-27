@@ -156,6 +156,9 @@ export const useAuthStore = create<AuthState>()(
         console.log(response);
 
         useAuthStore.getState().resetAuthState();
+        const { useUserStore } = await import('../stores/user-store');
+        useUserStore.getState().clearProfile();
+        
       },
 
       // 토큰 갱신
