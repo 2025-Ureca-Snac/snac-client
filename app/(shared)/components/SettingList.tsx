@@ -14,8 +14,16 @@ export default function SettingList({ onItemClick }: SettingListProps) {
       {settings.map((item) => (
         <li key={item}>
           <button
-            className="w-full flex justify-between items-center py-6 px-8 text-lg font-bold text-gray-800 hover:bg-gray-50 transition-colors focus:outline-none"
+            className="w-full flex justify-between items-center py-6 px-8 text-lg font-bold text-gray-800 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:bg-gray-50"
             onClick={() => onItemClick?.(item)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onItemClick?.(item);
+              }
+            }}
+            tabIndex={0}
+            aria-label={`${item} 설정으로 이동`}
           >
             {item}
             <Image

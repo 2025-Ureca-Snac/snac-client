@@ -36,9 +36,16 @@ export default function MyPageLayout({
       {/* 모바일 상단 헤더 */}
       <div className="md:hidden relative h-14 flex items-center border-b border-gray-200 bg-white sticky top-0 z-20">
         <button
-          className="absolute left-4 text-2xl text-gray-700"
+          className="absolute left-4 text-2xl text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-1"
           aria-label="뒤로가기"
           onClick={handleBackClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleBackClick();
+            }
+          }}
+          tabIndex={0}
         >
           ←
         </button>

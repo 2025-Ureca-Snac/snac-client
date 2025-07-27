@@ -71,11 +71,19 @@ export default function ScoreCard() {
             {profile?.nickname || '사용자'}
           </div>
           <button
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
             onClick={() => {
               // 단골 목록 모달 열기
               useModalStore.getState().openModal('favorite-list');
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                useModalStore.getState().openModal('favorite-list');
+              }
+            }}
+            tabIndex={0}
+            aria-label="단골 목록 보기"
           >
             <span className="font-bold text-lg">20</span>
             <span className="text-sm">단골 목록</span>

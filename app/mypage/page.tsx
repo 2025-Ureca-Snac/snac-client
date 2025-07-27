@@ -109,11 +109,30 @@ export default function MyPage() {
               <div className="flex flex-col gap-3 mt-6">
                 <button
                   onClick={handleLogout}
-                  className="w-full py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg hover:bg-yellow-700 transition-colors"
+                  className="w-full py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleLogout();
+                    }
+                  }}
+                  tabIndex={0}
+                  aria-label="로그아웃"
                 >
                   로그아웃
                 </button>
-                <button className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg">
+                <button
+                  className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      // 탈퇴 기능 구현 필요
+                      alert('탈퇴 기능은 아직 구현되지 않았습니다.');
+                    }
+                  }}
+                  tabIndex={0}
+                  aria-label="회원 탈퇴"
+                >
                   탈퇴하기
                 </button>
               </div>
