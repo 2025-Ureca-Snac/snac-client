@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { api, handleApiError, ApiResponse } from '../../(shared)/utils/api';
+import { api, handleApiError } from '../../(shared)/utils/api';
+import { ApiResponse } from '../../(shared)/types/api';
 import { TradeCreateData, TradeScrollParams, CommonProps } from '../types';
 
 export default function TradeManagement({ loading, setResponse }: CommonProps) {

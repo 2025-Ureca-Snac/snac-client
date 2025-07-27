@@ -108,7 +108,16 @@ export default function Home() {
     };
 
     fetchScrollCards();
-  }, [currentPage, refetchTrigger]);
+  }, [
+    currentPage,
+    refetchTrigger,
+    cardCategory,
+    carrier,
+    category,
+    priceRanges,
+    sortBy,
+    transactionStatus,
+  ]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {

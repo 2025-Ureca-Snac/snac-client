@@ -6,7 +6,8 @@ import AccountManagement from './components/AccountManagement';
 import BankManagement from './components/BankManagement';
 import TradeManagement from './components/TradeManagement';
 import SocketManagement from './components/SocketManagement';
-import { api, handleApiError, ApiResponse } from '../(shared)/utils/api';
+import { api, handleApiError } from '../(shared)/utils/api';
+import { ApiResponse } from '../(shared)/types/api';
 import { testTokenManager } from './utils/tokenManager';
 
 export default function TestPage() {
