@@ -98,8 +98,14 @@ interface UseGlobalWebSocketProps {
 
 export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const router = useRouter();
-  const { foundMatch, setWebSocketFunctions, partner, userRole, setUserRole } =
-    useMatchStore();
+  const {
+    foundMatch,
+    setWebSocketFunctions,
+    partner,
+    userRole,
+    setUserRole,
+    setCurrentCardId,
+  } = useMatchStore();
   const [isConnected, setIsConnected] = useState(false);
   const connectionId = useRef(++globalConnectionCount);
   // JWT 토큰 가져오기
@@ -261,10 +267,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       console.log('🟢 매칭 알림 수신:', frame.body);
       try {
         const cardData: ServerCardData = JSON.parse(frame.body);
-        console.log(cardData, '야여기1');
         const user = convertServerCardToUser(cardData);
-        console.log(user, '야여기2');
-
+        if (cardData.cardId) {
+          setCurrentCardId(cardData.cardId);
+        }
         console.log('🔍 매칭 알림 처리 조건 확인:', {
           userRole,
           hasSetActiveSellers: !!props?.setActiveSellers,
@@ -327,6 +333,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           phone: tradeData.phone,
           cancelReason: tradeData.cancelReason,
         });
+
+        // cardId를 store에 저장
+        if (tradeData.cardId) {
+          setCurrentCardId(tradeData.cardId);
+        }
 
         // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트
         if (userRole === 'buyer' && props?.setActiveSellers) {
@@ -599,18 +610,27 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   // 판매자 카드 삭제
   const deleteSellerCard = useCallback(
     (
-      cardId: number,
+      cardId?: number,
       reason: CancelReason = CancelReason.SELLER_CHANGE_MIND
     ) => {
       if (!globalStompClient?.connected || userRole !== 'seller') {
         return;
       }
 
-      console.log('🗑️ 판매자 카드 삭제:', { cardId, reason });
+      // store에서 currentCardId를 가져와서 사용
+      const { currentCardId } = useMatchStore.getState();
+      const targetCardId = cardId || currentCardId;
+      console.log(currentCardId, '야여기5');
+      if (!targetCardId) {
+        console.error('❌ 삭제할 카드 ID가 없습니다.');
+        return;
+      }
+
+      console.log('🗑️ 판매자 카드 삭제:', { cardId: targetCardId, reason });
 
       globalStompClient.publish({
         destination: '/app/trade/buy-request/cancel/seller',
-        body: JSON.stringify({ cardId, reason }),
+        body: JSON.stringify({ cardId: targetCardId, reason }),
       });
     },
     [userRole]
