@@ -41,11 +41,11 @@ const FILTER_OPTIONS = {
     { value: '2GB 이상', label: '2GB 이상' },
   ],
   price: [
-    { value: '0 - 999', label: '0 - 999' },
-    { value: '1,000 - 1,499', label: '1,000 - 1,499' },
-    { value: '1,500 - 1,999', label: '1,500 - 1,999' },
-    { value: '2,000 - 2,499', label: '2,000 - 2,499' },
-    { value: '2,500 이상', label: '2,500 이상' },
+    { value: 'ALL', label: '전체' },
+    { value: 'P0_1000', label: '1,000원 이하' },
+    { value: 'P0_1500', label: '1,500원 이하' },
+    { value: 'P0_2000', label: '2,000원 이하' },
+    { value: 'P0_2500', label: '2,500원 이하' },
   ],
 };
 

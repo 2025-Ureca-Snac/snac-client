@@ -529,15 +529,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   // 가격 필터 변환
   const convertPriceFilter = (priceFilters: string[]): string => {
     if (priceFilters.length === 0) return 'ALL';
-
-    const firstFilter = priceFilters[0];
-    if (firstFilter.includes('0 - 999')) return 'P0_999';
-    if (firstFilter.includes('1,000 - 1,499')) return 'P1000_1499';
-    if (firstFilter.includes('1,500 - 1,999')) return 'P1500_1999';
-    if (firstFilter.includes('2,000 - 2,499')) return 'P2000_2499';
-    if (firstFilter.includes('2,500 이상')) return 'P2500_PLUS';
-
-    return 'ALL';
+    return priceFilters[0] || 'ALL';
   };
 
   // userRole 업데이트 함수
