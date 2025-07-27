@@ -50,6 +50,8 @@ export default function SignUp() {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailVerificationRef = useRef<HTMLInputElement>(null);
   const phoneVerificationRef = useRef<HTMLInputElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     nameInputRef.current?.focus();
@@ -226,10 +228,7 @@ export default function SignUp() {
         setShowEmailVerification(false);
         // 전화번호 입력 필드로 포커스
         setTimeout(() => {
-          const phoneInput = document.querySelector(
-            'input[name="phoneNumber"]'
-          ) as HTMLInputElement;
-          phoneInput?.focus();
+          phoneInputRef.current?.focus();
         }, 100);
       } else {
         alert('인증코드가 일치하지 않습니다.');
@@ -259,10 +258,7 @@ export default function SignUp() {
       setShowPhoneVerification(false);
       // 비밀번호 입력 필드로 포커스
       setTimeout(() => {
-        const passwordInput = document.querySelector(
-          'input[name="password"]'
-        ) as HTMLInputElement;
-        passwordInput?.focus();
+        passwordInputRef.current?.focus();
       }, 100);
     } else {
       alert('인증코드가 일치하지 않습니다.');
@@ -490,6 +486,7 @@ export default function SignUp() {
               (isPhoneSent && phoneTimer.time > 240) ||
               isPhoneVerifying
             }
+            ref={phoneInputRef}
           />
 
           <VerificationInput
@@ -514,6 +511,7 @@ export default function SignUp() {
             value={formData.password}
             onChange={handleInputChange}
             required
+            ref={passwordInputRef}
           />
 
           <PasswordInput
