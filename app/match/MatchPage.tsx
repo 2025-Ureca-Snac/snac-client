@@ -121,6 +121,7 @@ export default function MatchPage() {
   const {
     isConnected,
     registerSellerCard,
+    deleteSellerCard,
     registerBuyerFilter,
     respondToTrade,
     createTrade,
@@ -287,8 +288,10 @@ export default function MatchPage() {
       });
     } else {
       console.log('판매 상태가 비활성화되었습니다.');
+      // 판매자 카드 삭제 (cardId는 서버에서 관리되므로 임시로 0 사용)
+      deleteSellerCard(0);
     }
-  }, [sellerInfo, registerSellerCard, setActiveSellers]);
+  }, [sellerInfo, registerSellerCard, deleteSellerCard, setActiveSellers]);
 
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = useCallback(

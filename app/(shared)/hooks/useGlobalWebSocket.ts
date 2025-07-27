@@ -8,6 +8,15 @@ import { useMatchStore } from '../stores/match-store';
 import { User, Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
 
+// 거래 취소 사유 enum
+export enum CancelReason {
+  BUYER_CHANGE_MIND = 'BUYER_CHANGE_MIND',
+  BUYER_LIMIT_EXCEEDED = 'BUYER_LIMIT_EXCEEDED',
+  SELLER_CHANGE_MIND = 'SELLER_CHANGE_MIND',
+  SELLER_LIMIT_EXCEEDED = 'SELLER_LIMIT_EXCEEDED',
+  NOT_SELECTED = 'NOT_SELECTED',
+}
+
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
 let globalStompClient: StompClient | null = null;
 let globalConnectionCount = 0;
@@ -587,6 +596,26 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     [userRole]
   );
 
+  // 판매자 카드 삭제
+  const deleteSellerCard = useCallback(
+    (
+      cardId: number,
+      reason: CancelReason = CancelReason.SELLER_CHANGE_MIND
+    ) => {
+      if (!globalStompClient?.connected || userRole !== 'seller') {
+        return;
+      }
+
+      console.log('🗑️ 판매자 카드 삭제:', { cardId, reason });
+
+      globalStompClient.publish({
+        destination: '/app/trade/buy-request/cancel/seller',
+        body: JSON.stringify({ cardId, reason }),
+      });
+    },
+    [userRole]
+  );
+
   // 거래 응답 (판매자용)
   const respondToTrade = useCallback((tradeId: number, accept: boolean) => {
     if (!globalStompClient?.connected) return;
@@ -679,6 +708,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   return {
     isConnected,
     registerSellerCard,
+    deleteSellerCard,
     registerBuyerFilter,
     respondToTrade,
     createTrade,
