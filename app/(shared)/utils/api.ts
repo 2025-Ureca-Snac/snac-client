@@ -1,12 +1,11 @@
 import axios from 'axios';
+import { useAuthStore } from '../stores/auth-store';
 
 /**
  * @author 이승우
  * @description API URL 설정
  */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://snac-alb-35725453.ap-northeast-2.elb.amazonaws.com/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 /**
 /**
@@ -28,22 +27,83 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-/**
- * @author 이승우
- * @description API 응답 타입 정의
- * @param code 응답 코드
- * @param status 응답 상태
- * @param message 응답 메시지
- * @param data 응답 데이터
- * @param timestamp 응답 시간
- */
-export interface ApiResponse<T = unknown> {
-  code: string;
-  status: string;
-  message: string;
-  data: T;
-  timestamp: string;
-}
+// 요청 인터셉터: 매 요청마다 최신 토큰을 헤더에 추가
+api.interceptors.request.use((config) => {
+  if (
+    typeof window !== 'undefined' &&
+    !(config.headers && 'Authorization' in config.headers)
+  ) {
+    const token = useAuthStore.getState().token;
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+// 응답 인터셉터: 401 에러 시 토큰 갱신 후 재시도
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    const code = error.response?.data?.code;
+
+    // 401 에러이고 아직 재시도하지 않은 요청인 경우
+    if (code === 'TOKEN_EXPIRED_401' && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        console.log('401 에러 감지, 토큰 갱신 시도');
+
+        // 토큰 갱신 시도
+        const { checkAndRefreshToken } = useAuthStore.getState();
+        const isRefreshed = await checkAndRefreshToken();
+
+        if (isRefreshed) {
+          // 토큰 갱신 성공 시 새로운 토큰으로 원래 요청 재시도
+          const newToken = useAuthStore.getState().token;
+          if (newToken && originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+
+          console.log('토큰 갱신 성공, 원래 요청 재시도');
+          return api(originalRequest);
+        } else {
+          // 토큰 갱신 실패 시 로그아웃 처리
+          console.log('토큰 갱신 실패, 로그아웃 처리');
+          const { logout } = useAuthStore.getState();
+          await logout();
+
+          // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+
+          return Promise.reject(error);
+        }
+      } catch (refreshError) {
+        console.error('토큰 갱신 중 오류:', refreshError);
+
+        // 토큰 갱신 중 오류 발생 시 로그아웃 처리
+        const { logout } = useAuthStore.getState();
+        await logout();
+
+        // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+
+        return Promise.reject(error);
+      }
+    }
+
+    // 401이 아닌 다른 에러이거나 이미 재시도한 요청인 경우
+    return Promise.reject(error);
+  }
+);
 
 /**
  * @author 이승우

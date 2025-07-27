@@ -1,42 +1,48 @@
 import Image from 'next/image';
-
-const SOCIALS = [
-  {
-    name: '카카오',
-    pcSrc: '/kakao_login.svg',
-    mobileSrc: '/kakao_mobile_login.svg',
-  },
-  {
-    name: '네이버',
-    pcSrc: '/naver_login.svg',
-    mobileSrc: '/naver_mobile_login.svg',
-  },
-];
+import { useAuthStore } from '../stores/auth-store';
+import { SOCIALS } from '../constants/social-login-data';
+import { useRouter } from 'next/navigation';
 
 /**
  * @author 이승우
- * @description 소셜 로그인 버튼 컴포넌트( 카카오, 네이버 )
+ * @description 소셜 로그인 버튼 컴포넌트( 브랜드별 맞춤 스타일 )
  */
 export default function SocialLoginButtons() {
+  const { linkSocialAccount } = useAuthStore();
+  const router = useRouter();
+
+  const handleSocialLogin = async (providerId: string) => {
+    try {
+      // auth-store의 소셜 로그인 기능 사용
+      const success = await linkSocialAccount(providerId);
+
+      if (success) {
+        console.log('소셜 로그인 성공');
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('소셜 로그인 실패:', error);
+      alert(
+        `소셜 로그인 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
+      );
+    }
+  };
+
   return (
-    <div className="space-y-3">
-      {SOCIALS.map(({ name, pcSrc, mobileSrc }) => (
-        <button className="block w-full" key={name}>
-          <Image
-            src={pcSrc}
-            alt={name}
-            width={100}
-            height={100}
-            className="w-full object-contain hidden md:block"
-          />
-          <Image
-            src={mobileSrc}
-            alt={name}
-            width={100}
-            height={100}
-            className="w-full object-contain block md:hidden"
-          />
-        </button>
+    <div className="flex justify-center space-x-4">
+      {SOCIALS.map(({ name, src, providerId }) => (
+        <div key={name} className="flex flex-col items-center space-y-2">
+          <div className="w-36 h-36 rounded-full flex items-center justify-center">
+            <Image
+              src={src}
+              alt={name}
+              width={90}
+              height={90}
+              className="object-contain cursor-pointer"
+              onClick={() => handleSocialLogin(providerId)}
+            />
+          </div>
+        </div>
       ))}
     </div>
   );

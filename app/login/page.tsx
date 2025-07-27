@@ -1,6 +1,5 @@
-// app/login/page.tsx
-import Login from './Login'; // 파일명/경로 마음대로. 아래에서 'use client'!
+import Login from './Login';
 
-export default function Page() {
+export default function LoginPage() {
   return <Login />;
 }
