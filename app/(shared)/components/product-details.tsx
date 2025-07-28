@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { CardData } from '../types/card';
+import { getCarrierImageUrl, formatCarrierName } from '../utils/carrier-utils';
 
 /**
  * @author 이승우
@@ -11,23 +12,6 @@ export default function ProductDetails({
 }: {
   cardData?: CardData | null;
 }) {
-  const getCarrierImageUrl = (carrier: string): string => {
-    switch (carrier) {
-      case 'SKT':
-        return '/SKT.png';
-      case 'KT':
-        return '/KT.png';
-      case 'LGU+':
-      case 'LG':
-        return '/LG.png';
-      default:
-        return '/SKT.png';
-    }
-  };
-
-  const formatCarrierName = (carrier: string): string =>
-    carrier === 'LG' ? 'LGU+' : carrier;
-
   const formatDataAmount = (amountInGB: number): string => {
     return `${amountInGB}GB`;
   };

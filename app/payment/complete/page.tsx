@@ -2,6 +2,10 @@
 import { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import {
+  getCarrierImageUrl,
+  formatCarrierName,
+} from '../../(shared)/utils/carrier-utils';
 
 // 결제 유형 상수
 const PAYMENT_TYPES = {

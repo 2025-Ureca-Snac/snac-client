@@ -25,22 +25,10 @@ interface HomeSectionProps {
   unit: PriceUnit;
 }
 
-const getCarrierImageUrl = (carrier: string): string => {
-  switch (carrier) {
-    case 'SKT':
-      return '/SKT.png';
-    case 'KT':
-      return '/KT.png';
-    case 'LGU+':
-    case 'LG':
-      return '/LG.png';
-    default:
-      return '/SKT.png';
-  }
-};
-
-const formatCarrierName = (carrier: string): string =>
-  carrier === 'LG' ? 'LGU+' : carrier;
+import {
+  getCarrierImageUrl,
+  formatCarrierName,
+} from '../(shared)/utils/carrier-utils';
 
 const formatDataAmount = (amountInMB: number): string =>
   amountInMB >= 1024 && amountInMB % 1024 === 0
