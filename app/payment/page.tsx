@@ -112,51 +112,45 @@ export default function PaymentPage() {
   const handleSnackPayment = async () => {
     try {
       // 스낵 포인트로 결제 처리
-      const orderId = `ORDER_${Date.now()}`;
-      const amount = finalAmount;
 
-      // 여기서 실제 스낵 포인트 결제 API를 호출할 수 있습니다
-      console.log('스낵 포인트 결제:', {
-        orderId,
-        amount,
-        snackPointsUsed: snackPointsToUse,
-        finalAmount,
-      });
+      const amount = finalAmount;
 
       // INSERT_YOUR_CODE
       // pay 파라미터에 따라 API 엔드포인트 분기
       const searchParams = new URLSearchParams(window.location.search);
       const pay = searchParams.get('pay'); // 기본값은 'sell'
-
+      const cardId = searchParams.get('id');
       const apiEndpoint =
         pay === PAYMENT_TYPES.SELL
-          ? '/trades/sell'
+          ? '/trades/buy'
           : pay === PAYMENT_TYPES.BUY
-            ? '/trades/buy'
+            ? '/trades/sell'
             : null;
 
       if (!apiEndpoint) {
         throw new Error('잘못된 요청 파라미터입니다.');
       }
-
+      console.log('apiEndpoint', Number(cardId), amount, snackPointsToUse);
       const response = await api.post(apiEndpoint, {
-        cardId: orderId,
+        cardId: Number(cardId),
         money: amount,
         point: snackPointsToUse,
       });
 
       const responseData = response.data as Record<string, unknown>;
-      if (responseData.status === 'OK') {
+      if (responseData.status === 'CREATED') {
         router.push(
-          `/payment/complete?pay=${pay}&orderId=${orderId}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}`
+          `/payment/complete?pay=${pay}&orderId=${cardId}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}`
         );
       } else {
-        alert('결제가 실패했습니다. 다시 시도해주세요.');
+        alert(`결제가 실패했습니다. 다시 시도해주세요.`);
         console.error('결제 실패:', responseData);
       }
     } catch (error) {
       console.error('스낵 포인트 결제 오류:', error);
-      alert('결제 중 오류가 발생했습니다.');
+      alert(
+        `결제 중 오류가 발생했습니다. \n${(error as { response: { data: { message: string } } }).response.data.message}`
+      );
     }
   };
 
