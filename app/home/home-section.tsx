@@ -17,6 +17,7 @@ interface DataItem {
   dataAmount: number;
   price: number;
   updatedAt: string;
+  ratingScore: number;
 }
 
 interface HomeSectionProps {
@@ -64,6 +65,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
             email={item.email}
             cardCategory={item.cardCategory}
             createdAt={item.createdAt}
+            ratingScore={item.ratingScore}
             onClickBuy={() => setModalItem(item)}
           />
         ))}
