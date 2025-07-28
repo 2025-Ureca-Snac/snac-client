@@ -68,42 +68,6 @@ export default function BlogAdminPage() {
     }));
   };
 
-  const addImage = () => {
-    if (newImageUrl.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        images: [...prev.images, newImageUrl.trim()],
-        imagePositions: [...prev.imagePositions, newImagePosition],
-      }));
-      setNewImageUrl('');
-      setNewImagePosition(0);
-    }
-  };
-
-  const removeImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-      imagePositions: prev.imagePositions.filter((_, i) => i !== index),
-    }));
-  };
-
-  const updateImagePosition = (index: number, position: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      imagePositions: prev.imagePositions.map((pos, i) =>
-        i === index ? position : pos
-      ),
-    }));
-  };
-
-  const getParagraphCount = () => {
-    if (!formData.markdownContent) return 0;
-    return formData.markdownContent.split('\n\n').length;
-  };
-
-  const paragraphCount = getParagraphCount();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -133,7 +97,7 @@ export default function BlogAdminPage() {
     data.append('content', formData.content);
 
     try {
-      const response = await api.post('/articles', data, {
+      await api.post('/articles', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -295,102 +259,6 @@ export default function BlogAdminPage() {
                 </label>
               </div>
             </div>
-
-            {/* 이미지 갤러리 */}
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                추가 이미지들 (마크다운 내용 사이에 삽입)
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="md:col-span-2">
-                  <input
-                    type="url"
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="이미지 URL을 입력하세요"
-                  />
-                </div>
-                <div>
-                  <select
-                    value={newImagePosition}
-                    onChange={(e) =>
-                      setNewImagePosition(Number(e.target.value))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value={0}>첫 번째 단락 뒤</option>
-                    {Array.from({ length: paragraphCount }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}번째 단락 뒤
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="md:col-span-3">
-                  <button
-                    type="button"
-                    onClick={addImage}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    이미지 추가
-                  </button>
-                </div>
-              </div>
-
-              {formData.images.length > 0 && (
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-gray-700">
-                    추가된 이미지들
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {formData.images.map((image, index) => (
-                      <div
-                        key={image}
-                        className="border border-gray-200 rounded-lg p-3"
-                      >
-                        <div className="relative mb-2">
-                          <Image
-                            src={image}
-                            alt={`Gallery ${index + 1}`}
-                            width={200}
-                            height={150}
-                            className="w-full h-24 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <label className="text-xs text-gray-600">
-                            삽입 위치:
-                          </label>
-                          <select
-                            value={formData.imagePositions[index] || 0}
-                            onChange={(e) =>
-                              updateImagePosition(index, Number(e.target.value))
-                            }
-                            className="text-xs border border-gray-300 rounded px-2 py-1"
-                          >
-                            <option value={0}>첫 번째 단락 뒤</option>
-                            {Array.from({ length: paragraphCount }, (_, i) => (
-                              <option key={i + 1} value={i + 1}>
-                                {i + 1}번째 단락 뒤
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div> */}
-
             {/* 마크다운 에디터 */}
             <div>
               <div className="flex justify-between items-center mb-2">
