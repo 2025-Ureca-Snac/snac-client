@@ -45,33 +45,35 @@ export default function ProductDetails({
   return (
     <div className="lg:col-span-2">
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">상품 정보</h2>
+        <h2 className="text-sm md:text-lg font-semibold text-gray-900 mb-4">
+          상품 정보
+        </h2>
 
         {/* Product Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="w-[180px] text-left py-3 px-4 font-medium text-gray-700">
+              <tr className="border-b border-gray-200 text-sm md:text-base">
+                <th className="max-w-[180px] text-left py-3 whitespace-nowrap px-4 font-medium text-gray-700">
                   상품
                 </th>
-                <th className="w-[97px] text-left py-3 px-4 font-medium text-gray-700">
+                <th className="w-[97px] text-left py-3 px-4 whitespace-nowrap font-medium text-gray-700">
                   통신사
                 </th>
-                <th className="w-[140px] text-left py-3 px-4 font-medium text-gray-700">
+                <th className="w-[140px] text-left py-3 px-4 whitespace-nowrap font-medium text-gray-700">
                   데이터 용량
                 </th>
-                <th className="w-[118px] text-left py-3 px-4 font-medium text-gray-700">
+                <th className="w-[118px] text-left py-3 px-4 whitespace-nowrap font-medium text-gray-700">
                   가격
                 </th>
               </tr>
             </thead>
             <tbody>
               {cardData ? (
-                <tr className="border-b border-gray-100">
+                <tr className="border-b border-gray-100 text-sm md:text-base">
                   <td className="py-4 px-4">
                     <div className="flex items-center">
-                      <div className="w-8 h-8 rounded flex items-center justify-center overflow-hidden">
+                      <div className="h-6 w-6 md:w-8 md:h-8 rounded flex items-center justify-center overflow-hidden">
                         <Image
                           src={getCarrierImageUrl(displayCarrier!)}
                           alt={formatCarrierName(displayCarrier!)}
@@ -80,10 +82,9 @@ export default function ProductDetails({
                           className="w-full h-full object-contain"
                         />
                       </div>
-                      <div className="ml-3">
-                        <div className="font-medium text-gray-900">
+                      <div className="ml-3 hidden md:block">
+                        <div className="font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
                           {formatCarrierName(displayCarrier!)} 데이터{' '}
-                          {formatDataAmount(displayDataAmount!)}
                         </div>
                       </div>
                     </div>
