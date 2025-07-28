@@ -72,8 +72,7 @@ export default function TradeConfirmationModal({
         ) {
           const queryParams = new URLSearchParams({
             id: modalItem.id.toString(),
-            pay: 'sell',
-            tradeId: modalItem.id.toString(), // 기본적으로 cardId를 tradeId로 사용
+            pay: 'buy',
           });
 
           router.push(`/payment?${queryParams.toString()}`);

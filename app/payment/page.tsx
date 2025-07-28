@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import RechargeModal from '../(shared)/components/recharge-modal';
 import RechargeConfirmModal from '../(shared)/components/recharge-confirm-modal';
@@ -19,6 +19,7 @@ import {
   getTotalAvailable,
   getShortageAmount,
 } from '../(shared)/utils/payment-calculations';
+import { CardData } from '../(shared)/types/card';
 
 /**
  * @author 이승우
@@ -37,6 +38,38 @@ export default function PaymentPage() {
   );
   const [snackPointsToUse, setSnackPointsToUse] = useState(0);
   const [showSnackPayment, setShowSnackPayment] = useState(false);
+  const [cardData, setCardData] = useState<CardData | null>(null);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const cardId = searchParams.get('id');
+    const pay = searchParams.get('pay');
+
+    console.log('Payment Page Search Params:', {
+      cardId,
+      pay,
+      fullUrl: window.location.href,
+    });
+
+    // cardId가 있을 때 카드 상태 조회
+    if (cardId) {
+      const fetchCardStatus = async () => {
+        try {
+          const response = await api.get(`/cards/${cardId}`);
+          console.log('Card Status Response:', response.data);
+
+          // 응답 데이터를 cardData 상태에 저장
+          if ((response.data as { data: CardData })?.data) {
+            setCardData((response.data as { data: CardData }).data);
+          }
+        } catch (error) {
+          console.error('카드 상태 조회 실패:', error);
+        }
+      };
+
+      fetchCardStatus();
+    }
+  }, []);
 
   const productPrice = 2000;
   const finalAmount = getFinalAmount(productPrice, snackPointsToUse);
@@ -207,7 +240,7 @@ export default function PaymentPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Product Details */}
-            <ProductDetails productPrice={productPrice} />
+            <ProductDetails cardData={cardData} />
 
             {/* Payment Information */}
             <div className="lg:col-span-1">
