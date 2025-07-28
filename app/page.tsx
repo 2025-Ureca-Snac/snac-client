@@ -14,7 +14,6 @@ import type { CardData } from '@/app/(shared)/types/card';
 import type {
   CardCategory,
   SellStatus,
-  PriceRange,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
 
@@ -34,10 +33,10 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
 
   const {
-    category,
     cardCategory,
+    category,
     transactionStatus,
-    priceRanges,
+    priceRange,
     sortBy,
     carrier,
     actions,
@@ -48,7 +47,7 @@ export default function Home() {
     console.log('[디버깅] 필터 상태:', {
       category,
       transactionStatus,
-      priceRanges,
+      priceRange,
       sortBy,
       carrier,
     });
@@ -63,8 +62,7 @@ export default function Home() {
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,
           sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
-          priceRanges:
-            priceRanges.length === 0 ? ['ALL'] : (priceRanges as PriceRange[]),
+          priceRanges: [priceRange || 'ALL'],
           highRatingFirst,
           size: 54,
           carrier: carrierForQuery,
