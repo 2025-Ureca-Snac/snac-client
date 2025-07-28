@@ -291,7 +291,7 @@ export const Modal = () => {
                           {preset}
                         </button>
                       ))}
-                      <button
+                      {/* <button
                         type="button"
                         onClick={() =>
                           document.getElementById('dataAmountInput')?.focus()
@@ -299,10 +299,10 @@ export const Modal = () => {
                         className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
                       >
                         직접입력
-                      </button>
+                      </button> */}
                     </div>
                     <div className="flex items-center gap-2">
-                      <label htmlFor="dataAmountInput" className="sr-only">
+                      {/* <label htmlFor="dataAmountInput" className="sr-only">
                         데이터량 입력
                       </label>
                       <input
@@ -313,8 +313,8 @@ export const Modal = () => {
                         className="w-5/6 border border-gray-300 rounded-lg py-2 px-3 text-regular placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                         placeholder="0"
                         required
-                      />
-                      <select
+                      /> */}
+                      {/* <select
                         value={dataUnit}
                         onChange={(e) =>
                           handleDataUnitChange(e.target.value as DataUnit)
@@ -324,7 +324,7 @@ export const Modal = () => {
                       >
                         <option value="MB">MB</option>
                         <option value="GB">GB</option>
-                      </select>
+                      </select> */}
                     </div>
                   </div>
 
