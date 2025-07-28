@@ -30,10 +30,10 @@ import {
   formatCarrierName,
 } from '../(shared)/utils/carrier-utils';
 
-const formatDataAmount = (amountInMB: number): string =>
-  amountInMB >= 1024 && amountInMB % 1024 === 0
-    ? `${amountInMB / 1024}GB`
-    : `${amountInMB}MB`;
+// const formatDataAmount = (amountInMB: number): string =>
+//   amountInMB >= 1024 && amountInMB % 1024 === 0
+//     ? `${amountInMB / 1024}GB`
+//     : `${amountInMB}MB`;
 
 export default function HomeSection({ cards, unit }: HomeSectionProps) {
   const [modalItem, setModalItem] = useState<DataItem | null>(null);
@@ -45,7 +45,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
         {cards.map((item) => (
           <DataItemCard
             key={item.id}
-            title={`${formatCarrierName(item.carrier)} 데이터 ${formatDataAmount(item.dataAmount)}`}
+            title={`${formatCarrierName(item.carrier)} 데이터 ${item.dataAmount}GB`}
             imageUrl={getCarrierImageUrl(item.carrier)}
             price={item.price}
             isNew={isToday(item.updatedAt)}
