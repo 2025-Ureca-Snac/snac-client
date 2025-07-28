@@ -10,17 +10,19 @@ import EarningsDisplay from './components/EarningsDisplay';
 import ActionButtons from './components/ActionButtons';
 
 export default function CompletePage() {
-  const { partner } = useMatchStore();
+  const { partner, userRole } = useMatchStore();
+  console.log('마지막보자:', partner);
+  console.log('현재 사용자 역할:', userRole);
 
   // 거래 상대방 정보 (store에서 가져오거나 기본값)
   const partnerInfo = partner
     ? {
         ...partner,
-        name: partner.type === 'seller' ? partner.buyer : partner.seller, // 상대방 이름
+        // userRole에 따라 상대방 정보 결정
+        name: userRole === 'seller' ? partner.buyer : partner.seller, // seller면 buyer 정보, buyer면 seller 정보
         data: partner.dataAmount, // dataAmount를 data로 매핑
         price: partner.priceGb, // priceGb를 price로 매핑
         rating: partner.sellerRatingScore,
-        transactionCount: partner.tradeId.toString(),
       }
     : {
         tradeId: 789,
@@ -36,20 +38,19 @@ export default function CompletePage() {
         status: 'COMPLETED',
         cancelReason: null,
         type: 'seller' as const,
-        name: 'user07',
+        name:
+          userRole === 'seller' ? 'buyer@example.com' : 'seller@example.com', // userRole에 따라 기본값도 설정
         data: 2,
         price: 2000,
         rating: 4.9,
         transactionCount: '156',
       };
 
-  // 거래 정보
-  const transactionId = 'TXN-' + Date.now();
   const completedAt = new Date().toLocaleString();
 
   // 보상 정보
-  const pointsEarned = 100;
-  const bonusPoints = 50; // 첫 거래 보너스
+  const pointsEarned = 2;
+  const bonusPoints = 5; // 첫 거래 보너스
   const experienceGained = 25;
 
   return (
@@ -67,7 +68,7 @@ export default function CompletePage() {
             <div className="space-y-6">
               <TransactionSummary
                 partner={partnerInfo}
-                transactionId={transactionId}
+                tradeId={partnerInfo.tradeId}
                 completedAt={completedAt}
               />
 
@@ -81,48 +82,6 @@ export default function CompletePage() {
             {/* 오른쪽 컬럼 */}
             <div className="space-y-6">
               <ActionButtons />
-
-              {/* 고객 지원 */}
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  고객 지원
-                </h2>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-2xl">📞</span>
-                    <div>
-                      <div className="font-medium text-gray-700">고객센터</div>
-                      <div className="text-sm text-gray-600">
-                        1588-0000 (24시간)
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-2xl">💬</span>
-                    <div>
-                      <div className="font-medium text-gray-700">
-                        실시간 채팅
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        즉시 문의 가능
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-2xl">📧</span>
-                    <div>
-                      <div className="font-medium text-gray-700">
-                        이메일 문의
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        support@snac.com
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
