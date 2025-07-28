@@ -186,13 +186,17 @@ export const useAuthStore = create<AuthState>()(
 
       // 로그아웃 액션
       logout: async () => {
-        const response = await api.post<unknown>('/logout');
-
-        console.log(response);
-
-        useAuthStore.getState().resetAuthState();
-        const { useUserStore } = await import('../stores/user-store');
-        useUserStore.getState().clearProfile();
+        try {
+          const response = await api.post<unknown>('/logout');
+          console.log(response);
+        } catch (error) {
+          console.error('로그아웃 중 오류:', error);
+        } finally {
+          // 로그아웃을 실패했어도 리프래쉬가 없는 것이기 때문에 무조건 상태 초기화
+          useAuthStore.getState().resetAuthState();
+          const { useUserStore } = await import('../stores/user-store');
+          useUserStore.getState().clearProfile();
+        }
       },
 
       // 토큰 갱신
