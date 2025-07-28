@@ -100,7 +100,7 @@ export default function Home() {
     cardCategory,
     carrier,
     category,
-    priceRanges,
+    priceRange,
     sortBy,
     transactionStatus,
   ]);
