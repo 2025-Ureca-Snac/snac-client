@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Header } from '../../(shared)/components/Header';
 import { Footer } from '../../(shared)/components/Footer';
 import { useMatchStore } from '../../(shared)/stores/match-store';
+import { useAuthStore } from '../../(shared)/stores/auth-store';
 import { useGlobalWebSocket } from '../../(shared)/hooks/useGlobalWebSocket';
 import TradingHeader from './components/TradingHeader';
 import TradingSteps from './components/TradingSteps';
@@ -44,17 +45,72 @@ const SELLER_TRADING_STEPS: TradingStep[] = [
 
 export default function TradingPage() {
   const router = useRouter();
-  const { partner, sendTradeConfirm } = useMatchStore();
+  const { partner, setUserRole, userRole } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
-  // 전역 WebSocket 연결 유지
-  useGlobalWebSocket();
 
   // 현재 사용자가 판매자인지 구매자인지 판단
-  const isSeller = partner?.type === 'buyer';
+  // partner.buyer가 현재 사용자라면 구매자, partner.seller가 현재 사용자라면 판매자
+  const { user } = useAuthStore();
+  const isSeller = partner?.seller === user;
+
+  // 전역 WebSocket 연결 유지
+  const { activatePage, deactivatePage } = useGlobalWebSocket();
+
+  // TradingPage 활성화
+  useEffect(() => {
+    activatePage('trading', (status, tradeData) => {
+      console.log('🔔 거래 상태 변경 오는거맞냐:', {
+        status,
+        tradeData,
+        userRole,
+        isSeller,
+      });
+      console.log('userRole확인!!!:', userRole);
+
+      // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동 (판매자용)
+      if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
+        console.log('💰 결제 확인됨 - show_phone 단계로 이동');
+        setCurrentStep('show_phone');
+      }
+      // DATA_SENT 상태일 때 verification 단계로 이동 (구매자용)
+      else if (status === 'DATA_SENT' && userRole === 'buyer') {
+        console.log('📤 데이터 전송됨 - verification 단계로 이동');
+        setCurrentStep('verification');
+      }
+      // COMPLETED 상태일 때 거래 완료 페이지로 이동 (모든 사용자)
+      else if (status === 'COMPLETED') {
+        console.log('🎉 거래 완료 - 완료 페이지로 이동');
+        router.push('/match/complete');
+      } else {
+        console.log('❌ 조건 불일치:', {
+          status,
+          userRole,
+          isSeller,
+          isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
+          isSellerRole: userRole === 'seller',
+          isDataSent: status === 'DATA_SENT',
+          isBuyerRole: userRole === 'buyer',
+          isCompleted: status === 'COMPLETED',
+        });
+      }
+    });
+    return () => {
+      deactivatePage('trading');
+    };
+  }, [activatePage, deactivatePage, userRole, isSeller, setCurrentStep]);
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
+
+  // userRole 설정
+  useEffect(() => {
+    if (partner) {
+      const role = isSeller ? 'seller' : 'buyer';
+      setUserRole(role);
+      console.log('🔄 userRole 설정:', role);
+    }
+  }, [partner, isSeller, setUserRole]);
 
   // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
   useEffect(() => {
@@ -65,19 +121,13 @@ export default function TradingPage() {
       return;
     }
     // partner 정보 유효성 검증
-    if (
-      !partner.tradeId ||
-      !partner.carrier ||
-      !partner.dataAmount ||
-      !partner.priceGb
-    ) {
+    if (!partner.carrier || !partner.dataAmount || !partner.priceGb) {
       console.warn('❌ 불완전한 거래 정보:', partner);
       alert('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
       router.push('/match');
       return;
     }
 
-    console.log('✅ 유효한 거래 정보 확인:', partner);
     setIsValidPartner(true);
   }, [partner, router]);
 
@@ -115,7 +165,6 @@ export default function TradingPage() {
 
   // 이제 partner는 항상 유효함 (MatchPartner 타입 그대로 사용)
   const partnerInfo = partner!;
-  console.log(partnerInfo, 'partnerInfo');
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);
@@ -161,7 +210,11 @@ export default function TradingPage() {
 
         case 'upload_data':
           return (
-            <UploadDataStep partner={partnerInfo} onNext={handleNextStep} />
+            <UploadDataStep
+              partner={partnerInfo}
+              tradeId={partnerInfo.tradeId}
+              onNext={handleNextStep}
+            />
           );
 
         case 'verification':
@@ -170,7 +223,7 @@ export default function TradingPage() {
               dataAmount={partnerInfo.dataAmount}
               timeLeft={timeLeft}
               tradeId={partnerInfo.tradeId}
-              sendTradeConfirm={sendTradeConfirm}
+              userRole={userRole || 'seller'}
               onNext={handleNextStep}
             />
           );
@@ -210,7 +263,7 @@ export default function TradingPage() {
               dataAmount={partnerInfo.dataAmount}
               timeLeft={timeLeft}
               tradeId={partnerInfo.tradeId}
-              sendTradeConfirm={sendTradeConfirm}
+              userRole={userRole || 'buyer'}
               onNext={handleNextStep}
             />
           );

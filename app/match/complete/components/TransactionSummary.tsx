@@ -9,15 +9,14 @@ interface TransactionSummaryProps {
     data: number;
     price: number;
     rating: number;
-    transactionCount: string;
   };
-  transactionId: string;
+  tradeId: number;
   completedAt: string;
 }
 
 export default function TransactionSummary({
   partner,
-  transactionId,
+  tradeId,
   completedAt,
 }: TransactionSummaryProps) {
   return (
@@ -27,9 +26,7 @@ export default function TransactionSummary({
       <div className="space-y-4">
         <div className="flex justify-between items-center py-3 border-b">
           <span className="text-gray-600">거래 ID</span>
-          <span className="font-mono text-sm text-gray-800">
-            {transactionId}
-          </span>
+          <span className="font-mono text-lg text-gray-800">{tradeId}</span>
         </div>
 
         <div className="flex justify-between items-center py-3 border-b">
