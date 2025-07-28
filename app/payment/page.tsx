@@ -31,14 +31,18 @@ export default function PaymentPage() {
   const [rechargeConfirmModalOpen, setRechargeConfirmModalOpen] =
     useState(false);
   const [shortageAmount, setShortageAmount] = useState(0);
-  const [snackMoney, setSnackMoney] = useState(3000); // 스낵 머니 3,000
-  const [snackPoints] = useState(1500); // 스낵 포인트 1,500 (테스트용)
+  const [snackMoney, setSnackMoney] = useState(0); // 스낵 머니
+  const [snackPoints, setSnackPoints] = useState(0); // 스낵 포인트
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PAYMENT_METHODS.TOSS
   );
   const [snackPointsToUse, setSnackPointsToUse] = useState(0);
   const [showSnackPayment, setShowSnackPayment] = useState(false);
   const [cardData, setCardData] = useState<CardData | null>(null);
+  const [walletData, setWalletData] = useState<{
+    money: number;
+    point: number;
+  } | null>(null);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -69,9 +73,32 @@ export default function PaymentPage() {
 
       fetchCardStatus();
     }
+
+    // 지갑 정보 조회
+    const fetchWalletData = async () => {
+      try {
+        const response = await api.get('/wallets/summary');
+        console.log('Wallet Summary Response:', response.data);
+        setWalletData(
+          (response.data as { data: { money: number; point: number } }).data
+        );
+      } catch (error) {
+        console.error('지갑 정보 조회 실패:', error);
+      }
+    };
+
+    fetchWalletData();
   }, []);
 
-  const productPrice = 2000;
+  // walletData가 업데이트될 때 snackMoney와 snackPoints 업데이트
+  useEffect(() => {
+    if (walletData) {
+      setSnackMoney(walletData.money);
+      setSnackPoints(walletData.point);
+    }
+  }, [walletData]);
+
+  const productPrice = cardData?.price || 0;
   const finalAmount = getFinalAmount(productPrice, snackPointsToUse);
 
   // 디버깅용 로그
