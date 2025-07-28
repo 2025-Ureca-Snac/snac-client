@@ -142,7 +142,7 @@ export default function PaymentPage() {
       const responseData = response.data as Record<string, unknown>;
       if (responseData.status === 'CREATED') {
         router.push(
-          `/payment/complete?pay=${pay}&orderId=${cardId}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}`
+          `/payment/complete?pay=${pay}&cardId=${cardId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
         alert(`결제가 실패했습니다. 다시 시도해주세요.`);
