@@ -34,13 +34,6 @@ export default function SideMenu() {
       <button
         onClick={() => router.push('/mypage')}
         className="text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            router.push('/mypage');
-          }
-        }}
-        tabIndex={0}
         aria-label="마이페이지 홈으로 이동"
       >
         <h2 className="text-lg font-extrabold mb-5 text-black select-none hover:text-gray-700 transition-colors">
@@ -59,12 +52,6 @@ export default function SideMenu() {
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={() => handleMenuClick(item)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleMenuClick(item);
-                }
-              }}
               disabled={item.disabled}
               type="button"
               tabIndex={item.disabled ? -1 : 0}

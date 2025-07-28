@@ -18,18 +18,19 @@ import { useModalStore } from '../(shared)/stores/modal-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import { useRouter } from 'next/navigation';
 
-const FAVORITES = Array(12).fill('데이터바삭이');
-
 /**
  * @author 이승우
  * @description 마이페이지 페이지
  */
 export default function MyPage() {
-  const { profile, updatePreferences, updateProfile, setProfile } =
+  const { profile, fetchUserProfile, updateProfile, isLoading, error } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();
   const { logout } = useAuthStore();
   const router = useRouter();
+
+  // 실제 즐겨찾기 데이터 (API에서 가져와야 함)
+  const favorites = Array(profile?.favoriteCount || 0).fill('데이터바삭이');
 
   // 로그아웃 핸들러
   const handleLogout = async () => {
@@ -42,32 +43,10 @@ export default function MyPage() {
     }
   };
 
-  // 테스트용 사용자 데이터 설정
+  // 컴포넌트 마운트 시 사용자 정보 가져오기
   useEffect(() => {
-    if (!profile) {
-      setProfile({
-        id: '1',
-        email: 'test@example.com',
-        name: '김유정',
-        nickname: '김유정',
-        phone: '010-1234-5678',
-        birthDate: new Date('1999-05-02'),
-        points: 104,
-        money: 6000,
-        preferences: {
-          theme: 'light',
-          language: 'ko',
-          notifications: {
-            email: true,
-            push: true,
-            sms: false,
-          },
-        },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    }
-  }, [profile, setProfile]);
+    fetchUserProfile();
+  }, []); // fetchUserProfile을 의존성에서 제거
 
   // SettingList에서 항목 클릭 시 모달 오픈
   const handleSettingClick = (item: string) => {
@@ -86,8 +65,37 @@ export default function MyPage() {
     if (item === '화면 테마') useModalStore.getState().openModal('theme');
   };
 
+  // 로딩 상태 표시
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-foreground">사용자 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태 표시
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background w-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">{error}</p>
+          <button
+            onClick={fetchUserProfile}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-background w-full">
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
@@ -110,27 +118,13 @@ export default function MyPage() {
                 <button
                   onClick={handleLogout}
                   className="w-full py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleLogout();
-                    }
-                  }}
-                  tabIndex={0}
                   aria-label="로그아웃"
                 >
                   로그아웃
                 </button>
                 <button
+                  onClick={() => alert('탈퇴 기능은 아직 구현되지 않았습니다.')}
                   className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      // 탈퇴 기능 구현 필요
-                      alert('탈퇴 기능은 아직 구현되지 않았습니다.');
-                    }
-                  }}
-                  tabIndex={0}
                   aria-label="회원 탈퇴"
                 >
                   탈퇴하기
@@ -192,18 +186,9 @@ export default function MyPage() {
       <FavoriteListModal
         open={isOpen && modalType === 'favorite-list'}
         onClose={closeModal}
-        favorites={FAVORITES}
+        favorites={favorites}
       />
-      <ThemeModal
-        open={isOpen && modalType === 'theme'}
-        onClose={closeModal}
-        currentTheme={profile?.preferences.theme || 'light'}
-        onThemeChange={(theme) => {
-          if (profile) {
-            updatePreferences({ theme });
-          }
-        }}
-      />
+      <ThemeModal open={isOpen && modalType === 'theme'} onClose={closeModal} />
     </div>
   );
 }

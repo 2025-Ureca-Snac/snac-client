@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ModalPortal from './modal-portal';
 import type { ChangeNicknameModalProps } from '../types/change-nickname-modal';
+import { api } from '../utils/api';
+import {
+  getRemainingTimeForNicknameChange,
+  formatRemainingTime,
+} from '../utils';
+import { useUserStore } from '../stores/user-store';
 
 /**
  * @author 이승우
@@ -17,24 +23,146 @@ export default function ChangeNicknameModal({
   currentNickname = '',
 }: ChangeNicknameModalProps) {
   const [nickname, setNickname] = useState(currentNickname);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const nicknameRef = useRef<HTMLInputElement>(null);
+  const { profile } = useUserStore();
 
-  // 모달이 열릴 때마다 현재 닉네임으로 초기화
+  // 실시간 타이머 업데이트
+  useEffect(() => {
+    if (!open || !profile?.nicknameUpdatedAt) return;
+
+    const updateTimer = () => {
+      const remaining = getRemainingTimeForNicknameChange(
+        profile.nicknameUpdatedAt
+      );
+      setRemainingTime(remaining);
+    };
+
+    // 초기 실행
+    updateTimer();
+
+    // 1초마다 업데이트
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [open, profile?.nicknameUpdatedAt]);
+
+  // 모달이 열릴 때 자동 포커스
   useEffect(() => {
     if (open) {
       setNickname(currentNickname);
+      setTimeout(() => {
+        nicknameRef.current?.focus();
+      }, 100);
     }
   }, [open, currentNickname]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSubmit) onSubmit(nickname);
+  // 닉네임 변경 가능 여부 확인
+  const canChangeNickname = remainingTime <= 0;
+
+  // 닉네임 변경 처리
+  const handleNicknameChange = useCallback(async () => {
+    if (!nickname.trim()) {
+      setError('닉네임을 입력해주세요.');
+      return;
+    }
+
+    if (nickname.trim() === currentNickname) {
+      setError('현재 닉네임과 동일합니다.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.post('/member/change-nickname', {
+        nickname: nickname.trim(),
+      });
+
+      if (response.status === 200) {
+        setSuccess(true);
+        // 성공 시 콜백 호출
+        if (onSubmit) {
+          onSubmit(nickname.trim());
+        }
+      } else {
+        setError('닉네임 변경에 실패했습니다.');
+      }
+    } catch (error: unknown) {
+      console.error('닉네임 변경 오류:', error);
+
+      // 에러 메시지 처리
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as {
+          response?: { data?: { message?: string }; status?: number };
+        };
+        if (apiError.response?.data?.message) {
+          setError(apiError.response.data.message);
+        } else if (apiError.response?.status === 409) {
+          setError('이미 사용 중인 닉네임입니다.');
+        } else {
+          setError('닉네임 변경 중 오류가 발생했습니다.');
+        }
+      } else {
+        setError('닉네임 변경 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [nickname, currentNickname, onSubmit]);
+
+  // 초기화
+  const handleReset = () => {
+    setNickname('');
+    setError(null);
+    setSuccess(false);
+    setIsLoading(false);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleNicknameChange();
+  };
+
+  // 키보드 이벤트 핸들러
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    },
+    [onClose]
+  );
+
+  // 닉네임 입력 후 Enter 키 처리
+  const handleNicknameKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && nickname.trim()) {
+        e.preventDefault();
+        handleNicknameChange();
+      }
+    },
+    [nickname, handleNicknameChange]
+  );
+
   return (
-    <ModalPortal isOpen={open} onClose={onClose}>
+    <ModalPortal
+      isOpen={open}
+      onClose={() => {
+        handleReset();
+        onClose();
+      }}
+    >
       <div
         className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
-        onClick={onClose}
+        onClick={() => {
+          handleReset();
+          onClose();
+        }}
         tabIndex={-1}
         aria-modal="true"
         role="dialog"
@@ -43,6 +171,7 @@ export default function ChangeNicknameModal({
           className="bg-white rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
           onSubmit={handleSubmit}
+          onKeyDown={handleKeyDown}
         >
           {/* 상단 아이콘 */}
           <div className="flex flex-col items-center -mt-12 mb-2">
@@ -66,10 +195,14 @@ export default function ChangeNicknameModal({
               닉네임 변경
             </div>
             <button
-              onClick={onClose}
+              onClick={() => {
+                handleReset();
+                onClose();
+              }}
               type="button"
               className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
               aria-label="닫기"
+              tabIndex={0}
             >
               ×
             </button>
@@ -77,34 +210,78 @@ export default function ChangeNicknameModal({
           <div className="w-full text-center text-gray-600 mb-4 text-sm">
             현재 닉네임을 수정해주세요.
           </div>
+
+          {/* 성공 메시지 */}
+          {success && (
+            <div className="w-full mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-800 text-center">
+                닉네임이 성공적으로 변경되었습니다.
+              </p>
+            </div>
+          )}
+
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="w-full mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800 text-center">{error}</p>
+            </div>
+          )}
+
           <div className="w-full flex flex-col gap-3 mb-4">
             <div>
-              <label className="block text-sm font-semibold mb-1">닉네임</label>
+              <label
+                htmlFor="nickname"
+                className="block text-sm font-semibold mb-1"
+              >
+                닉네임
+              </label>
               <input
+                ref={nicknameRef}
                 type="text"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-200"
+                id="nickname"
+                name="nickname"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:text-gray-500"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="닉네임을 입력하세요"
                 maxLength={10}
                 required
+                disabled={success}
+                onKeyDown={handleNicknameKeyDown}
+                tabIndex={0}
               />
               <div className="text-xs text-gray-500 mt-1">
                 최대 10자까지 입력 가능합니다.
               </div>
             </div>
           </div>
+
           <div className="w-full flex gap-2 mb-2">
             <button
               type="submit"
-              className="w-2/3 py-3 rounded-lg bg-blue-200 text-black font-bold text-lg hover:bg-blue-300 transition-colors"
+              disabled={
+                !nickname.trim() ||
+                nickname.trim() === currentNickname ||
+                isLoading ||
+                success ||
+                !canChangeNickname
+              }
+              className="w-2/3 py-3 rounded-lg bg-blue-200 text-black font-bold text-lg hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
+              tabIndex={0}
             >
-              변경하기
+              {success
+                ? '완료'
+                : isLoading
+                  ? '처리중...'
+                  : !canChangeNickname
+                    ? formatRemainingTime(remainingTime)
+                    : '변경하기'}
             </button>
             <button
               type="button"
-              className="w-1/3 py-3 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg"
+              className="w-1/3 py-3 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               onClick={onClose}
+              tabIndex={0}
             >
               취소
             </button>

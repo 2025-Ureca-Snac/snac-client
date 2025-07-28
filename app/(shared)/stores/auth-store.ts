@@ -56,7 +56,8 @@ export const useAuthStore = create<AuthState>()(
 
           // 백엔드 인증 페이지를 팝업으로 열기
           const currentToken = useAuthStore.getState().token;
-          const authUrl = `${process.env.NEXT_PUBLIC_SOCIAL_API_URL}/oauth2/authorization/${providerId}${currentToken ? `?state=${currentToken}` : ''}`;
+          const socialApiUrl = process.env.NEXT_PUBLIC_SOCIAL_API_URL;
+          const authUrl = `${socialApiUrl}/oauth2/authorization/${providerId}${currentToken ? `?state=${currentToken}` : ''}`;
           const width = 500;
           const height = 600;
           const left = window.screenX + (window.outerWidth - width) / 2;
@@ -73,9 +74,19 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Promise로 인증 완료 대기
+
           return new Promise<boolean>((resolve, reject) => {
+            // 팝업 창 상태 확인을 위한 인터벌 추가
+            const checkWindowClosed = setInterval(() => {
+              if (authWindow.closed) {
+                clearInterval(checkWindowClosed);
+                reject(new Error('팝업 창이 닫혔습니다.'));
+              }
+            }, 1000);
             const handleAuthMessage = async (event: MessageEvent) => {
-              if (event.origin !== window.location.origin) return;
+              if (event.origin !== window.location.origin) {
+                return;
+              }
 
               if (event.data.type === 'AUTH_SUCCESS') {
                 console.log('소셜 로그인 인증 성공:', event.data.data);
@@ -126,6 +137,28 @@ export const useAuthStore = create<AuthState>()(
             };
 
             window.addEventListener('message', handleAuthMessage);
+
+            // 타임아웃 설정 (30초)
+            const timeout = setTimeout(() => {
+              window.removeEventListener('message', handleAuthMessage);
+              reject(new Error('소셜 로그인 시간이 초과되었습니다.'));
+            }, 30000);
+
+            // Promise 완료 시 타임아웃 제거
+            const originalResolve = resolve;
+            const originalReject = reject;
+
+            resolve = (value: boolean | PromiseLike<boolean>) => {
+              clearTimeout(timeout);
+              clearInterval(checkWindowClosed);
+              originalResolve(value);
+            };
+
+            reject = (reason: unknown) => {
+              clearTimeout(timeout);
+              clearInterval(checkWindowClosed);
+              originalReject(reason);
+            };
           });
         } catch (error) {
           console.error('소셜 로그인 연동 중 오류:', error);
@@ -139,13 +172,15 @@ export const useAuthStore = create<AuthState>()(
       unlinkSocialAccount: async (providerId: string) => {
         try {
           set({ isLoading: true });
-          await api.delete(`/oauth2/authorization/unlink/${providerId}`);
+          const response = await api.post(`/unlink/${providerId}`);
+          console.log(response);
           console.log('소셜 로그인 해제 성공');
+          set({ isLoading: false });
+          return response.status === 200;
         } catch (error) {
           console.error('소셜 로그인 해제 중 오류:', error);
-          throw error;
-        } finally {
           set({ isLoading: false });
+          throw error;
         }
       },
 
@@ -158,17 +193,17 @@ export const useAuthStore = create<AuthState>()(
         useAuthStore.getState().resetAuthState();
         const { useUserStore } = await import('../stores/user-store');
         useUserStore.getState().clearProfile();
-        
       },
 
       // 토큰 갱신
       checkAndRefreshToken: async () => {
         const { token } = useAuthStore.getState();
-        if (!token) return false;
+        if (!token) {
+          return false;
+        }
 
         try {
           // 만료시간 상관없이 항상 /reissue 호출
-          console.log('토큰 갱신 요청');
           const response = await api.post('/reissue');
 
           // 새로운 토큰이 헤더에 포함되어 있는지 확인
@@ -180,17 +215,23 @@ export const useAuthStore = create<AuthState>()(
               token: newToken,
               tokenExp: decoded?.exp,
             });
-            console.log('새로운 토큰으로 갱신 완료');
             return true;
           } else {
             // 새로운 토큰이 없는 경우 기존 토큰 유지
-            console.log('새로운 토큰이 발급되지 않음, 기존 토큰 유지');
             return true;
           }
-        } catch (error) {
+        } catch {
           // /reissue 실패 시 로그아웃
-          console.error('토큰 갱신 실패:', error);
-          useAuthStore.getState().resetAuthState();
+
+          // resetAuthState 대신 직접 상태 초기화 (다른 컴포넌트 리렌더링 방지)
+          set({
+            user: null,
+            role: null,
+            token: null,
+            tokenExp: null,
+            isLoading: false,
+          });
+
           return false;
         }
       },
