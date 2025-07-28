@@ -28,14 +28,14 @@ export default function ProductDetails({
   const formatCarrierName = (carrier: string): string =>
     carrier === 'LG' ? 'LGU+' : carrier;
 
-  const formatDataAmount = (amountInGB: number): string => {
-    // 소수점이 있는 경우 MB로 변환
-    if (amountInGB % 1 !== 0) {
-      const amountInMB = Math.round(amountInGB * 1024);
-      return `${amountInMB}MB`;
+  const formatDataAmount = (amountInMB: number): string => {
+    // 1024의 배수인 경우 GB로 변환
+    if (amountInMB >= 1024 && amountInMB % 1024 === 0) {
+      const amountInGB = amountInMB / 1024;
+      return `${amountInGB}GB`;
     }
-    // 정수인 경우 GB로 표시
-    return `${amountInGB}GB`;
+    // 그 외의 경우 MB로 표시
+    return `${amountInMB}MB`;
   };
 
   const displayPrice = cardData?.price;
