@@ -20,6 +20,8 @@ import {
   getShortageAmount,
 } from '../(shared)/utils/payment-calculations';
 import { CardData } from '../(shared)/types/card';
+import { Header } from '../(shared)/components/Header';
+import { Footer } from '../(shared)/components/Footer';
 
 /**
  * @author 이승우
@@ -245,6 +247,7 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
@@ -329,6 +332,7 @@ export default function PaymentPage() {
         snackPoints={snackPoints}
         shortage={shortageAmount}
       />
+      <Footer />
     </div>
   );
 }
