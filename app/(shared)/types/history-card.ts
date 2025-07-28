@@ -6,6 +6,11 @@
  * @property {string} date 거래 날짜
  * @property {string} title 거래 제목
  * @property {number} price 거래 가격
+ * @property {string} status 거래 상태
+ * @property {string} transactionNumber 거래 번호
+ * @property {string} carrier 거래 통신사
+ * @property {string} dataAmount 거래 데이터 양
+ * @property {string} phoneNumber 거래 전화번호
  */
 export interface HistoryItem {
   id: number;

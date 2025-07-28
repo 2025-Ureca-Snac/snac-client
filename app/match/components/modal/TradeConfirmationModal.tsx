@@ -97,26 +97,8 @@ export default function TradeConfirmationModal({
     if (tradeStatus === 'ACCEPTED') {
       setModalState('success');
 
-      // 상대방 정보를 store에 저장하고 trading 페이지로 이동
-      console.log(partner, 'partner');
-      console.log(seller, 'seller');
-
       // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
-        console.log('🔍 partner 객체 정보:', {
-          tradeId: partner.tradeId,
-          cardId: partner.cardId,
-          name: partner.seller,
-          email: partner.seller,
-          전체_데이터: partner,
-        });
-        console.log('🔍 profile 정보:', {
-          email: profile?.email,
-          phone: profile?.phone,
-          points: profile?.points,
-          전체_데이터: profile,
-        });
-        console.log(partner, profile, '아아다닷');
         const partnerInfo = {
           tradeId: partner.tradeId,
           buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
@@ -133,7 +115,6 @@ export default function TradeConfirmationModal({
           type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
         };
 
-        console.log('🔥 partnerInfo:', partnerInfo);
         foundMatch(partnerInfo);
 
         // 1초 후 trading 페이지로 이동
@@ -154,7 +135,6 @@ export default function TradeConfirmationModal({
           points: profile?.points,
           전체_데이터: profile,
         });
-        console.log(seller, profile, '아아다닷');
         const partnerInfo = {
           tradeId: seller.tradeId,
           buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
@@ -180,7 +160,6 @@ export default function TradeConfirmationModal({
           type: partnerInfo.type,
         });
 
-        console.log('으아악 여기야2', partnerInfo);
         foundMatch(partnerInfo);
 
         // 2초 후 trading 페이지로 이동

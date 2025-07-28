@@ -2,20 +2,20 @@
  * @author 이승우
  * @description 모달 타입
  * @interface ModalType
- * @property {string} search 검색
- * @property {string} payment 결제
- * @property {string} confirm 확인
- * @property {string} alert 알림
- * @property {string} blog 블로그
- * @property {string} favorite-list 단골 목록
- * @property {string} change-password 비밀번호 변경
- * @property {string} change-phone 전화번호 변경
- * @property {string} change-nickname 닉네임 변경
- * @property {string} social-login 소셜 로그인 연동
- * @property {string} service-guide 서비스 가이드
- * @property {string} privacy-policy 개인정보처리방침
- * @property {string} theme 화면 테마
- * @property {null} null 모달 타입 없음
+ * @property {string} search 검색 모달
+ * @property {string} payment 결제 모달
+ * @property {string} confirm 확인 모달
+ * @property {string} alert 알림 모달
+ * @property {string} blog 블로그 모달
+ * @property {string} favorite-list 즐겨찾기 모달
+ * @property {string} change-password 비밀번호 변경 모달
+ * @property {string} change-phone 전화번호 변경 모달
+ * @property {string} change-nickname 닉네임 변경 모달
+ * @property {string} social-login 소셜 로그인 모달
+ * @property {string} service-guide 서비스 가이드 모달
+ * @property {string} privacy-policy 개인정보 처리방침 모달
+ * @property {string} theme 테마 모달
+ * @property {null} null 모달 없음
  */
 export type ModalType =
   | 'search'

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import InputField from '../(shared)/components/input-field';
 import InputWithButton from '../(shared)/components/input-with-button';
@@ -29,6 +29,11 @@ export default function SignUp() {
   const emailTimer = useTimer();
   const phoneTimer = useTimer();
   const router = useRouter();
+
+  // 인증 요청 중복 방지 상태
+  const [isEmailVerifying, setIsEmailVerifying] = useState(false);
+  const [isPhoneVerifying, setIsPhoneVerifying] = useState(false);
+
   const [passwordMatch, setPasswordMatch] =
     useState<PasswordMatchState>('none');
   const [formData, setFormData] = useState<SignUpFormData>({
@@ -42,6 +47,15 @@ export default function SignUp() {
     emailVerificationCode: '',
     phoneVerificationCode: '',
   });
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const emailVerificationRef = useRef<HTMLInputElement>(null);
+  const phoneVerificationRef = useRef<HTMLInputElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
 
   // 비밀번호 일치 확인
   useEffect(() => {
@@ -113,6 +127,8 @@ export default function SignUp() {
    * @return 이메일 인증 요청에 성공 여부 반환(성공, 중복, 실패)
    */
   const handleEmailVerification = useCallback(async () => {
+    if (isEmailVerifying) return; // 이미 인증 요청 중이면 무시
+
     if (!formData.email) {
       alert('이메일을 입력해주세요.');
       return;
@@ -120,6 +136,7 @@ export default function SignUp() {
 
     console.log('이메일 인증 요청', formData.email);
     try {
+      setIsEmailVerifying(true); // 인증 요청 시작
       const response = await api.post('/email/send-verification-code', {
         email: formData.email,
       });
@@ -130,13 +147,20 @@ export default function SignUp() {
         setShowEmailVerification(true);
         setIsEmailSent(true);
         emailTimer.start(300); // 5분 = 300초
+        // 인증코드 입력 필드에 포커스
+        setTimeout(() => {
+          emailVerificationRef.current?.focus();
+        }, 100);
       } else {
         alert('인증코드 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('이메일 인증 요청 오류', error);
+      alert('인증코드 전송에 실패했습니다.');
+    } finally {
+      setIsEmailVerifying(false); // 인증 요청 완료
     }
-  }, [formData.email, emailTimer]);
+  }, [formData.email, emailTimer, isEmailVerifying]);
 
   /**
    * @author 이승우
@@ -144,6 +168,8 @@ export default function SignUp() {
    * @return 전화번호 인증 요청에 성공 여부 반환(성공, 실패)
    */
   const handlePhoneVerification = useCallback(async () => {
+    if (isPhoneVerifying) return; // 이미 인증 요청 중이면 무시
+
     if (!formData.phoneNumber) {
       alert('전화번호를 입력해주세요.');
       return;
@@ -152,6 +178,7 @@ export default function SignUp() {
     console.log('전화번호 인증 요청', formData.phoneNumber);
 
     try {
+      setIsPhoneVerifying(true); // 인증 요청 시작
       const phoneVerificationCode = await api.post(
         '/sns/send-verification-code',
         {
@@ -167,13 +194,20 @@ export default function SignUp() {
         setShowPhoneVerification(true);
         setIsPhoneSent(true);
         phoneTimer.start(300); // 5분 = 300초
+        // 인증코드 입력 필드에 포커스
+        setTimeout(() => {
+          phoneVerificationRef.current?.focus();
+        }, 100);
       } else {
         alert('인증코드 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('전화번호 인증 요청 오류', error);
+      alert('인증코드 전송에 실패했습니다.');
+    } finally {
+      setIsPhoneVerifying(false); // 인증 요청 완료
     }
-  }, [formData.phoneNumber, phoneTimer]);
+  }, [formData.phoneNumber, phoneTimer, isPhoneVerifying]);
 
   /**
    * @author 이승우
@@ -192,6 +226,10 @@ export default function SignUp() {
       if ((response.data as { status?: string })?.status === 'OK') {
         setIsEmailVerified(true);
         setShowEmailVerification(false);
+        // 전화번호 입력 필드로 포커스
+        setTimeout(() => {
+          phoneInputRef.current?.focus();
+        }, 100);
       } else {
         alert('인증코드가 일치하지 않습니다.');
       }
@@ -218,6 +256,10 @@ export default function SignUp() {
     if ((response.data as { status?: string })?.status === 'OK') {
       setIsPhoneVerified(true);
       setShowPhoneVerification(false);
+      // 비밀번호 입력 필드로 포커스
+      setTimeout(() => {
+        passwordInputRef.current?.focus();
+      }, 100);
     } else {
       alert('인증코드가 일치하지 않습니다.');
     }
@@ -368,6 +410,7 @@ export default function SignUp() {
             value={formData.name}
             onChange={handleInputChange}
             required
+            ref={nameInputRef}
           />
 
           <InputField
@@ -406,7 +449,9 @@ export default function SignUp() {
             buttonText={emailButtonText}
             onButtonClick={handleEmailVerification}
             buttonDisabled={
-              isEmailVerified || (isEmailSent && emailTimer.time > 240)
+              isEmailVerified ||
+              (isEmailSent && emailTimer.time > 240) ||
+              isEmailVerifying
             }
           />
 
@@ -422,6 +467,7 @@ export default function SignUp() {
             verifyDisabled={!showEmailVerification || isEmailVerified}
             helpText={emailHelpText}
             showHelpText={showEmailVerification && !isEmailVerified}
+            ref={emailVerificationRef}
           />
 
           <InputWithButton
@@ -436,8 +482,11 @@ export default function SignUp() {
             buttonText={phoneButtonText}
             onButtonClick={handlePhoneVerification}
             buttonDisabled={
-              isPhoneVerified || (isPhoneSent && phoneTimer.time > 240)
+              isPhoneVerified ||
+              (isPhoneSent && phoneTimer.time > 240) ||
+              isPhoneVerifying
             }
+            ref={phoneInputRef}
           />
 
           <VerificationInput
@@ -452,6 +501,7 @@ export default function SignUp() {
             verifyDisabled={!showPhoneVerification || isPhoneVerified}
             helpText={phoneHelpText}
             showHelpText={showPhoneVerification && !isPhoneVerified}
+            ref={phoneVerificationRef}
           />
 
           <PasswordInput
@@ -461,6 +511,7 @@ export default function SignUp() {
             value={formData.password}
             onChange={handleInputChange}
             required
+            ref={passwordInputRef}
           />
 
           <PasswordInput
@@ -477,7 +528,7 @@ export default function SignUp() {
           <button
             type="submit"
             disabled={!isFormValid}
-            className="w-full py-3 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             회원가입
           </button>
