@@ -9,30 +9,17 @@ import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
+import type { CardData } from '@/app/(shared)/types/card';
 
 import type {
   CardCategory,
   SellStatus,
-  PriceRange,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
 
-interface Card {
-  id: number;
-  cardCategory: 'BUY' | 'SELL';
-  carrier: 'SKT' | 'KT' | 'LGU+';
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  name: string;
-  sellStatus: string;
-}
-
 interface CardApiResponse {
   data: {
-    cardResponseList: Card[];
+    cardResponseList: CardData[];
     hasNext: boolean;
   };
 }
@@ -40,16 +27,16 @@ interface CardApiResponse {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const {
-    category,
     cardCategory,
+    category,
     transactionStatus,
-    priceRanges,
+    priceRange,
     sortBy,
     carrier,
     actions,
@@ -60,7 +47,7 @@ export default function Home() {
     console.log('[디버깅] 필터 상태:', {
       category,
       transactionStatus,
-      priceRanges,
+      priceRange,
       sortBy,
       carrier,
     });
@@ -75,8 +62,7 @@ export default function Home() {
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,
           sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
-          priceRanges:
-            priceRanges.length === 0 ? ['ALL'] : (priceRanges as PriceRange[]),
+          priceRanges: [priceRange || 'ALL'],
           highRatingFirst,
           size: 54,
           carrier: carrierForQuery,

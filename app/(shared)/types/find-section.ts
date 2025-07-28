@@ -14,6 +14,8 @@
  * @property {Function} handleIdVerificationCheck 아이디 인증 확인 핸들러
  * @property {Function} handleFindId 아이디 찾기 핸들러
  * @property {Function} goToLogin 로그인 이동 핸들러
+ * @property {Function} onReset 초기화 핸들러
+ * @property {React.RefObject<HTMLInputElement | null>} idVerificationRef 아이디 인증 참조
  */
 export type FindEmailSectionProps = {
   foundEmail: string | null;
@@ -31,6 +33,9 @@ export type FindEmailSectionProps = {
   handleIdVerificationCheck: () => void;
   handleFindId: (e: React.FormEvent) => void;
   goToLogin: () => void;
+  onReset: () => void;
+  idVerificationRef?: React.RefObject<HTMLInputElement | null>;
+  isIdVerifying?: boolean;
 };
 
 /**
@@ -44,6 +49,11 @@ export type FindEmailSectionProps = {
  * @property {boolean} isPasswordSent 비밀번호 인증 전송 여부
  * @property {object} passwordTimer 비밀번호 인증 타이머( 초 단위 )
  * @property {Function} handlePasswordFormChange 비밀번호 폼 변경 핸들러
+ * @property {Function} onReset 초기화 핸들러
+ * @property {Function} onSubmit 비밀번호 변경 핸들러
+ * @property {React.RefObject<HTMLInputElement | null>} passwordVerificationRef 비밀번호 인증 참조
+ * @property {React.RefObject<HTMLInputElement | null>} newPasswordInputRef 새 비밀번호 입력 필드 참조
+ * @property {boolean} isPasswordVerifying 비밀번호 인증 중 여부
  */
 export type FindPasswordSectionProps = {
   isVerified?: boolean;
@@ -65,4 +75,9 @@ export type FindPasswordSectionProps = {
   handlePasswordVerificationCheck: () => void;
   passwordAuthType: 'email' | 'phone';
   handlePasswordAuthTypeChange: (authType: 'email' | 'phone') => void;
+  onReset: () => void;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
+  passwordVerificationRef?: React.RefObject<HTMLInputElement | null>;
+  newPasswordInputRef?: React.RefObject<HTMLInputElement | null>;
+  isPasswordVerifying?: boolean;
 };

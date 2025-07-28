@@ -12,22 +12,10 @@ import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import LoadingSpinner from '@/app/(shared)/components/LoadingSpinner';
-
-interface Card {
-  id: number;
-  name: string;
-  createdAt: string;
-  email: string;
-  sellStatus: string;
-  cardCategory: 'SELL' | 'BUY';
-  carrier: string;
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-}
+import type { CardData } from '@/app/(shared)/types/card';
 
 interface HomeLayoutProps {
-  cards: Card[];
+  cards: CardData[];
   isLoading: boolean;
   currentPage: number;
   totalPages: number;
