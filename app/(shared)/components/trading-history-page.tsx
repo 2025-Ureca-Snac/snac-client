@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import AnimatedTabContent from './AnimatedTabContent';
@@ -71,43 +71,46 @@ export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
   const [error, setError] = useState<string | null>(null);
 
   // 거래 내역 데이터 로드
-  const loadTradingHistory = async (status: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const loadTradingHistory = useCallback(
+    async (status: string) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      console.log('API 호출 시작:', { type, status });
+        console.log('API 호출 시작:', { type, status });
 
-      const response = await getTradingHistory(type);
+        const response = await getTradingHistory(type);
 
-      console.log('API 응답:', response);
-      console.log('응답 content:', response.cardResponseList);
+        console.log('API 응답:', response);
+        console.log('응답 content:', response.cardResponseList);
 
-      // sellStatus에 따라 필터링
-      let filteredData = response.cardResponseList;
-      if (status === 'active') {
-        filteredData = response.cardResponseList.filter(
-          (item) =>
-            item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING'
-        );
-      } else if (status === 'completed') {
-        filteredData = response.cardResponseList.filter(
-          (item) =>
-            item.sellStatus !== 'SELLING' && item.sellStatus !== 'PURCHASING'
-        );
+        // sellStatus에 따라 필터링
+        let filteredData = response.cardResponseList;
+        if (status === 'active') {
+          filteredData = response.cardResponseList.filter(
+            (item) =>
+              item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING'
+          );
+        } else if (status === 'completed') {
+          filteredData = response.cardResponseList.filter(
+            (item) =>
+              item.sellStatus !== 'SELLING' && item.sellStatus !== 'PURCHASING'
+          );
+        }
+
+        setTradingHistory(filteredData);
+
+        console.log('상태 업데이트 완료');
+      } catch (err) {
+        const errorMessage = handleApiError(err);
+        setError(errorMessage);
+        console.error(`${isPurchase ? '구매' : '판매'} 내역 로드 실패:`, err);
+      } finally {
+        setIsLoading(false);
       }
-
-      setTradingHistory(filteredData);
-
-      console.log('상태 업데이트 완료');
-    } catch (err) {
-      const errorMessage = handleApiError(err);
-      setError(errorMessage);
-      console.error(`${isPurchase ? '구매' : '판매'} 내역 로드 실패:`, err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [type, isPurchase]
+  );
 
   // 탭 변경 시 데이터 로드
   useEffect(() => {
