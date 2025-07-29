@@ -1,7 +1,7 @@
 import React from 'react';
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
-import Edit from '../../../public/edit.svg';
-import Trash from '../../../public/trash.svg';
+import Edit from '@/public/edit.svg';
+import Trash from '@/public/trash.svg';
 
 export function BlogTable() {
   const { blogs, openDeleteModal } = useBlogStore();
