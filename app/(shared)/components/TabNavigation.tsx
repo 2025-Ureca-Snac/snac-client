@@ -34,7 +34,7 @@ export default function TabNavigation({
           key={tab.id}
           type="button"
           tabIndex={0}
-          className={`flex-1 py-2 text-center text-base font-semibold relative z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+          className={`flex-1 py-3 text-center text-base font-semibold relative z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
             activeTab === tab.id ? activeTextColor : inactiveTextColor
           }`}
           onClick={() => onTabChange(tab.id)}

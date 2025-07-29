@@ -74,12 +74,8 @@ export default function MatchPage() {
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
 
-  const userRole =
-    appliedFilters.transactionType[0] === '구매자'
-      ? 'buyer'
-      : appliedFilters.transactionType[0] === '판매자'
-        ? 'seller'
-        : 'buyer';
+  // store에서 userRole 가져오기
+  const { userRole, setUserRole } = useMatchStore();
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
@@ -130,7 +126,8 @@ export default function MatchPage() {
     createTrade,
     sendPayment,
     sendTradeConfirm,
-    updateUserRole,
+    activatePage,
+    deactivatePage,
   } = useGlobalWebSocket({
     appliedFilters,
     setIncomingRequests,
@@ -140,22 +137,28 @@ export default function MatchPage() {
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
   });
 
+  // MatchPage 활성화
+  useEffect(() => {
+    activatePage('match', handleTradeStatusChange);
+    return () => {
+      deactivatePage('match');
+    };
+  }, [activatePage, deactivatePage, handleTradeStatusChange]);
+
   // WebSocket 함수들을 store에 저장
   useEffect(() => {
     setWebSocketFunctions({ sendPayment, sendTradeConfirm });
   }, [sendPayment, sendTradeConfirm, setWebSocketFunctions]);
 
-  // userRole이 변경될 때마다 전역 소켓에 업데이트
+  // userRole이 변경될 때마다 로그 출력
   useEffect(() => {
-    console.log('🔄 MatchPage useEffect 실행:', {
+    console.log(
+      '🔄 MatchPage userRole 변경:',
       userRole,
-      updateUserRole: !!updateUserRole,
-    });
-    if (updateUserRole) {
-      console.log('여기서 실행되냐?');
-      updateUserRole(userRole);
-    }
-  }, [userRole]); // updateUserRole 의존성 제거
+      '타입:',
+      typeof userRole
+    );
+  }, [userRole]);
 
   // 필터 핸들러
   const handleFilterChange = useCallback(
@@ -166,7 +169,7 @@ export default function MatchPage() {
       if (filters.transactionType.length > 0) {
         setAppliedFilters(filters);
 
-        // userRole이 변경될 때마다 전역 소켓에 즉시 업데이트
+        // userRole이 변경될 때마다 store에 즉시 업데이트
         const newUserRole =
           filters.transactionType[0] === '구매자'
             ? 'buyer'
@@ -174,10 +177,10 @@ export default function MatchPage() {
               ? 'seller'
               : null;
         console.log('🎯 필터 변경 시 userRole 업데이트:', newUserRole);
-        updateUserRole(newUserRole);
+        setUserRole(newUserRole);
       }
     },
-    [updateUserRole]
+    [setUserRole]
   );
 
   const handleApplyFilters = useCallback(() => {
@@ -199,29 +202,6 @@ export default function MatchPage() {
       setHasStartedSearch(true);
       setActiveSellers([]); // 🔧 기존 판매자 목록 초기화
 
-      // 실제 서버에 구매자 필터 등록
-      console.log('📡 구매자 필터 서버 등록 중...');
-      console.log('🔍 필터 원본 데이터:', pendingFilters);
-      console.log('🔧 변환된 서버 데이터:', {
-        carrier: (() => {
-          const carrier = pendingFilters.carrier[0];
-          return carrier === 'LGU+' ? 'LG' : carrier || 'ALL';
-        })(),
-        dataAmount: parseInt(
-          pendingFilters.dataAmount[0]?.replace(/[^0-9]/g, '') || '1'
-        ),
-        priceRange: (() => {
-          const price = pendingFilters.price[0];
-          if (!price) return 'ALL';
-          if (price.includes('0 - 999')) return 'P0_999';
-          if (price.includes('1,000 - 1,499')) return 'P1000_1499';
-          if (price.includes('1,500 - 1,999')) return 'P1500_1999';
-          if (price.includes('2,000 - 2,499')) return 'P2000_2499';
-          if (price.includes('2,500 이상')) return 'P2500_PLUS';
-          return 'ALL';
-        })(),
-      });
-
       // 서버에 필터 등록 후 WebSocket을 통해 매칭 결과 수신 대기
       registerBuyerFilter(pendingFilters);
 
@@ -229,7 +209,6 @@ export default function MatchPage() {
       setTimeout(() => {
         if (matchingStatus === 'searching') {
           setMatchingStatus('idle');
-          console.log('⏰ 매칭 검색 타임아웃 - 서버 응답 대기 중');
         }
       }, 5000); // 5초 타임아웃
     } else if (pendingFilters.transactionType[0] === '판매자') {
@@ -327,7 +306,6 @@ export default function MatchPage() {
       // 거래를 수락한 경우 trading 페이지로 이동
       if (accept) {
         // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
-        console.log('요청:', request, '셀러인포:', sellerInfo);
         const buyerInfo = {
           tradeId: request.tradeId,
           buyer: request.buyerName, // 구매자 이메일
@@ -359,7 +337,6 @@ export default function MatchPage() {
       <Header />
       <main className="flex-1">
         <MatchContent
-          userRole={userRole}
           appliedFilters={appliedFilters}
           pendingFilters={pendingFilters}
           onFilterChange={handleFilterChange}

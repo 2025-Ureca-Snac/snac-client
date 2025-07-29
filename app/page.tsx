@@ -9,6 +9,7 @@ import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
+import type { Card } from '@/app/(shared)/types/card';
 
 import type {
   CardCategory,
@@ -16,19 +17,6 @@ import type {
   PriceRange,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
-
-interface Card {
-  id: number;
-  cardCategory: 'BUY' | 'SELL';
-  carrier: 'SKT' | 'KT' | 'LGU+';
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  name: string;
-  sellStatus: string;
-}
 
 interface CardApiResponse {
   data: {
@@ -131,17 +119,13 @@ export default function Home() {
       </button>
 
       <div className="flex items-center justify-center">
-        {loading ? (
-          <p>로딩 중…</p>
-        ) : (
-          <HomeLayout
-            cards={cards}
-            isLoading={loading}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
+        <HomeLayout
+          cards={cards}
+          isLoading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="w-full">

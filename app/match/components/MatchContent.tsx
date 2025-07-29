@@ -7,10 +7,10 @@ import IncomingRequestsPanel from './IncomingRequestsPanel';
 import ResultSection from './ResultSection';
 import { Filters } from '../types';
 import { User, TradeRequest } from '../types/match';
+import { useMatchStore } from '@/app/(shared)/stores/match-store';
 
 interface MatchContentProps {
   // 상태들
-  userRole: 'buyer' | 'seller' | null;
   hasStartedSearch: boolean;
   matchingStatus: string;
   pendingFilters: Filters;
@@ -31,7 +31,6 @@ interface MatchContentProps {
 }
 
 export default function MatchContent({
-  userRole,
   hasStartedSearch,
   matchingStatus,
   pendingFilters,
@@ -48,6 +47,7 @@ export default function MatchContent({
   onUserClick,
   onRequestResponse,
 }: MatchContentProps) {
+  const { userRole } = useMatchStore();
   return (
     <main className="flex-1">
       {/* 필터 섹션 (검색을 시작하지 않았을 때만 표시) */}

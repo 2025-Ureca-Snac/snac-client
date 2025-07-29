@@ -154,7 +154,7 @@ export default function MyPage() {
           <SideMenu />
         </div>
         {/* 메인 컨텐츠 */}
-        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2">
+        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2 mb-12">
           <div className="max-w-4xl mx-auto w-full">
             <section className="w-full max-w-full">
               {/* ScoreCard (User Profile + 바삭 스코어 + 새싹 스낵이) */}
