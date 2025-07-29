@@ -21,7 +21,7 @@ interface BlogState {
   deleteBlog: () => Promise<void>;
 }
 
-const mockBlogs: Blog[] = [
+const MOCK_BLOGS: Blog[] = [
   {
     id: 18,
     title: '이메일 마케팅 ROI 향상 전략',
@@ -62,7 +62,7 @@ export const useBlogStore = create<BlogState>((set, get) => ({
           if (Math.random() < 0.2) {
             reject(new Error('서버에서 블로그 목록을 가져오지 못했습니다.'));
           } else {
-            resolve(mockBlogs);
+            resolve(MOCK_BLOGS);
           }
         }, 500);
       });
