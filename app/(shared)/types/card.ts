@@ -2,7 +2,7 @@ export interface CardData {
   id: number;
   name: string;
   email: string;
-  cardCategory: 'BUY' | 'SELL';
+  cardCategory: string;
   carrier: string;
   dataAmount: number;
   price: number;

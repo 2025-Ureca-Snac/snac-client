@@ -6,22 +6,8 @@ import { isToday } from '@/app/(shared)/utils/';
 import { PriceUnit } from '@/app/(shared)/types';
 import TradeConfirmationModal from '../(shared)/components/TradeConfirmationModal';
 
-interface DataItem {
-  id: number;
-  name: string;
-  createdAt: string;
-  email: string;
-  sellStatus: string;
-  cardCategory: 'BUY' | 'SELL';
-  carrier: string;
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-  ratingScore: number;
-}
-
 interface HomeSectionProps {
-  cards: DataItem[];
+  cards: CardData[];
   unit: PriceUnit;
 }
 
@@ -29,6 +15,7 @@ import {
   getCarrierImageUrl,
   formatCarrierName,
 } from '../(shared)/utils/carrier-utils';
+import { CardData } from '../(shared)/types/card';
 
 // const formatDataAmount = (amountInMB: number): string =>
 //   amountInMB >= 1024 && amountInMB % 1024 === 0
@@ -36,7 +23,7 @@ import {
 //     : `${amountInMB}MB`;
 
 export default function HomeSection({ cards, unit }: HomeSectionProps) {
-  const [modalItem, setModalItem] = useState<DataItem | null>(null);
+  const [modalItem, setModalItem] = useState<CardData | null>(null);
 
   return (
     <>

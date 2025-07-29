@@ -5,23 +5,10 @@ import { useRouter } from 'next/navigation';
 import ModalPortal from './modal-portal';
 import { PriceUnit } from '../types';
 import { api } from '../utils/api';
-
-interface DataItem {
-  id: number;
-  name: string;
-  createdAt: string;
-  email: string;
-  sellStatus: string;
-  cardCategory: 'BUY' | 'SELL';
-  carrier: string;
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-  ratingScore: number;
-}
+import { CardData } from '../types/card';
 
 interface TradeConfirmationModalProps {
-  modalItem: DataItem | null;
+  modalItem: CardData | null;
   onClose: () => void;
   unit: PriceUnit;
 }
