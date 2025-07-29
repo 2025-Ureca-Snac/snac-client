@@ -125,6 +125,11 @@ export default function ChangeNicknameModal({
     setIsLoading(false);
   };
 
+  const handleClose = () => {
+    handleReset();
+    onClose();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleNicknameChange();
@@ -152,19 +157,10 @@ export default function ChangeNicknameModal({
   );
 
   return (
-    <ModalPortal
-      isOpen={open}
-      onClose={() => {
-        handleReset();
-        onClose();
-      }}
-    >
+    <ModalPortal isOpen={open} onClose={handleClose}>
       <div
         className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
-        onClick={() => {
-          handleReset();
-          onClose();
-        }}
+        onClick={handleClose}
         tabIndex={-1}
         aria-modal="true"
         role="dialog"
@@ -197,10 +193,7 @@ export default function ChangeNicknameModal({
               닉네임 변경
             </div>
             <button
-              onClick={() => {
-                handleReset();
-                onClose();
-              }}
+              onClick={handleClose}
               type="button"
               className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
               aria-label="닫기"
