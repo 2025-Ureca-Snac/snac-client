@@ -8,11 +8,12 @@ import { Header } from '@/app/(shared)/components/Header';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdminStore } from '../(shared)/stores/use-admin-store';
-import ManagerIcon from '../../public/manager.svg';
-import NewReportIcon from '../../public/newReport.svg';
-import PostIcon from '../../public/post.svg';
-import TotalUserIcon from '../../public/totalUser.svg';
-import Menu from '../../public/menu.svg';
+import ManagerIcon from '@/public/manager.svg';
+import NewReportIcon from '@/public/newReport.svg';
+import PostIcon from '@/public/post.svg';
+import TotalUserIcon from '@/public/totalUser.svg';
+import Menu from '@/public/menu.svg';
+import DataBaseIcon from '@/public/database.svg';
 
 // 사이드바 컴포넌트
 function Sidebar() {
@@ -29,8 +30,8 @@ function Sidebar() {
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
 
-  const navItems = [
-    { name: '대시보드', icon: null, href: '/admin' },
+  const NAV_ITEMS = [
+    { name: '대시보드', icon: DataBaseIcon, href: '/admin' },
     { name: '사용자 관리', icon: TotalUserIcon, href: '/admin/users' },
     { name: '게시글 관리', icon: PostIcon, href: '/admin/blog' },
     { name: '신고 관리', icon: NewReportIcon, href: '/admin/reports' },
@@ -38,11 +39,11 @@ function Sidebar() {
 
   return (
     <aside
-      className={`fixed md:relative z-30 flex-shrink-0 w-64 h-full text-white transition-transform duration-300 ease-in-out ${
+      className={`fixed md:relative z-30 flex-shrink-0 w-64 h-full bg-white text-white transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0`}
     >
-      <div className="flex flex-col h-[500px] shadow-light rounded-lg mr-5">
+      <div className="flex flex-col h-full shadow-light rounded-lg mr-5">
         <div className="flex items-center justify-center h-16   gap-2">
           <ManagerIcon className="h-6 w-6 text-blue-600" />
           <span className="text-midnight-black text-lg font-bold">
@@ -50,7 +51,7 @@ function Sidebar() {
           </span>
         </div>
         <nav className="flex-1 px-4 py-4 space-y-2">
-          {navItems.map((item) => {
+          {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -62,6 +63,9 @@ function Sidebar() {
                     : 'text-gray-400 hover:bg-gray-500 hover:text-white'
                 }`}
               >
+                {item.icon && (
+                  <item.icon className="w-6 h-6 mr-3" aria-hidden="true" />
+                )}
                 <span>{item.name}</span>
               </Link>
             );

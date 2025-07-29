@@ -84,18 +84,28 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     if (!selectedBlogId) return;
 
     try {
-      console.log(`${selectedBlogId}번 블로그 글 삭제 API 호출`);
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // API 호출 시뮬레이션
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // 20% 확률로 에러 발생 시뮬레이션
+          if (Math.random() < 0.2) {
+            reject(new Error('서버 문제로 글을 삭제하지 못했습니다.'));
+          } else {
+            resolve(true);
+          }
+        }, 300);
+      });
 
       set((state) => ({
-        blogs: state.blogs.filter((p) => p.id !== selectedBlogId),
+        blogs: state.blogs.filter((blog) => blog.id !== selectedBlogId),
         isDeleteModalOpen: false,
         selectedBlogId: null,
       }));
       toast.success('블로그 글이 성공적으로 삭제되었습니다.');
     } catch (err) {
-      console.error('삭제 실패:', err);
-      toast.error('블로그 글 삭제에 실패했습니다.');
+      const message =
+        err instanceof Error ? err.message : '블로그 글 삭제에 실패했습니다.';
+      toast.error(message);
     }
   },
 }));

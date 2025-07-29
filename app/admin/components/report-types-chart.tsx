@@ -7,7 +7,7 @@ import {
   ResponsiveContainer as PieResponsiveContainer,
 } from 'recharts';
 
-const pieData = [
+const PIE_DATA = [
   { name: '스팸/광고', value: 45 },
   { name: '욕설/비방', value: 25 },
   { name: '부적절한 컨텐츠', value: 20 },
@@ -22,7 +22,7 @@ export function ReportTypesChart() {
       <PieResponsiveContainer>
         <PieChart>
           <Pie
-            data={pieData}
+            data={PIE_DATA}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -32,7 +32,7 @@ export function ReportTypesChart() {
             dataKey="value"
             nameKey="name"
           >
-            {pieData.map((entry, index) => (
+            {PIE_DATA.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}

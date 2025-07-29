@@ -6,7 +6,7 @@ export function BlogFilters() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categories = [
+  const CATEGORIES = [
     '마케팅',
     '데이터분석',
     '트렌드',
@@ -39,7 +39,7 @@ export function BlogFilters() {
         >
           <option value="all">모든 카테고리</option>
 
-          {categories.map((category) => (
+          {CATEGORIES.map((category) => (
             <option key={category} value={category}>
               {category}
             </option>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React, { useEffect } from 'react';
 
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
-import Plus from '../../../public/plus.svg';
+import Plus from '@/public/plus.svg';
 
 import { BlogFilters } from './blog-filter';
 import { BlogTable } from './blog-table';
