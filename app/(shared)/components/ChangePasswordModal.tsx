@@ -394,7 +394,7 @@ export default function ChangePasswordModal({
                   ? '비밀번호가 일치합니다.'
                   : passwordMatch === 'mismatch'
                     ? '비밀번호가 일치하지 않습니다.'
-                    : 'placeholder'}
+                    : '\u00A0'}
               </p>
             </div>
           </div>
