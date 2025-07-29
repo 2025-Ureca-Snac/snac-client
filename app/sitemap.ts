@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from './blog/data/blogPosts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://snac.com';
+  const baseUrl = 'https://snac-app.com';
 
   // 기본 페이지들
   const routes = [
