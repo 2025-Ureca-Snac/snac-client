@@ -2,10 +2,10 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-import NewReportIcon from '../../../public/newReport.svg';
-import PostIcon from '../../../public/post.svg';
-import TotalUserIcon from '../../../public/totalUser.svg';
-import IssueIcon from '../../../public/issue.svg';
+import NewReportIcon from '@/public/newReport.svg';
+import PostIcon from '@/public/post.svg';
+import TotalUserIcon from '@/public/totalUser.svg';
+import IssueIcon from '@/public/issue.svg';
 
 const WeeklyReportsChart = dynamic(
   () => import('./weekly-reports-chart').then((mod) => mod.WeeklyReportsChart),
