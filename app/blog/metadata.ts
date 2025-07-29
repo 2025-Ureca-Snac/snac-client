@@ -26,7 +26,7 @@ export const blogLayoutMetadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://snac.com'),
+  metadataBase: new URL('https://snac-app.com'),
   alternates: {
     canonical: '/blog',
   },
@@ -34,7 +34,7 @@ export const blogLayoutMetadata: Metadata = {
     title: '블로그 | 스낵',
     description:
       '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
-    url: 'https://snac.com/blog',
+    url: 'https://snac-app.com/blog',
     siteName: '스낵',
     images: [
       {
@@ -86,7 +86,7 @@ export const blogPageMetadata: Metadata = {
     title: '블로그 | 스낵',
     description:
       '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
-    url: 'https://snac.com/blog',
+    url: 'https://snac-app.com/blog',
     siteName: '스낵',
     images: [
       {
@@ -126,7 +126,7 @@ export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
       title: post.title,
       description:
         post.content?.substring(0, 160) || '스낵 블로그 포스트입니다.',
-      url: `https://snac.com/blog/${post.id}`,
+      url: `https://snac-app.com/blog/${post.id}`,
       siteName: '스낵',
       images: [
         {
