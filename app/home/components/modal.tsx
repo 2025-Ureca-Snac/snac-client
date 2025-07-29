@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, Fragment } from 'react';
+import { useRouter } from 'next/navigation';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Dialog, Transition, RadioGroup } from '@headlessui/react';
 
@@ -42,6 +43,7 @@ const CheckboxIcon = ({ checked }: { checked: boolean }) => (
 
 export const Modal = () => {
   const { isCreateModalOpen, actions } = useHomeStore();
+  const router = useRouter();
 
   const [cardCategory, setCardCategory] = useState<CardCategory>('');
   const [carrier, setCarrier] = useState<Carrier>('');
@@ -128,10 +130,20 @@ export const Modal = () => {
     console.log('서버로 전송하는 최종 데이터:', cards);
 
     try {
-      await api.post('/cards', cards);
-      toast.success('상품이 성공적으로 등록되었습니다.');
+      const response = await api.post('/cards', cards);
+      const cardId = (response.data as { data: { cardId: number } }).data
+        .cardId;
+      console.log('서버 응답:', cardId);
+
+      toast.success(
+        '상품이 성공적으로 등록되었습니다. 결제 페이지로 이동합니다.'
+      );
 
       actions.triggerRefetch();
+      // 1초 후 payment 페이지로 이동
+      setTimeout(() => {
+        router.push(`/payment?cardId=${cardId}&pay=sell`);
+      }, 1000);
       handleClose();
     } catch (error) {
       if (error instanceof Error) {

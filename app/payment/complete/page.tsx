@@ -133,12 +133,12 @@ function PaymentCompleteComponent() {
           {/* Success Message */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {pay === PAYMENT_TYPES.BUY
+              {pay === PAYMENT_TYPES.SELL
                 ? '구매 글이 등록되었습니다!'
                 : '구매요청이 전송되었습니다!'}
             </h2>
             <p className="text-gray-600 flex items-center justify-center">
-              {pay === PAYMENT_TYPES.BUY
+              {pay === PAYMENT_TYPES.SELL
                 ? '판매자가 구매요청을 보낼 때까지 기다려주세요.'
                 : '판매자가 빠른 시일 내에 데이터를 보내줄 예정입니다.'}
               <span className="ml-2 text-2xl">🎉</span>
