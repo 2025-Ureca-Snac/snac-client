@@ -28,9 +28,9 @@ export default function Page() {
             <span>새 글 작성</span>
           </a>
         </div>
-        <div className="bg-white p-8 rounded-2xl shadow-lg">
+        <div className="bg-white p-8 rounded-2xl shadow-light">
           <PostFilters />
-
+          <span className="text-sm text-gray-600">총 {posts.length}개</span>
           {loading && (
             <div className="text-center py-10">데이터를 불러오는 중...</div>
           )}
@@ -40,25 +40,6 @@ export default function Page() {
           {!loading && !error && (
             <>
               <PostsTable />
-              <div className="flex items-center justify-between mt-6">
-                <span className="text-sm text-gray-600">
-                  총 {posts.length}개
-                </span>
-                <div className="flex items-center space-x-2">
-                  <button
-                    className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
-                    disabled
-                  >
-                    이전
-                  </button>
-                  <button
-                    className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
-                    disabled
-                  >
-                    다음
-                  </button>
-                </div>
-              </div>
             </>
           )}
         </div>
