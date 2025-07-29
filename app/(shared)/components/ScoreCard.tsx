@@ -5,21 +5,58 @@ import ModalPortal from './modal-portal';
 import { useUserStore } from '../stores/user-store';
 import { useModalStore } from '../stores/modal-store';
 import { SNACK_GRADES } from '../constants/snack-grades';
+import { api } from '../utils/api';
+import { ApiResponse } from '../types/api';
+import { BalanceResponse } from '../types/point-history';
 
 /**
  * @author 이승우
  * @description 스코어 카드 컴포넌트
  */
-export default function ScoreCard() {
+interface ScoreCardProps {
+  favoriteCount?: number;
+}
+
+export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
   const { profile } = useUserStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const [balance, setBalance] = useState<BalanceResponse>({
+    point: 0,
+    money: 0,
+  });
+  const [isBalanceLoading, setIsBalanceLoading] = useState(true);
+
+  // 잔액 조회 API 함수
+  const getBalance = async (): Promise<BalanceResponse> => {
+    const response =
+      await api.get<ApiResponse<BalanceResponse>>('/wallets/summary');
+    return response.data.data;
+  };
+
+  // 잔액 데이터 로드
+  const loadBalance = async () => {
+    try {
+      setIsBalanceLoading(true);
+      const balanceResponse = await getBalance();
+      setBalance(balanceResponse);
+    } catch (err) {
+      console.error('잔액 로드 실패:', err);
+    } finally {
+      setIsBalanceLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 잔액 로드
+  useEffect(() => {
+    loadBalance();
+  }, []);
 
   // 실제 스코어는 API나 store에서 가져와야 함 (현재는 예시)
   const score = profile?.score || 0;
-  const maxScore = 500;
+  const maxScore = 1000;
 
   // 현재 등급 계산
   const currentGrade =
@@ -79,7 +116,9 @@ export default function ScoreCard() {
             aria-label="단골 목록 보기"
           >
             <span className="font-bold text-lg">
-              {profile?.favoriteCount || 0}
+              {favoriteCount !== undefined
+                ? favoriteCount
+                : profile?.favoriteCount || 0}
             </span>
             <span className="text-sm">단골 목록</span>
             <Image
@@ -101,31 +140,86 @@ export default function ScoreCard() {
 
       {/* 스낵 포인트 • 머니 Section */}
       <div className="mb-6">
-        <button
-          className="w-full flex items-center justify-between py-3 border-b border-border hover:bg-muted transition-colors"
-          onClick={() => (window.location.href = '/mypage/point')}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-amber-600 text-lg">🥔</span>
-            <span className="text-amber-600 text-sm font-medium">
-              스낵 포인트 • 머니
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-foreground text-sm font-medium">
-              {/* TODO: 실제 스낵 포인트 API 연동 필요 */}0 포인트
-            </span>
-            <span className="text-muted-foreground text-sm">
+        <div className="grid grid-cols-2 gap-4">
+          {/* 포인트 카드 */}
+          <div
+            onClick={() => (window.location.href = '/mypage/point?type=POINT')}
+            className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = '/mypage/point?type=POINT';
+              }
+            }}
+            role="button"
+            aria-label="포인트 내역 페이지로 이동"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl">🥔</span>
+              <span className="font-semibold text-sm">스낵 포인트</span>
+            </div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-white font-bold text-xl">
+                {isBalanceLoading
+                  ? '로딩 중...'
+                  : `${balance.point.toLocaleString()}P`}
+              </span>
               <Image
                 src="/chevron-down.svg"
                 alt="오른쪽 화살표"
-                width={20}
-                height={20}
-                className="inline-block -rotate-90 text-muted-foreground"
+                width={16}
+                height={16}
+                className="inline-block -rotate-90 text-white opacity-80"
               />
-            </span>
+            </div>
+            <div className="w-full bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center">
+              포인트 내역
+            </div>
           </div>
-        </button>
+
+          {/* 머니 카드 */}
+          <div
+            onClick={() => (window.location.href = '/mypage/point?type=MONEY')}
+            className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = '/mypage/point?type=MONEY';
+              }
+            }}
+            role="button"
+            aria-label="머니 내역 페이지로 이동"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl">💰</span>
+              <span className="font-semibold text-sm">스낵 머니</span>
+            </div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-white font-bold text-xl">
+                {isBalanceLoading
+                  ? '로딩 중...'
+                  : `${balance.money.toLocaleString()}S`}
+              </span>
+              <Image
+                src="/chevron-down.svg"
+                alt="오른쪽 화살표"
+                width={16}
+                height={16}
+                className="inline-block -rotate-90 text-white opacity-80"
+              />
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center">
+                충전
+              </div>
+              <div className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center">
+                송금
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 바삭 스코어 Section */}

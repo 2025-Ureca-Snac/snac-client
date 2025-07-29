@@ -1,12 +1,63 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
 import HistoryDetailModal from '@/app/(shared)/components/HistoryDetailModal';
-import { HistoryItem } from '@/app/(shared)/components/HistoryCard';
+import { HistoryItem } from '@/app/(shared)/types/history-card';
+import { api, handleApiError } from '@/app/(shared)/utils/api';
+import { ApiResponse } from '@/app/(shared)/types/api';
 import Link from 'next/link';
+
+// 구매 내역 관련 타입 정의
+interface PurchaseHistoryParams {
+  status?: 'all' | 'purchasing' | 'completed';
+  page?: number;
+  size?: number;
+}
+
+interface PurchaseHistoryResponse {
+  cardResponseList: PurchaseHistoryItem[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+interface PurchaseHistoryItem {
+  id: number;
+  name: string;
+  email: string;
+  ratingScore: number;
+  sellStatus: string;
+  cardCategory: string;
+  carrier: string;
+  dataAmount: number;
+  price: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 구매 내역 API 함수
+const getPurchaseHistory = async (
+  params: PurchaseHistoryParams = {}
+): Promise<PurchaseHistoryResponse> => {
+  const { status = 'all', page = 0, size = 10 } = params;
+
+  console.log(status, page, size);
+
+  const queryParams = new URLSearchParams();
+
+  queryParams.append('cardCategory', 'SELL');
+
+  const response = await api.get<ApiResponse<PurchaseHistoryResponse>>(
+    `/cards?${queryParams.toString()}`
+  );
+
+  return response.data.data;
+};
 
 export default function PurchaseHistoryPage() {
   const [activeTab, setActiveTab] = useState<
@@ -14,59 +65,97 @@ export default function PurchaseHistoryPage() {
   >('all');
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [purchaseHistory, setPurchaseHistory] = useState<PurchaseHistoryItem[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const purchaseHistory: HistoryItem[] = [
-    {
-      id: 1,
-      date: '2025.07.04',
-      title: '통신사 2GB',
-      price: 2000,
-      status: 'purchasing',
-      transactionNumber: '#0123_45678',
-      carrier: 'SKT',
-      dataAmount: '2GB',
-      phoneNumber: '010-0000-0000',
-    },
-    {
-      id: 2,
-      date: '2025.07.03',
-      title: '통신사 2GB',
-      price: 2000,
-      status: 'completed',
-      transactionNumber: '#0123_45679',
-      carrier: 'SKT',
-      dataAmount: '2GB',
-    },
-    {
-      id: 3,
-      date: '2025.07.02',
-      title: '통신사 5GB',
-      price: 5000,
-      status: 'completed',
-      transactionNumber: '#0123_45680',
-      carrier: 'KT',
-      dataAmount: '5GB',
-    },
-    {
-      id: 4,
-      date: '2025.07.01',
-      title: '통신사 1GB',
-      price: 1000,
-      status: 'completed',
-      transactionNumber: '#0123_45681',
-      carrier: 'LGU+',
-      dataAmount: '1GB',
-    },
-  ];
+  // 구매 내역 데이터 로드
+  const loadPurchaseHistory = async (status: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  const filteredPurchases = purchaseHistory.filter((item) => {
-    if (activeTab === 'all') return true;
-    return item.status === activeTab;
-  });
+      console.log('API 호출 시작:', { status });
 
-  const handleCardClick = (item: HistoryItem) => {
-    setSelectedItem(item);
+      const response = await getPurchaseHistory({
+        status:
+          status === 'all' ? undefined : (status as 'purchasing' | 'completed'),
+      });
+
+      console.log('API 응답:', response);
+      console.log('응답 content:', response.cardResponseList);
+
+      // sellStatus에 따라 필터링
+      let filteredData = response.cardResponseList;
+      if (status === 'purchasing') {
+        filteredData = response.cardResponseList.filter(
+          (item) =>
+            item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING'
+        );
+      } else if (status === 'completed') {
+        filteredData = response.cardResponseList.filter(
+          (item) =>
+            item.sellStatus !== 'SELLING' && item.sellStatus !== 'PURCHASING'
+        );
+      }
+
+      setPurchaseHistory(filteredData);
+
+      console.log('상태 업데이트 완료');
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
+      console.error('구매 내역 로드 실패:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 탭 변경 시 데이터 로드
+  useEffect(() => {
+    loadPurchaseHistory(activeTab);
+  }, [activeTab]);
+
+  // 디버깅용: 상태 변화 확인
+  useEffect(() => {
+    console.log('상태 변화:', {
+      isLoading,
+      error,
+      purchaseHistoryLength: purchaseHistory?.length,
+      activeTab,
+    });
+  }, [isLoading, error, purchaseHistory, activeTab]);
+
+  const handleCardClick = (item: PurchaseHistoryItem) => {
+    // PurchaseHistoryItem을 HistoryItem으로 변환
+    const historyItem: HistoryItem = {
+      id: item.id,
+      date: new Date(item.createdAt).toLocaleDateString('ko-KR'),
+      title: `${item.carrier} ${item.dataAmount}GB`,
+      price: item.price,
+      status:
+        item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING'
+          ? 'purchasing'
+          : 'completed',
+      transactionNumber: `#${item.id.toString().padStart(4, '0')}`,
+      carrier: item.carrier,
+      dataAmount: `${item.dataAmount}GB`,
+      phoneNumber: item.email,
+    };
+    setSelectedItem(historyItem);
     setIsModalOpen(true);
+  };
+
+  const handleCardKeyDown = (
+    event: React.KeyboardEvent,
+    item: PurchaseHistoryItem
+  ) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleCardClick(item);
+    }
   };
 
   const handleCloseModal = () => {
@@ -84,16 +173,20 @@ export default function PurchaseHistoryPage() {
   const DesktopHeader = () => (
     <div className="hidden md:block mb-8">
       {/* 네비게이션 */}
-      <div className="flex items-center gap-2 mb-4">
-        <Link
-          href="/mypage"
-          className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
-        >
-          마이페이지
-        </Link>
-        <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">구매 내역</span>
-      </div>
+      <nav aria-label="페이지 네비게이션">
+        <div className="flex items-center gap-2 mb-4">
+          <Link
+            href="/mypage"
+            className="text-gray-500 hover:text-gray-700 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          >
+            마이페이지
+          </Link>
+          <span className="text-gray-400" aria-hidden="true">
+            /
+          </span>
+          <span className="text-gray-900 font-medium">구매 내역</span>
+        </div>
+      </nav>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
@@ -109,19 +202,60 @@ export default function PurchaseHistoryPage() {
   const MobileHeader = () => (
     <div className="md:hidden mb-6">
       {/* 네비게이션 */}
-      <div className="flex items-center gap-2 mb-4">
-        <Link
-          href="/mypage"
-          className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
-        >
-          마이페이지
-        </Link>
-        <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">구매 내역</span>
-      </div>
+      <nav aria-label="페이지 네비게이션">
+        <div className="flex items-center gap-2 mb-4">
+          <Link
+            href="/mypage"
+            className="text-gray-500 hover:text-gray-700 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          >
+            마이페이지
+          </Link>
+          <span className="text-gray-400" aria-hidden="true">
+            /
+          </span>
+          <span className="text-gray-900 font-medium">구매 내역</span>
+        </div>
+      </nav>
 
       {/* 제목 */}
       <h1 className="text-xl font-bold text-gray-900">구매 내역</h1>
+    </div>
+  );
+
+  // 로딩 컴포넌트
+  const LoadingState = () => (
+    <div className="p-6">
+      <div className="space-y-4">
+        {[...Array(3)].map((_, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 animate-pulse"
+          >
+            <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0"></div>
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-20"></div>
+              <div className="h-5 bg-gray-200 rounded w-32"></div>
+              <div className="h-4 bg-gray-200 rounded w-24"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // 에러 컴포넌트
+  const ErrorState = () => (
+    <div className="p-6">
+      <div className="text-center py-8">
+        <div className="text-red-500 mb-2">오류가 발생했습니다</div>
+        <div className="text-gray-500 mb-4">{error}</div>
+        <button
+          onClick={() => loadPurchaseHistory(activeTab)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+        >
+          다시 시도
+        </button>
+      </div>
     </div>
   );
 
@@ -142,7 +276,10 @@ export default function PurchaseHistoryPage() {
             {/* 모바일 헤더 */}
             <MobileHeader />
 
-            <section className="w-full max-w-full">
+            <section
+              className="w-full max-w-full"
+              aria-labelledby="purchase-history-title"
+            >
               <div className="bg-white rounded-lg shadow-sm border">
                 {/* 탭 네비게이션 */}
                 <TabNavigation
@@ -157,61 +294,87 @@ export default function PurchaseHistoryPage() {
                 />
 
                 {/* 구매 내역 리스트 */}
-                <AnimatedTabContent key={activeTab}>
-                  <div className="p-6">
-                    {filteredPurchases.length > 0 ? (
-                      <div className="space-y-4">
-                        {filteredPurchases.map((item) => (
-                          <div
-                            key={item.id}
-                            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
-                            onClick={() => handleCardClick(item)}
-                          >
-                            {/* 아이콘 */}
-                            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <span className="text-blue-600 font-bold text-lg">
-                                T
-                              </span>
-                            </div>
+                <AnimatedTabContent tabKey={activeTab}>
+                  {isLoading ? (
+                    <LoadingState />
+                  ) : error ? (
+                    <ErrorState />
+                  ) : (
+                    <div className="p-6">
+                      {purchaseHistory?.length > 0 ? (
+                        <div
+                          className="space-y-4"
+                          role="list"
+                          aria-label={`${activeTab === 'all' ? '전체' : activeTab === 'purchasing' ? '구매 중' : '구매 완료'} 구매 내역`}
+                        >
+                          {purchaseHistory.map((item) => (
+                            <div
+                              key={item.id}
+                              role="listitem"
+                              tabIndex={0}
+                              className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                              onClick={() => handleCardClick(item)}
+                              onKeyDown={(e) => handleCardKeyDown(e, item)}
+                              aria-label={`${item.carrier} ${item.dataAmount}GB 구매 내역 - ${new Date(item.createdAt).toLocaleDateString('ko-KR')} - ${item.price.toLocaleString()}원 - ${item.sellStatus === 'SELLING' ? '구매요청' : '거래완료'}`}
+                            >
+                              {/* 아이콘 */}
+                              <div
+                                className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0"
+                                aria-hidden="true"
+                              >
+                                <span className="text-blue-600 font-bold text-lg">
+                                  T
+                                </span>
+                              </div>
 
-                            {/* 내용 */}
-                            <div className="flex-1">
-                              <div className="text-sm text-gray-500 mb-1">
-                                {item.date}
-                              </div>
-                              <div className="font-semibold text-gray-900 mb-1">
-                                {item.title}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className={`text-white text-xs px-2 py-1 rounded ${
-                                    item.status === 'completed'
-                                      ? 'bg-black'
-                                      : 'bg-red-500'
-                                  }`}
-                                >
-                                  {item.status === 'completed'
-                                    ? '거래완료'
-                                    : '구매요청'}
-                                </span>
-                                <span className="text-gray-900">
-                                  {item.price.toLocaleString()}원
-                                </span>
+                              {/* 내용 */}
+                              <div className="flex-1">
+                                <div className="text-sm text-gray-500 mb-1">
+                                  {new Date(item.createdAt).toLocaleDateString(
+                                    'ko-KR'
+                                  )}
+                                </div>
+                                <div className="font-semibold text-gray-900 mb-1">
+                                  {item.carrier} {item.dataAmount}GB
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`text-white text-xs px-2 py-1 rounded ${
+                                      item.sellStatus === 'SELLING' ||
+                                      item.sellStatus === 'PURCHASING'
+                                        ? 'bg-orange-500'
+                                        : 'bg-black'
+                                    }`}
+                                    aria-label={`상태: ${item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING' ? '구매요청' : '거래완료'}`}
+                                  >
+                                    {item.sellStatus === 'SELLING' ||
+                                    item.sellStatus === 'PURCHASING'
+                                      ? '구매요청'
+                                      : '거래완료'}
+                                  </span>
+                                  <span className="text-gray-900">
+                                    {item.price.toLocaleString()}원
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        {activeTab === 'all'
-                          ? '구매 내역이 없습니다.'
-                          : activeTab === 'purchasing'
-                            ? '구매 중인 상품이 없습니다.'
-                            : '구매 완료된 상품이 없습니다.'}
-                      </div>
-                    )}
-                  </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div
+                          className="text-center py-8 text-gray-500"
+                          role="status"
+                          aria-live="polite"
+                        >
+                          {activeTab === 'all'
+                            ? '구매 내역이 없습니다.'
+                            : activeTab === 'purchasing'
+                              ? '구매 중인 상품이 없습니다.'
+                              : '구매 완료된 상품이 없습니다.'}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </AnimatedTabContent>
               </div>
             </section>

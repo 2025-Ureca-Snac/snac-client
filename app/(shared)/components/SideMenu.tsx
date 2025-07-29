@@ -14,6 +14,10 @@ export default function SideMenu() {
 
   // 현재 활성 메뉴 아이템 확인
   const isActiveMenu = (item: MenuItem) => {
+    // 포인트 페이지의 경우 URL 파라미터가 있어도 활성화되도록 처리
+    if (item.path.startsWith('/mypage/point')) {
+      return pathname.startsWith('/mypage/point');
+    }
     return pathname === item.path;
   };
 

@@ -12,25 +12,76 @@ import SocialLoginModal from '../(shared)/components/SocialLoginModal';
 import ServiceGuideModal from '../(shared)/components/ServiceGuideModal';
 import PrivacyPolicyModal from '../(shared)/components/PrivacyPolicyModal';
 import ThemeModal from '../(shared)/components/ThemeModal';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUserStore } from '../(shared)/stores/user-store';
 import { useModalStore } from '../(shared)/stores/modal-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import { useRouter } from 'next/navigation';
+import { api } from '../(shared)/utils/api';
+import { ApiResponse } from '../(shared)/types/api';
 
 /**
  * @author 이승우
  * @description 마이페이지 페이지
  */
+// 단골 목록 타입
+interface FavoriteItem {
+  memberId: number;
+  nickname: string;
+}
+
+interface FavoriteResponse {
+  contents: FavoriteItem[];
+}
+
 export default function MyPage() {
   const { profile, fetchUserProfile, updateProfile, isLoading, error } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();
   const { logout } = useAuthStore();
   const router = useRouter();
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
-  // 실제 즐겨찾기 데이터 (API에서 가져와야 함)
-  const favorites = Array(profile?.favoriteCount || 0).fill('데이터바삭이');
+  // 단골 목록 조회 API 함수
+  const getFavorites = async (): Promise<FavoriteResponse> => {
+    const response = await api.get<ApiResponse<FavoriteResponse>>('/favorites');
+    console.log('단골 목록 조회: ', response.data.data);
+    return response.data.data;
+  };
+
+  // 단골 삭제 API 함수
+  const deleteFavorite = async (memberId: number): Promise<void> => {
+    await api.delete(`/favorites/${memberId}`);
+    console.log('단골 삭제 완료: ', memberId);
+  };
+
+  // 단골 목록 로드
+  const loadFavorites = async () => {
+    try {
+      const response = await getFavorites();
+      setFavorites(response.contents || []);
+    } catch (err) {
+      console.error('단골 목록 로드 실패:', err);
+      setFavorites([]);
+    }
+  };
+
+  // 단골 삭제 핸들러
+  const handleDeleteFavorite = async (memberId: number, nickname: string) => {
+    if (!confirm(`${nickname}을(를) 단골에서 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      await deleteFavorite(memberId);
+      // 삭제 후 목록 새로고침
+      await loadFavorites();
+      alert(`${nickname}이(가) 단골에서 삭제되었습니다.`);
+    } catch (err) {
+      console.error('단골 삭제 실패:', err);
+      alert('단골 삭제에 실패했습니다.');
+    }
+  };
 
   // 로그아웃 핸들러
   const handleLogout = async () => {
@@ -43,9 +94,10 @@ export default function MyPage() {
     }
   };
 
-  // 컴포넌트 마운트 시 사용자 정보 가져오기
+  // 컴포넌트 마운트 시 사용자 정보와 단골 목록 가져오기
   useEffect(() => {
     fetchUserProfile();
+    loadFavorites();
   }, []); // fetchUserProfile을 의존성에서 제거
 
   // SettingList에서 항목 클릭 시 모달 오픈
@@ -106,7 +158,7 @@ export default function MyPage() {
           <div className="max-w-4xl mx-auto w-full">
             <section className="w-full max-w-full">
               {/* ScoreCard (User Profile + 바삭 스코어 + 새싹 스낵이) */}
-              <ScoreCard />
+              <ScoreCard favoriteCount={favorites.length} />
               {/* ActionButtons (판매 내역, 구매 내역, 신고 내역) */}
               <ActionButtons />
               {/* Accordion (거래 후기) */}
@@ -186,7 +238,11 @@ export default function MyPage() {
       <FavoriteListModal
         open={isOpen && modalType === 'favorite-list'}
         onClose={closeModal}
-        favorites={favorites}
+        favorites={favorites.map((fav) => ({
+          memberId: fav.memberId,
+          nickname: fav.nickname,
+        }))}
+        onDelete={handleDeleteFavorite}
       />
       <ThemeModal open={isOpen && modalType === 'theme'} onClose={closeModal} />
     </div>

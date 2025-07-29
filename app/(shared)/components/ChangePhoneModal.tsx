@@ -210,10 +210,13 @@ export default function ChangePhoneModal({
         .get({
           otp: { transport: ['sms'] },
           signal: abortController.signal,
-        } as RequestInit)
-        .then((otp: { code?: string }) => {
-          if (otp && otp.code && typeof otp.code === 'string') {
-            setFormData((prev) => ({ ...prev, verificationCode: otp.code }));
+        } as CredentialRequestOptions)
+        .then((credential) => {
+          if (credential && 'code' in credential && credential.code) {
+            setFormData((prev) => ({
+              ...prev,
+              verificationCode: credential.code as string,
+            }));
             // 자동으로 인증 확인
             setTimeout(() => {
               handleVerifyCode();
