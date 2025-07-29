@@ -37,7 +37,7 @@ export function WeeklyReportsChart() {
               borderRadius: '0.5rem',
             }}
           />
-          <Bar dataKey="신고" fill="red" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="신고" fill="#ED1B23" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
