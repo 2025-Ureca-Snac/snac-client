@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Header } from '@/app/(shared)/components/Header';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
-import Image from 'next/image';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import dynamic from 'next/dynamic';
 import { api } from '@/app/(shared)/utils/api';
@@ -55,8 +54,6 @@ export default function BlogAdminPage() {
 
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
-  const [newImageUrl, setNewImageUrl] = useState('');
-  const [newImagePosition, setNewImagePosition] = useState(0);
 
   const handleInputChange = (
     field: keyof BlogPostForm,
@@ -119,9 +116,12 @@ export default function BlogAdminPage() {
       });
 
       setMainImageFile(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
-        error.response?.data?.message || error.message || '등록 실패';
+        (error as { response?: { data?: { message: string } } })?.response?.data
+          ?.message ||
+        (error as Error)?.message ||
+        '등록 실패';
       toast.error(`포스트 등록 실패: ${errorMessage}`);
       console.error('Failed to create blog post:', error);
     }
