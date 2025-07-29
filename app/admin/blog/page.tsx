@@ -18,7 +18,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto p-6">
         <div className="flex justify-end mb-4">
           <a
             href="/admin/blog/new"
@@ -43,7 +43,7 @@ export default function Page() {
             </>
           )}
         </div>
-      </main>
+      </div>
       <DeleteConfirmModal />
     </>
   );
