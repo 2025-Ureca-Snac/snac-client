@@ -5,6 +5,7 @@ import React from 'react';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { Header } from '@/app/(shared)/components/Header';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdminStore } from '../(shared)/stores/use-admin-store';
 import ManagerIcon from '../../public/manager.svg';
@@ -52,7 +53,7 @@ function Sidebar() {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className={`flex items-center px-4 py-2 rounded-md transition-colors ${
@@ -62,7 +63,7 @@ function Sidebar() {
                 }`}
               >
                 <span>{item.name}</span>
-              </a>
+              </Link>
             );
           })}
         </nav>
