@@ -16,6 +16,7 @@ import React, { useEffect } from 'react';
 import { useUserStore } from '../(shared)/stores/user-store';
 import { useModalStore } from '../(shared)/stores/modal-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
+import { useWebSocketGuard } from '../(shared)/hooks/useWebSocketGuard';
 import { useRouter } from 'next/navigation';
 
 const FAVORITES = Array(12).fill('데이터바삭이');
@@ -25,6 +26,9 @@ const FAVORITES = Array(12).fill('데이터바삭이');
  * @description 마이페이지 페이지
  */
 export default function MyPage() {
+  // WebSocket 가드 사용
+  useWebSocketGuard();
+
   const { profile, updatePreferences, updateProfile, setProfile } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();

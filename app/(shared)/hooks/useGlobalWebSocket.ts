@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Client as StompClient } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useMatchStore } from '../stores/match-store';
+import { useWebSocketStore } from '../stores/websocket-store';
 import { User, Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
 
@@ -91,6 +92,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const router = useRouter();
   const { foundMatch, setWebSocketFunctions, partner, userRole, setUserRole } =
     useMatchStore();
+  const { setConnectionStatus } = useWebSocketStore();
   const [isConnected, setIsConnected] = useState(false);
   const connectionId = useRef(++globalConnectionCount);
   // JWT 토큰 가져오기
@@ -200,6 +202,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       onConnect: () => {
         console.log('✅ 전역 WebSocket 연결 성공');
         setIsConnected(true);
+        setConnectionStatus(true);
         setupSubscriptions();
       },
       onStompError: (frame) => {
@@ -209,6 +212,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       onDisconnect: () => {
         console.log('🔌 WebSocket 연결 해제');
         setIsConnected(false);
+        setConnectionStatus(false);
       },
     });
 
