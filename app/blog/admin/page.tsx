@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // useEffect import 추가
+import { useState } from 'react';
 import { Header } from '@/app/(shared)/components/Header';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
@@ -8,9 +8,6 @@ import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import dynamic from 'next/dynamic';
 import { api } from '@/app/(shared)/utils/api';
 import { toast } from 'sonner';
-
-// 'Image' import는 사용되지 않으므로 제거합니다.
-// import Image from 'next/image';
 
 const ToastEditor = dynamic(
   () => import('../admin/ToastEditor').then((mod) => mod.ToastEditor),
@@ -46,22 +43,17 @@ export default function BlogAdminPage() {
     imagePositions: [],
   });
 
-  // 'useEffect' is defined but never used. 오류 해결: 주석 해제 및 종속성 추가
-  useEffect(() => {
-    if (user) {
-      setFormData((prev) => ({
-        ...prev,
-        author: user, // 작성자 자동 설정
-      }));
-    }
-  }, [user]); // user를 종속성 배열에 추가
+  // useEffect(() => {
+  //   if (user) {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       author: user, // 작성자 자동 설정
+  //     }));
+  //   }
+  // }, [user]);
 
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
-
-  // 'newImageUrl'과 'newImagePosition'은 사용되지 않으므로 제거합니다.
-  // const [newImageUrl, setNewImageUrl] = useState('');
-  // const [newImagePosition, setNewImagePosition] = useState<number[]>([]);
 
   const handleInputChange = (
     field: keyof BlogPostForm,
@@ -125,18 +117,11 @@ export default function BlogAdminPage() {
 
       setMainImageFile(null);
     } catch (error: unknown) {
-      // 'Unexpected any. Specify a different type.' 오류 해결: 타입 가드를 사용하여 안전하게 접근
-      let errorMessage = '등록 실패';
-      if (error && typeof error === 'object' && 'response' in error) {
-        const errResponse = error as {
-          response?: { data?: { message: string } };
-        };
-        if (errResponse.response?.data?.message) {
-          errorMessage = errResponse.response.data.message;
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage =
+        (error as { response?: { data?: { message: string } } })?.response?.data
+          ?.message ||
+        (error as Error)?.message ||
+        '등록 실패';
       toast.error(`포스트 등록 실패: ${errorMessage}`);
       console.error('Failed to create blog post:', error);
     }
