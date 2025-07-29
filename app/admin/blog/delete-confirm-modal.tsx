@@ -1,6 +1,6 @@
 import React from 'react';
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
-import NewReportIcon from '../../../public/newReport.svg';
+import NewReportIcon from '@/public/newReport.svg';
 import ModalPortal from '@/app/(shared)/components/modal-portal';
 
 export function DeleteConfirmModal() {
