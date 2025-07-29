@@ -4,32 +4,31 @@ import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import Image from 'next/image';
+import FilterGroup from '@/app/(shared)/components/FilterGroup';
+import FilterButtons from '@/app/(shared)/components/FilterButtons';
 
-const DISPLAY_CATEGORIES = ['SKT', 'KT', 'LGU+'] as const;
+type Category = 'SKT' | 'KT' | 'LGU+';
+type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
+type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 
-const transactionOptions = [
-  { label: '모든 거래', value: 'ALL' as const },
-  { label: '거래 전', value: 'SELLING' as const },
-  { label: '거래 완료', value: 'SOLD_OUT' as const },
-];
-
-const price_ranges = [
-  '모든 가격',
-  '1,000원 이하',
-  '1,500원 이하',
-  '2,000원 이하',
-  '2,500원 이하',
-] as const;
-
-const PRICE_VALUE_MAP: Record<
-  (typeof price_ranges)[number],
-  'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500'
-> = {
-  '모든 가격': 'ALL',
-  '1,000원 이하': 'P0_1000',
-  '1,500원 이하': 'P0_1500',
-  '2,000원 이하': 'P0_2000',
-  '2,500원 이하': 'P0_2500',
+const FILTER_OPTIONS = {
+  category: [
+    { value: 'SKT', label: 'SKT' },
+    { value: 'KT', label: 'KT' },
+    { value: 'LGU+', label: 'LGU+' },
+  ],
+  transactionStatus: [
+    { value: 'ALL', label: '모든 거래' },
+    { value: 'SELLING', label: '거래 전' },
+    { value: 'SOLD_OUT', label: '거래 완료' },
+  ],
+  priceRange: [
+    { value: 'ALL', label: '모든 가격' },
+    { value: 'P0_1000', label: '1,000원 이하' },
+    { value: 'P0_1500', label: '1,500원 이하' },
+    { value: 'P0_2000', label: '2,000원 이하' },
+    { value: 'P0_2500', label: '2,500원 이하' },
+  ],
 };
 
 export const Filter = () => {
@@ -62,99 +61,44 @@ export const Filter = () => {
           </div>
 
           <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide">
-            <div className="space-y-3">
-              <h3 className="text-regular-md md:text-medium-md text-midnight-black">
-                카테고리
-              </h3>
-              <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
-                {DISPLAY_CATEGORIES.map((item) => {
-                  const isSelected = category === item;
-                  return (
-                    <button
-                      key={item}
-                      onClick={() =>
-                        actions.setCategory(isSelected ? null : item)
-                      }
-                      className={`px-2 py-2 text-regular-sm md:text-medium-sm w-[95px] h-[40px] rounded-[10px] border transition-colors md:w-auto md:h-auto md:p-0 md:border-none md:bg-transparent md:rounded-none ${
-                        isSelected
-                          ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent md:text-midnight-black md:font-bold md:underline'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 md:text-gray-500 md:hover:bg-transparent'
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <FilterGroup
+              title="카테고리"
+              options={FILTER_OPTIONS.category}
+              selectedValues={category ? [category] : []}
+              onValueChange={(value) =>
+                actions.setCategory(
+                  category === value ? null : (value as Category)
+                )
+              }
+              variant="button"
+            />
 
-            <div className="space-y-3">
-              <h3 className="text-regular-md md:text-medium-md text-midnight-black">
-                거래 상태
-              </h3>
-              <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
-                {transactionOptions.map((option) => {
-                  const isSelected = transactionStatus === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => actions.setTransactionStatus(option.value)}
-                      className={`px-2 py-2 text-regular-sm w-[95px] h-[40px] rounded-lg border transition-colors md:w-auto md:h-auto md:p-0 md:border-none md:bg-transparent md:rounded-none ${
-                        isSelected
-                          ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent md:text-midnight-black md:font-bold md:underline'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 md:text-gray-500 md:hover:bg-transparent'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <FilterGroup
+              title="거래 상태"
+              options={FILTER_OPTIONS.transactionStatus}
+              selectedValues={transactionStatus ? [transactionStatus] : []}
+              onValueChange={(value) =>
+                actions.setTransactionStatus(value as TransactionStatus)
+              }
+              variant="button"
+            />
 
-            <div className="space-y-3">
-              <h3 className="text-regular-md md:text-medium-md text-midnight-black">
-                가격
-              </h3>
-              <div className="space-y-2">
-                {price_ranges.map((item) => {
-                  const value = PRICE_VALUE_MAP[item];
-                  return (
-                    <label
-                      key={item}
-                      className="flex items-center space-x-3 cursor-pointer p-1"
-                    >
-                      <span className="text-gray-500 mr-auto md:text-medium-sm text-medium-sm">
-                        {item}
-                      </span>
-                      <input
-                        type="radio"
-                        name="priceRange"
-                        checked={priceRange === value}
-                        onChange={() => actions.setPriceRange(value)}
-                        className="h-6 w-6 border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
-                      />
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
+            <FilterGroup
+              title="가격"
+              options={FILTER_OPTIONS.priceRange}
+              selectedValues={priceRange ? [priceRange] : []}
+              onValueChange={(value) =>
+                actions.setPriceRange(value as PriceRange)
+              }
+              variant="radio"
+            />
           </div>
 
-          <div className="flex-shrink-0 grid grid-cols-2 gap-4 p-4">
-            <button
-              onClick={actions.resetFilters}
-              className="px-4 py-3 bg-gray-100 rounded-lg font-bold text-gray-800 hover:bg-gray-200 md:bg-transparent md:border md:border-gray-400 md:text-gray-400"
-            >
-              전체 해제
-            </button>
-            <button
-              onClick={closeAndApply}
-              className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-gray-800 text-white hover:bg-gray-500"
-            >
-              적용하기
-            </button>
-          </div>
+          <FilterButtons
+            onReset={actions.resetFilters}
+            onApply={closeAndApply}
+            variant="home"
+          />
         </div>
       </div>
 
@@ -190,101 +134,46 @@ export const Filter = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide">
-                    <div className="space-y-3">
-                      <h3 className="text-regular-md text-midnight-black">
-                        카테고리
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {DISPLAY_CATEGORIES.map((item) => {
-                          const isSelected = category === item;
-                          return (
-                            <button
-                              key={item}
-                              onClick={() =>
-                                actions.setCategory(isSelected ? null : item)
-                              }
-                              className={`px-2 py-2 text-regular-sm w-[95px] h-[40px] rounded-[10px] border transition-colors ${
-                                isSelected
-                                  ? 'bg-teal-green text-white border-teal-green font-semibold'
-                                  : 'bg-white text-gray-700 hover:bg-gray-50'
-                              }`}
-                            >
-                              {item}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    <FilterGroup
+                      title="카테고리"
+                      options={FILTER_OPTIONS.category}
+                      selectedValues={category ? [category] : []}
+                      onValueChange={(value) =>
+                        actions.setCategory(
+                          category === value ? null : (value as Category)
+                        )
+                      }
+                      variant="button"
+                    />
 
-                    <div className="space-y-3">
-                      <h3 className="text-regular-md text-midnight-black">
-                        거래 상태
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {transactionOptions.map((option) => {
-                          const isSelected = transactionStatus === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              onClick={() =>
-                                actions.setTransactionStatus(option.value)
-                              }
-                              className={`px-2 py-2 text-regular-sm w-[95px] h-[40px] rounded-lg border transition-colors ${
-                                isSelected
-                                  ? 'bg-teal-green text-white border-teal-green font-semibold'
-                                  : 'bg-white text-gray-700 hover:bg-gray-50'
-                              }`}
-                            >
-                              {option.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    <FilterGroup
+                      title="거래 상태"
+                      options={FILTER_OPTIONS.transactionStatus}
+                      selectedValues={
+                        transactionStatus ? [transactionStatus] : []
+                      }
+                      onValueChange={(value) =>
+                        actions.setTransactionStatus(value as TransactionStatus)
+                      }
+                      variant="button"
+                    />
 
-                    <div className="space-y-3">
-                      <h3 className="text-regular-md text-midnight-black">
-                        가격
-                      </h3>
-                      <div className="space-y-2">
-                        {price_ranges.map((item) => {
-                          const value = PRICE_VALUE_MAP[item];
-                          return (
-                            <label
-                              key={item}
-                              className="flex items-center space-x-3 cursor-pointer p-1"
-                            >
-                              <span className="text-gray-500 mr-auto text-medium-sm">
-                                {item}
-                              </span>
-                              <input
-                                type="radio"
-                                name="priceRange"
-                                checked={priceRange === value}
-                                onChange={() => actions.setPriceRange(value)}
-                                className="h-6 w-6 border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
-                              />
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    <FilterGroup
+                      title="가격"
+                      options={FILTER_OPTIONS.priceRange}
+                      selectedValues={priceRange ? [priceRange] : []}
+                      onValueChange={(value) =>
+                        actions.setPriceRange(value as PriceRange)
+                      }
+                      variant="radio"
+                    />
                   </div>
 
-                  <div className="flex-shrink-0 grid grid-cols-2 gap-4 p-4">
-                    <button
-                      onClick={actions.resetFilters}
-                      className="px-4 py-3 bg-gray-100 rounded-lg font-bold text-gray-800 hover:bg-gray-200"
-                    >
-                      전체 해제
-                    </button>
-                    <button
-                      onClick={closeAndApply}
-                      className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green text-white hover:bg-gray-500"
-                    >
-                      적용하기
-                    </button>
-                  </div>
+                  <FilterButtons
+                    onReset={actions.resetFilters}
+                    onApply={closeAndApply}
+                    variant="home"
+                  />
                 </div>
               </div>
             </div>
