@@ -14,7 +14,15 @@ export default function ActionButtons() {
           <Link
             key={action.label}
             href={action.href}
-            className="flex flex-col items-center flex-1 py-4 rounded-lg hover:bg-gray-50 transition-colors relative"
+            className="flex flex-col items-center flex-1 py-4 rounded-lg hover:bg-gray-50 transition-colors relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:bg-gray-50"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = action.href;
+              }
+            }}
+            aria-label={`${action.label} 페이지로 이동`}
           >
             <div className="relative">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
