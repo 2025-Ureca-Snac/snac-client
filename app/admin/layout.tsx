@@ -31,7 +31,7 @@ function Sidebar() {
   const navItems = [
     { name: '대시보드', icon: null, href: '/admin' },
     { name: '사용자 관리', icon: TotalUserIcon, href: '/admin/users' },
-    { name: '게시글 관리', icon: PostIcon, href: '/admin/posts' },
+    { name: '게시글 관리', icon: PostIcon, href: '/admin/blog' },
     { name: '신고 관리', icon: NewReportIcon, href: '/admin/reports' },
   ];
 
@@ -77,7 +77,7 @@ function AdminHeader() {
   const pathname = usePathname();
 
   const getTitle = () => {
-    if (pathname.startsWith('/admin/posts')) return '게시글 관리';
+    if (pathname.startsWith('/admin/blogs')) return '게시글 관리';
     if (pathname.startsWith('/admin/users')) return '사용자 관리';
     if (pathname.startsWith('/admin/reports')) return '신고 관리';
     return '대시보드';
