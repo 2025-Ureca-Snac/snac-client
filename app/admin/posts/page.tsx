@@ -1,0 +1,69 @@
+'use client';
+
+import React, { useEffect } from 'react';
+
+import { usePostStore } from '@/app/(shared)/stores/use-post-store';
+import Plus from '../../../public/plus.svg';
+
+import { PostFilters } from './post-filter';
+import { PostsTable } from './posts-table';
+import { DeleteConfirmModal } from './delete-confirm-modal';
+
+export default function Page() {
+  const { fetchPosts, loading, error, posts } = usePostStore();
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  return (
+    <>
+      <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+        <div className="flex justify-end mb-4">
+          <a
+            href="/admin/posts/new"
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold flex items-center space-x-2"
+          >
+            <Plus className="h-8 w-8" />
+            <span>새 글 작성</span>
+          </a>
+        </div>
+        <div className="bg-white p-8 rounded-2xl shadow-lg">
+          <PostFilters />
+
+          {loading && (
+            <div className="text-center py-10">데이터를 불러오는 중...</div>
+          )}
+          {error && (
+            <div className="text-center py-10 text-red-500">{error}</div>
+          )}
+          {!loading && !error && (
+            <>
+              <PostsTable />
+              <div className="flex items-center justify-between mt-6">
+                <span className="text-sm text-gray-600">
+                  총 {posts.length}개
+                </span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
+                    disabled
+                  >
+                    이전
+                  </button>
+                  <button
+                    className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50"
+                    disabled
+                  >
+                    다음
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </main>
+      <DeleteConfirmModal />
+    </>
+  );
+}
