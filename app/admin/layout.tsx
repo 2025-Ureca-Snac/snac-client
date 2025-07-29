@@ -39,11 +39,11 @@ function Sidebar() {
 
   return (
     <aside
-      className={`fixed md:relative z-30 flex-shrink-0 w-64 h-full bg-white text-white transition-transform duration-300 ease-in-out ${
+      className={`fixed md:relative z-30 flex-shrink-0 w-64 h-full  text-white transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0`}
     >
-      <div className="flex flex-col h-full shadow-light rounded-lg mr-5">
+      <div className="flex flex-col h-full shadow-light rounded-lg bg-white mr-5">
         <div className="flex items-center justify-center h-16   gap-2">
           <ManagerIcon className="h-6 w-6 text-blue-600" />
           <span className="text-midnight-black text-lg font-bold">
@@ -109,11 +109,21 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { isSidebarOpen, setSidebarOpen } = useAdminStore();
+
   return (
     <div className=" min-h-screen">
       <Header />
       <div className="flex flex-1">
         <Sidebar />
+        {/* 모바일에서 사이드바가 열렸을 때 표시될 오버레이 */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+        )}
         <div className="flex-1 flex flex-col">
           <AdminHeader />
           <main className="flex-1 p-4">{children}</main>
