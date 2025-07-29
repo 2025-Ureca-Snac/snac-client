@@ -28,7 +28,7 @@ export default function ChangeNicknameModal({
   const [success, setSuccess] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
   const nicknameRef = useRef<HTMLInputElement>(null);
-  const { profile } = useUserStore();
+  const { profile, updateNickname } = useUserStore();
 
   // 실시간 타이머 업데이트
   useEffect(() => {
@@ -85,6 +85,8 @@ export default function ChangeNicknameModal({
 
       if (response.status === 200) {
         setSuccess(true);
+        // 스토어 업데이트
+        updateNickname(nickname.trim());
         // 성공 시 콜백 호출
         if (onSubmit) {
           onSubmit(nickname.trim());
@@ -113,7 +115,7 @@ export default function ChangeNicknameModal({
     } finally {
       setIsLoading(false);
     }
-  }, [nickname, currentNickname, onSubmit]);
+  }, [nickname, currentNickname, onSubmit, updateNickname]);
 
   // 초기화
   const handleReset = () => {
