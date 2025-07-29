@@ -43,15 +43,6 @@ export default function BlogAdminPage() {
     imagePositions: [],
   });
 
-  // useEffect(() => {
-  //   if (user) {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       author: user, // 작성자 자동 설정
-  //     }));
-  //   }
-  // }, [user]);
-
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
 
@@ -73,7 +64,7 @@ export default function BlogAdminPage() {
       return;
     }
 
-    console.log('user:', user);
+    console.log('user:', user); // Keeping this console log for now, but if 'user' is never used for logic, consider removing it.
 
     const data = new FormData();
 
@@ -116,7 +107,7 @@ export default function BlogAdminPage() {
       });
 
       setMainImageFile(null);
-    } catch (error: unknown) {
+    } catch (error) {
       const errorMessage =
         (error as { response?: { data?: { message: string } } })?.response?.data
           ?.message ||
