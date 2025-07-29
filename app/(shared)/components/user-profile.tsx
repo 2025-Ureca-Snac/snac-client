@@ -8,7 +8,7 @@ import { useAuthStore } from '../stores/auth-store';
  * @description 사용자 프로필 컴포넌트
  */
 export default function UserProfile() {
-  const { profile, updateProfile } = useUserStore();
+  const { profile, updateProfile, updateNickname } = useUserStore();
   const { logout } = useAuthStore();
 
   if (!profile) {
@@ -39,7 +39,7 @@ export default function UserProfile() {
           <input
             type="text"
             value={profile.nickname}
-            onChange={(e) => updateProfile({ nickname: e.target.value })}
+            onChange={(e) => updateNickname(e.target.value)}
             className="w-full p-2 border rounded-md"
           />
         </div>

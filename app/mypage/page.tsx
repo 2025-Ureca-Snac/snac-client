@@ -35,7 +35,7 @@ interface FavoriteResponse {
 }
 
 export default function MyPage() {
-  const { profile, fetchUserProfile, updateProfile, isLoading, error } =
+  const { profile, fetchUserProfile, updateNickname, isLoading, error } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();
   const { logout } = useAuthStore();
@@ -228,9 +228,7 @@ export default function MyPage() {
         onClose={closeModal}
         currentNickname={profile?.nickname || ''}
         onSubmit={(nickname) => {
-          if (profile) {
-            updateProfile({ nickname });
-          }
+          updateNickname(nickname);
           alert(`닉네임이 "${nickname}"로 변경되었습니다.`);
           closeModal();
         }}
