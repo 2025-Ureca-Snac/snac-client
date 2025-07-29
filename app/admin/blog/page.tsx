@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useEffect } from 'react';
 
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
@@ -20,13 +21,13 @@ export default function Page() {
     <>
       <div className="flex-1 overflow-x-hidden overflow-y-auto p-6">
         <div className="flex justify-end mb-4">
-          <a
+          <Link
             href="/admin/blog/new"
             className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold flex items-center space-x-2"
           >
             <Plus className="h-8 w-8" />
             <span>새 글 작성</span>
-          </a>
+          </Link>
         </div>
         <div className="bg-white p-8 rounded-2xl shadow-light">
           <BlogFilters />
