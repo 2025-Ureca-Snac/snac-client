@@ -14,7 +14,7 @@ interface DataItemCardProps {
   unit: PriceUnit;
   email: string;
   createdAt: string;
-  cardCategory: 'BUY' | 'SELL';
+  cardCategory: string;
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
   ratingScore: number;
   isNew?: boolean;

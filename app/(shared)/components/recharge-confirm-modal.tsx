@@ -24,7 +24,7 @@ export default function RechargeConfirmModal({
 
         <div className="space-y-3 mb-6">
           <p className="text-gray-600">
-            스낵 머니({snackMoney}원) + 스낵 포인트(
+            스낵 머니({snackMoney.toLocaleString()}원) + 스낵 포인트(
             {snackPoints.toLocaleString()}원)가 부족합니다.
           </p>
 
