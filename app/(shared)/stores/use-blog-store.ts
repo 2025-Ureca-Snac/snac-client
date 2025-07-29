@@ -55,10 +55,22 @@ export const useBlogStore = create<BlogState>((set, get) => ({
   fetchBlogs: async () => {
     set({ loading: true, error: null });
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      set({ blogs: mockBlogs, loading: false });
-    } catch {
-      set({ error: '데이터를 불러오는데 실패했습니다.', loading: false });
+      // API 호출 및 지연 시뮬레이션
+      const blogs = await new Promise<Blog[]>((resolve, reject) => {
+        setTimeout(() => {
+          // 20% 확률로 에러 발생 시뮬레이션
+          if (Math.random() < 0.2) {
+            reject(new Error('서버에서 블로그 목록을 가져오지 못했습니다.'));
+          } else {
+            resolve(mockBlogs);
+          }
+        }, 500);
+      });
+      set({ blogs, loading: false });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+      set({ error: message, loading: false });
     }
   },
 
