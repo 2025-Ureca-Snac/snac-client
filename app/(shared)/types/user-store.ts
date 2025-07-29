@@ -86,7 +86,8 @@ export interface UserProfile {
  *
  * @property {Function} fetchUserProfile 사용자 정보 가져오기 액션
  * @property {Function} setProfile 프로필 설정 액션
- * @property {Function} updateProfile 프로필 업데이트 액션
+ * @property {Function} updateProfile 프로필 업데이트 액션 (닉네임 제외)
+ * @property {Function} updateNickname 닉네임 업데이트 액션 (변경 시간 기록)
  * @property {Function} setLoading 로딩 상태 설정 액션
  * @property {Function} setError 에러 설정 액션
  * @property {Function} clearProfile 프로필 초기화 액션
@@ -100,7 +101,10 @@ export interface UserState {
   // 액션
   fetchUserProfile: () => Promise<void>;
   setProfile: (profile: UserProfile) => void;
-  updateProfile: (updates: Partial<UserProfile>) => void;
+  updateProfile: (
+    updates: Partial<Omit<UserProfile, 'nickname' | 'nicknameUpdatedAt'>>
+  ) => void;
+  updateNickname: (nickname: string) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearProfile: () => void;

@@ -52,14 +52,29 @@ export const useUserStore = create<UserState>()((set, get) => ({
     set({ profile, error: null });
   },
 
-  // 프로필 업데이트
-  updateProfile: (updates: Partial<UserProfile>) => {
+  // 프로필 업데이트 (닉네임 제외)
+  updateProfile: (
+    updates: Partial<Omit<UserProfile, 'nickname' | 'nicknameUpdatedAt'>>
+  ) => {
     const currentProfile = get().profile;
     if (currentProfile) {
       set({
         profile: {
           ...currentProfile,
           ...updates,
+        },
+      });
+    }
+  },
+
+  // 닉네임 업데이트 (변경 시간 기록)
+  updateNickname: (nickname: string) => {
+    const currentProfile = get().profile;
+    if (currentProfile) {
+      set({
+        profile: {
+          ...currentProfile,
+          nickname,
           nicknameUpdatedAt: new Date(),
         },
       });
