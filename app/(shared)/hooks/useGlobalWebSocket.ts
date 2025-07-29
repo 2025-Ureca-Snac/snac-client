@@ -92,7 +92,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const router = useRouter();
   const { foundMatch, setWebSocketFunctions, partner, userRole, setUserRole } =
     useMatchStore();
-  const { setConnectionStatus } = useWebSocketStore();
+  const { setConnectionStatus, setDisconnectFunction } = useWebSocketStore();
   const [isConnected, setIsConnected] = useState(false);
   const connectionId = useRef(++globalConnectionCount);
   // JWT 토큰 가져오기
@@ -662,6 +662,22 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     return true;
   }, []);
 
+  // 실제 WebSocket 연결 해제 함수
+  const disconnectWebSocket = useCallback(() => {
+    if (globalStompClient?.connected) {
+      console.log('🔌 실제 WebSocket 연결 해제 중...');
+      globalStompClient.deactivate();
+      globalStompClient = null;
+      setIsConnected(false);
+      setConnectionStatus(false);
+    }
+  }, [setConnectionStatus]);
+
+  // 실제 해제 함수를 store에 등록
+  useEffect(() => {
+    setDisconnectFunction(disconnectWebSocket);
+  }, [disconnectWebSocket, setDisconnectFunction]);
+
   // 연결 및 정리
   useEffect(() => {
     connectWebSocket();
@@ -699,5 +715,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     updateUserRole,
     activatePage,
     deactivatePage,
+    disconnectWebSocket,
   };
 }
