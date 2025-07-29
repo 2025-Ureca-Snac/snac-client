@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Client as StompClient } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -101,8 +101,8 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     setUserRole,
     setCurrentCardId,
   } = useMatchStore();
-  const { setConnectionStatus } = useWebSocketStore();
-  const [isConnected, setIsConnected] = useState(false);
+  const { setConnectionStatus, setDisconnectFunction, isConnected } =
+    useWebSocketStore();
   const connectionId = useRef(++globalConnectionCount);
   // JWT 토큰 가져오기
   const getToken = () => {
@@ -186,7 +186,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     // 이미 전역 연결이 있으면 재사용
     if (globalStompClient?.connected) {
       console.log('✅ 기존 전역 WebSocket 연결 재사용');
-      setIsConnected(true);
+      setConnectionStatus(true);
       return;
     }
 
@@ -210,17 +210,15 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       // debug: (str) => console.log(str),
       onConnect: () => {
         console.log('✅ 전역 WebSocket 연결 성공');
-        setIsConnected(true);
         setConnectionStatus(true);
         setupSubscriptions();
       },
       onStompError: (frame) => {
         console.error('❌ STOMP 오류:', frame);
-        setIsConnected(false);
+        setConnectionStatus(false);
       },
       onDisconnect: () => {
         console.log('🔌 WebSocket 연결 해제');
-        setIsConnected(false);
         setConnectionStatus(false);
       },
     });
@@ -707,6 +705,21 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     return true;
   }, []);
 
+  // 실제 WebSocket 연결 해제 함수
+  const disconnectWebSocket = useCallback(() => {
+    if (globalStompClient?.connected) {
+      console.log('🔌 실제 WebSocket 연결 해제 중...');
+      globalStompClient.deactivate();
+      globalStompClient = null;
+      setConnectionStatus(false);
+    }
+  }, [setConnectionStatus]);
+
+  // 실제 해제 함수를 store에 등록
+  useEffect(() => {
+    setDisconnectFunction(disconnectWebSocket);
+  }, [disconnectWebSocket, setDisconnectFunction]);
+
   // 연결 및 정리
   useEffect(() => {
     connectWebSocket();
@@ -745,5 +758,6 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     updateUserRole,
     activatePage,
     deactivatePage,
+    disconnectWebSocket,
   };
 }
