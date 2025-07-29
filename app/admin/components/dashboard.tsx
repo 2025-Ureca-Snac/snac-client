@@ -60,7 +60,7 @@ function MetricCard({
 
 export function Dashboard() {
   return (
-    <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+    <div className="flex-1 overflow-x-hidden overflow-y-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <MetricCard
           title="총 사용자"
@@ -102,6 +102,6 @@ export function Dashboard() {
           <ReportTypesChart />
         </div>
       </div>
-    </main>
+    </div>
   );
 }
