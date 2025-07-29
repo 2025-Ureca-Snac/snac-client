@@ -77,7 +77,7 @@ function AdminHeader() {
   const pathname = usePathname();
 
   const getTitle = () => {
-    if (pathname.startsWith('/admin/blogs')) return '게시글 관리';
+    if (pathname.startsWith('/admin/blog')) return '게시글 관리';
     if (pathname.startsWith('/admin/users')) return '사용자 관리';
     if (pathname.startsWith('/admin/reports')) return '신고 관리';
     return '대시보드';
