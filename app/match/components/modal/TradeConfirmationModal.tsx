@@ -450,7 +450,6 @@ function SuccessContent({ seller }: { seller: User }) {
 // 타임아웃/거부 컨텐츠
 function TimeoutContent({
   seller,
-  onRetry,
   onCancel,
 }: {
   seller: User;
@@ -489,12 +488,12 @@ function TimeoutContent({
 
       {/* 버튼들 */}
       <div className="space-y-3">
-        <button
+        {/* <button
           onClick={onRetry}
           className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
         >
           다시 시도하기
-        </button>
+        </button> */}
         <button
           onClick={onCancel}
           className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
