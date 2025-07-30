@@ -32,7 +32,8 @@ export interface AuthState {
   setLoading: (loading: boolean) => void;
   performSocialAuth: (
     providerId: string,
-    onAuthSuccess: (authorization: string) => Promise<boolean>
+    onAuthSuccess: (authorization: string) => Promise<boolean>,
+    isUnlink?: boolean
   ) => Promise<boolean>;
   linkSocialAccount: (providerId: string) => Promise<boolean>;
   unlinkSocialAccount: (providerId: string) => Promise<boolean>;

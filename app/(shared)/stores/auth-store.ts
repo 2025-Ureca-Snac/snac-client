@@ -52,7 +52,8 @@ export const useAuthStore = create<AuthState>()(
       // 공통 소셜 인증 함수
       performSocialAuth: async (
         providerId: string,
-        onAuthSuccess: (authorization: string) => Promise<boolean>
+        onAuthSuccess: (authorization: string) => Promise<boolean>,
+        isUnlink: boolean = false
       ) => {
         try {
           set({ isLoading: true });
@@ -60,7 +61,9 @@ export const useAuthStore = create<AuthState>()(
           // 백엔드 인증 페이지를 팝업으로 열기
           const currentToken = useAuthStore.getState().token;
           const socialApiUrl = process.env.NEXT_PUBLIC_SOCIAL_API_URL;
-          const authUrl = `${socialApiUrl}/oauth2/authorization/${providerId}${currentToken ? `?state=${currentToken}` : ''}`;
+          const authUrl = isUnlink
+            ? `${socialApiUrl}/oauth2/authorization/${providerId}`
+            : `${socialApiUrl}/oauth2/authorization/${providerId}${currentToken ? `?state=${currentToken}` : ''}`;
           const width = 500;
           const height = 600;
           const left = window.screenX + (window.outerWidth - width) / 2;
@@ -210,7 +213,7 @@ export const useAuthStore = create<AuthState>()(
                 {},
                 {
                   headers: {
-                    Authorization: `Bearer ${authorization}`,
+                    Authorization: `Bearer ${currentToken}`,
                   },
                 }
               );
@@ -221,7 +224,8 @@ export const useAuthStore = create<AuthState>()(
               console.error('소셜 로그인 해제 실패:', error);
               throw new Error('소셜 로그인 해제에 실패했습니다.');
             }
-          }
+          },
+          true // isUnlink: true
         );
       },
 
