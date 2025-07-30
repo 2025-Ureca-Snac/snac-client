@@ -135,16 +135,21 @@ export const Modal = () => {
         .cardId;
       console.log('서버 응답:', cardId);
 
-      toast.success(
-        '상품이 성공적으로 등록되었습니다. 결제 페이지로 이동합니다.'
-      );
+      if (cardCategory === 'BUY') {
+        toast.success(
+          '상품이 성공적으로 등록되었습니다. 결제 페이지로 이동합니다.'
+        );
 
-      actions.triggerRefetch();
-      // 1초 후 payment 페이지로 이동
-      setTimeout(() => {
-        router.push(`/payment?cardId=${cardId}&pay=sell`);
-      }, 1000);
-      handleClose();
+        actions.triggerRefetch();
+        // 1초 후 payment 페이지로 이동
+        setTimeout(() => {
+          router.push(`/payment?cardId=${cardId}&pay=sell`);
+        }, 1000);
+        handleClose();
+      } else {
+        toast.success('상품이 성공적으로 등록되었습니다.');
+        handleClose();
+      }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
