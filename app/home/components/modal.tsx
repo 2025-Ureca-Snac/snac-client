@@ -80,30 +80,11 @@ export const Modal = () => {
     setDataUnit(unit);
   };
 
-  const handleDataUnitChange = (newUnit: DataUnit) => {
-    // 입력값이 비어있으면 단위만 변경합니다.
-    if (dataAmount === '') {
-      setDataUnit(newUnit);
-      return;
-    }
-
-    const currentAmount = parseFloat(dataAmount);
-
-    // 유효한 숫자가 아니거나 0이면 단위만 변경합니다.
-    if (isNaN(currentAmount) || currentAmount === 0) {
-      setDataUnit(newUnit);
-      return;
-    }
-
-    let newAmount = currentAmount;
-    if (dataUnit === 'GB' && newUnit === 'MB') {
-      newAmount = currentAmount * 1024; // GB -> MB
-    } else if (dataUnit === 'MB' && newUnit === 'GB') {
-      newAmount = Math.round((currentAmount / 1024) * 1000) / 1000; // MB -> GB, 소수점 3자리까지 반올림
-    }
-
-    setDataAmount(String(newAmount));
-    setDataUnit(newUnit);
+  // 현재 선택된 프리셋을 확인하는 함수
+  const isPresetSelected = (preset: string) => {
+    const amount = preset.replace(/[^0-9]/g, '');
+    const unit = preset.replace(/[0-9]/g, '') as DataUnit;
+    return dataAmount === amount && dataUnit === unit;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,12 +116,12 @@ export const Modal = () => {
 
     const carrierForApi = carrier === 'LGU+' ? 'LG' : carrier;
 
-    const dataAmountInMB =
-      dataUnit === 'GB' ? numericDataAmount * 1024 : numericDataAmount;
+    // const dataAmountInMB =
+    //   dataUnit === 'GB' ? numericDataAmount * 1024 : numericDataAmount;
     const cards = {
       cardCategory: cardCategory,
       carrier: carrierForApi,
-      dataAmount: Math.round(dataAmountInMB),
+      dataAmount: Math.round(numericDataAmount),
       price: Number(price),
     };
 
@@ -286,12 +267,16 @@ export const Modal = () => {
                           key={preset}
                           type="button"
                           onClick={() => handleDataPresetClick(preset)}
-                          className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
+                          className={`w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50 ${
+                            isPresetSelected(preset)
+                              ? 'bg-gray-100 font-medium'
+                              : ''
+                          }`}
                         >
                           {preset}
                         </button>
                       ))}
-                      <button
+                      {/* <button
                         type="button"
                         onClick={() =>
                           document.getElementById('dataAmountInput')?.focus()
@@ -299,10 +284,10 @@ export const Modal = () => {
                         className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
                       >
                         직접입력
-                      </button>
+                      </button> */}
                     </div>
                     <div className="flex items-center gap-2">
-                      <label htmlFor="dataAmountInput" className="sr-only">
+                      {/* <label htmlFor="dataAmountInput" className="sr-only">
                         데이터량 입력
                       </label>
                       <input
@@ -313,8 +298,8 @@ export const Modal = () => {
                         className="w-5/6 border border-gray-300 rounded-lg py-2 px-3 text-regular placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                         placeholder="0"
                         required
-                      />
-                      <select
+                      /> */}
+                      {/* <select
                         value={dataUnit}
                         onChange={(e) =>
                           handleDataUnitChange(e.target.value as DataUnit)
@@ -324,7 +309,7 @@ export const Modal = () => {
                       >
                         <option value="MB">MB</option>
                         <option value="GB">GB</option>
-                      </select>
+                      </select> */}
                     </div>
                   </div>
 
