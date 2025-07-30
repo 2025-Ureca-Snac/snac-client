@@ -9,6 +9,8 @@ import {
   getHistoryStatusColor,
 } from '../utils/history-status';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
+import ProgressStepsDetail from './progress-steps-detail';
+import { getProgressSteps } from '../utils/progress-steps-utils';
 
 /**
  * @author 이승우
@@ -110,32 +112,9 @@ export default function HistoryDetailModal({
     }
   };
 
-  // 상태별 진행 단계 계산
-  const getCurrentStep = () => {
-    switch (item.status) {
-      case 'BUY_REQUESTED':
-      case 'SELL_REQUESTED':
-        return 1;
-      case 'ACCEPTED':
-      case 'PAYMENT_CONFIRMED':
-        return 2;
-      case 'PAYMENT_CONFIRMED_ACCEPTED':
-        return 3;
-      case 'DATA_SENT':
-        return 4;
-      case 'COMPLETED':
-      case 'AUTO_REFUND':
-      case 'AUTO_PAYOUT':
-        return 5;
-      case 'CANCELED':
-        return 0; // 취소된 경우
-      default:
-        return 1;
-    }
-  };
-
-  const currentStep = getCurrentStep();
-
+  // 진행 단계 생성
+  const progressSteps = getProgressSteps(type, item.status);
+  console.log('test:', item);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -206,132 +185,11 @@ export default function HistoryDetailModal({
           </div>
 
           {/* 진행 단계 */}
-          <div className="space-y-3">
-            <h3 className="font-medium text-gray-900">진행 단계</h3>
-            <div className="flex items-center justify-between">
-              {/* 1단계: 구매요청/판매요청 */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                    currentStep >= 1
-                      ? 'bg-black text-white'
-                      : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  1
-                </div>
-                <div
-                  className={`text-xs text-center whitespace-nowrap mt-1 ${
-                    currentStep >= 1
-                      ? 'text-black font-medium underline'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  구매글 등록
-                </div>
-              </div>
-              <div
-                className={`w-full h-0.5 ${currentStep >= 2 ? 'bg-black' : 'bg-gray-300'}`}
-              />
-
-              {/* 2단계: 수락 */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                    currentStep >= 2
-                      ? 'bg-black text-white'
-                      : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  2
-                </div>
-                <div
-                  className={`text-center whitespace-nowrap text-xs mt-1 ${
-                    currentStep >= 2
-                      ? 'text-black font-medium underline'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  결제완료
-                </div>
-              </div>
-              <div
-                className={`w-full h-0.5 ${currentStep >= 3 ? 'bg-black' : 'bg-gray-300'}`}
-              />
-
-              {/* 3단계: 결제완료 */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                    currentStep >= 3
-                      ? 'bg-black text-white'
-                      : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  3
-                </div>
-                <div
-                  className={`text-center whitespace-nowrap text-xs mt-1 ${
-                    currentStep >= 3
-                      ? 'text-black font-medium  underline'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  {type === 'purchase' ? '판매자 매칭' : '구매자 매칭'}
-                </div>
-              </div>
-              <div
-                className={`w-full h-0.5 ${currentStep >= 4 ? 'bg-black' : 'bg-gray-300'}`}
-              />
-
-              {/* 4단계: 데이터 송신완료 */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                    currentStep >= 4
-                      ? 'bg-black text-white'
-                      : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  4
-                </div>
-                <div
-                  className={`text-center whitespace-nowrap text-xs mt-1 ${
-                    currentStep >= 4
-                      ? 'text-black font-medium underline'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  판매자 데이터 송신
-                </div>
-              </div>
-              <div
-                className={`w-full h-0.5 ${currentStep >= 5 ? 'bg-black' : 'bg-gray-300'}`}
-              />
-
-              {/* 5단계: 거래완료 */}
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                    currentStep >= 5
-                      ? 'bg-black text-white'
-                      : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  5
-                </div>
-                <div
-                  className={`text-center whitespace-nowrap text-xs mt-1 ${
-                    currentStep >= 5
-                      ? 'text-black font-medium underline'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  거래완료
-                </div>
-              </div>
-            </div>
-          </div>
+          <ProgressStepsDetail
+            steps={progressSteps}
+            currentStep={progressSteps.filter((step) => step.isActive).length}
+            type={type}
+          />
           {/* 상태에 따라 메시지 조건부 표시 */}
           {item.status !== 'DATA_SENT' &&
             item.status !== 'COMPLETED' &&
@@ -388,8 +246,8 @@ export default function HistoryDetailModal({
 
           {/* 진행 중인 거래인 경우에만 추가 정보 표시 (DATA_SENT 상태가 아닐 때만) */}
           {type === 'sales' &&
-            currentStep >= 1 &&
-            currentStep < 5 &&
+            progressSteps.filter((step) => step.isActive).length >= 1 &&
+            progressSteps.filter((step) => step.isActive).length < 5 &&
             item.status !== 'DATA_SENT' && (
               <div className="space-y-3">
                 <div className="text-gray-700 text-sm">
