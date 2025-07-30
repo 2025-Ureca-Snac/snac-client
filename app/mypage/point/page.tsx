@@ -17,13 +17,6 @@ import PointContent from './PointContent';
 
 // 포인트/머니 관련 타입 정의
 
-// 잔액 조회 API 함수
-const getBalance = async (): Promise<BalanceResponse> => {
-  const response =
-    await api.get<ApiResponse<BalanceResponse>>('/wallets/summary');
-  return response.data.data;
-};
-
 // 내역 조회 API 함수
 const getHistory = async (assetType: AssetType, size: number = 20) => {
   const response = await api.get<ApiResponse<PointHistoryResponse>>(
@@ -64,11 +57,6 @@ function PointPageContent() {
 
       console.log('포인트/머니 데이터 API 호출 시작');
 
-      // 잔액 조회
-      const balanceResponse = await getBalance();
-      console.log('잔액 API 응답:', balanceResponse);
-      setBalance(balanceResponse);
-
       // 현재 활성 탭에 따른 내역 조회
       const historyResponse = await getHistory(activeTab, currentSize);
       console.log(
@@ -78,6 +66,22 @@ function PointPageContent() {
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
+
+      // 거래 내역에서 마지막 기록의 잔액으로 현재 잔액 업데이트
+      if (newHistory.length > 0) {
+        const lastRecord = newHistory[0]; // 가장 최근 기록 (인덱스 0)
+        const lastBalance =
+          typeof lastRecord.balanceAfter === 'string'
+            ? parseFloat((lastRecord.balanceAfter as string).replace(/,/g, ''))
+            : lastRecord.balanceAfter;
+
+        setBalance((prevBalance) => ({
+          ...prevBalance,
+          [activeTab === 'POINT' ? 'point' : 'money']: lastBalance,
+        }));
+
+        console.log(`${activeTab} 최신 잔액 업데이트:`, lastBalance);
+      }
 
       // 더보기 버튼 표시 여부 결정
       setHasMore(newHistory.length >= currentSize);
@@ -129,6 +133,22 @@ function PointPageContent() {
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
+
+      // 거래 내역에서 마지막 기록의 잔액으로 현재 잔액 업데이트
+      if (newHistory.length > 0) {
+        const lastRecord = newHistory[0]; // 가장 최근 기록 (인덱스 0)
+        const lastBalance =
+          typeof lastRecord.balanceAfter === 'string'
+            ? parseFloat((lastRecord.balanceAfter as string).replace(/,/g, ''))
+            : lastRecord.balanceAfter;
+
+        setBalance((prevBalance) => ({
+          ...prevBalance,
+          [activeTab === 'POINT' ? 'point' : 'money']: lastBalance,
+        }));
+
+        console.log(`${activeTab} 더보기 후 최신 잔액 업데이트:`, lastBalance);
+      }
 
       // 더보기 버튼 표시 여부 결정
       setHasMore(newHistory.length >= newSize);
