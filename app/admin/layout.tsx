@@ -32,7 +32,6 @@ function Sidebar() {
 
   const NAV_ITEMS = [
     { name: '대시보드', icon: DataBaseIcon, href: '/admin' },
-    { name: '사용자 관리', icon: TotalUserIcon, href: '/admin/users' },
     { name: '게시글 관리', icon: PostIcon, href: '/admin/blog' },
     { name: '신고 관리', icon: NewReportIcon, href: '/admin/reports' },
   ];
@@ -116,7 +115,7 @@ export default function AdminLayout({
       <Header />
       <div className="flex flex-1">
         <Sidebar />
-        {/* 모바일에서 사이드바가 열렸을 때 표시될 오버레이 */}
+
         {isSidebarOpen && (
           <div
             className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden"
