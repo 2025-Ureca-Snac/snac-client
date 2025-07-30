@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-
 import { api } from '@/app/(shared)/utils/api';
 
 interface ApiResponse<T> {
@@ -13,9 +12,13 @@ interface ApiResponse<T> {
 interface MemberCountData {
   memberCount: number;
 }
+interface ArticleCountData {
+  articleCount: number;
+}
 
 interface DashboardMetrics {
   memberCount: number;
+  activePostsCount: number;
 }
 
 interface AdminState {
@@ -42,18 +45,24 @@ export const useAdminStore = create<AdminState>((set) => ({
   fetchDashboardMetrics: async () => {
     set({ loading: true, error: null });
     try {
-      const response =
-        await api.get<ApiResponse<MemberCountData>>('/member/count');
+      const [memberResponse, articleResponse] = await Promise.all([
+        api.get<ApiResponse<MemberCountData>>('/member/count'),
+        api.get<ApiResponse<ArticleCountData>>('/articles/count'),
+      ]);
 
-      const count = response.data.data.memberCount;
+      const memberCount = memberResponse.data.data.memberCount;
+      const articleCount = articleResponse.data.data.articleCount;
 
-      if (typeof count === 'number') {
+      if (typeof memberCount === 'number' && typeof articleCount === 'number') {
         set({
-          dashboardMetrics: { memberCount: count },
+          dashboardMetrics: {
+            memberCount: memberCount,
+            activePostsCount: articleCount,
+          },
           loading: false,
         });
       } else {
-        throw new Error('API 응답에서 memberCount를 찾을 수 없습니다.');
+        throw new Error('API 응답 데이터 형식이 올바르지 않습니다.');
       }
     } catch (err) {
       console.error('대시보드 데이터 로딩 실패:', err);

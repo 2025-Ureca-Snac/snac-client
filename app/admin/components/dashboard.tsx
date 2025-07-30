@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
 import { useAdminStore } from '@/app/(shared)/stores/use-admin-store';
 
 import NewReportIcon from '@/public/newReport.svg';
@@ -51,7 +50,6 @@ function MetricCard({
     <div className="bg-white p-6 rounded-2xl shadow-light flex items-center justify-between">
       <div>
         <p className="text-regular-sm font-medium text-gray-500">{title}</p>
-
         {isLoading ? (
           <div className="mt-1 h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
         ) : (
@@ -68,45 +66,40 @@ function MetricCard({
 }
 
 export function Dashboard() {
-  const { blogs, fetchAll } = useBlogStore();
-
-  const {
-    dashboardMetrics,
-    loading: adminLoading,
-    error: adminError,
-    fetchDashboardMetrics,
-  } = useAdminStore();
+  const { dashboardMetrics, loading, error, fetchDashboardMetrics } =
+    useAdminStore();
 
   useEffect(() => {
-    fetchAll();
     fetchDashboardMetrics();
-  }, [fetchAll, fetchDashboardMetrics]);
+  }, [fetchDashboardMetrics]);
 
-  if (adminError) {
-    return <div className="p-6 text-center text-red-500">{adminError}</div>;
+  if (error) {
+    return <div className="p-6 text-center text-red-500">{error}</div>;
   }
 
   return (
     <div className="flex-1 overflow-x-hidden overflow-y-auto p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
         <MetricCard
           title="총 사용자"
-          value={dashboardMetrics?.memberCount ?? '...'}
           icon={TotalUserIcon}
+          value={dashboardMetrics?.memberCount ?? '...'}
           colorClass="bg-indigo-100 text-blue-600"
-          isLoading={adminLoading}
+          isLoading={loading}
         />
         <MetricCard
           title="신고 수"
-          value="28"
+          value={28} // TODO: API 연동 필요
           icon={NewReportIcon}
           colorClass="bg-yellow-100 text-yellow-600"
+          isLoading={loading}
         />
         <MetricCard
           title="활성 게시글"
-          value={blogs.length}
+          value={dashboardMetrics?.activePostsCount ?? '...'}
           icon={PostIcon}
           colorClass="bg-green-100 text-green-600"
+          isLoading={loading}
         />
       </div>
 
