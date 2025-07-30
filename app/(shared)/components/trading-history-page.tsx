@@ -241,8 +241,11 @@ export default function TradingHistoryPage({
 
   const tabs = [
     { id: 'all', label: '전체' },
-    { id: 'active', label: isPurchase ? '구매 중' : '판매 거래 중' },
-    { id: 'completed', label: isPurchase ? '구매 완료' : '판매 거래 완료' },
+    { id: 'active', label: isPurchase ? '구매 거래 중' : '판매 거래 중' },
+    {
+      id: 'completed',
+      label: isPurchase ? '구매 거래 완료' : '판매 거래 완료',
+    },
   ];
 
   const pageTitle = isPurchase ? '구매 내역' : '판매 내역';
