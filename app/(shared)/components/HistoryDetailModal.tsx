@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
+import Image from 'next/image';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
 import api from '../utils/api';
 import {
   getHistoryStatusText,
   getHistoryStatusColor,
 } from '../utils/history-status';
+import { getCarrierImageUrl } from '../utils/carrier-utils';
 
 /**
  * @author 이승우
@@ -21,23 +24,65 @@ export default function HistoryDetailModal({
   item,
   type,
 }: HistoryDetailModalProps) {
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
   if (!open || !item) return null;
+
+  // 파일 업로드 핸들러
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    console.log('파일 선택됨:', file.name);
+    setUploadedFile(file);
+  };
 
   // 전송완료 핸들러
   const handleDataSent = async () => {
+    if (!uploadedFile) {
+      console.log('업로드된 파일이 없습니다.');
+      return;
+    }
+
     try {
       console.log('전송완료 버튼 클릭됨:', item);
 
-      // TODO: API 연동
-      const response = await api.post('/trades/data-sent', {
-        tradeId: item.id,
-        status: 'DATA_SENT',
-      });
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
 
-      // 성공 시 처리
+      const response = await api.patch(
+        `/trades/${item.id}/send-data`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
       console.log('데이터 전송 완료 처리됨', response);
+      setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
+
+      // 성공 시 페이지 새로고침
+      window.location.reload();
     } catch (error) {
       console.error('데이터 전송 완료 처리 실패:', error);
+    }
+  };
+
+  // 데이터 수신 확인 핸들러
+  const handleDataConfirm = async () => {
+    try {
+      console.log('데이터 수신 확인 버튼 클릭됨:', item);
+
+      const response = await api.patch(`/trades/${item.id}/confirm`);
+
+      console.log('데이터 수신 확인 완료:', response);
+
+      // 성공 시 페이지 새로고침
+      window.location.reload();
+    } catch (error) {
+      console.error('데이터 수신 확인 실패:', error);
     }
   };
 
@@ -98,8 +143,14 @@ export default function HistoryDetailModal({
         <div className="p-4 space-y-4">
           {/* 기본 정보 */}
           <div className="flex items-start gap-3">
-            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-blue-600 font-bold text-lg">T</span>
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <Image
+                src={getCarrierImageUrl(item.carrier || 'SKT')}
+                alt={item.carrier || 'SKT'}
+                width={48}
+                height={48}
+                className="w-[80%] h-[80%] object-contain"
+              />
             </div>
             <div className="flex-1">
               <div className="text-sm text-gray-500 mb-1">{item.date}</div>
@@ -256,59 +307,150 @@ export default function HistoryDetailModal({
               </div>
             </div>
           </div>
-          <div className="text-green-600 text-sm">
-            {type === 'sales'
-              ? '판매요청이 접수되었습니다.'
-              : '구매글이 등록 되었습니다.'}
-          </div>
-          {/* 진행 중인 거래인 경우에만 추가 정보 표시 */}
-          {type === 'sales' && currentStep >= 1 && currentStep < 5 && (
-            <div className="space-y-3">
-              <div className="text-gray-700 text-sm">
-                아래 번호로{' '}
-                <a
-                  href={
-                    item.carrier === 'SKT'
-                      ? 'https://www.tworld.co.kr/web/myt-data/giftdata?menuNm=T+끼리+데이터+선물'
-                      : item.carrier === 'KT'
-                        ? 'https://www.kt.com/mypage/benefit/data-gift'
-                        : item.carrier === 'LGU+'
-                          ? 'https://www.lguplus.co.kr/mypage/benefit/data-gift'
-                          : 'https://www.tworld.co.kr/web/myt-data/giftdata?menuNm=T+끼리+데이터+선물'
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 underline"
-                >
-                  {item.carrier || 'SKT'}
-                </a>
-                통신사의 데이터{item.dataAmount || '2GB'}를 전송해주세요
-              </div>
-
-              {/* 전화번호 표시 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  전화번호
-                </label>
-                <div className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-base font-semibold text-gray-900">
-                  {item.phoneNumber || '010-0000-0000'}
-                </div>
-              </div>
-
-              {/* 액션 버튼 */}
-              <div className="flex gap-2">
-                <button
-                  onClick={handleDataSent}
-                  className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
-                >
-                  전송완료
-                </button>
-                <button className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
-                  전송실패
-                </button>
-              </div>
+          {/* 상태에 따라 메시지 조건부 표시 */}
+          {item.status !== 'DATA_SENT' && item.status !== 'COMPLETED' && (
+            <div className="text-green-600 text-sm">
+              {type === 'sales'
+                ? '판매요청이 접수되었습니다.'
+                : '구매글이 등록 되었습니다.'}
             </div>
           )}
+
+          {/* DATA_SENT 상태일 때 판매자/구매자별 다른 UI */}
+          {item.status === 'DATA_SENT' && (
+            <>
+              {/* 판매자일 때 대기 메시지 */}
+              {type === 'sales' && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <span className="text-yellow-600 text-xs">⏳</span>
+                    </div>
+                    <div className="text-yellow-800 text-sm">
+                      구매자 데이터 수신 확인을 기다리고 있습니다.
+                    </div>
+                  </div>
+                  <div className="text-red text-xs mt-2">
+                    구매자 24시간 이내 수신확인 하지 않을 시, 거래 완료
+                    처리됩니다.
+                  </div>
+                </div>
+              )}
+
+              {/* 구매자일 때 데이터 수신 확인 버튼 */}
+              {type === 'purchase' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 text-xs">📥</span>
+                    </div>
+                    <div className="text-blue-800 text-sm">
+                      판매자가 데이터를 전송했습니다. 수신 확인해주세요.
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleDataConfirm}
+                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                  >
+                    데이터 수신 완료
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* 진행 중인 거래인 경우에만 추가 정보 표시 (DATA_SENT 상태가 아닐 때만) */}
+          {type === 'sales' &&
+            currentStep >= 1 &&
+            currentStep < 5 &&
+            item.status !== 'DATA_SENT' && (
+              <div className="space-y-3">
+                <div className="text-gray-700 text-sm">
+                  아래 번호로{' '}
+                  <a
+                    href={
+                      item.carrier === 'SKT'
+                        ? 'https://www.tworld.co.kr/web/myt-data/giftdata?menuNm=T+끼리+데이터+선물'
+                        : item.carrier === 'KT'
+                          ? 'https://www.kt.com/mypage/benefit/data-gift'
+                          : item.carrier === 'LGU+'
+                            ? 'https://www.lguplus.co.kr/mypage/benefit/data-gift'
+                            : 'https://www.tworld.co.kr/web/myt-data/giftdata?menuNm=T+끼리+데이터+선물'
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {item.carrier || 'SKT'}
+                  </a>
+                  통신사의 데이터{item.dataAmount || '2GB'}를 전송해주세요
+                </div>
+
+                {/* 전화번호 표시 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    전화번호
+                  </label>
+                  <div className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-base font-semibold text-gray-900">
+                    {item.phoneNumber || '010-0000-0000'}
+                  </div>
+                </div>
+
+                {/* 업로드된 파일 정보 */}
+                {uploadedFile && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-blue-600 text-xs">📎</span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-blue-900">
+                            {uploadedFile.name}
+                          </div>
+                          <div className="text-xs text-blue-600">
+                            {(uploadedFile.size / 1024).toFixed(1)} KB
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setUploadedFile(null)}
+                        className="text-blue-500 hover:text-blue-700 text-sm"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 액션 버튼 */}
+                <div className="flex gap-2">
+                  <label className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer text-center">
+                    파일 업로드
+                    <input
+                      type="file"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    />
+                  </label>
+                  <button
+                    onClick={handleDataSent}
+                    disabled={!uploadedFile}
+                    className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                      uploadedFile
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    전송완료
+                  </button>
+                  <button className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
+                    전송실패
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
 
         {/* 하단 버튼 */}

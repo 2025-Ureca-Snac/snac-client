@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import AnimatedTabContent from './AnimatedTabContent';
@@ -9,6 +10,7 @@ import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
 import { ApiResponse } from '../types/api';
 import Link from 'next/link';
+import { getCarrierImageUrl } from '../utils/carrier-utils';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
@@ -160,7 +162,7 @@ export default function TradingHistoryPage({
         handleCardClick(targetItem);
       }
     }
-  }, [selectedId, tradingHistory]);
+  }, [selectedId, tradingHistory.length]); // tradingHistory.length만 의존
 
   // 디버깅용: 상태 변화 확인
   useEffect(() => {
@@ -433,14 +435,16 @@ export default function TradingHistoryPage({
                             >
                               {/* 아이콘 */}
                               <div
-                                className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0"
+                                className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
                                 aria-hidden="true"
                               >
-                                <span
-                                  className={`${theme.iconColor} font-bold text-lg`}
-                                >
-                                  T
-                                </span>
+                                <Image
+                                  src={getCarrierImageUrl(item.carrier)}
+                                  alt={item.carrier}
+                                  width={48}
+                                  height={48}
+                                  className="w-[80%] h-[80%] object-contain"
+                                />
                               </div>
 
                               {/* 내용 */}
