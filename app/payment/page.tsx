@@ -139,9 +139,10 @@ export default function PaymentPage() {
       });
 
       const responseData = response.data as Record<string, unknown>;
+      const tradeId = (responseData.data as { tradeId: number }).tradeId;
       if (responseData.status === 'CREATED') {
         router.push(
-          `/payment/complete?pay=${pay}&cardId=${cardId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
+          `/payment/complete?pay=${pay}&tradeId=${tradeId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
         alert(`결제가 실패했습니다. 다시 시도해주세요.`);

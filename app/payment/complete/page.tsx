@@ -78,7 +78,7 @@ function PaymentCompleteComponent() {
     }
   }, [searchParams]);
 
-  const cardId = searchParams.get('cardId') || '#0123_45678';
+  const tradeId = searchParams.get('tradeId') || '#0123_45678';
   const amount = searchParams.get('amount') || '2,000';
   const pay = searchParams.get('pay') || 'sell';
   const carrier = searchParams.get('carrier') || '';
@@ -164,7 +164,7 @@ function PaymentCompleteComponent() {
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">주문 번호:</span>
-              <span className="font-medium text-gray-900">{cardId}</span>
+              <span className="font-medium text-gray-900">{tradeId}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">날짜:</span>
@@ -202,9 +202,9 @@ function PaymentCompleteComponent() {
             <button
               onClick={() => {
                 if (pay === PAYMENT_TYPES.SELL) {
-                  router.push(`/mypage/purchase-history/${cardId}`);
+                  router.push(`/mypage/purchase-history/${tradeId}`);
                 } else {
-                  router.push(`/mypage/sales-history/${cardId}`);
+                  router.push(`/mypage/sales-history/${tradeId}`);
                 }
               }}
               className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
