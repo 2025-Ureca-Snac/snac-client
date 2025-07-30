@@ -33,6 +33,7 @@ const InputWithButton = forwardRef<HTMLInputElement, InputWithButtonProps>(
       onButtonClick,
       buttonDisabled = false,
       autoComplete,
+      onKeyDown,
     },
     ref
   ) => {
@@ -53,6 +54,12 @@ const InputWithButton = forwardRef<HTMLInputElement, InputWithButtonProps>(
             value={value}
             onChange={onChange}
             onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+              // 커스텀 onKeyDown이 있으면 먼저 실행
+              if (onKeyDown) {
+                onKeyDown(e);
+                return;
+              }
+              // 기본 동작: Enter 키로 버튼 클릭
               if (e.key === 'Enter' && !buttonDisabled && onButtonClick) {
                 e.preventDefault();
                 onButtonClick();

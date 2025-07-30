@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import type { TimerReturn } from '../types/timer';
 
 /**
  * @author 이승우
@@ -6,7 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
  * @param initial 초기 시간( 기본값 0 )
  * @returns 타이머 시간( 초 단위로 감소 ), 타이머 시작(start( 초 단위 )), 타이머 멈춤(stop())
  */
-export function useTimer(initial: number = 0) {
+export function useTimer(initial: number = 0): TimerReturn {
   const [time, setTime] = useState(initial);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 

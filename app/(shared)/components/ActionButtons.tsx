@@ -8,29 +8,22 @@ import { actionButtons } from '../constants/action-buttons';
  */
 export default function ActionButtons() {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+    <div className="bg-card border border-border rounded-lg p-6 mb-8">
       <div className="flex justify-between gap-4">
         {actionButtons.map((action) => (
           <Link
             key={action.label}
             href={action.href}
-            className="flex flex-col items-center flex-1 py-4 rounded-lg hover:bg-gray-50 transition-colors relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:bg-gray-50"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                window.location.href = action.href;
-              }
-            }}
+            className="flex flex-col items-center flex-1 py-4 rounded-lg hover:bg-muted transition-colors relative focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:bg-muted"
             aria-label={`${action.label} 페이지로 이동`}
           >
             <div className="relative">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-2">
                 <span className="text-xl">{action.icon}</span>
               </div>
               {action.hasNotification && (
                 <div
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white z-10"
+                  className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full border-2 border-card z-10"
                   style={{
                     display: 'block',
                     position: 'absolute',
@@ -40,13 +33,13 @@ export default function ActionButtons() {
                     height: '16px',
                     backgroundColor: '#ef4444',
                     borderRadius: '50%',
-                    border: '2px solid white',
+                    border: '2px solid var(--card)',
                     zIndex: 10,
                   }}
                 ></div>
               )}
             </div>
-            <span className="text-sm font-medium text-gray-800 text-center">
+            <span className="text-sm font-medium text-foreground text-center">
               {action.label}
             </span>
           </Link>
