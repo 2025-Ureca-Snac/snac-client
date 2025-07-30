@@ -86,6 +86,30 @@ export default function HistoryDetailModal({
     }
   };
 
+  // 전송실패 핸들러
+  const handleDataFail = async () => {
+    try {
+      console.log('전송실패 버튼 클릭됨:', item);
+
+      // 판매자/구매자에 따라 다른 reason 설정
+      const reason =
+        type === 'sales'
+          ? 'SELLER_FORCED_TERMINATION'
+          : 'BUYER_FORCED_TERMINATION';
+
+      const response = await api.patch(`/trades/${item.id}/cancel/request`, {
+        reason: reason,
+      });
+
+      console.log('전송실패 처리 완료:', response);
+
+      // 성공 시 페이지 새로고침
+      window.location.reload();
+    } catch (error) {
+      console.error('전송실패 처리 실패:', error);
+    }
+  };
+
   // 상태별 진행 단계 계산
   const getCurrentStep = () => {
     switch (item.status) {
@@ -308,13 +332,15 @@ export default function HistoryDetailModal({
             </div>
           </div>
           {/* 상태에 따라 메시지 조건부 표시 */}
-          {item.status !== 'DATA_SENT' && item.status !== 'COMPLETED' && (
-            <div className="text-green-600 text-sm">
-              {type === 'sales'
-                ? '판매요청이 접수되었습니다.'
-                : '구매글이 등록 되었습니다.'}
-            </div>
-          )}
+          {item.status !== 'DATA_SENT' &&
+            item.status !== 'COMPLETED' &&
+            item.status !== 'CANCELED' && (
+              <div className="text-green-600 text-sm">
+                {type === 'sales'
+                  ? '판매요청이 접수되었습니다.'
+                  : '구매글이 등록 되었습니다.'}
+              </div>
+            )}
 
           {/* DATA_SENT 상태일 때 판매자/구매자별 다른 UI */}
           {item.status === 'DATA_SENT' && (
@@ -445,7 +471,10 @@ export default function HistoryDetailModal({
                   >
                     전송완료
                   </button>
-                  <button className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
+                  <button
+                    onClick={handleDataFail}
+                    className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                  >
                     전송실패
                   </button>
                 </div>
