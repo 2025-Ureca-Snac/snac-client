@@ -1,3 +1,4 @@
+// app/admin/blog/store.ts
 import { create } from 'zustand';
 import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
@@ -9,15 +10,6 @@ export interface Blog {
   contentFileUrl?: string;
   imageUrl?: string;
   articleUrl?: string;
-}
-
-export interface ArticleApiRawData {
-  id: number;
-  email: string;
-  nickname: string;
-  articleUrl?: string;
-  imageUrl?: string;
-  title: string | null;
 }
 
 interface BlogState {
@@ -42,11 +34,6 @@ interface BlogState {
     image: File
   ) => Promise<void>;
 
-  // 상세 모달 상태
-  isDetailModalOpen: boolean;
-  openDetailModal: (blog: Blog) => void;
-  closeDetailModal: () => void;
-
   // 삭제 모달 관련
   isDeleteModalOpen: boolean;
   selectedBlogId: number | null;
@@ -68,7 +55,7 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     try {
       const res = await api.get<{
         data: { articleResponseList: Blog[]; hasNext: boolean };
-      }>('/articles', { params: { size: 20 } }); // 적당한 size로 변경 추천
+      }>('/articles', { params: { size: 20 } });
 
       const { articleResponseList, hasNext } = res.data.data;
 
@@ -117,21 +104,26 @@ export const useBlogStore = create<BlogState>((set, get) => ({
   fetchOne: async (articleId) => {
     set({ loading: true, error: null });
     try {
-      const res = await api.get<{ data: ArticleApiRawData }>(
-        `/articles/${articleId}`
-      );
+      const res = await api.get<{
+        data: {
+          id: number;
+          email: string;
+          name: string;
+          nickname: string;
+          articleUrl?: string;
+          imageUrl?: string;
+          title: string | null;
+        };
+      }>(`/articles/${articleId}`);
+
       const raw = res.data.data;
 
       const mappedBlog: Blog = {
         id: raw.id,
-
         title: raw.title ?? '(제목 없음)',
         nickname: raw.nickname,
-
         contentFileUrl: raw.articleUrl,
-
         imageUrl: raw.imageUrl,
-
         articleUrl: raw.articleUrl,
       };
 
@@ -198,10 +190,4 @@ export const useBlogStore = create<BlogState>((set, get) => ({
       toast.error(msg);
     }
   },
-
-  // 상세 모달 상태
-  isDetailModalOpen: false,
-  openDetailModal: (blog) =>
-    set({ isDetailModalOpen: true, currentBlog: blog }),
-  closeDetailModal: () => set({ isDetailModalOpen: false, currentBlog: null }),
 }));

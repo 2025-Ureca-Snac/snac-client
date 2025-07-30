@@ -1,18 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Edit from '@/public/edit.svg';
 import Trash from '@/public/trash.svg';
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
-import { BlogDetailModal } from '@/app/blog/components/BlogDetailModal';
 
 export function BlogTable() {
   const { blogs, loading, error, openDeleteModal } = useBlogStore();
-
-  // 로컬 상태로 모달 관리
-  const [selectedPost, setSelectedPost] = useState<any | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (loading) return <p className="p-6 text-center">로딩 중...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
@@ -31,13 +26,6 @@ export function BlogTable() {
         <span className="font-semibold">새 파일로 교체</span>됩니다.
       </div>
 
-      <BlogDetailModal
-        post={selectedPost}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onPostSelect={(post) => setSelectedPost(post)}
-      />
-
       <table className="w-full text-regular-sm text-left text-gray-500">
         <thead className="text-regular-xs text-gray-700 uppercase bg-gray-50">
           <tr>
@@ -53,38 +41,12 @@ export function BlogTable() {
               <td className="px-6 py-4 font-medium text-gray-900">
                 #{blog.id}
               </td>
-              <td className="px-6 py-4 font-semibold">
-                {/* <button
-                  onClick={() => {
-                    setSelectedPost(blog);
-                    setIsModalOpen(true);
-                  }}
-                  className="text-teal-green hover:underline"
-                >
-                  {blog.title || '(제목 없음)'}
-                </button> */}
-                <td className="px-6 py-4 font-semibold">
-                  <button
-                    onClick={() => {
-                      setSelectedPost({
-                        id: blog.id,
-                        title: blog.title ?? '(제목 없음)',
-                        author: blog.nickname,
-                        image: blog.imageUrl,
-                        markdownContent: '',
-                        articleUrl: blog.articleUrl,
-                        category: blog.category ?? '',
-                        subtitle: '',
-                        featured: false,
-                      });
-                      setIsModalOpen(true);
-                    }}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {blog.title || '(제목 없음)'}
-                  </button>
-                </td>
+
+              {/* 제목 단순 표시 */}
+              <td className="px-6 py-4 font-semibold text-gray-900">
+                {blog.title || '(제목 없음)'}
               </td>
+
               <td className="px-6 py-4">{blog.nickname}</td>
               <td className="px-6 py-4 flex justify-center space-x-3">
                 <Link href={`/blog/admin?edit=${blog.id}`} title="수정">
