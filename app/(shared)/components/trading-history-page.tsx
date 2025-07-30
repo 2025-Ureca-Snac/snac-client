@@ -346,7 +346,7 @@ export default function TradingHistoryPage({
       case 'ACCEPTED':
         return '거래 수락';
       case 'PAYMENT_CONFIRMED':
-        return '돈 입금';
+        return '결제 완료';
       case 'DATA_SENT':
         return '데이터 보냄';
       case 'COMPLETED':
