@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 import { useUserStore } from '../(shared)/stores/user-store';
 import { useModalStore } from '../(shared)/stores/modal-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
+import { useWebSocketGuard } from '../(shared)/hooks/useWebSocketGuard';
 import { useRouter } from 'next/navigation';
 import { api } from '../(shared)/utils/api';
 import { ApiResponse } from '../(shared)/types/api';
@@ -35,6 +36,9 @@ interface FavoriteResponse {
 }
 
 export default function MyPage() {
+  // WebSocket 가드 사용
+  useWebSocketGuard();
+
   const { profile, fetchUserProfile, updateNickname, isLoading, error } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();

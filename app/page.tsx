@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
+import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
 import { Header } from './(shared)/components/Header';
 import Banner from './home/banner';
 import { DataAvg } from './home/data-avgs';
@@ -27,6 +28,9 @@ interface CardApiResponse {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
+  // WebSocket 가드 사용
+  useWebSocketGuard();
+
   const [cards, setCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
