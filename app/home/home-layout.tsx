@@ -12,10 +12,10 @@ import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import LoadingSpinner from '@/app/(shared)/components/LoadingSpinner';
-import type { Card } from '@/app/(shared)/types/card';
+import type { CardData } from '@/app/(shared)/types/card';
 
 interface HomeLayoutProps {
-  cards: Card[];
+  cards: CardData[];
   isLoading: boolean;
   currentPage: number;
   totalPages: number;
