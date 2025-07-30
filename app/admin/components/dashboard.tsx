@@ -1,6 +1,7 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
 
 import NewReportIcon from '@/public/newReport.svg';
 import PostIcon from '@/public/post.svg';
@@ -59,6 +60,13 @@ function MetricCard({
 }
 
 export function Dashboard() {
+  const { blogs, fetchAll } = useBlogStore();
+
+  //  처음 렌더링 시 게시글 불러오기
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+
   return (
     <div className="flex-1 overflow-x-hidden overflow-y-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -74,9 +82,11 @@ export function Dashboard() {
           icon={NewReportIcon}
           colorClass="bg-yellow-100 text-yellow-600"
         />
+
+        {/* 게시글 수 완료 */}
         <MetricCard
           title="활성 게시글"
-          value="589"
+          value={blogs.length}
           icon={PostIcon}
           colorClass="bg-green-100 text-green-600"
         />
