@@ -29,7 +29,7 @@ function PaymentCompleteComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const orderId = searchParams.get('orderId');
+    const cardId = searchParams.get('cardId');
     const amount = searchParams.get('amount');
     const pay = searchParams.get('pay');
     const snackMoneyUsed = parseInt(searchParams.get('snackMoneyUsed') || '0');
@@ -38,14 +38,14 @@ function PaymentCompleteComponent() {
     );
 
     console.log('결제 완료 페이지 파라미터:', {
-      orderId,
+      cardId,
       amount,
       pay,
       snackMoneyUsed,
       snackPointsUsed,
     });
 
-    if (orderId && amount) {
+    if (cardId && amount) {
       // 결제 완료 확인 API 호출
       const verifyPayment = async () => {
         try {
@@ -78,7 +78,7 @@ function PaymentCompleteComponent() {
     }
   }, [searchParams]);
 
-  const orderId = searchParams.get('orderId') || '#0123_45678';
+  const cardId = searchParams.get('cardId') || '#0123_45678';
   const amount = searchParams.get('amount') || '2,000';
   const pay = searchParams.get('pay') || 'sell';
   const carrier = searchParams.get('carrier') || '';
@@ -164,7 +164,7 @@ function PaymentCompleteComponent() {
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">주문 번호:</span>
-              <span className="font-medium text-gray-900">{orderId}</span>
+              <span className="font-medium text-gray-900">{cardId}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">날짜:</span>
@@ -200,10 +200,16 @@ function PaymentCompleteComponent() {
           {/* History Button */}
           <div className="text-center">
             <button
-              onClick={() => router.push('/mypage')}
+              onClick={() => {
+                if (pay === PAYMENT_TYPES.SELL) {
+                  router.push(`/mypage/purchase-history/${cardId}`);
+                } else {
+                  router.push(`/mypage/sales-history/${cardId}`);
+                }
+              }}
               className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
-              {pay === PAYMENT_TYPES.BUY ? '구매 내역' : '판매 내역'}
+              {pay === PAYMENT_TYPES.SELL ? '구매 내역' : '판매 내역'}
             </button>
           </div>
         </div>
