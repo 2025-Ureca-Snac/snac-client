@@ -181,7 +181,7 @@ export default function TradingHistoryPage({
       date: new Date(item.createdAt).toLocaleDateString('ko-KR'),
       title: `${item.carrier} ${item.dataAmount}GB`,
       price: item.priceGb,
-      status: item.status, // 새로운 상태값을 그대로 사용
+      status: item.status as HistoryItem['status'], // 새로운 상태값을 그대로 사용
       transactionNumber: `#${item.tradeId.toString().padStart(4, '0')}`,
       carrier: item.carrier,
       dataAmount: `${item.dataAmount}GB`,
