@@ -137,7 +137,7 @@ export default function ReportHistoryPage() {
                 />
 
                 {/* 신고 내역 리스트 */}
-                <AnimatedTabContent key={activeTab}>
+                <AnimatedTabContent tabKey={activeTab}>
                   <div className="p-6">
                     {filteredReports.length > 0 ? (
                       <div className="space-y-4">

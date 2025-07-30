@@ -17,23 +17,23 @@ export interface MenuItem {
  */
 export const menuItems: MenuItem[] = [
   {
-    id: 'purchase-info',
-    label: '구매 정보',
-    path: '/mypage/purchase-history',
-  },
-  {
     id: 'sales-history',
     label: '판매 내역',
     path: '/mypage/sales-history',
   },
   {
+    id: 'purchase-info',
+    label: '구매 내역',
+    path: '/mypage/purchase-history',
+  },
+  {
     id: 'report-history',
-    label: '신고 내역',
+    label: '문의 내역',
     path: '/mypage/report-history',
   },
   {
     id: 'point',
     label: '포인트',
-    path: '/mypage/point',
+    path: '/mypage/point?type=POINT',
   },
 ];
