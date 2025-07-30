@@ -11,6 +11,8 @@ export function getHistoryStatusText(
       return '거래 수락';
     case 'PAYMENT_CONFIRMED':
       return '결제 완료';
+    case 'PAYMENT_CONFIRMED_ACCEPTED':
+      return '매칭 완료';
     case 'DATA_SENT':
       return '데이터 보냄';
     case 'COMPLETED':
@@ -40,6 +42,7 @@ export function getHistoryStatusColor(
     case 'BUY_REQUESTED':
     case 'ACCEPTED':
     case 'PAYMENT_CONFIRMED':
+    case 'PAYMENT_CONFIRMED_ACCEPTED':
     case 'DATA_SENT':
       return 'bg-orange-500 text-white';
     case 'COMPLETED':

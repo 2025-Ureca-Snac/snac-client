@@ -117,8 +117,9 @@ export default function HistoryDetailModal({
       case 'SELL_REQUESTED':
         return 1;
       case 'ACCEPTED':
-        return 2;
       case 'PAYMENT_CONFIRMED':
+        return 2;
+      case 'PAYMENT_CONFIRMED_ACCEPTED':
         return 3;
       case 'DATA_SENT':
         return 4;

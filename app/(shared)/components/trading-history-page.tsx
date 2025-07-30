@@ -98,6 +98,7 @@ export default function TradingHistoryPage({
               item.status === 'BUY_REQUESTED' ||
               item.status === 'ACCEPTED' ||
               item.status === 'PAYMENT_CONFIRMED' ||
+              item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
               item.status === 'DATA_SENT'
           );
         } else if (status === 'completed') {
@@ -352,6 +353,8 @@ export default function TradingHistoryPage({
         return '거래 수락';
       case 'PAYMENT_CONFIRMED':
         return '결제 완료';
+      case 'PAYMENT_CONFIRMED_ACCEPTED':
+        return '구매자 매칭';
       case 'DATA_SENT':
         return '데이터 보냄';
       case 'COMPLETED':
@@ -466,6 +469,8 @@ export default function TradingHistoryPage({
                                       item.status === 'BUY_REQUESTED' ||
                                       item.status === 'ACCEPTED' ||
                                       item.status === 'PAYMENT_CONFIRMED' ||
+                                      item.status ===
+                                        'PAYMENT_CONFIRMED_ACCEPTED' ||
                                       item.status === 'DATA_SENT'
                                         ? 'bg-orange-500'
                                         : item.status === 'COMPLETED' ||

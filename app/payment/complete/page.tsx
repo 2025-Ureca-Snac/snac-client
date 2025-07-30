@@ -201,11 +201,7 @@ function PaymentCompleteComponent() {
           <div className="text-center">
             <button
               onClick={() => {
-                if (pay === PAYMENT_TYPES.SELL) {
-                  router.push(`/mypage/purchase-history/${tradeId}`);
-                } else {
-                  router.push(`/mypage/sales-history/${tradeId}`);
-                }
+                router.push(`/mypage/purchase-history/${tradeId}`);
               }}
               className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >

@@ -25,6 +25,7 @@ export interface HistoryItem {
     | 'SELL_REQUESTED'
     | 'ACCEPTED'
     | 'PAYMENT_CONFIRMED'
+    | 'PAYMENT_CONFIRMED_ACCEPTED'
     | 'DATA_SENT'
     | 'COMPLETED'
     | 'CANCELED'
