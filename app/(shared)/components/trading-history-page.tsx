@@ -40,6 +40,7 @@ export type TradingType = 'purchase' | 'sales';
 // 컴포넌트 Props
 interface TradingHistoryPageProps {
   type: TradingType;
+  selectedId?: string;
 }
 
 // 거래 내역 API 함수
@@ -56,7 +57,10 @@ const getTradingHistory = async (
   return response.data.data;
 };
 
-export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
+export default function TradingHistoryPage({
+  type,
+  selectedId,
+}: TradingHistoryPageProps) {
   const isPurchase = type === 'purchase';
 
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'completed'>(
@@ -98,7 +102,24 @@ export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
           );
         }
 
-        setTradingHistory(filteredData);
+        // 정렬: 판매중/구매중이 맨 위로, 그 다음 최신순
+        const sortedData = filteredData.sort((a, b) => {
+          // 판매중/구매중 상태 우선 정렬
+          const aIsActive =
+            a.sellStatus === 'SELLING' || a.sellStatus === 'PURCHASING';
+          const bIsActive =
+            b.sellStatus === 'SELLING' || b.sellStatus === 'PURCHASING';
+
+          if (aIsActive && !bIsActive) return -1;
+          if (!aIsActive && bIsActive) return 1;
+
+          // 둘 다 활성 상태이거나 둘 다 완료 상태인 경우 최신순 정렬
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
+
+        setTradingHistory(sortedData);
 
         console.log('상태 업데이트 완료');
       } catch (err) {
@@ -117,6 +138,18 @@ export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
     loadTradingHistory(activeTab);
   }, [activeTab, type, loadTradingHistory]);
 
+  // selectedId가 있으면 해당 아이템의 모달을 열기
+  useEffect(() => {
+    if (selectedId && tradingHistory.length > 0) {
+      const targetItem = tradingHistory.find(
+        (item) => item.id.toString() === selectedId
+      );
+      if (targetItem) {
+        handleCardClick(targetItem);
+      }
+    }
+  }, [selectedId, tradingHistory]);
+
   // 디버깅용: 상태 변화 확인
   useEffect(() => {
     console.log('상태 변화:', {
@@ -125,8 +158,9 @@ export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
       tradingHistoryLength: tradingHistory?.length,
       activeTab,
       type,
+      selectedId,
     });
-  }, [isLoading, error, tradingHistory, activeTab, type]);
+  }, [isLoading, error, tradingHistory, activeTab, type, selectedId]);
 
   const handleCardClick = (item: TradingHistoryItem) => {
     // TradingHistoryItem을 HistoryItem으로 변환
@@ -148,6 +182,13 @@ export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
     };
     setSelectedItem(historyItem);
     setIsModalOpen(true);
+
+    // URL 업데이트
+    if (type === 'sales') {
+      window.history.pushState({}, '', `/mypage/sales-history/${item.id}`);
+    } else if (type === 'purchase') {
+      window.history.pushState({}, '', `/mypage/purchase-history/${item.id}`);
+    }
   };
 
   const handleCardKeyDown = (
@@ -163,6 +204,15 @@ export default function TradingHistoryPage({ type }: TradingHistoryPageProps) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedItem(null);
+
+    // URL에서 id 파라미터가 있으면 기본 페이지로 리다이렉트
+    if (selectedId) {
+      if (type === 'sales') {
+        window.history.pushState({}, '', `/mypage/sales-history`);
+      } else if (type === 'purchase') {
+        window.history.pushState({}, '', `/mypage/purchase-history`);
+      }
+    }
   };
 
   // 테마 설정
