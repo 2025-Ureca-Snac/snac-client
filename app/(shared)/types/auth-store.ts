@@ -30,7 +30,7 @@ export interface AuthState {
   logout: () => void;
   setLoading: (loading: boolean) => void;
   linkSocialAccount: (providerId: string) => Promise<boolean>;
-  unlinkSocialAccount: (providerId: string) => Promise<void>;
+  unlinkSocialAccount: (providerId: string) => Promise<boolean>;
   checkAndRefreshToken: () => Promise<boolean>;
 }
 

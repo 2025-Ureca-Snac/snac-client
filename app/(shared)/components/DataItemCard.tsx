@@ -5,6 +5,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
 import { PriceUnit } from '@/app/(shared)/types';
+import { useRouter } from 'next/navigation';
 
 interface DataItemCardProps {
   imageUrl: string;
@@ -13,7 +14,7 @@ interface DataItemCardProps {
   unit: PriceUnit;
   email: string;
   createdAt: string;
-  cardCategory: 'BUY' | 'SELL';
+  cardCategory: string;
   onClickBuy: (meta: { email: string; createdAt: string }) => void;
   ratingScore: number;
   isNew?: boolean;
@@ -36,6 +37,7 @@ export const DataItemCard = ({
   onClickBuy,
 }: DataItemCardProps) => {
   const loggedInUser = useAuthStore((state) => state.user);
+  const router = useRouter();
   const isMyPost = loggedInUser === email;
   const displayPrice =
     unit === 'snack' ? (
@@ -96,7 +98,15 @@ export const DataItemCard = ({
       <div className="flex justify-center h-btn-sm md:h-btn-md">
         {!isMyPost ? (
           <Button
-            onClick={() => onClickBuy({ email, createdAt })}
+            onClick={() => {
+              // 로그인 상태 확인
+              if (!loggedInUser) {
+                alert('로그인 해주세요.');
+                router.push('/login');
+                return;
+              }
+              onClickBuy({ email, createdAt });
+            }}
             className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition text-regular-md border rounded-lg flex items-center justify-center`}
             style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
           >

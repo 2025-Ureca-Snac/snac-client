@@ -1,13 +1,13 @@
-export interface Card {
+export interface CardData {
   id: number;
-  cardCategory: 'BUY' | 'SELL';
-  carrier: 'SKT' | 'KT' | 'LGU+';
+  name: string;
+  email: string;
+  cardCategory: string;
+  carrier: string;
   dataAmount: number;
   price: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  name: string;
   sellStatus: string;
   ratingScore: number;
+  createdAt: string;
+  updatedAt: string;
 }

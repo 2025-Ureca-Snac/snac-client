@@ -9,5 +9,5 @@
 export interface ChangePhoneModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: (password: string, next: string, code: string) => void;
+  onSubmit?: (current: string, next: string, code: string) => void;
 }

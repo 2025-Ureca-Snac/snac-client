@@ -1,4 +1,4 @@
-import type { HistoryItem, HistoryCardProps } from '../types/history-card';
+import type { HistoryCardProps } from '../types/history-card';
 import {
   getHistoryStatusText,
   getHistoryStatusColor,
@@ -38,5 +38,3 @@ export default function HistoryCard({ item, type, onClick }: HistoryCardProps) {
     </div>
   );
 }
-
-export type { HistoryItem };

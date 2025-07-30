@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import RechargeModal from '../(shared)/components/recharge-modal';
 import RechargeConfirmModal from '../(shared)/components/recharge-confirm-modal';
@@ -19,6 +19,9 @@ import {
   getTotalAvailable,
   getShortageAmount,
 } from '../(shared)/utils/payment-calculations';
+import { CardData } from '../(shared)/types/card';
+import { Header } from '../(shared)/components/Header';
+import { Footer } from '../(shared)/components/Footer';
 
 /**
  * @author 이승우
@@ -30,15 +33,74 @@ export default function PaymentPage() {
   const [rechargeConfirmModalOpen, setRechargeConfirmModalOpen] =
     useState(false);
   const [shortageAmount, setShortageAmount] = useState(0);
-  const [snackMoney, setSnackMoney] = useState(3000); // 스낵 머니 3,000
-  const [snackPoints] = useState(1500); // 스낵 포인트 1,500 (테스트용)
+  const [snackMoney, setSnackMoney] = useState(0); // 스낵 머니
+  const [snackPoints, setSnackPoints] = useState(0); // 스낵 포인트
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PAYMENT_METHODS.TOSS
   );
   const [snackPointsToUse, setSnackPointsToUse] = useState(0);
   const [showSnackPayment, setShowSnackPayment] = useState(false);
+  const [cardData, setCardData] = useState<CardData | null>(null);
+  const [walletData, setWalletData] = useState<{
+    money: number;
+    point: number;
+  } | null>(null);
 
-  const productPrice = 2000;
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const cardId = searchParams.get('id');
+    const pay = searchParams.get('pay');
+
+    console.log('Payment Page Search Params:', {
+      cardId,
+      pay,
+      fullUrl: window.location.href,
+    });
+
+    // cardId가 있을 때 카드 상태 조회
+    if (cardId) {
+      const fetchCardStatus = async () => {
+        try {
+          const response = await api.get(`/cards/${cardId}`);
+          console.log('Card Status Response:', response.data);
+
+          // 응답 데이터를 cardData 상태에 저장
+          if ((response.data as { data: CardData })?.data) {
+            setCardData((response.data as { data: CardData }).data);
+          }
+        } catch (error) {
+          console.error('카드 상태 조회 실패:', error);
+        }
+      };
+
+      fetchCardStatus();
+    }
+
+    // 지갑 정보 조회
+    const fetchWalletData = async () => {
+      try {
+        const response = await api.get('/wallets/summary');
+        console.log('Wallet Summary Response:', response.data);
+        setWalletData(
+          (response.data as { data: { money: number; point: number } }).data
+        );
+      } catch (error) {
+        console.error('지갑 정보 조회 실패:', error);
+      }
+    };
+
+    fetchWalletData();
+  }, []);
+
+  // walletData가 업데이트될 때 snackMoney와 snackPoints 업데이트
+  useEffect(() => {
+    if (walletData) {
+      setSnackMoney(walletData.money);
+      setSnackPoints(walletData.point);
+    }
+  }, [walletData]);
+
+  const productPrice = cardData?.price || 0;
   const finalAmount = getFinalAmount(productPrice, snackPointsToUse);
 
   // 디버깅용 로그
@@ -52,51 +114,45 @@ export default function PaymentPage() {
   const handleSnackPayment = async () => {
     try {
       // 스낵 포인트로 결제 처리
-      const orderId = `ORDER_${Date.now()}`;
-      const amount = finalAmount;
 
-      // 여기서 실제 스낵 포인트 결제 API를 호출할 수 있습니다
-      console.log('스낵 포인트 결제:', {
-        orderId,
-        amount,
-        snackPointsUsed: snackPointsToUse,
-        finalAmount,
-      });
+      const amount = finalAmount;
 
       // INSERT_YOUR_CODE
       // pay 파라미터에 따라 API 엔드포인트 분기
       const searchParams = new URLSearchParams(window.location.search);
       const pay = searchParams.get('pay'); // 기본값은 'sell'
-
+      const cardId = searchParams.get('id');
       const apiEndpoint =
         pay === PAYMENT_TYPES.SELL
-          ? '/trades/sell'
+          ? '/trades/buy'
           : pay === PAYMENT_TYPES.BUY
-            ? '/trades/buy'
+            ? '/trades/sell'
             : null;
 
       if (!apiEndpoint) {
         throw new Error('잘못된 요청 파라미터입니다.');
       }
-
+      console.log('apiEndpoint', Number(cardId), amount, snackPointsToUse);
       const response = await api.post(apiEndpoint, {
-        cardId: orderId,
+        cardId: Number(cardId),
         money: amount,
         point: snackPointsToUse,
       });
 
       const responseData = response.data as Record<string, unknown>;
-      if (responseData.status === 'OK') {
+      if (responseData.status === 'CREATED') {
         router.push(
-          `/payment/complete?pay=${pay}&orderId=${orderId}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}`
+          `/payment/complete?pay=${pay}&cardId=${cardId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
-        alert('결제가 실패했습니다. 다시 시도해주세요.');
+        alert(`결제가 실패했습니다. 다시 시도해주세요.`);
         console.error('결제 실패:', responseData);
       }
     } catch (error) {
       console.error('스낵 포인트 결제 오류:', error);
-      alert('결제 중 오류가 발생했습니다.');
+      alert(
+        `결제 중 오류가 발생했습니다. \n${(error as { response: { data: { message: string } } }).response.data.message}`
+      );
     }
   };
 
@@ -191,6 +247,7 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
@@ -207,7 +264,7 @@ export default function PaymentPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Product Details */}
-            <ProductDetails productPrice={productPrice} />
+            <ProductDetails cardData={cardData} />
 
             {/* Payment Information */}
             <div className="lg:col-span-1">
@@ -275,6 +332,7 @@ export default function PaymentPage() {
         snackPoints={snackPoints}
         shortage={shortageAmount}
       />
+      <Footer />
     </div>
   );
 }

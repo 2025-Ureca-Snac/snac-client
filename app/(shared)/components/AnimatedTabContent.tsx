@@ -7,11 +7,11 @@ import type { AnimatedTabContentProps } from '../types/animated-tab-content';
  * @author 이승우
  * @description 애니메이션 탭 콘텐츠 컴포넌트
  * @param {React.ReactNode} children 콘텐츠
- * @param {string} key 키
+ * @param {string} tabKey 탭 키
  */
 export default function AnimatedTabContent({
   children,
-  key,
+  tabKey,
 }: AnimatedTabContentProps) {
   const contentVariants = {
     initial: { opacity: 0, x: 50 },
@@ -22,7 +22,7 @@ export default function AnimatedTabContent({
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={key}
+        key={tabKey}
         variants={contentVariants}
         initial="initial"
         animate="animate"

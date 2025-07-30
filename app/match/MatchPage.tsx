@@ -12,8 +12,7 @@ import { Filters } from './types';
 import { User, TradeRequest } from './types/match';
 import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
-import { useAuthStore } from '../(shared)/stores/auth-store';
-import { useUserStore } from '../(shared)/stores/user-store';
+//import { useAuthStore } from '../(shared)/stores/auth-store';
 
 interface ServerTradeData {
   tradeId: number;
@@ -40,8 +39,8 @@ type MatchingStatus =
 export default function MatchPage() {
   const router = useRouter();
   const { foundMatch } = useMatchStore();
-  const { user } = useAuthStore();
-  const { profile } = useUserStore();
+  // const { user } = useAuthStore();
+  // const { profile } = useUserStore();
 
   // 상태 관리
   const initialFilters: Filters = {
@@ -307,19 +306,19 @@ export default function MatchPage() {
       if (accept) {
         // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
         const buyerInfo = {
-          tradeId: request.tradeId,
-          buyer: request.buyerName, // 구매자 이메일
-          seller: user || profile?.email || 'unknown_seller', // 현재 판매자 이메일
-          cardId: request.cardId,
-          carrier: sellerInfo.carrier,
-          dataAmount: sellerInfo.dataAmount,
-          phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
-          point: profile?.points || 0, // 현재 사용자 포인트
-          priceGb: sellerInfo.price,
-          sellerRatingScore: 1000, // TODO: 실제 평점 (서버에서 받아야 함)
+          tradeId: 1,
+          buyer: 'hardcoded-buyer@email.com',
+          seller: 'hardcoded-seller@email.com',
+          cardId: 1,
+          carrier: 'SKT',
+          dataAmount: 10,
+          phone: '010-1234-5678',
+          point: 10000,
+          priceGb: 2000,
+          sellerRatingScore: 4.8,
           status: 'ACCEPTED',
           cancelReason: null,
-          type: 'buyer' as const,
+          type: 'seller' as const,
         };
 
         foundMatch(buyerInfo);

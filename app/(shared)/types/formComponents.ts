@@ -61,6 +61,7 @@ export interface InputWithButtonProps {
   buttonDisabled?: boolean;
   className?: string;
   autoComplete?: string;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 /**
