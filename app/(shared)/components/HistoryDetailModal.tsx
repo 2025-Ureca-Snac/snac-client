@@ -1,6 +1,7 @@
 'use client';
 
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
+import api from '../utils/api';
 import {
   getHistoryStatusText,
   getHistoryStatusColor,
@@ -21,6 +22,24 @@ export default function HistoryDetailModal({
   type,
 }: HistoryDetailModalProps) {
   if (!open || !item) return null;
+
+  // 전송완료 핸들러
+  const handleDataSent = async () => {
+    try {
+      console.log('전송완료 버튼 클릭됨:', item);
+
+      // TODO: API 연동
+      const response = await api.post('/trades/data-sent', {
+        tradeId: item.id,
+        status: 'DATA_SENT',
+      });
+
+      // 성공 시 처리
+      console.log('데이터 전송 완료 처리됨', response);
+    } catch (error) {
+      console.error('데이터 전송 완료 처리 실패:', error);
+    }
+  };
 
   // 상태별 진행 단계 계산
   const getCurrentStep = () => {
@@ -132,7 +151,7 @@ export default function HistoryDetailModal({
                       : 'text-gray-500'
                   }`}
                 >
-                  {type === 'purchase' ? '구매요청' : '판매요청'}
+                  구매글 등록
                 </div>
               </div>
               <div
@@ -157,7 +176,7 @@ export default function HistoryDetailModal({
                       : 'text-gray-500'
                   }`}
                 >
-                  {type === 'purchase' ? '판매자수락' : '구매자수락'}
+                  결제완료
                 </div>
               </div>
               <div
@@ -182,7 +201,7 @@ export default function HistoryDetailModal({
                       : 'text-gray-500'
                   }`}
                 >
-                  결제완료
+                  {type === 'purchase' ? '판매자 매칭' : '구매자 매칭'}
                 </div>
               </div>
               <div
@@ -207,7 +226,7 @@ export default function HistoryDetailModal({
                       : 'text-gray-500'
                   }`}
                 >
-                  데이터 송신완료
+                  판매자 데이터 송신
                 </div>
               </div>
               <div
@@ -237,13 +256,14 @@ export default function HistoryDetailModal({
               </div>
             </div>
           </div>
-
+          <div className="text-green-600 text-sm">
+            {type === 'sales'
+              ? '판매요청이 접수되었습니다.'
+              : '구매글이 등록 되었습니다.'}
+          </div>
           {/* 진행 중인 거래인 경우에만 추가 정보 표시 */}
-          {currentStep >= 1 && currentStep < 5 && (
+          {type === 'sales' && currentStep >= 1 && currentStep < 5 && (
             <div className="space-y-3">
-              <div className="text-green-600 text-sm">
-                {type === 'purchase' ? '구매' : '판매'}요청이 접수되었습니다.
-              </div>
               <div className="text-gray-700 text-sm">
                 아래 번호로{' '}
                 <a
@@ -277,7 +297,10 @@ export default function HistoryDetailModal({
 
               {/* 액션 버튼 */}
               <div className="flex gap-2">
-                <button className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">
+                <button
+                  onClick={handleDataSent}
+                  className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
+                >
                   전송완료
                 </button>
                 <button className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
