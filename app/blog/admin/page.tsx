@@ -29,7 +29,7 @@ interface BlogPostForm {
 }
 
 export default function BlogAdminPage() {
-  const user = useAuthStore((state) => state.user); // ✅ 사용자 이름 가져오기
+  const user = useAuthStore((state) => state.user);
 
   const [formData, setFormData] = useState<BlogPostForm>({
     title: '',
@@ -64,7 +64,7 @@ export default function BlogAdminPage() {
       return;
     }
 
-    console.log('user:', user); // Keeping this console log for now, but if 'user' is never used for logic, consider removing it.
+    console.log('user:', user);
 
     const data = new FormData();
 
