@@ -1,13 +1,14 @@
 'use client';
 
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { AuthState } from '@/app/(shared)/types/auth-store';
 import React, { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MenuLink } from './MenuLink';
 
 export const Header: FC = () => {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state: AuthState) => state.user);
   const isLoggedIn: boolean = !!user;
 
   return (
