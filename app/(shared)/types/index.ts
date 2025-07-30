@@ -10,25 +10,6 @@ export interface User {
 
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
-export interface VerificationInputProps {
-  label: string;
-  id: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  required?: boolean;
-  disabled?: boolean;
-  helpText?: string;
-  showHelpText?: boolean;
-  codeLength?: number;
-  onCodeChange?: (code: string) => void;
-  codeDisabled?: boolean;
-  codeValue?: string;
-  onVerify?: () => void;
-  verifyDisabled?: boolean;
-}
-
 export type SearchModalType = 'id' | 'password' | null;
 
 export interface SearchModalProps {
@@ -68,3 +49,18 @@ export interface TabNavigationProps {
 export * from './auth-store';
 export * from './user-store';
 export * from './modal-store';
+
+// 훅 타입들
+export * from './timer';
+export * from './theme';
+
+// 모달 타입들
+export * from './modal-portal';
+export * from './change-password-modal';
+export * from './change-phone-modal';
+export * from './change-nickname-modal';
+export * from './social-login-modal';
+export * from './service-guide-modal';
+export * from './privacy-policy-modal';
+export * from './favorite-list-modal';
+export * from './history-detail-modal';

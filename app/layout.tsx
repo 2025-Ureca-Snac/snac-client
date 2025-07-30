@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
-
-import { Toaster } from 'sonner';
-
+import { ThemeProvider } from './theme-provider';
 import WwwRedirect from './(shared)/components/www-redirect';
+import { Toaster } from 'sonner';
 
 const notoSansKr = Noto_Sans_KR({
   weight: ['400', '500', '700'],
@@ -14,21 +13,23 @@ const notoSansKr = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   title: 'Snac',
-  description: 'Snac - 스낵 거래 플랫폼',
+  description: 'Snac - 데이터 거래 플랫폼',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <WwwRedirect />
       <body className={`${notoSansKr.className} antialiased`}>
-        <WwwRedirect />
-        <div className="w-full  md:max-w-[1440px] mx-auto ">
-          {children} <Toaster richColors position="top-center" />
-        </div>
+        <ThemeProvider>
+          <div className="w-full md:max-w-[1440px] mx-auto">
+            {children} <Toaster richColors position="top-center" />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

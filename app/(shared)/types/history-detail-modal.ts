@@ -1,4 +1,4 @@
-import type { HistoryItem } from '../components/HistoryCard';
+import type { HistoryItem } from './history-card';
 
 /**
  * @author 이승우

@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import InputWithButton from './input-with-button';
 import VerificationInput from './verification-input';
 import PasswordInput from './password-input';
 import type { FindPasswordSectionProps } from '../types/find-section';
+import { checkPasswordMatch } from '../utils/password-validation';
 
 /**
  * @author 이승우
@@ -33,6 +34,11 @@ export default function FindPasswordSection({
   const sent = isPasswordSent;
   const show = showPasswordVerification;
 
+  // 비밀번호 일치 여부 상태
+  const [passwordMatch, setPasswordMatch] = useState<
+    'none' | 'match' | 'mismatch'
+  >('none');
+
   const emailInputRef = useRef<HTMLInputElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
 
@@ -51,6 +57,25 @@ export default function FindPasswordSection({
       return () => clearTimeout(timer);
     }
   }, [verified, passwordAuthType]);
+
+  // 비밀번호 일치 여부 확인
+  useEffect(() => {
+    if (
+      passwordFormData.password === '' ||
+      passwordFormData.passwordConfirm === ''
+    ) {
+      setPasswordMatch('none');
+    } else if (
+      checkPasswordMatch(
+        passwordFormData.password,
+        passwordFormData.passwordConfirm
+      )
+    ) {
+      setPasswordMatch('match');
+    } else {
+      setPasswordMatch('mismatch');
+    }
+  }, [passwordFormData.password, passwordFormData.passwordConfirm]);
 
   return (
     <motion.form
@@ -206,6 +231,16 @@ export default function FindPasswordSection({
               onChange={handlePasswordFormChange('passwordConfirm')}
               placeholder="비밀번호 확인"
             />
+            {/* 비밀번호 일치 여부 표시 - 항상 표시하여 높이 유지 */}
+            <p
+              className={`text-sm mt-2 min-h-[20px] ${passwordMatch === 'match' ? 'text-green-500' : passwordMatch === 'mismatch' ? 'text-red-500' : 'text-transparent'}`}
+            >
+              {passwordMatch === 'match'
+                ? '비밀번호가 일치합니다.'
+                : passwordMatch === 'mismatch'
+                  ? '비밀번호가 일치하지 않습니다.'
+                  : 'placeholder'}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
