@@ -27,6 +27,8 @@ export default function HistoryDetailModal({
   type,
 }: HistoryDetailModalProps) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [showCancelReason, setShowCancelReason] = useState(false);
+  const [selectedCancelReason, setSelectedCancelReason] = useState<string>('');
 
   if (!open || !item) return null;
 
@@ -112,12 +114,43 @@ export default function HistoryDetailModal({
     }
   };
 
+  // 거래 취소 사유 토글
+  const handleTradeCancelClick = () => {
+    setShowCancelReason(!showCancelReason);
+    if (!showCancelReason) {
+      // 기본값 설정
+      setSelectedCancelReason(
+        type === 'sales'
+          ? 'SELLER_FORCED_TERMINATION'
+          : 'BUYER_FORCED_TERMINATION'
+      );
+    }
+  };
+
+  // 거래 취소 실행 핸들러
+  const handleTradeCancelConfirm = async () => {
+    try {
+      console.log('거래 취소 확인 버튼 클릭됨:', item);
+
+      const response = await api.patch(`/trades/${item.id}/cancel/request`, {
+        reason: selectedCancelReason,
+      });
+
+      console.log('거래 취소 처리 완료:', response);
+
+      // 성공 시 페이지 새로고침
+      window.location.reload();
+    } catch (error) {
+      console.error('거래 취소 처리 실패:', error);
+    }
+  };
+
   // 진행 단계 생성
   const progressSteps = getProgressSteps(type, item.status);
   console.log('test:', item);
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300">
         {/* 헤더 */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold text-gray-900">
@@ -342,7 +375,74 @@ export default function HistoryDetailModal({
         </div>
 
         {/* 하단 버튼 */}
-        <div className="p-4 border-t">
+        <div className="flex-col p-4 border-t flex gap-2">
+          {/* 거래 취소 버튼 */}
+          {item.status !== 'CANCELED' && item.status !== 'COMPLETED' && (
+            <div className="flex w-full">
+              <button
+                onClick={handleTradeCancelClick}
+                className="flex-1 bg-gray-400 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-500 transition-colors"
+              >
+                거래 취소
+              </button>
+            </div>
+          )}
+
+          {/* 거래 취소 사유 선택 */}
+          {showCancelReason && (
+            <div className="space-y-3 p-3 bg-gray-50 rounded-lg">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  취소 사유 선택
+                </label>
+                <select
+                  value={selectedCancelReason}
+                  onChange={(e) => setSelectedCancelReason(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {type === 'sales' ? (
+                    <>
+                      <option value="SELLER_FORCED_TERMINATION">
+                        판매자 강제 종료
+                      </option>
+                      <option value="SELLER_CHANGE_MIND">
+                        판매자 단순 변심
+                      </option>
+                      <option value="SELLER_LIMIT_EXCEEDED">
+                        판매자 기다리다가 포기
+                      </option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="BUYER_FORCED_TERMINATION">
+                        구매자 강제 종료
+                      </option>
+                      <option value="BUYER_CHANGE_MIND">
+                        구매자 단순 변심
+                      </option>
+                      <option value="BUYER_LIMIT_EXCEEDED">
+                        구매자 기다리다가 포기
+                      </option>
+                    </>
+                  )}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleTradeCancelConfirm}
+                  className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                >
+                  취소 확인
+                </button>
+                <button
+                  onClick={() => setShowCancelReason(false)}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-400 transition-colors"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          )}
           <button
             onClick={onClose}
             className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
