@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
-  cardResponseList: TradingHistoryItem[];
+  trades: TradingHistoryItem[];
   totalElements: number;
   totalPages: number;
   currentPage: number;
@@ -21,17 +21,17 @@ interface TradingHistoryResponse {
 }
 
 interface TradingHistoryItem {
-  id: number;
-  name: string;
-  email: string;
-  ratingScore: number;
-  sellStatus: string;
-  cardCategory: string;
+  tradeId: number;
+  buyer: string;
+  seller: string;
   carrier: string;
   dataAmount: number;
-  price: number;
+  priceGb: number;
+  status: string;
+  tradeType: string;
   createdAt: string;
-  updatedAt: string;
+  phone: string | null;
+  cancelReason?: string;
 }
 
 // 거래 내역 타입
@@ -48,10 +48,10 @@ const getTradingHistory = async (
   type: TradingType
 ): Promise<TradingHistoryResponse> => {
   const queryParams = new URLSearchParams();
-  queryParams.append('cardCategory', type === 'purchase' ? 'SELL' : 'BUY');
+  queryParams.append('side', type === 'purchase' ? 'BUY' : 'SELL');
 
   const response = await api.get<ApiResponse<TradingHistoryResponse>>(
-    `/cards?${queryParams.toString()}`
+    `/trades/scroll?${queryParams.toString()}`
   );
 
   return response.data.data;
@@ -86,29 +86,41 @@ export default function TradingHistoryPage({
         const response = await getTradingHistory(type);
 
         console.log('API 응답:', response);
-        console.log('응답 content:', response.cardResponseList);
+        console.log('응답 content:', response.trades);
 
-        // sellStatus에 따라 필터링
-        let filteredData = response.cardResponseList;
+        // status에 따라 필터링
+        let filteredData = response.trades;
         if (status === 'active') {
-          filteredData = response.cardResponseList.filter(
+          filteredData = response.trades.filter(
             (item) =>
-              item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING'
+              item.status === 'BUY_REQUESTED' ||
+              item.status === 'ACCEPTED' ||
+              item.status === 'PAYMENT_CONFIRMED' ||
+              item.status === 'DATA_SENT'
           );
         } else if (status === 'completed') {
-          filteredData = response.cardResponseList.filter(
+          filteredData = response.trades.filter(
             (item) =>
-              item.sellStatus !== 'SELLING' && item.sellStatus !== 'PURCHASING'
+              item.status === 'COMPLETED' ||
+              item.status === 'CANCELED' ||
+              item.status === 'AUTO_REFUND' ||
+              item.status === 'AUTO_PAYOUT'
           );
         }
 
-        // 정렬: 판매중/구매중이 맨 위로, 그 다음 최신순
+        // 정렬: 진행중인 거래가 맨 위로, 그 다음 최신순
         const sortedData = filteredData.sort((a, b) => {
-          // 판매중/구매중 상태 우선 정렬
+          // 진행중인 거래 상태 우선 정렬
           const aIsActive =
-            a.sellStatus === 'SELLING' || a.sellStatus === 'PURCHASING';
+            a.status === 'BUY_REQUESTED' ||
+            a.status === 'ACCEPTED' ||
+            a.status === 'PAYMENT_CONFIRMED' ||
+            a.status === 'DATA_SENT';
           const bIsActive =
-            b.sellStatus === 'SELLING' || b.sellStatus === 'PURCHASING';
+            b.status === 'BUY_REQUESTED' ||
+            b.status === 'ACCEPTED' ||
+            b.status === 'PAYMENT_CONFIRMED' ||
+            b.status === 'DATA_SENT';
 
           if (aIsActive && !bIsActive) return -1;
           if (!aIsActive && bIsActive) return 1;
@@ -142,7 +154,7 @@ export default function TradingHistoryPage({
   useEffect(() => {
     if (selectedId && tradingHistory.length > 0) {
       const targetItem = tradingHistory.find(
-        (item) => item.id.toString() === selectedId
+        (item) => item.tradeId.toString() === selectedId
       );
       if (targetItem) {
         handleCardClick(targetItem);
@@ -165,29 +177,28 @@ export default function TradingHistoryPage({
   const handleCardClick = (item: TradingHistoryItem) => {
     // TradingHistoryItem을 HistoryItem으로 변환
     const historyItem: HistoryItem = {
-      id: item.id,
+      id: item.tradeId,
       date: new Date(item.createdAt).toLocaleDateString('ko-KR'),
       title: `${item.carrier} ${item.dataAmount}GB`,
-      price: item.price,
-      status:
-        item.sellStatus === 'SELLING' || item.sellStatus === 'PURCHASING'
-          ? isPurchase
-            ? 'purchasing'
-            : 'selling'
-          : 'completed',
-      transactionNumber: `#${item.id.toString().padStart(4, '0')}`,
+      price: item.priceGb,
+      status: item.status, // 새로운 상태값을 그대로 사용
+      transactionNumber: `#${item.tradeId.toString().padStart(4, '0')}`,
       carrier: item.carrier,
       dataAmount: `${item.dataAmount}GB`,
-      phoneNumber: item.email,
+      phoneNumber: item.phone || '',
     };
     setSelectedItem(historyItem);
     setIsModalOpen(true);
 
     // URL 업데이트
     if (type === 'sales') {
-      window.history.pushState({}, '', `/mypage/sales-history/${item.id}`);
+      window.history.pushState({}, '', `/mypage/sales-history/${item.tradeId}`);
     } else if (type === 'purchase') {
-      window.history.pushState({}, '', `/mypage/purchase-history/${item.id}`);
+      window.history.pushState(
+        {},
+        '',
+        `/mypage/purchase-history/${item.tradeId}`
+      );
     }
   };
 
@@ -228,8 +239,8 @@ export default function TradingHistoryPage({
 
   const tabs = [
     { id: 'all', label: '전체' },
-    { id: 'active', label: isPurchase ? '구매 중' : '판매 중' },
-    { id: 'completed', label: isPurchase ? '구매 완료' : '판매 완료' },
+    { id: 'active', label: isPurchase ? '구매 중' : '판매 거래 중' },
+    { id: 'completed', label: isPurchase ? '구매 완료' : '판매 거래 완료' },
   ];
 
   const pageTitle = isPurchase ? '구매 내역' : '판매 내역';
@@ -326,12 +337,29 @@ export default function TradingHistoryPage({
   );
 
   // 상태 텍스트 매핑
-  const getStatusText = (sellStatus: string) => {
-    const isActive = sellStatus === 'SELLING' || sellStatus === 'PURCHASING';
-    if (isActive) {
-      return isPurchase ? '구매요청' : '판매중';
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'BUY_REQUESTED':
+        return '거래 요청';
+      case 'SELL_REQUESTED':
+        return '판매 요청';
+      case 'ACCEPTED':
+        return '거래 수락';
+      case 'PAYMENT_CONFIRMED':
+        return '돈 입금';
+      case 'DATA_SENT':
+        return '데이터 보냄';
+      case 'COMPLETED':
+        return '거래 완료';
+      case 'CANCELED':
+        return '거래 취소';
+      case 'AUTO_REFUND':
+        return '자동 환불';
+      case 'AUTO_PAYOUT':
+        return '자동 확정';
+      default:
+        return '거래 완료';
     }
-    return '거래완료';
   };
 
   // 빈 상태 메시지
@@ -395,13 +423,13 @@ export default function TradingHistoryPage({
                         >
                           {tradingHistory.map((item) => (
                             <div
-                              key={item.id}
+                              key={item.tradeId}
                               role="listitem"
                               tabIndex={0}
                               className={`bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
                               onClick={() => handleCardClick(item)}
                               onKeyDown={(e) => handleCardKeyDown(e, item)}
-                              aria-label={`${item.carrier} ${item.dataAmount}GB ${isPurchase ? '구매' : '판매'} 내역 - ${new Date(item.createdAt).toLocaleDateString('ko-KR')} - ${item.price.toLocaleString()}원 - ${getStatusText(item.sellStatus)}`}
+                              aria-label={`${item.carrier} ${item.dataAmount}GB ${isPurchase ? '구매' : '판매'} 내역 - ${new Date(item.createdAt).toLocaleDateString('ko-KR')} - ${item.priceGb.toLocaleString()}원 - ${getStatusText(item.status)}`}
                             >
                               {/* 아이콘 */}
                               <div
@@ -428,17 +456,25 @@ export default function TradingHistoryPage({
                                 <div className="flex items-center gap-2">
                                   <span
                                     className={`text-white text-xs px-2 py-1 rounded ${
-                                      item.sellStatus === 'SELLING' ||
-                                      item.sellStatus === 'PURCHASING'
+                                      item.status === 'BUY_REQUESTED' ||
+                                      item.status === 'ACCEPTED' ||
+                                      item.status === 'PAYMENT_CONFIRMED' ||
+                                      item.status === 'DATA_SENT'
                                         ? 'bg-orange-500'
-                                        : 'bg-black'
+                                        : item.status === 'COMPLETED' ||
+                                            item.status === 'AUTO_PAYOUT'
+                                          ? 'bg-green-500'
+                                          : item.status === 'CANCELED' ||
+                                              item.status === 'AUTO_REFUND'
+                                            ? 'bg-red-500'
+                                            : 'bg-black'
                                     }`}
-                                    aria-label={`상태: ${getStatusText(item.sellStatus)}`}
+                                    aria-label={`상태: ${getStatusText(item.status)}`}
                                   >
-                                    {getStatusText(item.sellStatus)}
+                                    {getStatusText(item.status)}
                                   </span>
                                   <span className="text-gray-900">
-                                    {item.price.toLocaleString()}원
+                                    {item.priceGb.toLocaleString()}원
                                   </span>
                                 </div>
                               </div>
