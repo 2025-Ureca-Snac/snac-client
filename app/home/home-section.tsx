@@ -41,6 +41,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
             cardCategory={item.cardCategory}
             createdAt={item.createdAt}
             ratingScore={item.ratingScore}
+            sellStatus={item.sellStatus}
             onClickBuy={() => setModalItem(item)}
           />
         ))}

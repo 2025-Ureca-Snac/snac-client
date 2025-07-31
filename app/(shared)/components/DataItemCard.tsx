@@ -21,6 +21,7 @@ interface DataItemCardProps {
   isNew?: boolean;
   newBadgeText?: string;
   buyButtonText?: string;
+  sellStatus: string;
 }
 
 export const DataItemCard = ({
@@ -36,6 +37,7 @@ export const DataItemCard = ({
   newBadgeText = 'NEW',
   buyButtonText,
   onClickBuy,
+  sellStatus,
 }: DataItemCardProps) => {
   const loggedInUser = useAuthStore((state: AuthState) => state.user);
   const router = useRouter();
@@ -57,12 +59,35 @@ export const DataItemCard = ({
     );
 
   const isBuyView = cardCategory === 'BUY';
-  const finalButtonText =
-    buyButtonText ?? (isBuyView ? '판매하기' : '구매하기');
 
-  const buttonColorClass = isBuyView
-    ? 'bg-candy-pink hover:bg-gray-700 active:bg-gray-800'
-    : 'bg-gray-900 hover:bg-red active:bg-red';
+  // sellStatus에 따른 버튼 텍스트와 클릭 가능 여부 결정
+  const getButtonConfig = () => {
+    switch (sellStatus) {
+      case 'SELLING':
+        return {
+          text: buyButtonText ?? (isBuyView ? '판매하기' : '구매하기'),
+          clickable: true,
+          className: isBuyView
+            ? 'bg-candy-pink hover:bg-gray-700 active:bg-gray-800'
+            : 'bg-gray-900 hover:bg-red active:bg-red',
+        };
+      case 'SOLD_OUT':
+        return {
+          text: '거래 완료',
+          clickable: false,
+          className: 'bg-gray-400 cursor-not-allowed',
+        };
+      default:
+        return {
+          text: '거래중',
+          clickable: false,
+          className: 'bg-gray-400 cursor-not-allowed',
+        };
+    }
+  };
+
+  const buttonConfig = getButtonConfig();
+
   return (
     <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md max-w-[150px] max-h-[203px] md:max-w-[238px] md:max-h-[348px] flex flex-col p-3">
       {isNew && (
@@ -100,6 +125,11 @@ export const DataItemCard = ({
         {!isMyPost ? (
           <Button
             onClick={() => {
+              // 클릭 불가능한 상태면 클릭 이벤트 무시
+              if (!buttonConfig.clickable) {
+                return;
+              }
+
               // 로그인 상태 확인
               if (!loggedInUser) {
                 alert('로그인 해주세요.');
@@ -108,10 +138,11 @@ export const DataItemCard = ({
               }
               onClickBuy({ email, createdAt });
             }}
-            className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonColorClass} transition text-regular-md border rounded-lg flex items-center justify-center`}
+            className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
             style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+            disabled={!buttonConfig.clickable}
           >
-            {finalButtonText}
+            {buttonConfig.text}
           </Button>
         ) : (
           <div className="w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md" />

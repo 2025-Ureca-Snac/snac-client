@@ -3,7 +3,7 @@ import { create } from 'zustand';
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL' | null;
 export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--';
 export type SortBy = 'LATEST' | 'RATING';
-type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT' | null;
+type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT' | null;
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 type CardCategory = 'SELL' | 'BUY';
 

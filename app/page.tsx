@@ -69,7 +69,7 @@ export default function Home() {
 
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,
-          sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
+          sellStatusFilter: 'ALL' as SellStatus,
           priceRanges: [priceRange || 'ALL'],
           highRatingFirst,
           size: 54,
@@ -90,11 +90,23 @@ export default function Home() {
         }
 
         const json: CardApiResponse = await res.json();
-        // sellStatus가 'TRADING'인 항목만 필터링
-        const sellingCards = json.data.cardResponseList.filter(
-          (card: { sellStatus: string }) => card.sellStatus === 'SELLING'
+
+        // transactionStatus에 따라 카드 필터링
+        let filteredCards = json.data.cardResponseList;
+
+        // CANCELLED 상태의 카드 제외
+        filteredCards = filteredCards.filter(
+          (card: { sellStatus: string }) => card.sellStatus !== 'CANCELLED'
         );
-        setCards(sellingCards);
+
+        if (transactionStatus && transactionStatus !== 'ALL') {
+          filteredCards = filteredCards.filter(
+            (card: { sellStatus: string }) =>
+              card.sellStatus === transactionStatus
+          );
+        }
+
+        setCards(filteredCards);
         console.log('응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {

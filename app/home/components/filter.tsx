@@ -21,6 +21,7 @@ const FILTER_OPTIONS = {
   transactionStatus: [
     { value: 'ALL', label: '모든 거래' },
     { value: 'SELLING', label: '거래 전' },
+    { value: 'TRADING', label: '거래 중' },
     { value: 'SOLD_OUT', label: '거래 완료' },
   ],
   priceRange: [
@@ -46,8 +47,8 @@ export const Filter = () => {
   return (
     <>
       {/* PC 사이드바 */}
-      <div className="hidden md:block md:w-72 lg:w-80 md:flex-shrink-0">
-        <div className="flex flex-col max-h-[85vh] md:w-[288px] md:h-[729px] bg-white md:max-h-full md:rounded-2xl shadow-light">
+      <div className="hidden md:block md:w-72 md:flex-shrink-0 mr-8">
+        <div className="flex flex-col max-h-[85vh] md:w-[288px] md:h-[800px] bg-white md:max-h-full md:rounded-2xl shadow-light">
           <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
             <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
               <Image
