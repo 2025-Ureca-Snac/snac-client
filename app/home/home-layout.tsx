@@ -44,7 +44,7 @@ export default function HomeLayout({
     }
   };
   return (
-    <div className="flex w-full flex-col md:flex-row p-6">
+    <div className="flex w-full min-h-dvh flex-col md:flex-row p-6">
       <Filter />
       <Modal />
 
