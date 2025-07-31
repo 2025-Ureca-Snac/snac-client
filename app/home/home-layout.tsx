@@ -106,7 +106,7 @@ export default function HomeLayout({
             <div className="flex items-center gap-4">
               <Sort />
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => actions.triggerRefetch()}
                 aria-label="새로고침"
               >
                 <Image
