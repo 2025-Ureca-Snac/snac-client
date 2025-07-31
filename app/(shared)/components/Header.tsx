@@ -1,19 +1,20 @@
 'use client';
 
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { AuthState } from '@/app/(shared)/types/auth-store';
 import React, { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MenuLink } from './MenuLink';
 
 export const Header: FC = () => {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state: AuthState) => state.user);
   const isLoggedIn: boolean = !!user;
 
   return (
     <header className="w-full bg-white h-[57px] md:h-[67px] px-6 flex justify-between items-center md:pl-[160px] md:pr-[51px]">
       <Link href="/">
-        <Image src="/logo_mobile.svg" alt="스낵 로고" width={68} height={25} />
+        <Image src="/logo_mobile.svg" alt="스낵 로고" width={100} height={25} />
       </Link>
 
       <div className="flex gap-4 items-center">

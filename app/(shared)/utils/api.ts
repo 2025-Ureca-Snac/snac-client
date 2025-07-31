@@ -50,14 +50,31 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     const code = error.response?.data?.code;
+    const status = error.response?.status;
+    const url = originalRequest.url;
 
     // 401 에러이고 아직 재시도하지 않은 요청인 경우
-    if (code === 'TOKEN_EXPIRED_401' && !originalRequest._retry) {
+    if (
+      status === 401 &&
+      code === 'TOKEN_EXPIRED_401' &&
+      !originalRequest._retry
+    ) {
+      // /reissue 요청 자체가 실패한 경우는 재시도하지 않음(리이슈가 실패했다는 건 리프래시 토큰도 만료 또는 없다는 의미 즉 로그아웃 처리)
+      if (url?.includes('/reissue')) {
+        // /reissue 실패 시 상태만 초기화
+        useAuthStore.getState().resetAuthState();
+
+        // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       try {
-        console.log('401 에러 감지, 토큰 갱신 시도');
-
         // 토큰 갱신 시도
         const { checkAndRefreshToken } = useAuthStore.getState();
         const isRefreshed = await checkAndRefreshToken();
@@ -69,11 +86,9 @@ api.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
           }
 
-          console.log('토큰 갱신 성공, 원래 요청 재시도');
           return api(originalRequest);
         } else {
           // 토큰 갱신 실패 시 로그아웃 처리
-          console.log('토큰 갱신 실패, 로그아웃 처리');
           const { logout } = useAuthStore.getState();
           await logout();
 
@@ -84,9 +99,7 @@ api.interceptors.response.use(
 
           return Promise.reject(error);
         }
-      } catch (refreshError) {
-        console.error('토큰 갱신 중 오류:', refreshError);
-
+      } catch {
         // 토큰 갱신 중 오류 발생 시 로그아웃 처리
         const { logout } = useAuthStore.getState();
         await logout();

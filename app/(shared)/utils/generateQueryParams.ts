@@ -1,11 +1,5 @@
 export type CardCategory = 'BUY' | 'SELL';
-export type PriceRange =
-  | 'ALL'
-  | 'P0_999'
-  | 'P1000_1499'
-  | 'P1500_1999'
-  | 'P2000_2499'
-  | 'P2500_PLUS';
+export type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 export type SellStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
 export type Carrier = 'SKT' | 'KT' | 'LG';
 

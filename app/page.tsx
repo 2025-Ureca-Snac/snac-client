@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
+import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
 import { Header } from './(shared)/components/Header';
 import Banner from './home/banner';
 import { DataAvg } from './home/data-avgs';
@@ -9,30 +10,17 @@ import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
 import { Footer } from './(shared)/components/Footer';
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
+import type { CardData } from '@/app/(shared)/types/card';
 
 import type {
   CardCategory,
   SellStatus,
-  PriceRange,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
 
-interface Card {
-  id: number;
-  cardCategory: 'BUY' | 'SELL';
-  carrier: 'SKT' | 'KT' | 'LGU+';
-  dataAmount: number;
-  price: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  name: string;
-  sellStatus: string;
-}
-
 interface CardApiResponse {
   data: {
-    cardResponseList: Card[];
+    cardResponseList: CardData[];
     hasNext: boolean;
   };
 }
@@ -40,16 +28,19 @@ interface CardApiResponse {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
-  const [cards, setCards] = useState<Card[]>([]);
+  // WebSocket 가드 사용
+  useWebSocketGuard();
+
+  const [cards, setCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const {
-    category,
     cardCategory,
+    category,
     transactionStatus,
-    priceRanges,
+    priceRange,
     sortBy,
     carrier,
     actions,
@@ -60,7 +51,7 @@ export default function Home() {
     console.log('[디버깅] 필터 상태:', {
       category,
       transactionStatus,
-      priceRanges,
+      priceRange,
       sortBy,
       carrier,
     });
@@ -75,8 +66,7 @@ export default function Home() {
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,
           sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
-          priceRanges:
-            priceRanges.length === 0 ? ['ALL'] : (priceRanges as PriceRange[]),
+          priceRanges: [priceRange || 'ALL'],
           highRatingFirst,
           size: 54,
           carrier: carrierForQuery,
@@ -96,7 +86,11 @@ export default function Home() {
         }
 
         const json: CardApiResponse = await res.json();
-        setCards(json.data.cardResponseList);
+        // sellStatus가 'TRADING'인 항목만 필터링
+        const sellingCards = json.data.cardResponseList.filter(
+          (card: { sellStatus: string }) => card.sellStatus === 'SELLING'
+        );
+        setCards(sellingCards);
         console.log('응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {
@@ -131,17 +125,13 @@ export default function Home() {
       </button>
 
       <div className="flex items-center justify-center">
-        {loading ? (
-          <p>로딩 중…</p>
-        ) : (
-          <HomeLayout
-            cards={cards}
-            isLoading={loading}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
+        <HomeLayout
+          cards={cards}
+          isLoading={loading}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="w-full">

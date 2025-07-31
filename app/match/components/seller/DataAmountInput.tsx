@@ -91,14 +91,13 @@ export default function DataAmountInput({
               </button>
             ))}
           </div>
-
-          {/* 직접 입력 버튼 */}
+          {/* 직접 입력 버튼
           <button
             onClick={handleCustomInputToggle}
             className="w-full py-3 text-sm border border-dashed border-gray-400 text-gray-300 rounded-lg hover:border-white hover:text-white transition-all"
           >
             + 직접 입력하기
-          </button>
+          </button> */}
         </div>
       ) : (
         <div className="space-y-3">

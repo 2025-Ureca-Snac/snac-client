@@ -54,6 +54,7 @@ const config: Config = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class', // class 기반 다크 모드
   theme: {
     extend: {
       fontFamily: {
@@ -61,6 +62,39 @@ const config: Config = {
         sans: ['Noto Sans KR', 'sans-serif'],
       },
       colors: {
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
+        },
+        primary: {
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+        },
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
+        },
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
         'midnight-black': '#121212',
         'signal-brown': '#5C4531',
         'burst-lime': '#98FF58',
@@ -69,7 +103,18 @@ const config: Config = {
         'cloud-white': '#F3F3F3',
         'teal-green': '#38CB89',
         'surface-light': '#F3F5F7',
-        red: '#ED1B23',
+        red: {
+          100: '#FFE4E6',
+          200: '#FFB8BB',
+          300: '#FF8B90',
+          400: '#F85A60',
+          500: '#F3353D',
+          600: '#ED1B23',
+          700: '#C90D15',
+          800: '#A4060C',
+          900: '#8A0308',
+          DEFAULT: '#ED1B23',
+        },
         gray: {
           50: '#FAFAFA',
           100: '#F5F5F5',
@@ -101,6 +146,9 @@ const config: Config = {
       },
       borderRadius: {
         card: '24px',
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
     },
   },

@@ -58,9 +58,11 @@ function UserInfo({ user }: { user: User }) {
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
       <UserAvatar />
-      <span className="font-medium text-sm md:text-base">{user.name}</span>
+      <span className="text-midnight-black font-medium text-sm md:text-base">
+        {user.name}
+      </span>
       <span className="text-gray-500 text-sm md:text-base">|</span>
-      <span className="text-sm md:text-base">
+      <span className="text-midnight-black text-sm md:text-base">
         {user.carrier} | {formatData(user.data)} | {formatPrice(user.price)}
       </span>
     </div>

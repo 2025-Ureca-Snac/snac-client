@@ -1,7 +1,13 @@
 'use client';
 import { useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import {
+  getCarrierImageUrl,
+  formatCarrierName,
+} from '../../(shared)/utils/carrier-utils';
+import { Header } from '@/app/(shared)/components/Header';
+import { Footer } from '@/app/(shared)/components/Footer';
 
 // 결제 유형 상수
 const PAYMENT_TYPES = {
@@ -20,9 +26,10 @@ const PAYMENT_TYPES = {
  */
 function PaymentCompleteComponent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    const orderId = searchParams.get('orderId');
+    const cardId = searchParams.get('cardId');
     const amount = searchParams.get('amount');
     const pay = searchParams.get('pay');
     const snackMoneyUsed = parseInt(searchParams.get('snackMoneyUsed') || '0');
@@ -31,14 +38,14 @@ function PaymentCompleteComponent() {
     );
 
     console.log('결제 완료 페이지 파라미터:', {
-      orderId,
+      cardId,
       amount,
       pay,
       snackMoneyUsed,
       snackPointsUsed,
     });
 
-    if (orderId && amount) {
+    if (cardId && amount) {
       // 결제 완료 확인 API 호출
       const verifyPayment = async () => {
         try {
@@ -71,14 +78,17 @@ function PaymentCompleteComponent() {
     }
   }, [searchParams]);
 
-  const orderId = searchParams.get('orderId') || '#0123_45678';
+  const tradeId = searchParams.get('tradeId') || '#0123_45678';
   const amount = searchParams.get('amount') || '2,000';
   const pay = searchParams.get('pay') || 'sell';
+  const carrier = searchParams.get('carrier') || '';
+  const dataAmount = searchParams.get('dataAmount') || '';
   const currentDate = new Date();
   const formattedDate = `${currentDate.getFullYear()}년, ${currentDate.getMonth() + 1}월 ${currentDate.getDate()}일`;
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Title */}
@@ -123,12 +133,12 @@ function PaymentCompleteComponent() {
           {/* Success Message */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {pay === PAYMENT_TYPES.BUY
+              {pay === PAYMENT_TYPES.SELL
                 ? '구매 글이 등록되었습니다!'
                 : '구매요청이 전송되었습니다!'}
             </h2>
             <p className="text-gray-600 flex items-center justify-center">
-              {pay === PAYMENT_TYPES.BUY
+              {pay === PAYMENT_TYPES.SELL
                 ? '판매자가 구매요청을 보낼 때까지 기다려주세요.'
                 : '판매자가 빠른 시일 내에 데이터를 보내줄 예정입니다.'}
               <span className="ml-2 text-2xl">🎉</span>
@@ -138,8 +148,14 @@ function PaymentCompleteComponent() {
           {/* Product Icon */}
           <div className="flex justify-center mb-8">
             <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-              <div className="w-12 h-12 bg-blue-500 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-xl">T</span>
+              <div className="w-12 h-12 rounded flex items-center justify-center overflow-hidden">
+                <Image
+                  src={getCarrierImageUrl(carrier)}
+                  alt={formatCarrierName(carrier)}
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
           </div>
@@ -148,11 +164,19 @@ function PaymentCompleteComponent() {
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">주문 번호:</span>
-              <span className="font-medium text-gray-900">{orderId}</span>
+              <span className="font-medium text-gray-900">{tradeId}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">날짜:</span>
               <span className="font-medium text-gray-900">{formattedDate}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">통신사:</span>
+              <span className="font-medium text-gray-900">{carrier}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">데이터 용량:</span>
+              <span className="font-medium text-gray-900">{dataAmount}GB</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">결제 금액:</span>
@@ -175,12 +199,18 @@ function PaymentCompleteComponent() {
 
           {/* History Button */}
           <div className="text-center">
-            <button className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-              {pay === PAYMENT_TYPES.BUY ? '구매 내역' : '판매 내역'}
+            <button
+              onClick={() => {
+                router.push(`/mypage/purchase-history/${tradeId}`);
+              }}
+              className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            >
+              구매 내역
             </button>
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
