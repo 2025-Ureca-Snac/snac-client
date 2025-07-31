@@ -7,6 +7,9 @@ import Image from 'next/image';
 import { Button } from './Button';
 import { PriceUnit } from '@/app/(shared)/types';
 import { useRouter } from 'next/navigation';
+import { useHomeStore } from '@/app/(shared)/stores/home-store';
+import { api } from '@/app/(shared)/utils/api';
+import { toast } from 'sonner';
 
 interface DataItemCardProps {
   imageUrl: string;
@@ -22,6 +25,9 @@ interface DataItemCardProps {
   newBadgeText?: string;
   buyButtonText?: string;
   sellStatus: string;
+  cardId?: number;
+  carrier?: string;
+  dataAmount?: number;
 }
 
 export const DataItemCard = ({
@@ -38,8 +44,12 @@ export const DataItemCard = ({
   buyButtonText,
   onClickBuy,
   sellStatus,
+  cardId,
+  carrier,
+  dataAmount,
 }: DataItemCardProps) => {
   const loggedInUser = useAuthStore((state: AuthState) => state.user);
+  const { actions } = useHomeStore();
   const router = useRouter();
   const isMyPost = loggedInUser === email;
   const displayPrice =
@@ -96,8 +106,8 @@ export const DataItemCard = ({
         </span>
       )}
       {isMyPost && (
-        <span className="absolute top-3 right-3 z-10 bg-gray-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center ">
-          작성자
+        <span className="absolute top-3 right-3 z-10 bg-green-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center ">
+          MY
         </span>
       )}
       <div className="relative h-[64px] md:h-[125px] mt-[35px] md:mt-[80px]">
@@ -145,7 +155,49 @@ export const DataItemCard = ({
             {buttonConfig.text}
           </Button>
         ) : (
-          <div className="w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md" />
+          <div className="flex gap-2 w-full">
+            <Button
+              onClick={() => {
+                console.log(cardId);
+                // 수정하기 로직
+                if (cardId) {
+                  actions.openEditModal(cardId.toString(), {
+                    cardCategory: cardCategory as 'SELL' | 'BUY',
+                    carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
+                    dataAmount: dataAmount || 0,
+                    price: price,
+                  });
+                }
+              }}
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+              style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+            >
+              수정하기
+            </Button>
+            <Button
+              onClick={() => {
+                // 삭제하기 로직
+                if (confirm('정말 삭제하시겠습니까?')) {
+                  if (cardId) {
+                    api
+                      .delete(`/cards/${cardId}`)
+                      .then(() => {
+                        toast.success('게시글이 삭제되었습니다.');
+                        actions.triggerRefetch();
+                      })
+                      .catch((error) => {
+                        console.error('삭제 실패:', error);
+                        toast.error('삭제에 실패했습니다.');
+                      });
+                  }
+                }
+              }}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+              style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+            >
+              삭제하기
+            </Button>
+          </div>
         )}
       </div>
     </div>
