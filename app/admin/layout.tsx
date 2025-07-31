@@ -11,7 +11,7 @@ import { useAdminStore } from '../(shared)/stores/use-admin-store';
 import ManagerIcon from '@/public/manager.svg';
 import NewReportIcon from '@/public/newReport.svg';
 import PostIcon from '@/public/post.svg';
-import TotalUserIcon from '@/public/totalUser.svg';
+
 import Menu from '@/public/menu.svg';
 import DataBaseIcon from '@/public/database.svg';
 
