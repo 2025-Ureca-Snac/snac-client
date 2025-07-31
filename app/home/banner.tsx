@@ -1,21 +1,63 @@
+'use client';
+
 import Image from 'next/image';
 // import { Button } from '@/app/(shared)/components/Button';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { api } from '@/app/(shared)/utils/api';
 
 interface BannerProps {
   avgMinutes?: number;
   avgSeconds?: number;
 }
 
+interface TradeDurationResponse {
+  data: {
+    durationSeconds: number;
+  };
+  code: string;
+  status: string;
+  message: string;
+  timestamp: string;
+}
+
 const formatTime = (time: number) => time.toString().padStart(2, '0');
 
-const DEFAULT_AVG_MINUTES = 2;
-const DEFAULT_AVG_SECONDS = 12;
+const DEFAULT_AVG_MINUTES = 0;
+const DEFAULT_AVG_SECONDS = 0;
 
 export default function Banner({
   avgMinutes = DEFAULT_AVG_MINUTES,
   avgSeconds = DEFAULT_AVG_SECONDS,
 }: BannerProps) {
+  const [displayMinutes, setDisplayMinutes] = useState(avgMinutes);
+  const [displaySeconds, setDisplaySeconds] = useState(avgSeconds);
+
+  useEffect(() => {
+    const fetchTradeDuration = async () => {
+      try {
+        const response = await api.get('/trade-duration-statistics');
+        const data = response.data as TradeDurationResponse;
+        const totalSeconds = data.data.durationSeconds;
+        console.log(data);
+
+        // 초를 분과 초로 변환
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        setDisplayMinutes(minutes);
+        setDisplaySeconds(seconds);
+      } catch (error) {
+        console.error('거래 소요 시간 통계 조회 실패:', error);
+        // 에러 시 기본값 사용
+        setDisplayMinutes(avgMinutes);
+        setDisplaySeconds(avgSeconds);
+      }
+    };
+
+    fetchTradeDuration();
+  }, [avgMinutes, avgSeconds]);
+
   return (
     <section className="bg-black ">
       <div className="flex flex-col md:flex-row items-start">
@@ -48,27 +90,53 @@ export default function Banner({
             <p className="text-regular-md text-white pb-2">
               평균 거래 완료 시간
             </p>
-            <div
-              role="timer"
-              aria-label="평균 거래 완료 시간"
-              className="flex items-center space-x-2"
-            >
-              <div className="flex flex-col items-center">
-                <span className="bg-white text-midnight-black text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg">
-                  {formatTime(avgMinutes)}
+            {displayMinutes > 0 || displaySeconds > 0 ? (
+              <div
+                role="timer"
+                aria-label="평균 거래 완료 시간"
+                className="flex items-center space-x-2 p-4 rounded-xl  via-transparent to-burst-lime/5 relative overflow-hidden"
+              >
+                {/* 형광 효과 배경 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent  -translate-x-full animate-glow" />
+
+                <div className="flex flex-col items-center relative z-10">
+                  <span className="w-[70px] h-[64px] bg-white text-midnight-black text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
+                    {formatTime(displayMinutes)}
+                  </span>
+                  <span className="mt-1 text-regular-xs text-white">분</span>
+                </div>
+                <span className="text-white text-regular-3xl font-bold pb-5 relative z-10">
+                  :
                 </span>
-                <span className="mt-1 text-regular-xs text-white">분</span>
+                <div className="flex flex-col items-center relative z-10">
+                  <span className="bg-white w-[70px] h-[64px] text-midnight-black text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
+                    {formatTime(displaySeconds)}
+                  </span>
+                  <span className="mt-1 text-regular-xs text-white">초</span>
+                </div>
               </div>
-              <span className="text-white text-regular-3xl font-bold pb-5">
-                :
-              </span>
-              <div className="flex flex-col items-center">
-                <span className="bg-white text-midnight-black text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg">
-                  {formatTime(avgSeconds)}
+            ) : (
+              <div
+                role="timer"
+                aria-label="평균 거래 완료 시간"
+                className="flex items-center space-x-2 p-4 rounded-xl  via-transparent to-burst-lime/5 relative overflow-hidden"
+              >
+                {/* 형광 효과 배경 */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent  -translate-x-full animate-glow" />
+
+                <div className="flex flex-col items-center relative z-10">
+                  <span className="bg-white w-[70px] h-[64px]  text-midnight-black text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow"></span>
+                  <span className="mt-1 text-regular-xs text-white">분</span>
+                </div>
+                <span className="text-white text-regular-3xl font-bold pb-5 relative z-10">
+                  :
                 </span>
-                <span className="mt-1 text-regular-xs text-white">초</span>
+                <div className="flex flex-col items-center relative z-10">
+                  <span className="w-[70px] h-[64px] bg-white text-midnight-black text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow"></span>
+                  <span className="mt-1 text-regular-xs text-white">초</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="pt-6 flex justify-center">
