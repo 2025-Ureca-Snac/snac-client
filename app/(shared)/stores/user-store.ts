@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { UserProfile, UserState, ApiUserResponse } from '../types/user-store';
+import { ApiResponse } from '../types/api';
 import { api } from '../utils/api';
 
 export const useUserStore = create<UserState>()((set, get) => ({
@@ -13,12 +14,12 @@ export const useUserStore = create<UserState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await api.get('/mypage');
+      const response = await api.get<ApiResponse<ApiUserResponse>>('/mypage');
 
       console.log('사용자 정보 API 응답 데이터:', response);
 
       if (response.status === 200) {
-        const userData = (response.data as { data: ApiUserResponse }).data;
+        const userData = response.data.data;
         console.log('API 응답 데이터:', userData);
 
         const profile: UserProfile = {

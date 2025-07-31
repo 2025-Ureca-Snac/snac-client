@@ -3,18 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { api, handleApiError } from '../utils/api';
 import { ApiResponse } from '../types/api';
+import { MIN_SETTLEMENT_AMOUNT, DEFAULT_BANKS } from '../constants/settlement';
 import {
   SettlementModalProps,
   SettlementRequest,
+  Bank,
   BankAccount,
   BankAccountRequest,
-  Bank,
 } from '../types/settlement-modal';
 
 /**
  * @author 이승우
  * @description 스낵머니 정산 모달 컴포넌트 (계좌 등록/수정 기능 포함)
- * @params {@link TransferModalProps}: 정산 모달 컴포넌트 타입
+ * @params {@link SettlementModalProps}: 정산 모달 컴포넌트 타입
  */
 export default function SettlementModal({
   open,
@@ -39,8 +40,9 @@ export default function SettlementModal({
     accountHolder: '',
   });
 
-  // 은행 목록 (서버에서 가져올 예정)
-  const [banks] = useState<Bank[]>([]);
+  // 은행 목록 상태
+  const [banks, setBanks] = useState<Bank[]>([]);
+  const [isLoadingBanks, setIsLoadingBanks] = useState(false);
 
   // 모달이 열릴 때마다 초기화 및 계좌 목록 조회
   useEffect(() => {
@@ -52,15 +54,43 @@ export default function SettlementModal({
       setError(null);
       setIsAddingAccount(false);
       fetchAccounts();
+      fetchBanks();
     }
   }, [open]);
+
+  // 은행 목록 조회
+  const fetchBanks = async () => {
+    try {
+      setIsLoadingBanks(true);
+      console.log('은행 목록 조회 시작...');
+      const response = await api.get<ApiResponse<Bank[]>>('/banks');
+      const bankList = response.data.data;
+      console.log('은행 목록 조회 성공:', bankList);
+      setBanks(bankList);
+    } catch (err) {
+      console.error('은행 목록 조회 실패:', err);
+      // 에러가 발생하면 기본 은행 목록으로 설정
+      setBanks(DEFAULT_BANKS);
+    } finally {
+      setIsLoadingBanks(false);
+    }
+  };
 
   // 계좌 목록 조회
   const fetchAccounts = async () => {
     try {
+      console.log('계좌 목록 조회 시작...');
       const response = await api.get<ApiResponse<BankAccount[]>>('/accounts');
       const accountList = response.data.data;
+      console.log('계좌 목록 조회 성공:', accountList);
       setAccounts(accountList);
+
+      // 계좌가 없으면 바로 계좌 등록 화면으로
+      if (accountList.length === 0) {
+        console.log('계좌가 없음 - 계좌 등록 화면으로 자동 이동');
+        setIsAddingAccount(true);
+        return;
+      }
 
       // 기본 계좌가 있으면 선택
       const defaultAccount = accountList.find(
@@ -73,6 +103,11 @@ export default function SettlementModal({
       }
     } catch (err) {
       console.error('계좌 목록 조회 실패:', err);
+      // 에러가 발생해도 빈 배열로 설정하여 계좌가 없다고 인식하도록 함
+      setAccounts([]);
+      setSelectedAccountId('');
+      // 에러 발생 시에도 계좌 등록 화면으로 이동
+      setIsAddingAccount(true);
     }
   };
 
@@ -102,7 +137,7 @@ export default function SettlementModal({
   const handleAccountSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!accountForm.bankId) {
+    if (accountForm.bankId === 0) {
       setError('은행을 선택해주세요.');
       return;
     }
@@ -148,11 +183,8 @@ export default function SettlementModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 계좌가 없으면 등록 화면으로
-    if (accounts.length === 0) {
-      setIsAddingAccount(true);
-      return;
-    }
+    console.log('정산 버튼 클릭 - 현재 계좌 목록:', accounts);
+    console.log('계좌 개수:', accounts.length);
 
     // 계좌가 선택되지 않았으면
     if (!selectedAccountId) {
@@ -170,8 +202,10 @@ export default function SettlementModal({
       return;
     }
 
-    if (formData.amount < 1000) {
-      setError('최소 정산 금액은 1,000S입니다.');
+    if (formData.amount < MIN_SETTLEMENT_AMOUNT) {
+      setError(
+        `최소 정산 금액은 ${MIN_SETTLEMENT_AMOUNT.toLocaleString()}S입니다.`
+      );
       return;
     }
 
@@ -258,14 +292,21 @@ export default function SettlementModal({
                 은행 선택
               </label>
               <select
-                value={accountForm.bankId}
+                value={accountForm.bankId || ''}
                 onChange={(e) =>
-                  handleAccountInputChange('bankId', parseInt(e.target.value))
+                  handleAccountInputChange(
+                    'bankId',
+                    parseInt(e.target.value) || 0
+                  )
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={isLoading}
+                disabled={isLoading || isLoadingBanks}
               >
-                <option value="">은행을 선택하세요</option>
+                <option value="">
+                  {isLoadingBanks
+                    ? '은행 목록 로딩 중...'
+                    : '은행을 선택하세요'}
+                </option>
                 {banks.map((bank) => (
                   <option key={bank.id} value={bank.id}>
                     {bank.name}
@@ -362,8 +403,8 @@ export default function SettlementModal({
                   <option value="">계좌를 선택하세요</option>
                   {accounts.map((account) => (
                     <option key={account.id} value={account.id}>
-                      {account.bankName} - {account.accountNumber} (
-                      {account.accountHolder})
+                      {account.bankName} - {account.accountNumber}
+                      {account.accountHolder && ` (${account.accountHolder})`}
                       {account.isDefault ? ' (기본)' : ''}
                     </option>
                   ))}

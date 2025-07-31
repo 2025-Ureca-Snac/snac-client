@@ -86,7 +86,11 @@ export default function Home() {
         }
 
         const json: CardApiResponse = await res.json();
-        setCards(json.data.cardResponseList);
+        // sellStatus가 'TRADING'인 항목만 필터링
+        const sellingCards = json.data.cardResponseList.filter(
+          (card: { sellStatus: string }) => card.sellStatus === 'SELLING'
+        );
+        setCards(sellingCards);
         console.log('응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {

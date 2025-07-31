@@ -9,6 +9,7 @@ import PaymentMethods from '../(shared)/components/payment-methods';
 import PaymentSummary from '../(shared)/components/payment-summary';
 import PaymentButton from '../(shared)/components/payment-button';
 import api from '../(shared)/utils/api';
+import { ApiResponse } from '../(shared)/types/api';
 import {
   PAYMENT_METHODS,
   PAYMENT_TYPES,
@@ -48,7 +49,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const cardId = searchParams.get('id');
+    const cardId = searchParams.get('id') || searchParams.get('cardId');
     const pay = searchParams.get('pay');
 
     console.log('Payment Page Search Params:', {
@@ -61,12 +62,14 @@ export default function PaymentPage() {
     if (cardId) {
       const fetchCardStatus = async () => {
         try {
-          const response = await api.get(`/cards/${cardId}`);
+          const response = await api.get<ApiResponse<CardData>>(
+            `/cards/${cardId}`
+          );
           console.log('Card Status Response:', response.data);
 
           // 응답 데이터를 cardData 상태에 저장
-          if ((response.data as { data: CardData })?.data) {
-            setCardData((response.data as { data: CardData }).data);
+          if (response.data.data) {
+            setCardData(response.data.data);
           }
         } catch (error) {
           console.error('카드 상태 조회 실패:', error);
@@ -79,11 +82,12 @@ export default function PaymentPage() {
     // 지갑 정보 조회
     const fetchWalletData = async () => {
       try {
-        const response = await api.get('/wallets/summary');
+        const response =
+          await api.get<ApiResponse<{ money: number; point: number }>>(
+            '/wallets/summary'
+          );
         console.log('Wallet Summary Response:', response.data);
-        setWalletData(
-          (response.data as { data: { money: number; point: number } }).data
-        );
+        setWalletData(response.data.data);
       } catch (error) {
         console.error('지갑 정보 조회 실패:', error);
       }
@@ -121,14 +125,13 @@ export default function PaymentPage() {
       // pay 파라미터에 따라 API 엔드포인트 분기
       const searchParams = new URLSearchParams(window.location.search);
       const pay = searchParams.get('pay'); // 기본값은 'sell'
-      const cardId = searchParams.get('id');
+      const cardId = searchParams.get('id') || searchParams.get('cardId');
       const apiEndpoint =
         pay === PAYMENT_TYPES.SELL
           ? '/trades/buy'
           : pay === PAYMENT_TYPES.BUY
             ? '/trades/sell'
             : null;
-
       if (!apiEndpoint) {
         throw new Error('잘못된 요청 파라미터입니다.');
       }
@@ -140,9 +143,10 @@ export default function PaymentPage() {
       });
 
       const responseData = response.data as Record<string, unknown>;
+      const tradeId = (responseData.data as { tradeId: number }).tradeId;
       if (responseData.status === 'CREATED') {
         router.push(
-          `/payment/complete?pay=${pay}&cardId=${cardId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
+          `/payment/complete?pay=${pay}&tradeId=${tradeId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
         alert(`결제가 실패했습니다. 다시 시도해주세요.`);

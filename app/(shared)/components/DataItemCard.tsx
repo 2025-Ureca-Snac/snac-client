@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { AuthState } from '@/app/(shared)/types/auth-store';
 import React from 'react';
 import Image from 'next/image';
 import { Button } from './Button';
@@ -36,7 +37,7 @@ export const DataItemCard = ({
   buyButtonText,
   onClickBuy,
 }: DataItemCardProps) => {
-  const loggedInUser = useAuthStore((state) => state.user);
+  const loggedInUser = useAuthStore((state: AuthState) => state.user);
   const router = useRouter();
   const isMyPost = loggedInUser === email;
   const displayPrice =

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ModalPortal from './modal-portal';
 import { PriceUnit } from '../types';
+import { ApiResponse } from '../types/api';
 import { api } from '../utils/api';
 import { CardData } from '../types/card';
 
@@ -48,15 +49,14 @@ export default function TradeConfirmationModal({
       try {
         console.log('구매 거래 요청 시작:', modalItem);
         // 구매 거래 요청 생성
-        const response = await api.get(`/cards/${modalItem.id}`);
+        const response = await api.get<ApiResponse<{ sellStatus: string }>>(
+          `/cards/${modalItem.id}`
+        );
 
         console.log('구매 거래 요청 성공:', response.data);
 
         // sellStatus 확인
-        if (
-          (response.data as { data: { sellStatus: string } }).data
-            .sellStatus === 'SELLING'
-        ) {
+        if (response.data.data.sellStatus === 'SELLING') {
           const queryParams = new URLSearchParams({
             id: modalItem.id.toString(),
             pay: 'buy',
@@ -101,10 +101,43 @@ export default function TradeConfirmationModal({
     } else {
       const confirmed = window.confirm('판매하시겠습니까?');
       if (confirmed) {
-        console.log('판매 확정:', modalItem);
-        // TODO: 구매자 로직 추가
+        setError(null);
+        setIsLoading(true);
+
+        try {
+          console.log('판매 확정 요청 시작:', modalItem);
+          // 판매 확정 API 요청
+          const response = await api.post(`/trades/buy/accept`, {
+            cardId: modalItem.id,
+          });
+
+          console.log('판매 확정 응답:', response.data);
+
+          // 성공 시 판매 내역 페이지로 이동
+          const responseData = response.data as { data: { tradeId?: string } };
+          console.log('판매 확정 응답:', responseData);
+          if (responseData && responseData.data.tradeId) {
+            router.push(`/mypage/sales-history/${responseData.data.tradeId}`);
+            onClose();
+          } else {
+            setError('거래 ID를 받지 못했습니다.');
+          }
+        } catch (error) {
+          console.error('판매 확정 요청 실패:', error);
+
+          const errorMessage = (
+            error as { response?: { data: { message: string } } }
+          )?.response?.data.message;
+
+          setError(
+            errorMessage || '판매 확정에 실패했습니다. 다시 시도해주세요.'
+          );
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        onClose(); // 취소 시에만 모달 닫기
       }
-      onClose(); // 판매 로직에서는 모달 닫기
     }
   };
 
