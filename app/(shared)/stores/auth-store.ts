@@ -75,7 +75,7 @@ export const useAuthStore = create<AuthState>()(
           // Promise로 인증 완료 대기
           return new Promise<boolean>((resolve, reject) => {
             const handleAuthMessage = async (event: MessageEvent) => {
-              if (event.origin !== window.location.origin) return;
+              //if (event.origin !== window.location.origin) return;
 
               // 즉시 이벤트 리스너 제거 (중복 메시지 방지)
               window.removeEventListener('message', handleAuthMessage);
@@ -157,7 +157,7 @@ export const useAuthStore = create<AuthState>()(
           // Promise로 인증 완료 대기
           return new Promise<boolean>((resolve, reject) => {
             const handleAuthMessage = async (event: MessageEvent) => {
-              if (event.origin !== window.location.origin) return;
+              //if (event.origin !== window.location.origin) return;
 
               // 즉시 이벤트 리스너 제거 (중복 메시지 방지)
               window.removeEventListener('message', handleAuthMessage);
