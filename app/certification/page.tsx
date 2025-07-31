@@ -30,7 +30,7 @@ export default function Certification() {
                 authorization,
               },
             },
-            window.location.origin
+            '*' //window.location.origin
           );
           console.log('인증 데이터 전송 완료');
         } else {
@@ -48,7 +48,7 @@ export default function Certification() {
                 authorization: 'authorization 없음',
               },
             },
-            window.location.origin
+            '*' //window.location.origin
           );
         } else {
           // 부모 창이 없는 경우 (직접 접근) 처리

@@ -167,9 +167,7 @@ export const useAuthStore = create<AuthState>()(
 
                 try {
                   // 백엔드로 소셜 로그인 해제 요청
-                  const response = await api.delete(
-                    `/oauth2/authorization/unlink/${providerId}`
-                  );
+                  const response = await api.delete(`/unlink/${providerId}`);
                   console.log('소셜 로그인 해제 성공:', response);
                   resolve(true);
                 } catch (error) {
