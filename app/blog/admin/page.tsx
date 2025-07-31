@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Header } from '@/app/(shared)/components/Header';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
@@ -29,7 +30,8 @@ interface BlogPostForm {
 }
 
 export default function BlogAdminPage() {
-  const user = useAuthStore((state) => state.user); // ✅ 사용자 이름 가져오기
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
 
   const [formData, setFormData] = useState<BlogPostForm>({
     title: '',
@@ -64,7 +66,7 @@ export default function BlogAdminPage() {
       return;
     }
 
-    console.log('user:', user); // Keeping this console log for now, but if 'user' is never used for logic, consider removing it.
+    console.log('user:', user);
 
     const data = new FormData();
 
@@ -83,7 +85,7 @@ export default function BlogAdminPage() {
     data.append('featured', String(formData.featured));
     data.append('author', formData.author);
     data.append('content', formData.content);
-
+    console.log('첨부된 파일:', data.get('file'));
     try {
       await api.post('/articles', data, {
         headers: {
@@ -92,6 +94,11 @@ export default function BlogAdminPage() {
       });
 
       toast.success('블로그 포스트가 성공적으로 등록되었습니다!');
+
+      router.push('/admin/blog');
+
+      // 페이지가 이동되므로 아래 상태 초기화는 필수는 아니지만,
+      // 만약을 위해 그대로 두릅
       (e.target as HTMLFormElement).reset();
 
       setFormData({

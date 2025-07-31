@@ -1,111 +1,215 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
+import { api } from '@/app/(shared)/utils/api';
 
-interface Blog {
+export interface Blog {
   id: number;
   title: string;
-  author: string;
-  category: string;
-  date: string;
+  nickname: string;
+  contentFileUrl?: string;
+  imageUrl?: string;
+  articleUrl?: string;
 }
 
 interface BlogState {
   blogs: Blog[];
+  currentBlog: Blog | null;
   loading: boolean;
   error: string | null;
+  hasNext: boolean;
+  // relatedBlogs: Blog[];
+
+  // fetchRelated: (currentArticleId: number) => Promise<void>;
+
+  // 목록 조회
+  fetchAll: () => Promise<void>;
+  fetchMore: () => Promise<void>;
+
+  // 상세 조회
+  fetchOne: (articleId: number) => Promise<void>;
+
+  // 수정
+  updateBlog: (
+    articleId: number,
+    title: string,
+    file: File,
+    image: File
+  ) => Promise<void>;
+
+  // 삭제 모달 관련
   isDeleteModalOpen: boolean;
   selectedBlogId: number | null;
-  fetchBlogs: () => Promise<void>;
   openDeleteModal: (id: number) => void;
   closeDeleteModal: () => void;
   deleteBlog: () => Promise<void>;
 }
 
-const MOCK_BLOGS: Blog[] = [
-  {
-    id: 18,
-    title: '이메일 마케팅 ROI 향상 전략',
-    author: '이메일팀',
-    category: '이메일마케팅',
-    date: '2023-11-30',
-  },
-  {
-    id: 17,
-    title: 'SEO 최적화 완벽 가이드',
-    author: 'SEO팀',
-    category: 'SEO',
-    date: '2023-12-05',
-  },
-  {
-    id: 16,
-    title: '콘텐츠 마케팅 전략 수립',
-    author: '콘텐츠팀',
-    category: '콘텐츠마케팅',
-    date: '2023-12-10',
-  },
-];
-
 export const useBlogStore = create<BlogState>((set, get) => ({
+  // relatedBlogs: [],
   blogs: [],
-  loading: true,
+  currentBlog: null,
+  loading: false,
   error: null,
-  isDeleteModalOpen: false,
-  selectedBlogId: null,
+  hasNext: true,
 
-  fetchBlogs: async () => {
+  //  관련 api
+  // fetchRelated: async (currentArticleId) => {
+  //   try {
+  //     const res = await api.get<{
+  //       data: { articleResponseList: Blog[]; hasNext: boolean };
+  //     }>('/articles', { params: { size: 4 } });
+
+  //     const allFetchedBlogs = res.data.data.articleResponseList ?? [];
+
+  //     const related = allFetchedBlogs
+  //       .filter((blog) => blog.id !== currentArticleId)
+  //       .slice(0, 3);
+
+  //     set({ relatedBlogs: related });
+  //   } catch (err) {
+  //     console.error('관련 포스트 로드 실패:', err);
+  //     set({ relatedBlogs: [] });
+  //   }
+  // },
+
+  //  전체 조회
+  fetchAll: async () => {
     set({ loading: true, error: null });
     try {
-      // API 호출 및 지연 시뮬레이션
-      const blogs = await new Promise<Blog[]>((resolve, reject) => {
-        setTimeout(() => {
-          // 20% 확률로 에러 발생 시뮬레이션
-          if (Math.random() < 0.2) {
-            reject(new Error('서버에서 블로그 목록을 가져오지 못했습니다.'));
-          } else {
-            resolve(MOCK_BLOGS);
-          }
-        }, 500);
+      const res = await api.get<{
+        data: { articleResponseList: Blog[]; hasNext: boolean };
+      }>('/articles', { params: { size: 20 } });
+
+      const { articleResponseList, hasNext } = res.data.data;
+
+      set({
+        blogs: articleResponseList ?? [],
+        hasNext,
+        loading: false,
       });
-      set({ blogs, loading: false });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
-      set({ error: message, loading: false });
+      const msg = err instanceof Error ? err.message : '전체 목록 로드 실패';
+      set({ error: msg, loading: false });
+      toast.error(msg);
     }
   },
 
-  openDeleteModal: (id) => set({ isDeleteModalOpen: true, selectedBlogId: id }),
+  //  무한 스크롤
+  fetchMore: async () => {
+    const { blogs, hasNext, loading } = get();
+    if (!hasNext || loading) return;
 
+    set({ loading: true });
+    try {
+      const lastId = blogs.length > 0 ? blogs[blogs.length - 1].id : undefined;
+
+      const res = await api.get<{
+        data: { articleResponseList: Blog[]; hasNext: boolean };
+      }>('/articles', {
+        params: { lastArticleId: lastId, size: 9 },
+      });
+
+      const { articleResponseList, hasNext: newHasNext } = res.data.data;
+
+      set({
+        blogs: [...blogs, ...(articleResponseList ?? [])],
+        hasNext: newHasNext,
+        loading: false,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '추가 로드 실패';
+      set({ error: msg, loading: false });
+      toast.error(msg);
+    }
+  },
+
+  // 상세 조회
+  fetchOne: async (articleId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.get<{
+        data: {
+          id: number;
+          email: string;
+          name: string;
+          nickname: string;
+          articleUrl?: string;
+          imageUrl?: string;
+          title: string | null;
+        };
+      }>(`/articles/${articleId}`);
+
+      const raw = res.data.data;
+
+      const mappedBlog: Blog = {
+        id: raw.id,
+        title: raw.title ?? '(제목 없음)',
+        nickname: raw.nickname,
+        contentFileUrl: raw.articleUrl,
+        imageUrl: raw.imageUrl,
+        articleUrl: raw.articleUrl,
+      };
+
+      set({ currentBlog: mappedBlog, loading: false });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '상세 조회 실패';
+      set({ error: msg, loading: false });
+      toast.error(msg);
+    }
+  },
+
+  // 수정
+  updateBlog: async (articleId, title, file, image) => {
+    set({ loading: true, error: null });
+    try {
+      const form = new FormData();
+      form.append('title', title);
+      form.append('file', file);
+      form.append('image', image);
+
+      await api.put(`/articles/${articleId}`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      toast.success('게시글이 수정되었습니다.');
+
+      // 수정 후 목록 갱신
+      await get().fetchAll();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '수정 실패';
+      set({ error: msg, loading: false });
+      toast.error(msg);
+    }
+  },
+
+  // 삭제 모달 상태
+  isDeleteModalOpen: false,
+  selectedBlogId: null,
+  openDeleteModal: (id) => set({ isDeleteModalOpen: true, selectedBlogId: id }),
   closeDeleteModal: () =>
     set({ isDeleteModalOpen: false, selectedBlogId: null }),
 
+  // 삭제 기능
   deleteBlog: async () => {
-    const { selectedBlogId } = get();
+    const { selectedBlogId, blogs } = get();
     if (!selectedBlogId) return;
 
+    set({ loading: true });
     try {
-      // API 호출 시뮬레이션
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // 20% 확률로 에러 발생 시뮬레이션
-          if (Math.random() < 0.2) {
-            reject(new Error('서버 문제로 글을 삭제하지 못했습니다.'));
-          } else {
-            resolve(true);
-          }
-        }, 300);
-      });
+      await api.delete(`/articles/${selectedBlogId}`);
 
-      set((state) => ({
-        blogs: state.blogs.filter((blog) => blog.id !== selectedBlogId),
+      set({
+        blogs: blogs.filter((b) => b.id !== selectedBlogId),
         isDeleteModalOpen: false,
         selectedBlogId: null,
-      }));
-      toast.success('블로그 글이 성공적으로 삭제되었습니다.');
+        loading: false,
+      });
+
+      toast.success('게시글이 삭제되었습니다.');
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : '블로그 글 삭제에 실패했습니다.';
-      toast.error(message);
+      const msg = err instanceof Error ? err.message : '삭제 실패';
+      set({ error: msg, loading: false });
+      toast.error(msg);
     }
   },
 }));

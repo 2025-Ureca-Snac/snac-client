@@ -26,6 +26,8 @@ export default function MyPageLayout({
       router.push('/mypage');
     } else if (pathname === '/mypage') {
       router.back();
+    } else {
+      router.push('/mypage');
     }
   };
 
