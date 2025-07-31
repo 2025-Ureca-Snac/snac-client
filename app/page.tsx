@@ -106,6 +106,27 @@ export default function Home() {
           );
         }
 
+        // sortBy에 따라 카드 정렬
+        if (sortBy === 'RATING') {
+          // 인기순: 바삭스코어 높은 순, 같으면 등록순
+          filteredCards.sort((a, b) => {
+            if (a.ratingScore !== b.ratingScore) {
+              return b.ratingScore - a.ratingScore; // 높은 점수 먼저
+            }
+            // 점수가 같으면 등록순 (최신 등록 먼저)
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
+        } else {
+          // 최신순: 등록순 (최신 등록 먼저)
+          filteredCards.sort((a, b) => {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
+        }
+
         setCards(filteredCards);
         console.log('응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
