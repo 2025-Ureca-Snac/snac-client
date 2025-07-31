@@ -7,12 +7,13 @@ import Image from 'next/image';
 import FilterGroup from '@/app/(shared)/components/FilterGroup';
 import FilterButtons from '@/app/(shared)/components/FilterButtons';
 
-type Category = 'SKT' | 'KT' | 'LGU+';
+type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL';
 type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 
 const FILTER_OPTIONS = {
   category: [
+    { value: 'ALL', label: '모든 통신사' },
     { value: 'SKT', label: 'SKT' },
     { value: 'KT', label: 'KT' },
     { value: 'LGU+', label: 'LGU+' },
@@ -64,12 +65,8 @@ export const Filter = () => {
             <FilterGroup
               title="카테고리"
               options={FILTER_OPTIONS.category}
-              selectedValues={category ? [category] : []}
-              onValueChange={(value) =>
-                actions.setCategory(
-                  category === value ? null : (value as Category)
-                )
-              }
+              selectedValues={category ? [category] : ['ALL']}
+              onValueChange={(value) => actions.setCategory(value as Category)}
               variant="button"
             />
 
@@ -137,11 +134,9 @@ export const Filter = () => {
                     <FilterGroup
                       title="카테고리"
                       options={FILTER_OPTIONS.category}
-                      selectedValues={category ? [category] : []}
+                      selectedValues={category ? [category] : ['ALL']}
                       onValueChange={(value) =>
-                        actions.setCategory(
-                          category === value ? null : (value as Category)
-                        )
+                        actions.setCategory(value as Category)
                       }
                       variant="button"
                     />

@@ -61,7 +61,11 @@ export default function Home() {
       try {
         const highRatingFirst = sortBy === 'RATING';
         const carrierForQuery: Carrier | undefined =
-          category === 'LGU+' ? 'LG' : (category ?? undefined);
+          category === 'ALL'
+            ? undefined
+            : category === 'LGU+'
+              ? 'LG'
+              : (category ?? undefined);
 
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type Category = 'SKT' | 'KT' | 'LGU+' | null;
+type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL' | null;
 export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--';
 export type SortBy = 'LATEST' | 'RATING';
 type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT' | null;
@@ -39,7 +39,7 @@ export const homeInitialState = {
   isFilterOpen: false,
   isCreateModalOpen: false,
   refetchTrigger: 0,
-  category: null,
+  category: 'ALL' as Category,
   carrier: '--' as Carrier,
   sortBy: 'LATEST' as SortBy,
   transactionStatus: 'ALL' as TransactionStatus,
@@ -70,7 +70,7 @@ export const useHomeStore = create<HomeState>((set) => ({
     resetFilters: () =>
       set((state) => ({
         ...state,
-        category: homeInitialState.category,
+        category: 'ALL' as Category,
         transactionStatus: homeInitialState.transactionStatus,
         priceRange: homeInitialState.priceRange,
         showRegularsOnly: homeInitialState.showRegularsOnly,
