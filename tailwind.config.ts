@@ -61,6 +61,34 @@ const config: Config = {
         'noto-sans-kr': ['Noto Sans KR', 'sans-serif'],
         sans: ['Noto Sans KR', 'sans-serif'],
       },
+      animation: {
+        glow: 'glow 2s ease-in-out infinite',
+        'pulse-glow': 'pulse-glow 1.5s ease-in-out infinite',
+        blink: 'blink 3s ease-in-out infinite',
+        'blink-fast': 'blink 0.5s ease-in-out infinite',
+        'blink-slow': 'blink 2s ease-in-out infinite',
+      },
+      keyframes: {
+        glow: {
+          '0%, 100%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(100%)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': {
+            boxShadow:
+              '0 0 5px rgba(152,255,88,0.3), 0 0 10px rgba(152,255,88,0.2), 0 0 30px rgba(152,255,88,0.1)',
+          },
+          '50%': {
+            boxShadow:
+              '0 0 10px rgba(152,255,88,0.5), 0 0 20px rgba(152,255,88,0.3), 0 0 30px rgba(152,255,88,0.3)',
+          },
+        },
+        blink: {
+          '0%, 50%': { opacity: '1' },
+          '25%, 75%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
