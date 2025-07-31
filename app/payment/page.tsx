@@ -49,7 +49,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const cardId = searchParams.get('id');
+    const cardId = searchParams.get('id') || searchParams.get('cardId');
     const pay = searchParams.get('pay');
 
     console.log('Payment Page Search Params:', {
@@ -125,14 +125,13 @@ export default function PaymentPage() {
       // pay 파라미터에 따라 API 엔드포인트 분기
       const searchParams = new URLSearchParams(window.location.search);
       const pay = searchParams.get('pay'); // 기본값은 'sell'
-      const cardId = searchParams.get('id');
+      const cardId = searchParams.get('id') || searchParams.get('cardId');
       const apiEndpoint =
         pay === PAYMENT_TYPES.SELL
           ? '/trades/buy'
           : pay === PAYMENT_TYPES.BUY
             ? '/trades/sell'
             : null;
-
       if (!apiEndpoint) {
         throw new Error('잘못된 요청 파라미터입니다.');
       }
@@ -143,10 +142,11 @@ export default function PaymentPage() {
         point: snackPointsToUse,
       });
 
-      const responseData = response.data as ApiResponse<unknown>;
+      const responseData = response.data as Record<string, unknown>;
+      const tradeId = (responseData.data as { tradeId: number }).tradeId;
       if (responseData.status === 'CREATED') {
         router.push(
-          `/payment/complete?pay=${pay}&cardId=${cardId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
+          `/payment/complete?pay=${pay}&tradeId=${tradeId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
         alert(`결제가 실패했습니다. 다시 시도해주세요.`);
