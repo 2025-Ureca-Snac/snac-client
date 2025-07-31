@@ -12,6 +12,20 @@ import { getCarrierImageUrl } from '../utils/carrier-utils';
 import ProgressStepsDetail from './progress-steps-detail';
 import { getProgressSteps } from '../utils/progress-steps-utils';
 
+// 취소 사유를 한글로 변환하는 함수
+const getCancelReasonText = (reason: string): string => {
+  const reasonMap: Record<string, string> = {
+    BUYER_CHANGE_MIND: '구매자 단순 변심',
+    BUYER_LIMIT_EXCEEDED: '구매자 기다리다가 포기',
+    SELLER_CHANGE_MIND: '판매자 단순 변심',
+    SELLER_LIMIT_EXCEEDED: '판매자 기다리다가 포기',
+    BUYER_FORCED_TERMINATION: '구매자 강제 종료',
+    SELLER_FORCED_TERMINATION: '판매자 강제 종료',
+  };
+
+  return reasonMap[reason] || reason || '없음';
+};
+
 /**
  * @author 이승우
  * @description 거래 내역 상세 모달 컴포넌트{@link HistoryDetailModalProps(open, onClose, item, type)}
@@ -214,6 +228,10 @@ export default function HistoryDetailModal({
             </div>
             <div className="text-sm text-gray-600">
               거래금액: {item.price.toLocaleString()}원
+            </div>
+            <div className="text-sm text-gray-600">
+              취소 사유:{' '}
+              {getCancelReasonText(item.cancelReason || 'NOT_SELECTED')}
             </div>
           </div>
 
