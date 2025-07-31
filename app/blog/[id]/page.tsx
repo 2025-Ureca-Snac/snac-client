@@ -1,19 +1,39 @@
-import { BLOG_POSTS } from '../data/blogPosts';
+import { notFound } from 'next/navigation';
 import BlogPostPageClient from './BlogPostPageClient';
 import BlogStructuredData from '../components/BlogStructuredData';
 import { generateBlogPostMetadata } from '../metadata';
+import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
-interface BlogPostPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+// 데이터를 가져오는 통합 함수
+async function getPost(id: string): Promise<Blog | null> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/articles/${id}`,
+      { cache: 'no-store' }
+    );
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const responseJson = await res.json();
+    return responseJson.data;
+  } catch (error) {
+    console.error('Failed to fetch post:', error);
+    return null;
+  }
 }
 
-// 동적 메타데이터 생성
+// Props 인터페이스
+interface BlogPostPageProps {
+  params: { id: string };
+}
+
+// 동적 메타데이터 (SEO)
 export async function generateMetadata({ params }: BlogPostPageProps) {
+  // params를 await로 비동기적으로 처리하여 id를 추출
   const { id } = await params;
-  const postId = parseInt(id);
-  const post = BLOG_POSTS.find((p) => p.id === postId);
+  const post = await getPost(id);
 
   if (!post) {
     return {
@@ -25,14 +45,20 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
   return generateBlogPostMetadata(post);
 }
 
+// 메인 페이지 컴포넌트
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  // 2. ㄴ동일하게 params를 await로 처리
   const { id } = await params;
-  const post = BLOG_POSTS.find((p) => p.id === parseInt(id));
+  const post = await getPost(id);
+
+  if (!post) {
+    notFound();
+  }
 
   return (
     <>
-      {post && <BlogStructuredData post={post} />}
-      <BlogPostPageClient params={params} />
+      <BlogStructuredData post={post} />
+      <BlogPostPageClient id={id} />
     </>
   );
 }
