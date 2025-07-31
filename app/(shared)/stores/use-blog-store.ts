@@ -1,4 +1,3 @@
-// app/admin/blog/store.ts
 import { create } from 'zustand';
 import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
@@ -18,6 +17,9 @@ interface BlogState {
   loading: boolean;
   error: string | null;
   hasNext: boolean;
+  // relatedBlogs: Blog[];
+
+  // fetchRelated: (currentArticleId: number) => Promise<void>;
 
   // 목록 조회
   fetchAll: () => Promise<void>;
@@ -43,11 +45,32 @@ interface BlogState {
 }
 
 export const useBlogStore = create<BlogState>((set, get) => ({
+  // relatedBlogs: [],
   blogs: [],
   currentBlog: null,
   loading: false,
   error: null,
   hasNext: true,
+
+  //  관련 api
+  // fetchRelated: async (currentArticleId) => {
+  //   try {
+  //     const res = await api.get<{
+  //       data: { articleResponseList: Blog[]; hasNext: boolean };
+  //     }>('/articles', { params: { size: 4 } });
+
+  //     const allFetchedBlogs = res.data.data.articleResponseList ?? [];
+
+  //     const related = allFetchedBlogs
+  //       .filter((blog) => blog.id !== currentArticleId)
+  //       .slice(0, 3);
+
+  //     set({ relatedBlogs: related });
+  //   } catch (err) {
+  //     console.error('관련 포스트 로드 실패:', err);
+  //     set({ relatedBlogs: [] });
+  //   }
+  // },
 
   //  전체 조회
   fetchAll: async () => {
@@ -152,7 +175,6 @@ export const useBlogStore = create<BlogState>((set, get) => ({
 
       // 수정 후 목록 갱신
       await get().fetchAll();
-      set({ loading: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '수정 실패';
       set({ error: msg, loading: false });
