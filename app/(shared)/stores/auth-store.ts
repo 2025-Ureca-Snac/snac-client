@@ -6,7 +6,7 @@ import { AuthState, JwtPayload } from '../types/auth-store';
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // 초기 상태
       user: null,
       token: null,
@@ -49,21 +49,14 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      // 공통 소셜 인증 함수
-      performSocialAuth: async (
-        providerId: string,
-        onAuthSuccess: (authorization: string) => Promise<boolean>,
-        isUnlink: boolean = false
-      ) => {
+      // 소셜 로그인 연동 액션
+      linkSocialAccount: async (providerId: string) => {
         try {
           set({ isLoading: true });
 
           // 백엔드 인증 페이지를 팝업으로 열기
           const currentToken = useAuthStore.getState().token;
-          const socialApiUrl = process.env.NEXT_PUBLIC_SOCIAL_API_URL;
-          const authUrl = isUnlink
-            ? `${socialApiUrl}/oauth2/authorization/${providerId}`
-            : `${socialApiUrl}/oauth2/authorization/${providerId}${currentToken ? `?state=${currentToken}` : ''}`;
+          const authUrl = `${process.env.NEXT_PUBLIC_SOCIAL_API_URL}/oauth2/authorization/${providerId}${currentToken ? `?state=${currentToken}` : ''}`;
           const width = 500;
           const height = 600;
           const left = window.screenX + (window.outerWidth - width) / 2;
@@ -81,31 +74,44 @@ export const useAuthStore = create<AuthState>()(
 
           // Promise로 인증 완료 대기
           return new Promise<boolean>((resolve, reject) => {
-            // 팝업 창 상태 확인을 위한 인터벌 추가
-            const checkWindowClosed = setInterval(() => {
-              if (authWindow.closed) {
-                clearInterval(checkWindowClosed);
-                reject(new Error('팝업 창이 닫혔습니다.'));
-              }
-            }, 1000);
-
             const handleAuthMessage = async (event: MessageEvent) => {
-              if (event.origin !== window.location.origin) {
-                return;
-              }
+              if (event.origin !== window.location.origin) return;
 
               if (event.data.type === 'AUTH_SUCCESS') {
                 console.log('소셜 로그인 인증 성공:', event.data.data);
 
                 try {
-                  // 콜백 함수로 인증 성공 후 처리
-                  const result = await onAuthSuccess(
-                    event.data.data.authorization
+                  // 백엔드로 소셜 로그인 연동 요청
+                  const response = await api.post(
+                    '/social-login',
+                    { providerId },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${event.data.data.authorization}`,
+                      },
+                    }
                   );
-                  resolve(result);
+
+                  const token = response.headers
+                    .get('Authorization')
+                    ?.split(' ')[1];
+                  if (token) {
+                    const decoded: JwtPayload = jwtDecode(token);
+                    set({
+                      user: decoded?.username,
+                      role: decoded?.role,
+                      token: token,
+                      tokenExp: decoded?.exp, // 토큰 만료 시간 저장
+                    });
+                    console.log('소셜 로그인 성공:', response);
+                    resolve(true);
+                  } else {
+                    useAuthStore.getState().resetAuthState();
+                    reject(new Error('소셜 로그인에 실패했습니다.'));
+                  }
                 } catch (error) {
-                  console.error('소셜 인증 후 처리 실패:', error);
-                  reject(error);
+                  console.error('소셜 로그인 실패:', error);
+                  reject(new Error('소셜 로그인에 실패했습니다.'));
                 }
 
                 // 이벤트 리스너 제거
@@ -120,28 +126,6 @@ export const useAuthStore = create<AuthState>()(
             };
 
             window.addEventListener('message', handleAuthMessage);
-
-            // 타임아웃 설정 (30초)
-            const timeout = setTimeout(() => {
-              window.removeEventListener('message', handleAuthMessage);
-              reject(new Error('소셜 로그인 시간이 초과되었습니다.'));
-            }, 30000);
-
-            // Promise 완료 시 타임아웃 제거
-            const originalResolve = resolve;
-            const originalReject = reject;
-
-            resolve = (value: boolean | PromiseLike<boolean>) => {
-              clearTimeout(timeout);
-              clearInterval(checkWindowClosed);
-              originalResolve(value);
-            };
-
-            reject = (reason: unknown) => {
-              clearTimeout(timeout);
-              clearInterval(checkWindowClosed);
-              originalReject(reason);
-            };
           });
         } catch (error) {
           console.error('소셜 인증 중 오류:', error);
@@ -151,82 +135,65 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      // 소셜 로그인 연동 액션
-      linkSocialAccount: async (providerId: string) => {
-        return get().performSocialAuth(
-          providerId,
-          async (authorization: string) => {
-            try {
-              // 백엔드로 소셜 로그인 연동 요청
-              const response = await api.post(
-                '/social-login',
-                { providerId },
-                {
-                  headers: {
-                    Authorization: `Bearer ${authorization}`,
-                  },
-                }
-              );
-
-              const token = response.headers
-                .get('Authorization')
-                ?.split(' ')[1];
-              if (token) {
-                const decoded: JwtPayload = jwtDecode(token);
-                set({
-                  user: decoded?.username,
-                  role: decoded?.role,
-                  token: token,
-                  tokenExp: decoded?.exp, // 토큰 만료 시간 저장
-                });
-                console.log('소셜 로그인 성공:', response);
-                return true;
-              } else {
-                useAuthStore.getState().resetAuthState();
-                throw new Error('소셜 로그인에 실패했습니다.');
-              }
-            } catch (error) {
-              console.error('소셜 로그인 실패:', error);
-              throw new Error('소셜 로그인에 실패했습니다.');
-            }
-          }
-        );
-      },
-
       // 소셜 로그인 해제 액션
       unlinkSocialAccount: async (providerId: string) => {
-        const currentToken = get().token;
+        try {
+          set({ isLoading: true });
 
-        if (!currentToken) {
-          throw new Error('로그인이 필요합니다. 먼저 로그인해주세요.');
-        }
+          // 백엔드 인증 페이지를 팝업으로 열기
+          const authUrl = `${process.env.NEXT_PUBLIC_SOCIAL_API_URL}/oauth2/authorization/${providerId}`;
+          const width = 500;
+          const height = 600;
+          const left = window.screenX + (window.outerWidth - width) / 2;
+          const top = window.screenY + (window.outerHeight - height) / 2;
 
-        return get().performSocialAuth(
-          providerId,
-          async (authorization: string) => {
-            try {
-              console.log('소셜 로그인 해제 요청:', authorization);
-              console.log('providerId: ', providerId);
-              // 백엔드로 소셜 로그인 해제 요청
-              const response = await api.post(
-                `/unlink/${providerId}`,
-                {},
-                {
-                  headers: {
-                    Authorization: `Bearer ${currentToken}`,
-                  },
+          const authWindow = window.open(
+            authUrl,
+            'socialAuth',
+            `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+          );
+
+          if (!authWindow) {
+            throw new Error('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+          }
+
+          // Promise로 인증 완료 대기
+          return new Promise<boolean>((resolve, reject) => {
+            const handleAuthMessage = async (event: MessageEvent) => {
+              if (event.origin !== window.location.origin) return;
+
+              if (event.data.type === 'AUTH_SUCCESS') {
+                console.log('소셜 로그인 해제 인증 성공:', event.data.data);
+
+                try {
+                  // 백엔드로 소셜 로그인 해제 요청
+                  const response = await api.delete(`/unlink/${providerId}`);
+                  console.log('소셜 로그인 해제 성공:', response);
+                  resolve(true);
+                } catch (error) {
+                  console.error('소셜 로그인 해제 실패:', error);
+                  reject(new Error('소셜 로그인 해제에 실패했습니다.'));
                 }
-              );
 
-              console.log('소셜 로그인 해제 성공:', response);
-              return true;
-            } catch (error) {
-              console.error('소셜 로그인 해제 실패:', error);
-              throw new Error('소셜 로그인 해제에 실패했습니다.');
-            }
-          },
-          true // isUnlink: true
-        );
+                // 이벤트 리스너 제거
+                window.removeEventListener('message', handleAuthMessage);
+              } else if (event.data.type === 'AUTH_ERROR') {
+                console.log('소셜 로그인 해제 인증 실패:', event.data.data);
+                reject(new Error('소셜 로그인 해제 인증에 실패했습니다.'));
+
+                // 이벤트 리스너 제거
+                window.removeEventListener('message', handleAuthMessage);
+              }
+            };
+
+            window.addEventListener('message', handleAuthMessage);
+          });
+        } catch (error) {
+          console.error('소셜 해제 중 오류:', error);
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
       },
 
       // 로그아웃 액션

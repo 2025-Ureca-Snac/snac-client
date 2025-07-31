@@ -16,6 +16,7 @@ import VerificationStep from './components/VerificationStep';
 import WaitingPaymentStep from './components/WaitingPaymentStep';
 import ShowPhoneStep from './components/ShowPhoneStep';
 import UploadDataStep from './components/UploadDataStep';
+import TradeCancelModal from '@/app/(shared)/components/TradeCancelModal';
 
 type TradingStep =
   | 'confirmation'
@@ -410,7 +411,7 @@ export default function TradingPage() {
           </div>
         )}
       </main>
-
+      <TradeCancelModal />
       <Footer />
     </div>
   );

@@ -49,6 +49,9 @@ interface MatchState {
   timeLeft: number;
   transactionId: string | null;
 
+  // 판매자 카드 ID
+  currentCardId: number | null;
+
   // WebSocket 함수들
   sendPayment?: (tradeId: number, money: number, point: number) => boolean;
   sendTradeConfirm?: (tradeId: number) => boolean;
@@ -56,6 +59,7 @@ interface MatchState {
   // 액션
   setFilters: (filters: MatchFilters) => void;
   setUserRole: (role: 'buyer' | 'seller' | null) => void; // userRole 설정 액션 추가
+  setCurrentCardId: (cardId: number | null) => void; // currentCardId 설정 액션 추가
   startMatching: () => void;
   foundMatch: (partner: MatchPartner) => void;
   updatePartner: (updates: Partial<MatchPartner>) => void; // partner 업데이트 함수 추가
@@ -89,10 +93,12 @@ export const useMatchStore = create<MatchState>()(
       tradingStep: 'confirmation',
       timeLeft: 300, // 5분
       transactionId: null,
+      currentCardId: null,
 
       // 액션들
       setFilters: (filters) => set({ filters }),
       setUserRole: (role) => set({ userRole: role }),
+      setCurrentCardId: (cardId) => set({ currentCardId: cardId }),
 
       startMatching: () =>
         set({
@@ -150,6 +156,7 @@ export const useMatchStore = create<MatchState>()(
           tradingStep: 'confirmation',
           timeLeft: 300,
           transactionId: null,
+          currentCardId: null,
         }),
     }),
     {
