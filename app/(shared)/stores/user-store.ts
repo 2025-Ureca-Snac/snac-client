@@ -24,7 +24,7 @@ export const useUserStore = create<UserState>()((set, get) => ({
 
         const profile: UserProfile = {
           name: userData.name,
-          nickname: userData.name, // 임시 : name을 nickname으로 사용 (API 응답 데이터 수정 필요)
+          nickname: userData.nickname,
           phone: userData.phone,
           birthDate: new Date(userData.birthDate),
           score: userData.score,

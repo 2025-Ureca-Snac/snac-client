@@ -38,6 +38,7 @@ export interface UserPreferences {
  */
 export interface ApiUserResponse {
   name: string;
+  nickname: string;
   phone: string;
   birthDate: string;
   score: number;

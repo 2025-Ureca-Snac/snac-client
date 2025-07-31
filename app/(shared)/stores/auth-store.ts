@@ -16,7 +16,12 @@ export const useAuthStore = create<AuthState>()(
 
       // 초기화 함수
       resetAuthState: () => {
-        set({ user: null, role: null, token: null, tokenExp: null });
+        set({
+          user: null,
+          role: null,
+          token: null,
+          tokenExp: null,
+        });
       },
 
       // 로그인 액션
