@@ -65,9 +65,7 @@ export function DataAvg() {
     return () => clearInterval(intervalId);
   }, [dataList]);
 
-  if (dataList.length === 0) return null;
-
-  const current = dataList[index];
+  const current = dataList[index] || FALLBACK_MAP.SKT;
 
   return (
     <div className="text-center h-[161px] md:h-[288px] py-[40px] md:py-[80px]">
