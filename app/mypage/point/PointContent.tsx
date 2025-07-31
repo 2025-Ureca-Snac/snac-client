@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import RechargeModal from '@/app/(shared)/components/recharge-modal';
-import TransferModal from '@/app/(shared)/components/transfer-modal';
+import SettlementModal from '@/app/(shared)/components/settlement-modal';
+import RefundModal from '@/app/(shared)/components/refund-modal';
 import {
   PointHistoryItem,
   AssetType,
@@ -38,7 +39,31 @@ export default function PointContent({
   const [pointsFilter, setPointsFilter] = useState<FilterType>('all');
   const [moneyFilter, setMoneyFilter] = useState<FilterType>('all');
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+  const [selectedRefundAmount, setSelectedRefundAmount] = useState<number>(0);
+  const [selectedRefundPaymentKey, setSelectedRefundPaymentKey] =
+    useState<string>('');
+
+  // URL 파라미터에서 모달 타입 확인
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const modalType = urlParams.get('modal');
+
+    if (modalType === 'settlement') {
+      setIsSettlementModalOpen(true);
+      // URL에서 모달 파라미터 제거
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('modal');
+      window.history.replaceState({}, '', newUrl.toString());
+    } else if (modalType === 'recharge') {
+      setIsRechargeModalOpen(true);
+      // URL에서 모달 파라미터 제거
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('modal');
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+  }, []);
 
   // 탭이 바뀔 때 필터 초기화
   React.useEffect(() => {
@@ -59,6 +84,15 @@ export default function PointContent({
     // 쉼표 제거 후 파싱
     const cleanAmount = signedAmount.replace(/,/g, '');
     return Math.abs(parseFloat(cleanAmount));
+  };
+
+  // balanceAfter를 안전하게 숫자로 변환하는 함수
+  const getBalanceAfterValue = (balanceAfter: string | number): number => {
+    if (typeof balanceAfter === 'number') {
+      return balanceAfter;
+    }
+    // 문자열인 경우 쉼표 제거 후 파싱
+    return parseFloat(balanceAfter.replace(/,/g, ''));
   };
 
   // 필터링된 거래 내역
@@ -203,7 +237,10 @@ export default function PointContent({
                             P
                           </span>
                           <span className="text-xs text-gray-400">
-                            잔액: {item.balanceAfter.toLocaleString()}P
+                            {getBalanceAfterValue(
+                              item.balanceAfter
+                            ).toLocaleString()}
+                            P
                           </span>
                         </div>
                       </div>
@@ -241,7 +278,7 @@ export default function PointContent({
           </div>
         ) : (
           <div>
-            {/* 충전/송금 버튼 */}
+            {/* 충전/정산 버튼 */}
             <div className="flex gap-3 mb-6">
               <button
                 onClick={() => setIsRechargeModalOpen(true)}
@@ -250,10 +287,10 @@ export default function PointContent({
                 충전
               </button>
               <button
-                onClick={() => setIsTransferModalOpen(true)}
+                onClick={() => setIsSettlementModalOpen(true)}
                 className="flex-1 bg-blue-500 text-white py-4 rounded-lg font-medium hover:bg-blue-600 transition-colors"
               >
-                송금
+                정산
               </button>
             </div>
 
@@ -286,13 +323,36 @@ export default function PointContent({
                             S
                           </span>
                           <span className="text-xs text-gray-400">
-                            잔액: {item.balanceAfter.toLocaleString()}S
+                            {getBalanceAfterValue(
+                              item.balanceAfter
+                            ).toLocaleString()}
+                            S
                           </span>
                         </div>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {item.createdAt}
-                      </span>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-sm text-gray-500">
+                          {item.createdAt}
+                        </span>
+                        {getTransactionType(item.signedAmount) === 'earned' && (
+                          <button
+                            onClick={() => {
+                              // 충전 내역인 경우에만 환불 버튼 표시
+                              const amount = getAmountValue(item.signedAmount);
+                              // paymentKey는 item에서 가져와야 합니다 (실제 필드명에 따라 조정 필요)
+                              const paymentKey =
+                                (item as { paymentKey?: string }).paymentKey ||
+                                item.id.toString();
+                              setSelectedRefundAmount(amount);
+                              setSelectedRefundPaymentKey(paymentKey);
+                              setIsRefundModalOpen(true);
+                            }}
+                            className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors"
+                          >
+                            환불
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
@@ -338,14 +398,33 @@ export default function PointContent({
         }}
       />
 
-      {/* 송금 모달 */}
-      <TransferModal
-        open={isTransferModalOpen}
-        onClose={() => setIsTransferModalOpen(false)}
+      {/* 정산 모달 */}
+      <SettlementModal
+        open={isSettlementModalOpen}
+        onClose={() => setIsSettlementModalOpen(false)}
         currentMoney={balance.money}
-        onTransferSuccess={(amount, recipientId) => {
-          console.log('송금 성공:', amount, recipientId);
-          setIsTransferModalOpen(false);
+        onSettlementSuccess={(amount, type) => {
+          console.log('정산 성공:', amount, type);
+          setIsSettlementModalOpen(false);
+          // 필요시 페이지 새로고침 또는 데이터 다시 로드
+        }}
+      />
+
+      {/* 환불 모달 */}
+      <RefundModal
+        open={isRefundModalOpen}
+        onClose={() => {
+          setIsRefundModalOpen(false);
+          setSelectedRefundAmount(0);
+          setSelectedRefundPaymentKey('');
+        }}
+        amount={selectedRefundAmount}
+        paymentKey={selectedRefundPaymentKey}
+        onRefundSuccess={(amount) => {
+          console.log('환불 성공:', amount);
+          setIsRefundModalOpen(false);
+          setSelectedRefundAmount(0);
+          setSelectedRefundPaymentKey('');
           // 필요시 페이지 새로고침 또는 데이터 다시 로드
         }}
       />

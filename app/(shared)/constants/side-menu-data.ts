@@ -33,7 +33,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: 'point',
-    label: '포인트',
+    label: '포인트 • 머니',
     path: '/mypage/point?type=POINT',
   },
 ];
