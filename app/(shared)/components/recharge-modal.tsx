@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { api, handleApiError } from '../utils/api';
+import { ApiResponse } from '../types/api';
 import { RechargeModalProps } from '../types/recharge-modal';
 
 /**
@@ -49,7 +50,7 @@ export default function RechargeModal({
 
             console.log('충전 성공 처리 완료:', response.data);
 
-            const responseData = response.data as Record<string, unknown>;
+            const responseData = response.data as ApiResponse<unknown>;
             if (responseData.status === 'OK') {
               console.log('결제가 성공적으로 완료되었습니다!');
 
@@ -124,18 +125,19 @@ export default function RechargeModal({
         });
 
         // API 응답에서 받은 값들 (안전하게 처리)
-        const responseData = response.data as Record<string, unknown>;
+        const responseData = response.data as ApiResponse<{
+          amount: number;
+          customerEmail: string;
+          customerName: string;
+          orderId: string;
+          orderName: string;
+        }>;
 
-        const amount = (responseData?.data as Record<string, unknown>)
-          ?.amount as number;
-        const customerEmail = (responseData?.data as Record<string, unknown>)
-          ?.customerEmail as string;
-        const customerName = (responseData?.data as Record<string, unknown>)
-          ?.customerName as string;
-        const serverOrderId = (responseData?.data as Record<string, unknown>)
-          ?.orderId as string;
-        const orderName = (responseData?.data as Record<string, unknown>)
-          ?.orderName as string;
+        const amount = responseData.data.amount;
+        const customerEmail = responseData.data.customerEmail;
+        const customerName = responseData.data.customerName;
+        const serverOrderId = responseData.data.orderId;
+        const orderName = responseData.data.orderName;
 
         // 필수 값들이 있는지 확인
         if (!amount || !serverOrderId) {
@@ -166,7 +168,7 @@ export default function RechargeModal({
           console.error('충전 준비 실패 정보 전송 실패:', apiError);
         }
 
-        alert(errorMessage);
+        alert('충전 준비 중 문제가 발생했습니다. 고객센터로 문의해주세요.');
       }
     }
   };

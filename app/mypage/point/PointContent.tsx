@@ -86,6 +86,15 @@ export default function PointContent({
     return Math.abs(parseFloat(cleanAmount));
   };
 
+  // balanceAfter를 안전하게 숫자로 변환하는 함수
+  const getBalanceAfterValue = (balanceAfter: string | number): number => {
+    if (typeof balanceAfter === 'number') {
+      return balanceAfter;
+    }
+    // 문자열인 경우 쉼표 제거 후 파싱
+    return parseFloat(balanceAfter.replace(/,/g, ''));
+  };
+
   // 필터링된 거래 내역
   const filteredPointsHistory = useMemo(() => {
     if (pointsFilter === 'all') return pointsHistory;
@@ -228,7 +237,10 @@ export default function PointContent({
                             P
                           </span>
                           <span className="text-xs text-gray-400">
-                            {item.balanceAfter.toLocaleString()}P
+                            {getBalanceAfterValue(
+                              item.balanceAfter
+                            ).toLocaleString()}
+                            P
                           </span>
                         </div>
                       </div>
@@ -311,7 +323,10 @@ export default function PointContent({
                             S
                           </span>
                           <span className="text-xs text-gray-400">
-                            {item.balanceAfter.toLocaleString()}S
+                            {getBalanceAfterValue(
+                              item.balanceAfter
+                            ).toLocaleString()}
+                            S
                           </span>
                         </div>
                       </div>

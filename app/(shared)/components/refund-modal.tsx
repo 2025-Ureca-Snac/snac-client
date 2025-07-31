@@ -1,7 +1,17 @@
 'use client';
 import React, { useState } from 'react';
 import { api } from '../utils/api';
+import { ApiResponse } from '../types/api';
 import { RefundModalProps, RefundRequest } from '../types/refund-modal';
+
+// 일반적인 환불 사유 목록
+const COMMON_REFUND_REASONS = [
+  '실수로 충전했습니다',
+  '서비스를 사용하지 않게 되었습니다',
+  '중복 충전되었습니다',
+  '결제 오류로 인한 환불',
+  '기타',
+] as const;
 
 /**
  * @author 이승우
@@ -17,15 +27,6 @@ export default function RefundModal({
   const [isLoading, setIsLoading] = useState(false);
   const [reason, setReason] = useState('');
   const [customReason, setCustomReason] = useState('');
-
-  // 일반적인 환불 사유 목록
-  const commonReasons = [
-    '실수로 충전했습니다',
-    '서비스를 사용하지 않게 되었습니다',
-    '중복 충전되었습니다',
-    '결제 오류로 인한 환불',
-    '기타',
-  ];
 
   const handleRefund = async () => {
     if (!reason.trim()) {
@@ -57,7 +58,7 @@ export default function RefundModal({
 
       console.log('환불 성공:', response.data);
 
-      const responseData = response.data as Record<string, unknown>;
+      const responseData = response.data as ApiResponse<unknown>;
       if (responseData.status === 'OK') {
         alert('환불이 성공적으로 처리되었습니다.');
 
@@ -120,7 +121,7 @@ export default function RefundModal({
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-3"
             >
               <option value="">환불 사유를 선택해주세요</option>
-              {commonReasons.map((commonReason) => (
+              {COMMON_REFUND_REASONS.map((commonReason) => (
                 <option key={commonReason} value={commonReason}>
                   {commonReason}
                 </option>

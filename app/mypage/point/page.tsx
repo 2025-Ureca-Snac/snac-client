@@ -26,6 +26,14 @@ const getHistory = async (assetType: AssetType, size: number = 20) => {
   return response.data.data;
 };
 
+// balanceAfter를 안전하게 숫자로 변환하는 유틸리티 함수
+const parseBalanceAfter = (balanceAfter: string | number): number => {
+  if (typeof balanceAfter === 'number') {
+    return balanceAfter;
+  }
+  return parseFloat(balanceAfter.replace(/,/g, ''));
+};
+
 function PointPageContent() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type') as AssetType;
@@ -70,10 +78,7 @@ function PointPageContent() {
       // 거래 내역에서 마지막 기록의 잔액으로 현재 잔액 업데이트
       if (newHistory.length > 0) {
         const lastRecord = newHistory[0]; // 가장 최근 기록 (인덱스 0)
-        const lastBalance =
-          typeof lastRecord.balanceAfter === 'string'
-            ? parseFloat((lastRecord.balanceAfter as string).replace(/,/g, ''))
-            : lastRecord.balanceAfter;
+        const lastBalance = parseBalanceAfter(lastRecord.balanceAfter);
 
         setBalance((prevBalance) => ({
           ...prevBalance,
@@ -137,10 +142,7 @@ function PointPageContent() {
       // 거래 내역에서 마지막 기록의 잔액으로 현재 잔액 업데이트
       if (newHistory.length > 0) {
         const lastRecord = newHistory[0]; // 가장 최근 기록 (인덱스 0)
-        const lastBalance =
-          typeof lastRecord.balanceAfter === 'string'
-            ? parseFloat((lastRecord.balanceAfter as string).replace(/,/g, ''))
-            : lastRecord.balanceAfter;
+        const lastBalance = parseBalanceAfter(lastRecord.balanceAfter);
 
         setBalance((prevBalance) => ({
           ...prevBalance,

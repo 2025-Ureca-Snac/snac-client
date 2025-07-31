@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, handleApiError } from '../utils/api';
+import { ApiResponse } from '../types/api';
 import {
   SettlementModalProps,
   SettlementRequest,
@@ -57,8 +58,8 @@ export default function SettlementModal({
   // 계좌 목록 조회
   const fetchAccounts = async () => {
     try {
-      const response = await api.get('/accounts');
-      const accountList = response.data as BankAccount[];
+      const response = await api.get<ApiResponse<BankAccount[]>>('/accounts');
+      const accountList = response.data.data;
       setAccounts(accountList);
 
       // 기본 계좌가 있으면 선택

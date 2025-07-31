@@ -12,7 +12,7 @@ export type AssetType = 'POINT' | 'MONEY';
  * @property {string} title 내역 제목
  * @property {string} category 내역 카테고리
  * @property {string} signedAmount 부호가 포함된 금액 (양수: 충전, 음수: 사용)
- * @property {number} balanceAfter 거래 후 잔액
+ * @property {string | number} balanceAfter 거래 후 잔액 (백엔드에서 문자열로 반환될 수 있음)
  * @property {string} createdAt 내역 날짜
  * @property {string | null} paymentKey 결제 키 (null일 수 있음)
  */
@@ -21,7 +21,7 @@ export interface PointHistoryItem {
   title: string;
   category: string;
   signedAmount: string;
-  balanceAfter: number;
+  balanceAfter: string | number;
   createdAt: string;
   paymentKey: string | null;
 }

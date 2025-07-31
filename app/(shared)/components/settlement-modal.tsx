@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { api, handleApiError } from '../utils/api';
+import { ApiResponse } from '../types/api';
+import { MIN_SETTLEMENT_AMOUNT, DEFAULT_BANKS } from '../constants/settlement';
 import {
   SettlementModalProps,
   SettlementRequest,
@@ -61,31 +63,14 @@ export default function SettlementModal({
     try {
       setIsLoadingBanks(true);
       console.log('은행 목록 조회 시작...');
-      const response = await api.get('/banks');
-      const bankList = (response.data as { data: Bank[] }).data;
+      const response = await api.get<ApiResponse<Bank[]>>('/banks');
+      const bankList = response.data.data;
       console.log('은행 목록 조회 성공:', bankList);
       setBanks(bankList);
     } catch (err) {
       console.error('은행 목록 조회 실패:', err);
       // 에러가 발생하면 기본 은행 목록으로 설정
-      setBanks([
-        { id: 1, name: '신한은행' },
-        { id: 2, name: 'KB국민은행' },
-        { id: 3, name: '우리은행' },
-        { id: 4, name: '하나은행' },
-        { id: 5, name: 'NH농협은행' },
-        { id: 6, name: '기업은행' },
-        { id: 7, name: 'SC제일은행' },
-        { id: 8, name: '케이뱅크' },
-        { id: 9, name: '카카오뱅크' },
-        { id: 10, name: '토스뱅크' },
-        { id: 11, name: '새마을금고' },
-        { id: 12, name: '신협' },
-        { id: 13, name: '우체국' },
-        { id: 14, name: '수협은행' },
-        { id: 15, name: '대구은행' },
-        { id: 16, name: '부산은행' },
-      ]);
+      setBanks(DEFAULT_BANKS);
     } finally {
       setIsLoadingBanks(false);
     }
@@ -95,8 +80,8 @@ export default function SettlementModal({
   const fetchAccounts = async () => {
     try {
       console.log('계좌 목록 조회 시작...');
-      const response = await api.get('/accounts');
-      const accountList = (response.data as { data: BankAccount[] }).data;
+      const response = await api.get<ApiResponse<BankAccount[]>>('/accounts');
+      const accountList = response.data.data;
       console.log('계좌 목록 조회 성공:', accountList);
       setAccounts(accountList);
 
@@ -217,8 +202,10 @@ export default function SettlementModal({
       return;
     }
 
-    if (formData.amount < 1000) {
-      setError('최소 정산 금액은 1,000S입니다.');
+    if (formData.amount < MIN_SETTLEMENT_AMOUNT) {
+      setError(
+        `최소 정산 금액은 ${MIN_SETTLEMENT_AMOUNT.toLocaleString()}S입니다.`
+      );
       return;
     }
 
