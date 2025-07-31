@@ -5,9 +5,16 @@ import { useEffect, useState } from 'react';
 export default function Certification() {
   const [countdown, setCountdown] = useState(5);
   const [isProcessing, setIsProcessing] = useState(true);
+  const [isMessageSent, setIsMessageSent] = useState(false); // 메시지 전송 상태 추적
 
   // 창이 닫히는 순간에 헤더 정보를 추출하는 함수
   const extractAuthData = async () => {
+    // 이미 메시지를 전송했다면 중복 전송 방지
+    if (isMessageSent) {
+      console.log('이미 메시지를 전송했으므로 중복 전송을 방지합니다');
+      return;
+    }
+
     try {
       // URL 파라미터에서 인증 정보 추출
       const urlParams = new URLSearchParams(window.location.search);
@@ -32,6 +39,7 @@ export default function Certification() {
             },
             '*' //window.location.origin
           );
+          setIsMessageSent(true); // 메시지 전송 완료 표시
           console.log('인증 데이터 전송 완료');
         } else {
           // 부모 창이 없는 경우 (직접 접근) 처리
@@ -50,6 +58,7 @@ export default function Certification() {
             },
             '*' //window.location.origin
           );
+          setIsMessageSent(true); // 메시지 전송 완료 표시
         } else {
           // 부모 창이 없는 경우 (직접 접근) 처리
           console.log('인증 실패');
@@ -69,6 +78,7 @@ export default function Certification() {
           },
           window.location.origin
         );
+        setIsMessageSent(true); // 메시지 전송 완료 표시
       }
     }
   };
