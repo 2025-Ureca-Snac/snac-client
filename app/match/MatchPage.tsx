@@ -13,6 +13,7 @@ import { User, TradeRequest } from './types/match';
 import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
 //import { useAuthStore } from '../(shared)/stores/auth-store';
+import TradeCancelModal from '../(shared)/components/TradeCancelModal';
 
 interface ServerTradeData {
   tradeId: number;
@@ -120,6 +121,7 @@ export default function MatchPage() {
   const {
     isConnected,
     registerSellerCard,
+    deleteSellerCard,
     registerBuyerFilter,
     respondToTrade,
     createTrade,
@@ -286,8 +288,10 @@ export default function MatchPage() {
       });
     } else {
       console.log('판매 상태가 비활성화되었습니다.');
+      // 판매자 카드 삭제 (store에서 currentCardId 사용)
+      deleteSellerCard();
     }
-  }, [sellerInfo, registerSellerCard, setActiveSellers]);
+  }, [sellerInfo, registerSellerCard, deleteSellerCard, setActiveSellers]);
 
   // 거래 요청 응답 (판매자용)
   const handleTradeRequestResponse = useCallback(
@@ -326,7 +330,7 @@ export default function MatchPage() {
         // 1초 후 trading 페이지로 이동
         setTimeout(() => {
           router.push('/match/trading');
-        }, 1000);
+        }, 500);
       }
     },
     [incomingRequests, respondToTrade, sellerInfo, foundMatch, router]
@@ -392,6 +396,7 @@ export default function MatchPage() {
           />
         )}
       </main>
+      <TradeCancelModal />
       <Footer />
     </div>
   );

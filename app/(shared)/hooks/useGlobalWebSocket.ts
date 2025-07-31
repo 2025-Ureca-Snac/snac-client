@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Client as StompClient } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useMatchStore } from '../stores/match-store';
+import { useModalStore } from '../stores/modal-store';
 import { useWebSocketStore } from '../stores/websocket-store';
 import { User, Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
+import { CancelReason } from '../constants';
 
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
 let globalStompClient: StompClient | null = null;
@@ -90,8 +92,15 @@ interface UseGlobalWebSocketProps {
 
 export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   const router = useRouter();
-  const { foundMatch, setWebSocketFunctions, partner, userRole, setUserRole } =
-    useMatchStore();
+  const { openModal } = useModalStore();
+  const {
+    foundMatch,
+    setWebSocketFunctions,
+    partner,
+    userRole,
+    setUserRole,
+    setCurrentCardId,
+  } = useMatchStore();
   const { setConnectionStatus, setDisconnectFunction, isConnected } =
     useWebSocketStore();
   const connectionId = useRef(++globalConnectionCount);
@@ -184,6 +193,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     const token = getToken();
     if (!token) {
       console.error('❌ 토큰이 없어서 WebSocket 연결할 수 없습니다.');
+      // 토큰이 없으면 로그인 페이지로 이동
+      if (typeof window !== 'undefined') {
+        router.push('/login');
+      }
       return;
     }
 
@@ -254,17 +267,18 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       console.log('🟢 매칭 알림 수신:', frame.body);
       try {
         const cardData: ServerCardData = JSON.parse(frame.body);
-        console.log(cardData, '야여기1');
         const user = convertServerCardToUser(cardData);
-        console.log(user, '야여기2');
-
+        if (cardData.cardId) {
+          setCurrentCardId(cardData.cardId);
+        }
+        const currentUserRole = useMatchStore.getState().userRole;
         console.log('🔍 매칭 알림 처리 조건 확인:', {
-          userRole,
+          currentUserRole,
           hasSetActiveSellers: !!props?.setActiveSellers,
           isBuyer: userRole === 'buyer',
         });
 
-        if (props?.setActiveSellers) {
+        if (currentUserRole === 'buyer' && props?.setActiveSellers) {
           props.setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
@@ -320,6 +334,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           phone: tradeData.phone,
           cancelReason: tradeData.cancelReason,
         });
+
+        // cardId를 store에 저장
+        if (tradeData.cardId) {
+          setCurrentCardId(tradeData.cardId);
+        }
 
         // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트
         if (userRole === 'buyer' && props?.setActiveSellers) {
@@ -502,6 +521,15 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           status: trade.status,
           cancelReason: trade.cancelReason,
         });
+
+        // 취소 사유가 있으면 모달 표시
+        if (trade.cancelReason) {
+          openModal('trade-cancel', {
+            cancelReason: trade.cancelReason,
+            tradeId: trade.id,
+            cardId: trade.cardId,
+          });
+        }
       } catch (error) {
         console.error('❌ 취소 큐 파싱 오류:', error);
       }
@@ -531,15 +559,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   // 가격 필터 변환
   const convertPriceFilter = (priceFilters: string[]): string => {
     if (priceFilters.length === 0) return 'ALL';
-
-    const firstFilter = priceFilters[0];
-    if (firstFilter.includes('0 - 999')) return 'P0_999';
-    if (firstFilter.includes('1,000 - 1,499')) return 'P1000_1499';
-    if (firstFilter.includes('1,500 - 1,999')) return 'P1500_1999';
-    if (firstFilter.includes('2,000 - 2,499')) return 'P2000_2499';
-    if (firstFilter.includes('2,500 이상')) return 'P2500_PLUS';
-
-    return 'ALL';
+    return priceFilters[0] || 'ALL';
   };
 
   // userRole 업데이트 함수
@@ -592,6 +612,35 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       globalStompClient.publish({
         destination: '/app/register-realtime-card',
         body: JSON.stringify(cardData),
+      });
+    },
+    [userRole]
+  );
+
+  // 판매자 카드 삭제
+  const deleteSellerCard = useCallback(
+    (
+      cardId?: number,
+      reason: CancelReason = CancelReason.SELLER_CHANGE_MIND
+    ) => {
+      if (!globalStompClient?.connected || userRole !== 'seller') {
+        return;
+      }
+
+      // store에서 currentCardId를 가져와서 사용
+      const { currentCardId } = useMatchStore.getState();
+      const targetCardId = cardId || currentCardId;
+      console.log(currentCardId, '야여기5');
+      if (!targetCardId) {
+        console.error('❌ 삭제할 카드 ID가 없습니다.');
+        return;
+      }
+
+      console.log('🗑️ 판매자 카드 삭제:', { cardId: targetCardId, reason });
+
+      globalStompClient.publish({
+        destination: '/app/trade/buy-request/cancel/seller',
+        body: JSON.stringify({ cardId: targetCardId, reason }),
       });
     },
     [userRole]
@@ -704,6 +753,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   return {
     isConnected,
     registerSellerCard,
+    deleteSellerCard,
     registerBuyerFilter,
     respondToTrade,
     createTrade,
