@@ -1,6 +1,6 @@
 import { blogPageMetadata } from './metadata';
-import { Footer } from '@/app/(shared)/components/Footer';
 import { Header } from '@/app/(shared)/components/Header';
+import { Footer } from '@/app/(shared)/components/Footer';
 import { BlogHero } from './components/BlogHero';
 import { BLOG_POSTS } from './data/blogPosts';
 import BlogPageClient from './BlogPageClient';
