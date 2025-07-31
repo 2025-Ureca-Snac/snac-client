@@ -29,10 +29,18 @@ export function BlogTable() {
       <table className="w-full text-regular-sm text-left text-gray-500">
         <thead className="text-regular-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th className="px-6 py-3">ID</th>
-            <th className="px-6 py-3">제목</th>
-            <th className="px-6 py-3">작성자</th>
-            <th className="px-6 py-3 text-center">작업</th>
+            <th scope="col" className="px-6 py-3">
+              ID
+            </th>
+            <th scope="col" className="px-6 py-3">
+              제목
+            </th>
+            <th scope="col" className="px-6 py-3">
+              작성자
+            </th>
+            <th scope="col" className="px-6 py-3 text-center">
+              작업
+            </th>
           </tr>
         </thead>
         <tbody>
