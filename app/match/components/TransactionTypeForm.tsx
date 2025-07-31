@@ -77,8 +77,8 @@ export default function TransactionTypeForm({
           title="가격"
           options={filterOptions.price}
           selectedValues={selectedFilters.price}
-          onValueChange={(value) => onFilterChange('price', value, true)}
-          multiSelect={true}
+          onValueChange={(value) => onFilterChange('price', value, false)}
+          multiSelect={false}
         />
 
         <FilterButtons onReset={onReset} onApply={onApply} />
