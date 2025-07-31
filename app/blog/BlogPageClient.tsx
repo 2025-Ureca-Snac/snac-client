@@ -1,34 +1,40 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExtendedBlogPost } from './data/blogPosts';
+import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
 import { BlogContent } from './components/BlogContent';
+import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
-interface BlogPageClientProps {
-  posts: ExtendedBlogPost[];
-}
-
-export default function BlogPageClient({ posts }: BlogPageClientProps) {
+export default function BlogPageClient() {
   const router = useRouter();
 
+  const { blogs, loading, hasNext, fetchAll, fetchMore } = useBlogStore();
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+
   const handleShowMore = () => {
-    console.log('Show more clicked!');
-    // 여기에 더 많은 포스트를 로드하는 로직 추가
+    if (hasNext && !loading) {
+      fetchMore();
+    }
   };
 
   const handleSortChange = (sortBy: string) => {
     console.log('Sort changed to:', sortBy);
-    // 여기에 정렬 로직 추가
+    // 추후 정렬 로직 구현
   };
 
-  const handlePostClick = (post: ExtendedBlogPost) => {
-    // 포스트 클릭 시 동적 라우트로 이동
+  const handlePostClick = (post: Blog) => {
     router.push(`/blog/${post.id}`);
   };
 
   return (
     <BlogContent
-      posts={posts}
+      posts={blogs}
+      isLoading={loading}
+      hasNext={hasNext}
       onShowMore={handleShowMore}
       onSortChange={handleSortChange}
       onPostClick={handlePostClick}
