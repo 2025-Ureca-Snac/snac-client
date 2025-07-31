@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ModalPortal from './modal-portal';
 import { PriceUnit } from '../types';
+import { ApiResponse } from '../types/api';
 import { api } from '../utils/api';
 import { CardData } from '../types/card';
 
@@ -48,15 +49,14 @@ export default function TradeConfirmationModal({
       try {
         console.log('구매 거래 요청 시작:', modalItem);
         // 구매 거래 요청 생성
-        const response = await api.get(`/cards/${modalItem.id}`);
+        const response = await api.get<ApiResponse<{ sellStatus: string }>>(
+          `/cards/${modalItem.id}`
+        );
 
         console.log('구매 거래 요청 성공:', response.data);
 
         // sellStatus 확인
-        if (
-          (response.data as { data: { sellStatus: string } }).data
-            .sellStatus === 'SELLING'
-        ) {
+        if (response.data.data.sellStatus === 'SELLING') {
           const queryParams = new URLSearchParams({
             id: modalItem.id.toString(),
             pay: 'buy',

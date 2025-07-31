@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { api, handleApiError } from '../utils/api';
+import { ApiResponse } from '../types/api';
 import { RechargeModalProps } from '../types/recharge-modal';
 
 /**
@@ -49,7 +50,7 @@ export default function RechargeModal({
 
             console.log('충전 성공 처리 완료:', response.data);
 
-            const responseData = response.data as Record<string, unknown>;
+            const responseData = response.data as ApiResponse<unknown>;
             if (responseData.status === 'OK') {
               console.log('결제가 성공적으로 완료되었습니다!');
 
@@ -63,14 +64,39 @@ export default function RechargeModal({
 
               alert('결제가 성공적으로 완료되었습니다!');
             } else {
-              alert('결제가 실패했습니다.');
+              // 백엔드에서 실패 응답을 보낸 경우
+              try {
+                await api.post('/payments/fail', {
+                  errorCode: 'RECHARGE_BACKEND_FAILED',
+                  errorMessage: `백엔드 처리 실패: ${responseData.message || '알 수 없는 오류'}`,
+                  orderId: event.data.orderId,
+                });
+                console.log('백엔드 처리 실패 정보가 전송되었습니다.');
+              } catch (apiError) {
+                console.error('백엔드 처리 실패 정보 전송 실패:', apiError);
+              }
+
+              alert(
+                '결제 처리 중 문제가 발생했습니다. 고객센터로 문의해주세요.'
+              );
             }
           } catch (error) {
             console.error('충전 성공 처리 오류:', error);
             const errorMessage = handleApiError(error);
-            alert(
-              `결제는 성공했지만 충전 처리 중 오류가 발생했습니다: ${errorMessage}`
-            );
+
+            // 백엔드에 충전 처리 실패 정보 전송
+            try {
+              await api.post('/payments/fail', {
+                errorCode: 'RECHARGE_PROCESS_ERROR',
+                errorMessage: `충전 처리 중 오류: ${errorMessage}`,
+                orderId: event.data.orderId,
+              });
+              console.log('충전 처리 실패 정보가 백엔드에 전송되었습니다.');
+            } catch (apiError) {
+              console.error('충전 처리 실패 정보 전송 실패:', apiError);
+            }
+
+            alert('결제 처리 중 문제가 발생했습니다. 고객센터로 문의해주세요.');
           }
         } else {
           // 결제 실패 처리
@@ -99,18 +125,19 @@ export default function RechargeModal({
         });
 
         // API 응답에서 받은 값들 (안전하게 처리)
-        const responseData = response.data as Record<string, unknown>;
+        const responseData = response.data as ApiResponse<{
+          amount: number;
+          customerEmail: string;
+          customerName: string;
+          orderId: string;
+          orderName: string;
+        }>;
 
-        const amount = (responseData?.data as Record<string, unknown>)
-          ?.amount as number;
-        const customerEmail = (responseData?.data as Record<string, unknown>)
-          ?.customerEmail as string;
-        const customerName = (responseData?.data as Record<string, unknown>)
-          ?.customerName as string;
-        const serverOrderId = (responseData?.data as Record<string, unknown>)
-          ?.orderId as string;
-        const orderName = (responseData?.data as Record<string, unknown>)
-          ?.orderName as string;
+        const amount = responseData.data.amount;
+        const customerEmail = responseData.data.customerEmail;
+        const customerName = responseData.data.customerName;
+        const serverOrderId = responseData.data.orderId;
+        const orderName = responseData.data.orderName;
 
         // 필수 값들이 있는지 확인
         if (!amount || !serverOrderId) {
@@ -128,7 +155,20 @@ export default function RechargeModal({
       } catch (error) {
         console.error('충전 준비 오류:', error);
         const errorMessage = handleApiError(error);
-        alert(errorMessage);
+
+        // 백엔드에 충전 준비 실패 정보 전송
+        try {
+          await api.post('/payments/fail', {
+            errorCode: 'RECHARGE_PREPARE_ERROR',
+            errorMessage: `충전 준비 중 오류: ${errorMessage}`,
+            orderId: 'PREPARE_STAGE', // 준비 단계에서는 orderId가 없음
+          });
+          console.log('충전 준비 실패 정보가 백엔드에 전송되었습니다.');
+        } catch (apiError) {
+          console.error('충전 준비 실패 정보 전송 실패:', apiError);
+        }
+
+        alert('충전 준비 중 문제가 발생했습니다. 고객센터로 문의해주세요.');
       }
     }
   };

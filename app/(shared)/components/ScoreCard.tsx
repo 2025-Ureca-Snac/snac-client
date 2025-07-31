@@ -196,12 +196,18 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
               />
             </div>
             <div className="flex gap-2">
-              <div className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center">
+              <Link
+                href="/mypage/point?type=MONEY&modal=recharge"
+                className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center hover:bg-opacity-30 transition-all"
+              >
                 충전
-              </div>
-              <div className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center">
-                송금
-              </div>
+              </Link>
+              <Link
+                href="/mypage/point?type=MONEY&modal=settlement"
+                className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center hover:bg-opacity-30 transition-all"
+              >
+                정산
+              </Link>
             </div>
           </Link>
         </div>
