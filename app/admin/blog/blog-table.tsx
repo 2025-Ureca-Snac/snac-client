@@ -1,13 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Edit from '@/public/edit.svg';
 import Trash from '@/public/trash.svg';
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
+import type { Blog } from '@/app/(shared)/stores/use-blog-store';
+import { BlogDetailModal } from './BlogDetailModal';
 
 export function BlogTable() {
   const { blogs, loading, error, openDeleteModal } = useBlogStore();
+  const [detailPost, setDetailPost] = useState<Blog | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   if (loading) return <p className="p-6 text-center">로딩 중...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
@@ -50,8 +54,14 @@ export function BlogTable() {
                 #{blog.id}
               </td>
 
-              {/* 제목 단순 표시 */}
-              <td className="px-6 py-4 font-semibold text-gray-900">
+              {/* 제목 클릭 시 모달 오픈 */}
+              <td
+                className="px-6 py-4 font-semibold text-gray-900 cursor-pointer hover:underline"
+                onClick={() => {
+                  setDetailPost(blog);
+                  setDetailOpen(true);
+                }}
+              >
                 {blog.title || '(제목 없음)'}
               </td>
 
@@ -72,6 +82,13 @@ export function BlogTable() {
           ))}
         </tbody>
       </table>
+
+      {/* 상세 모달 */}
+      <BlogDetailModal
+        post={detailPost}
+        isOpen={detailOpen}
+        onClose={() => setDetailOpen(false)}
+      />
     </div>
   );
 }
