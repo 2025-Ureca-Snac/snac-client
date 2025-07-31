@@ -47,12 +47,6 @@ export default function SocialLoginModal({
       return;
     }
 
-    console.log('연동 전 상태:', {
-      providerId,
-      isCurrentlyLinked,
-      currentProfile: profile,
-    });
-
     try {
       if (!isCurrentlyLinked) {
         // 소셜 로그인 연동
@@ -79,19 +73,14 @@ export default function SocialLoginModal({
         }
       } else {
         // 소셜 로그인 해제
-        console.log('소셜 로그인 해제 시작:', providerId);
         const success = await unlinkSocialAccount(providerId);
 
         if (success) {
-          console.log('소셜 로그인 해제 완료');
-
           // 로컬 상태 업데이트
           setLinkedProviders((prev) => ({
             ...prev,
             [providerId]: false,
           }));
-
-          console.log('로컬 상태 업데이트 완료');
 
           if (onSubmit) {
             onSubmit(providerId, false);

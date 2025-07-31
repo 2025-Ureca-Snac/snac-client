@@ -64,7 +64,7 @@ export const useAuthStore = create<AuthState>()(
 
           const authWindow = window.open(
             authUrl,
-            'socialAuth',
+            'socialAuthLink',
             `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
           );
 
@@ -76,6 +76,9 @@ export const useAuthStore = create<AuthState>()(
           return new Promise<boolean>((resolve, reject) => {
             const handleAuthMessage = async (event: MessageEvent) => {
               if (event.origin !== window.location.origin) return;
+
+              // 즉시 이벤트 리스너 제거 (중복 메시지 방지)
+              window.removeEventListener('message', handleAuthMessage);
 
               if (event.data.type === 'AUTH_SUCCESS') {
                 console.log('소셜 로그인 인증 성공:', event.data.data);
@@ -113,15 +116,9 @@ export const useAuthStore = create<AuthState>()(
                   console.error('소셜 로그인 실패:', error);
                   reject(new Error('소셜 로그인에 실패했습니다.'));
                 }
-
-                // 이벤트 리스너 제거
-                window.removeEventListener('message', handleAuthMessage);
               } else if (event.data.type === 'AUTH_ERROR') {
                 console.log('소셜 로그인 인증 실패:', event.data.data);
                 reject(new Error('소셜 로그인 인증에 실패했습니다.'));
-
-                // 이벤트 리스너 제거
-                window.removeEventListener('message', handleAuthMessage);
               }
             };
 
@@ -149,7 +146,7 @@ export const useAuthStore = create<AuthState>()(
 
           const authWindow = window.open(
             authUrl,
-            'socialAuth',
+            'socialAuthUnlink',
             `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
           );
 
@@ -162,27 +159,37 @@ export const useAuthStore = create<AuthState>()(
             const handleAuthMessage = async (event: MessageEvent) => {
               if (event.origin !== window.location.origin) return;
 
-              if (event.data.type === 'AUTH_SUCCESS') {
-                console.log('소셜 로그인 해제 인증 성공:', event.data.data);
+              // 즉시 이벤트 리스너 제거 (중복 메시지 방지)
+              window.removeEventListener('message', handleAuthMessage);
 
+              if (event.data.type === 'AUTH_SUCCESS') {
                 try {
                   // 백엔드로 소셜 로그인 해제 요청
-                  const response = await api.post(`/unlink/${providerId}`);
-                  console.log('소셜 로그인 해제 성공:', response);
+                  await api.post(`/unlink/${providerId}`);
+
+                  // 팝업 창 닫기
+                  if (authWindow && !authWindow.closed) {
+                    authWindow.close();
+                  }
+
                   resolve(true);
                 } catch (error) {
                   console.error('소셜 로그인 해제 실패:', error);
+
+                  // 팝업 창 닫기
+                  if (authWindow && !authWindow.closed) {
+                    authWindow.close();
+                  }
+
                   reject(new Error('소셜 로그인 해제에 실패했습니다.'));
                 }
-
-                // 이벤트 리스너 제거
-                window.removeEventListener('message', handleAuthMessage);
               } else if (event.data.type === 'AUTH_ERROR') {
-                console.log('소셜 로그인 해제 인증 실패:', event.data.data);
-                reject(new Error('소셜 로그인 해제 인증에 실패했습니다.'));
+                // 팝업 창 닫기
+                if (authWindow && !authWindow.closed) {
+                  authWindow.close();
+                }
 
-                // 이벤트 리스너 제거
-                window.removeEventListener('message', handleAuthMessage);
+                reject(new Error('소셜 로그인 해제 인증에 실패했습니다.'));
               }
             };
 
