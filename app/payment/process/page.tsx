@@ -30,18 +30,19 @@ function PaymentProcessComponent() {
             orderName: orderName || '스낵머니 충전',
             customerName: customerName || '스낵 사용자',
             customerEmail: customerEmail || undefined,
-            successUrl: `${window.location.origin}/payment/success?orderId=${orderId}`,
-            failUrl: `${window.location.origin}/payment/fail?orderId=${orderId}`,
+            successUrl: `${window.location.origin}/payment/success?orderId=${orderId}&amount=${amount}`,
+            failUrl: `${window.location.origin}/payment/fail`,
           });
         } catch (error) {
           console.error('토스페이먼츠 결제 오류:', error);
+
           // 부모 창에 에러 메시지 전송
           window.opener?.postMessage(
             {
               type: 'PAYMENT_ERROR',
               error: '결제 중 오류가 발생했습니다.',
             },
-            '*'
+            window.location.origin
           );
           window.close();
         }
@@ -63,7 +64,7 @@ function PaymentProcessComponent() {
             orderId: event.data.orderId,
             amount: event.data.amount,
           },
-          '*'
+          window.location.origin
         );
         window.close();
       }

@@ -29,7 +29,7 @@ function PaymentCompleteComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const orderId = searchParams.get('orderId');
+    const cardId = searchParams.get('cardId');
     const amount = searchParams.get('amount');
     const pay = searchParams.get('pay');
     const snackMoneyUsed = parseInt(searchParams.get('snackMoneyUsed') || '0');
@@ -38,14 +38,14 @@ function PaymentCompleteComponent() {
     );
 
     console.log('결제 완료 페이지 파라미터:', {
-      orderId,
+      cardId,
       amount,
       pay,
       snackMoneyUsed,
       snackPointsUsed,
     });
 
-    if (orderId && amount) {
+    if (cardId && amount) {
       // 결제 완료 확인 API 호출
       const verifyPayment = async () => {
         try {
@@ -78,7 +78,7 @@ function PaymentCompleteComponent() {
     }
   }, [searchParams]);
 
-  const orderId = searchParams.get('orderId') || '#0123_45678';
+  const tradeId = searchParams.get('tradeId') || '#0123_45678';
   const amount = searchParams.get('amount') || '2,000';
   const pay = searchParams.get('pay') || 'sell';
   const carrier = searchParams.get('carrier') || '';
@@ -133,12 +133,12 @@ function PaymentCompleteComponent() {
           {/* Success Message */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {pay === PAYMENT_TYPES.BUY
+              {pay === PAYMENT_TYPES.SELL
                 ? '구매 글이 등록되었습니다!'
                 : '구매요청이 전송되었습니다!'}
             </h2>
             <p className="text-gray-600 flex items-center justify-center">
-              {pay === PAYMENT_TYPES.BUY
+              {pay === PAYMENT_TYPES.SELL
                 ? '판매자가 구매요청을 보낼 때까지 기다려주세요.'
                 : '판매자가 빠른 시일 내에 데이터를 보내줄 예정입니다.'}
               <span className="ml-2 text-2xl">🎉</span>
@@ -164,7 +164,7 @@ function PaymentCompleteComponent() {
           <div className="space-y-4 mb-8">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">주문 번호:</span>
-              <span className="font-medium text-gray-900">{orderId}</span>
+              <span className="font-medium text-gray-900">{tradeId}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">날짜:</span>
@@ -200,10 +200,12 @@ function PaymentCompleteComponent() {
           {/* History Button */}
           <div className="text-center">
             <button
-              onClick={() => router.push('/mypage')}
+              onClick={() => {
+                router.push(`/mypage/purchase-history/${tradeId}`);
+              }}
               className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
             >
-              {pay === PAYMENT_TYPES.BUY ? '구매 내역' : '판매 내역'}
+              구매 내역
             </button>
           </div>
         </div>
