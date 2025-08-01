@@ -87,24 +87,29 @@ export default function TransactionTypeForm({
   }
 
   if (isSeller && sellerInfo && onSellerInfoChange && onToggleSellerStatus) {
+    const isSellingActive = sellerInfo.isActive;
+
     return (
       <div className="space-y-6">
         {/* 통신사 선택 */}
         <CarrierSelect
           value={sellerInfo.carrier}
           onChange={(value) => onSellerInfoChange('carrier', value)}
+          disabled={isSellingActive}
         />
 
         {/* 데이터량 입력 */}
         <DataAmountInput
           value={sellerInfo.dataAmount}
           onChange={(value) => onSellerInfoChange('dataAmount', value)}
+          disabled={isSellingActive}
         />
 
         {/* 가격 입력 */}
         <PriceInput
           value={sellerInfo.price}
           onChange={(value) => onSellerInfoChange('price', value)}
+          disabled={isSellingActive}
         />
 
         {/* 판매 상태 토글 */}
