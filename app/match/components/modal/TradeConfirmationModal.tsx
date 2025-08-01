@@ -75,26 +75,8 @@ export default function TradeConfirmationModal({
     if (tradeStatus === 'ACCEPTED') {
       setModalState('success');
 
-      const partnerInfo = {
-        tradeId: 1,
-        buyer: 'hardcoded-buyer@email.com',
-        seller: 'hardcoded-seller@email.com',
-        cardId: 1,
-        carrier: 'SKT',
-        dataAmount: 10,
-        phone: '010-1234-5678',
-        point: 10000,
-        priceGb: 2000,
-        sellerRatingScore: 4.8,
-        status: 'ACCEPTED',
-        cancelReason: null,
-        type: 'seller' as const,
-      };
-
       // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
-        foundMatch(partnerInfo);
-
         // 1초 후 trading 페이지로 이동
         setTimeout(() => {
           router.push('/match/trading');
@@ -107,8 +89,6 @@ export default function TradeConfirmationModal({
           email: seller.email,
           전체_데이터: seller,
         });
-
-        foundMatch(partnerInfo);
 
         // 2초 후 trading 페이지로 이동
         setTimeout(() => {

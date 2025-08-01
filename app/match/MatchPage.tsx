@@ -41,7 +41,7 @@ type MatchingStatus =
 
 export default function MatchPage() {
   const router = useRouter();
-  const { foundMatch } = useMatchStore();
+  const { foundMatch, updatePartner } = useMatchStore();
   // const { user } = useAuthStore();
   // const { profile } = useUserStore();
 
@@ -104,6 +104,23 @@ export default function MatchPage() {
       console.log('🔄 거래 상태 변경:', status, tradeData);
       setCurrentTradeStatus(status);
 
+      // tradeData로 파트너 정보 갱신
+      updatePartner({
+        tradeId: tradeData.tradeId,
+        buyer: tradeData.buyer,
+        seller: tradeData.seller,
+        cardId: tradeData.cardId,
+        carrier: tradeData.carrier,
+        dataAmount: tradeData.dataAmount,
+        phone: tradeData.phone || '010-0000-0000',
+        point: tradeData.point || 0,
+        priceGb: tradeData.priceGb || 0,
+        sellerRatingScore: 1000, // 기본값
+        status: tradeData.status,
+        cancelReason: tradeData.cancelReason || null,
+        type: 'seller' as const,
+      });
+
       if (status === 'ACCEPTED') {
         // 거래 수락 시 2초 후 모달 닫고 거래 페이지로 이동
         setTimeout(() => {
@@ -113,7 +130,7 @@ export default function MatchPage() {
         }, 2000);
       }
     },
-    []
+    [updatePartner]
   );
 
   const { setWebSocketFunctions } = useMatchStore();
@@ -341,24 +358,24 @@ export default function MatchPage() {
 
       // 거래를 수락한 경우 trading 페이지로 이동
       if (accept) {
-        // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
-        const buyerInfo = {
-          tradeId: 1,
-          buyer: 'hardcoded-buyer@email.com',
-          seller: 'hardcoded-seller@email.com',
-          cardId: 1,
-          carrier: 'SKT',
-          dataAmount: 10,
-          phone: '010-1234-5678',
-          point: 10000,
-          priceGb: 2000,
-          sellerRatingScore: 4.8,
+        // 실제 거래 요청 정보를 사용해서 파트너 정보 설정
+        const partnerInfo = {
+          tradeId: requestId,
+          buyer: request.buyerName,
+          seller: request.sellerId,
+          cardId: request.cardId,
+          carrier: sellerInfo.carrier,
+          dataAmount: sellerInfo.dataAmount,
+          phone: '010-0000-0000', // 실제로는 서버에서 받아야 함
+          point: 0, // 실제로는 서버에서 받아야 함
+          priceGb: sellerInfo.price,
+          sellerRatingScore: request.ratingData || 1000,
           status: 'ACCEPTED',
           cancelReason: null,
-          type: 'seller' as const,
+          type: 'buyer' as const, // 판매자 입장에서 상대방은 구매자
         };
 
-        foundMatch(buyerInfo);
+        foundMatch(partnerInfo);
 
         // 1초 후 trading 페이지로 이동
         setTimeout(() => {
@@ -366,7 +383,7 @@ export default function MatchPage() {
         }, 500);
       }
     },
-    [incomingRequests, respondToTrade, foundMatch, router]
+    [incomingRequests, respondToTrade, foundMatch, router, sellerInfo]
   );
   return (
     <div className="min-h-screen flex flex-col bg-white">

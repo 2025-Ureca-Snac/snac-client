@@ -56,6 +56,13 @@ export default function TradingPage() {
   const { user } = useAuthStore();
   const isSeller = partner?.seller === user;
 
+  // matchStore에서 파트너 정보 직접 사용 (null 체크 후 사용)
+  const partnerInfo = partner;
+
+  // 디버깅: 파트너 정보 변경 시 로그 출력
+  useEffect(() => {
+    console.log('🔄 TradingPage partnerInfo 업데이트:', partnerInfo);
+  }, [partnerInfo]);
   // 전역 WebSocket 연결 유지
   const { activatePage, deactivatePage } = useGlobalWebSocket();
 
@@ -100,7 +107,14 @@ export default function TradingPage() {
     return () => {
       deactivatePage('trading');
     };
-  }, [activatePage, deactivatePage, userRole, isSeller, setCurrentStep]);
+  }, [
+    activatePage,
+    deactivatePage,
+    userRole,
+    isSeller,
+    setCurrentStep,
+    router,
+  ]);
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
 
@@ -164,8 +178,7 @@ export default function TradingPage() {
     );
   }
 
-  // 이제 partner는 항상 유효함 (MatchPartner 타입 그대로 사용)
-  const partnerInfo = partner!;
+  // partnerInfo는 위에서 이미 선언됨 (partner와 동일)
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);
@@ -191,20 +204,20 @@ export default function TradingPage() {
         case 'confirmation':
           return (
             <ConfirmationStep
-              partner={partnerInfo}
+              partner={partnerInfo!}
               onNext={handleNextStep}
               onCancel={handleCancel}
             />
           );
 
         case 'waiting_payment':
-          return <WaitingPaymentStep partner={partnerInfo} />;
+          return <WaitingPaymentStep partner={partnerInfo!} />;
 
         case 'show_phone':
           return (
             <ShowPhoneStep
-              partner={partnerInfo}
-              buyerPhone={partnerInfo.phone}
+              partner={partnerInfo!}
+              buyerPhone={partnerInfo!.phone}
               onNext={handleNextStep}
             />
           );
@@ -212,8 +225,8 @@ export default function TradingPage() {
         case 'upload_data':
           return (
             <UploadDataStep
-              partner={partnerInfo}
-              tradeId={partnerInfo.tradeId}
+              partner={partnerInfo!}
+              tradeId={partnerInfo!.tradeId}
               onNext={handleNextStep}
             />
           );
@@ -221,9 +234,9 @@ export default function TradingPage() {
         case 'verification':
           return (
             <VerificationStep
-              dataAmount={partnerInfo.dataAmount}
+              dataAmount={partnerInfo!.dataAmount}
               timeLeft={timeLeft}
-              tradeId={partnerInfo.tradeId}
+              tradeId={partnerInfo!.tradeId}
               userRole={userRole || 'seller'}
               onNext={handleNextStep}
             />
@@ -240,7 +253,7 @@ export default function TradingPage() {
         case 'confirmation':
           return (
             <ConfirmationStep
-              partner={partnerInfo}
+              partner={partnerInfo!}
               onNext={handleNextStep}
               onCancel={handleCancel}
             />
@@ -249,8 +262,8 @@ export default function TradingPage() {
         case 'payment':
           return (
             <PaymentStep
-              amount={partnerInfo.priceGb}
-              tradeId={partnerInfo.tradeId}
+              amount={partnerInfo!.priceGb}
+              tradeId={partnerInfo!.tradeId}
               onNext={handleNextStep}
             />
           );
@@ -261,9 +274,9 @@ export default function TradingPage() {
         case 'verification':
           return (
             <VerificationStep
-              dataAmount={partnerInfo.dataAmount}
+              dataAmount={partnerInfo!.dataAmount}
               timeLeft={timeLeft}
-              tradeId={partnerInfo.tradeId}
+              tradeId={partnerInfo!.tradeId}
               userRole={userRole || 'buyer'}
               onNext={handleNextStep}
             />
