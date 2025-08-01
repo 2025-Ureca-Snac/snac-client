@@ -56,9 +56,7 @@ export const isToday = (dateString: string): boolean => {
  */
 export function getRemainingTimeForNicknameChange(lastUpdatedAt: Date): number {
   const now = new Date();
-  const nextAvailableTime = new Date(
-    lastUpdatedAt.getTime() + 24 * 60 * 60 * 1000
-  ); // 24시간 후
+  const nextAvailableTime = new Date(lastUpdatedAt.getTime());
   return Math.max(0, nextAvailableTime.getTime() - now.getTime());
 }
 
