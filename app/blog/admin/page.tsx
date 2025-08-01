@@ -100,7 +100,7 @@ function BlogAdminFormComponent() {
     }));
   };
 
-  // 폼 제출 핸들러 (생성 또는 업데이트)
+  // 폼 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
