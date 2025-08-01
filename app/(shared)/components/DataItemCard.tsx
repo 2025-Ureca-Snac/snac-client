@@ -169,10 +169,10 @@ export const DataItemCard = ({
                   });
                 }
               }}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+              className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
               style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
             >
-              수정하기
+              수정
             </Button>
             <Button
               onClick={() => {
@@ -192,10 +192,10 @@ export const DataItemCard = ({
                   }
                 }
               }}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+              className="flex-1 bg-red-500 hover:bg-red-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
               style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
             >
-              삭제하기
+              삭제
             </Button>
           </div>
         )}
