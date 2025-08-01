@@ -75,6 +75,7 @@ export default function BlogAdminPage() {
           imagePositions: post.imagePositions || [],
         });
       } catch (error) {
+        console.error('Failed to fetch post:', error);
         setFetchError('기존 포스트를 불러오지 못했습니다.');
         toast.error('기존 포스트를 불러오지 못했습니다.');
       } finally {
