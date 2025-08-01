@@ -5,6 +5,7 @@ export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--';
 export type SortBy = 'LATEST' | 'RATING';
 type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT' | null;
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
+type PostView = 'ALL' | 'MY_POSTS' | 'FAVORITE_POSTS';
 type CardCategory = 'SELL' | 'BUY';
 
 interface HomeState {
@@ -25,6 +26,7 @@ interface HomeState {
   sortBy: SortBy;
   transactionStatus: TransactionStatus;
   priceRange: PriceRange;
+  postView: PostView;
   showRegularsOnly: boolean;
   actions: {
     setCardCategory: (category: CardCategory) => void;
@@ -46,6 +48,7 @@ interface HomeState {
     setSortBy: (sortBy: SortBy) => void;
     setTransactionStatus: (status: TransactionStatus) => void;
     setPriceRange: (price: PriceRange) => void;
+    setPostView: (postView: PostView) => void;
     toggleShowRegularsOnly: () => void;
     resetFilters: () => void;
     resetAll: () => void;
@@ -65,6 +68,7 @@ export const homeInitialState = {
   sortBy: 'LATEST' as SortBy,
   transactionStatus: 'ALL' as TransactionStatus,
   priceRange: 'ALL' as PriceRange,
+  postView: 'ALL' as PostView,
   showRegularsOnly: false,
 };
 
@@ -96,6 +100,7 @@ export const useHomeStore = create<HomeState>((set) => ({
     setSortBy: (sortBy) => set({ sortBy }),
     setTransactionStatus: (status) => set({ transactionStatus: status }),
     setPriceRange: (price) => set({ priceRange: price }),
+    setPostView: (postView) => set({ postView }),
     toggleShowRegularsOnly: () =>
       set((state) => ({ showRegularsOnly: !state.showRegularsOnly })),
     triggerRefetch: () =>
@@ -106,6 +111,7 @@ export const useHomeStore = create<HomeState>((set) => ({
         category: 'ALL' as Category,
         transactionStatus: homeInitialState.transactionStatus,
         priceRange: homeInitialState.priceRange,
+        postView: homeInitialState.postView,
         showRegularsOnly: homeInitialState.showRegularsOnly,
         carrier: homeInitialState.carrier,
       })),
