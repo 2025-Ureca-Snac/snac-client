@@ -168,13 +168,9 @@ export const useBlogStore = create<BlogState>((set, get) => ({
       form.append('file', file);
       form.append('image', image);
 
-      await api.put(
-        `/articles/${articleId}?title=${encodeURIComponent(title)}`,
-        form,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        }
-      );
+      await api.put(`/articles/${articleId}`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
       toast.success('게시글이 수정되었습니다.');
 
