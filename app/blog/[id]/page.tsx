@@ -31,8 +31,7 @@ interface BlogPostPageProps {
 
 // 동적 메타데이터 (SEO)
 export async function generateMetadata({ params }: BlogPostPageProps) {
-  // params를 await로 비동기적으로 처리하여 id를 추출
-  const { id } = await params;
+  const { id } = params;
   const post = await getPost(id);
 
   if (!post) {
@@ -47,8 +46,7 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 
 // 메인 페이지 컴포넌트
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  // 2. ㄴ동일하게 params를 await로 처리
-  const { id } = await params;
+  const { id } = params;
   const post = await getPost(id);
 
   if (!post) {
