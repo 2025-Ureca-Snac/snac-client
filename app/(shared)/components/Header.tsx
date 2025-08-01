@@ -19,13 +19,13 @@ export const Header: FC = () => {
   const isAdmin: boolean = role === ADMIN_ROLE;
 
   return (
-    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center ">
-      <Link href="/" className="dark:text-white">
+    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center  ">
+      <Link href="/" className="dark:text-white" aria-label="스낵 로고">
         <LogoMobile
           width={100}
           height={25}
           className="text-black dark:text-white"
-          alt="스낵 로고"
+          aria-hidden="true"
         />
       </Link>
 
