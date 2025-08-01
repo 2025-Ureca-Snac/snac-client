@@ -31,7 +31,8 @@ export default function Home() {
   // WebSocket 가드 사용
   useWebSocketGuard();
 
-  const [cards, setCards] = useState<CardData[]>([]);
+  // 핵심! 각 페이지별로 카드 배열 저장
+  const [cardPages, setCardPages] = useState<CardData[][]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,99 +48,125 @@ export default function Home() {
     refetchTrigger,
   } = useHomeStore();
 
-  useEffect(() => {
-    console.log('[디버깅] 필터 상태:', {
-      category,
-      transactionStatus,
-      priceRange,
-      sortBy,
-      carrier,
+  const PAGE_SIZE = 54;
+
+  const fetchPage = async (pageIdx: number) => {
+    setLoading(true);
+
+    let lastCardId: number | undefined = undefined;
+    let lastUpdatedAt: string | undefined = undefined;
+    if (
+      pageIdx > 0 &&
+      cardPages[pageIdx - 1] &&
+      cardPages[pageIdx - 1].length > 0
+    ) {
+      const prevPageLast =
+        cardPages[pageIdx - 1][cardPages[pageIdx - 1].length - 1];
+      lastCardId = prevPageLast.id;
+      lastUpdatedAt = prevPageLast.updatedAt;
+    }
+
+    const highRatingFirst = sortBy === 'RATING';
+    const carrierForQuery: Carrier | undefined =
+      category === 'ALL'
+        ? undefined
+        : category === 'LGU+'
+          ? 'LG'
+          : (category ?? undefined);
+
+    const queryString = generateQueryParams({
+      cardCategory: (cardCategory || 'BUY') as CardCategory,
+      sellStatusFilter: 'ALL' as SellStatus,
+      priceRanges: [priceRange || 'ALL'],
+      highRatingFirst,
+      size: PAGE_SIZE,
+      lastCardId,
+      lastUpdatedAt,
+      carrier: carrierForQuery,
     });
 
-    const fetchScrollCards = async () => {
-      setLoading(true);
-      try {
-        const highRatingFirst = sortBy === 'RATING';
-        const carrierForQuery: Carrier | undefined =
-          category === 'ALL'
-            ? undefined
-            : category === 'LGU+'
-              ? 'LG'
-              : (category ?? undefined);
+    const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
+    console.log('[요청 URL]', fullUrl);
 
-        const queryString = generateQueryParams({
-          cardCategory: (cardCategory || 'BUY') as CardCategory,
-          sellStatusFilter: 'ALL' as SellStatus,
-          priceRanges: [priceRange || 'ALL'],
-          highRatingFirst,
-          size: 54,
-          carrier: carrierForQuery,
-        });
+    try {
+      const res = await fetch(fullUrl, { cache: 'no-store' });
+      if (!res.ok) throw new Error('fetch error');
 
-        const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
-        console.log('[ 요청 URL 확인]', fullUrl);
+      // transactionStatus에 따라 카드 필터링
+      const json: CardApiResponse = await res.json();
+      // CANCELLED 상태의 카드 제외
+      let filteredCards = json.data.cardResponseList.filter(
+        (card) => card.sellStatus !== 'CANCELLED'
+      );
 
-        const res = await fetch(fullUrl, {
-          cache: 'no-store',
-        });
-
-        if (!res.ok) {
-          console.error('fetch data 실패:', res.status, res.statusText);
-          setCards([]);
-          return;
-        }
-
-        const json: CardApiResponse = await res.json();
-
-        // transactionStatus에 따라 카드 필터링
-        let filteredCards = json.data.cardResponseList;
-
-        // CANCELLED 상태의 카드 제외
+      if (transactionStatus && transactionStatus !== 'ALL') {
         filteredCards = filteredCards.filter(
-          (card: { sellStatus: string }) => card.sellStatus !== 'CANCELLED'
+          (card) => card.sellStatus === transactionStatus
         );
-
-        if (transactionStatus && transactionStatus !== 'ALL') {
-          filteredCards = filteredCards.filter(
-            (card: { sellStatus: string }) =>
-              card.sellStatus === transactionStatus
-          );
-        }
-
-        // sortBy에 따라 카드 정렬
-        if (sortBy === 'RATING') {
-          // 인기순: 바삭스코어 높은 순, 같으면 등록순
-          filteredCards.sort((a, b) => {
-            if (a.ratingScore !== b.ratingScore) {
-              return b.ratingScore - a.ratingScore; // 높은 점수 먼저
-            }
-            // 점수가 같으면 등록순 (최신 등록 먼저)
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        } else {
-          // 최신순: 등록순 (최신 등록 먼저)
-          filteredCards.sort((a, b) => {
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        }
-
-        setCards(filteredCards);
-        console.log('응답 데이터:', json);
-        setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
-      } catch (err) {
-        console.error('카드 스크롤 조회 실패:', err);
-        setCards([]);
-      } finally {
-        setLoading(false);
       }
-    };
+      // 정렬(옵션)
+      if (sortBy === 'RATING') {
+        // 인기순: 바삭스코어 높은 순, 같으면 등록순
+        filteredCards.sort((a, b) => {
+          if (a.ratingScore !== b.ratingScore)
+            return b.ratingScore - a.ratingScore; // 높은 점수 먼저
+          // 점수가 같으면 등록순 (최신 등록 먼저)
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
+      } else {
+        // 최신순: 등록순 (최신 등록 먼저)
+        filteredCards.sort((a, b) => {
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
+      }
 
-    fetchScrollCards();
+      // 카드 페이지 배열에 추가(캐시)
+      setCardPages((prev) => {
+        const next = [...prev];
+        next[pageIdx] = filteredCards;
+        return next;
+      });
+
+      setTotalPages(json.data.hasNext ? pageIdx + 2 : pageIdx + 1);
+    } catch (e) {
+      console.error('카드 조회 실패:', e);
+      setCardPages((prev) => {
+        const next = [...prev];
+        next[pageIdx] = [];
+        return next;
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 페이지 변경/필터 변경시 처리
+  useEffect(() => {
+    if (!cardPages[currentPage - 1]) {
+      // 해당 페이지 데이터가 없으면 fetch
+      fetchPage(currentPage - 1);
+    }
+    // eslint-disable-next-line
   }, [currentPage, refetchTrigger]);
+
+  // 필터 바뀌면 페이지, 카드 배열 리셋
+  useEffect(() => {
+    setCardPages([]);
+    setCurrentPage(1);
+    // 필요시 fetchPage(0) 즉시 호출 가능
+  }, [
+    cardCategory,
+    category,
+    priceRange,
+    sortBy,
+    carrier,
+    transactionStatus,
+    refetchTrigger,
+  ]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -163,7 +190,7 @@ export default function Home() {
 
       <div className="flex items-center justify-center">
         <HomeLayout
-          cards={cards}
+          cards={cardPages[currentPage - 1] || []}
           isLoading={loading}
           currentPage={currentPage}
           totalPages={totalPages}
