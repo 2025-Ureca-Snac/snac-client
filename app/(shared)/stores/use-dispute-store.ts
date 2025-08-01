@@ -72,7 +72,6 @@ interface DisputeStore {
   refundAndCancel: (id: string) => Promise<void>;
   penaltySeller: (id: string) => Promise<void>;
   finalize: (id: string) => Promise<void>;
-  resolve: (id: string, answer: string, result: DisputeStatus) => Promise<void>;
 }
 
 export const useDisputeStore = create<DisputeStore>((set, get) => ({
@@ -223,20 +222,6 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '최종 처리 실패', loading: false });
-      toast.error(handleApiError(error));
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  async resolve(id: string, answer: string, result: DisputeStatus) {
-    set({ loading: true, error: null });
-    try {
-      await api.patch(`/admin/disputes/${id}/resolve`, { answer, result });
-      toast.success('분쟁 답변/상태 변경 완료');
-      get().fetchDisputes({ page: get().currentPage });
-    } catch (error) {
-      set({ error: '분쟁 답변 실패', loading: false });
       toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
