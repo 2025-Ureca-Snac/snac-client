@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import SearchModal from './search-modal';
 import { SearchModalType } from '../(shared)/types';
+import { toast } from 'sonner';
 import SocialLoginButtons from '../(shared)/components/social-login-buttons';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 
@@ -19,9 +20,10 @@ export default function Login() {
   const [password, setPassword] = useState<string>('');
   const [isOpen, setIsOpen] = useState<SearchModalType>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [socialError, setSocialError] = useState<string | null>(null);
 
   // Zustand 스토어 사용
-  const { user, isLoading, login } = useAuthStore();
+  const { user, isLoading, error, login } = useAuthStore();
 
   // 아이디 입력란 ref
   const idInputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +51,7 @@ export default function Login() {
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!id || !password) {
-      alert('아이디와 비밀번호를 입력해주세요.');
+      toast.error('아이디와 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -66,6 +68,10 @@ export default function Login() {
   };
   const findPassword = () => {
     setIsOpen('password');
+  };
+
+  const handleSocialError = (message: string) => {
+    setSocialError(message);
   };
 
   return (
@@ -113,6 +119,27 @@ export default function Login() {
               )}
             </button>
           </div>
+
+          {/* 오류 메시지 */}
+          {(error || socialError) && (
+            <div className="flex items-start gap-2 mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg
+                  className="w-4 h-4 text-red-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm text-red-800">{error || socialError}</p>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={isLoading}
@@ -146,7 +173,7 @@ export default function Login() {
             비밀번호 찾기
           </button>
         </div>
-        <SocialLoginButtons />
+        <SocialLoginButtons onError={handleSocialError} />
       </div>
       {isOpen && <SearchModal isOpen={isOpen} setIsOpen={setIsOpen} />}
     </div>

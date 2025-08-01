@@ -7,6 +7,7 @@ import {
   formatRemainingTime,
 } from '../utils';
 import { useUserStore } from '../stores/user-store';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -192,6 +193,7 @@ export default function ChangeNicknameModal({
       });
 
       if (response.status === 200) {
+        toast.success(`닉네임이 "${nickname.trim()}"로 변경되었습니다.`);
         // 스토어 업데이트
         updateNickname(nickname.trim());
         // 성공 시 콜백 호출

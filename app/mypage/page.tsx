@@ -20,6 +20,7 @@ import { useWebSocketGuard } from '../(shared)/hooks/useWebSocketGuard';
 import { useRouter } from 'next/navigation';
 import { api } from '../(shared)/utils/api';
 import { ApiResponse } from '../(shared)/types/api';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -80,10 +81,10 @@ export default function MyPage() {
       await deleteFavorite(memberId);
       // 삭제 후 목록 새로고침
       await loadFavorites();
-      alert(`${nickname}이(가) 단골에서 삭제되었습니다.`);
+      toast.success(`${nickname}이(가) 단골에서 삭제되었습니다.`);
     } catch (err) {
       console.error('단골 삭제 실패:', err);
-      alert('단골 삭제에 실패했습니다.');
+      toast.error('단골 삭제에 실패했습니다.');
     }
   };
 
@@ -91,10 +92,11 @@ export default function MyPage() {
   const handleLogout = async () => {
     try {
       await logout();
+      toast.success('로그아웃되었습니다.');
       router.push('/');
     } catch (error) {
       console.error('로그아웃 실패:', error);
-      alert('로그아웃 중 오류가 발생했습니다.');
+      toast.error('로그아웃 중 오류가 발생했습니다.');
     }
   };
 
@@ -133,23 +135,6 @@ export default function MyPage() {
     );
   }
 
-  // 에러 상태 표시
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background w-full flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-4">{error}</p>
-          <button
-            onClick={fetchUserProfile}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            다시 시도
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background w-full">
       <div className="flex w-full min-h-screen">
@@ -169,6 +154,34 @@ export default function MyPage() {
               <Accordion />
               {/* SettingList (설정 리스트) */}
               <SettingList onItemClick={handleSettingClick} />
+              {/* 오류 메시지 */}
+              {error && (
+                <div className="flex items-start gap-2 mt-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg
+                      className="w-4 h-4 text-red-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-red-800 mb-2">{error}</p>
+                    <button
+                      onClick={fetchUserProfile}
+                      className="text-xs text-red-600 hover:text-red-800 underline"
+                    >
+                      다시 시도
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* 하단 버튼들 */}
               <div className="flex flex-col gap-3 mt-6">
                 <button
@@ -179,7 +192,9 @@ export default function MyPage() {
                   로그아웃
                 </button>
                 <button
-                  onClick={() => alert('탈퇴 기능은 아직 구현되지 않았습니다.')}
+                  onClick={() =>
+                    toast.info('탈퇴 기능은 아직 구현되지 않았습니다.')
+                  }
                   className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   aria-label="회원 탈퇴"
                 >
@@ -196,7 +211,7 @@ export default function MyPage() {
         open={isOpen && modalType === 'change-password'}
         onClose={closeModal}
         onSubmit={(current, next, confirm) => {
-          alert(`현재: ${current}\n새 비번: ${next}\n확인: ${confirm}`);
+          // 비밀번호 변경 성공 시 모달 닫기
           closeModal();
         }}
       />
@@ -204,7 +219,7 @@ export default function MyPage() {
         open={isOpen && modalType === 'change-phone'}
         onClose={closeModal}
         onSubmit={(current, next, code) => {
-          alert(`현재: ${current}\n변경: ${next}\n코드: ${code}`);
+          // 전화번호 변경 성공 시 모달 닫기
           closeModal();
         }}
       />
@@ -220,11 +235,9 @@ export default function MyPage() {
         open={isOpen && modalType === 'social-login'}
         onClose={closeModal}
         onSubmit={(provider, isLinked) => {
-          if (isLinked) {
-            alert(`${provider} 계정이 연동되었습니다.`);
-          } else {
-            alert(`${provider} 계정 연동이 해제되었습니다.`);
-          }
+          // 소셜 로그인 연동/해제 성공 시 사용자 프로필 새로고침
+          fetchUserProfile();
+          // 모달은 닫지 않고 계속 열어둠 (사용자가 다른 계정도 연동/해제할 수 있도록)
         }}
       />
       <ChangeNicknameModal
@@ -233,7 +246,7 @@ export default function MyPage() {
         currentNickname={profile?.nickname || ''}
         onSubmit={(nickname) => {
           updateNickname(nickname);
-          alert(`닉네임이 "${nickname}"로 변경되었습니다.`);
+          // 닉네임 변경 성공 시 모달 닫기
           closeModal();
         }}
       />

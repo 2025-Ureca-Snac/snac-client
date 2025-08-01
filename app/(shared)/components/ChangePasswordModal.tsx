@@ -5,6 +5,7 @@ import type { ChangePasswordModalProps } from '../types/change-password-modal';
 import { checkPasswordMatch } from '../utils/password-validation';
 import { api } from '../utils/api';
 import { useAuthStore } from '../stores/auth-store';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -84,6 +85,8 @@ export default function ChangePasswordModal({
       });
 
       if (response.status === 200) {
+        toast.success('비밀번호가 성공적으로 변경되었습니다.');
+
         // 성공 시 콜백 호출
         if (onSubmit) {
           onSubmit(current, next, confirm);

@@ -15,6 +15,7 @@ import { useTimer } from '../(shared)/hooks/useTimer';
 import { api } from '../(shared)/utils/api';
 import { useRouter } from 'next/navigation';
 import { formatDateYYYYMMDD } from '../(shared)/utils';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -27,6 +28,10 @@ export default function SignUp() {
   const [isPhoneSent, setIsPhoneSent] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [verificationError, setVerificationError] = useState<string | null>(
+    null
+  );
   const emailTimer = useTimer();
   const phoneTimer = useTimer();
   const router = useRouter();
@@ -131,7 +136,7 @@ export default function SignUp() {
     if (isEmailVerifying) return; // 이미 인증 요청 중이면 무시
 
     if (!formData.email) {
-      alert('이메일을 입력해주세요.');
+      toast.error('이메일을 입력해주세요.');
       return;
     }
 
@@ -153,11 +158,11 @@ export default function SignUp() {
           emailVerificationRef.current?.focus();
         }, 100);
       } else {
-        alert('인증코드 전송에 실패했습니다.');
+        toast.error('인증코드 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('이메일 인증 요청 오류', error);
-      alert('인증코드 전송에 실패했습니다.');
+      toast.error('인증코드 전송에 실패했습니다.');
     } finally {
       setIsEmailVerifying(false); // 인증 요청 완료
     }
@@ -172,7 +177,7 @@ export default function SignUp() {
     if (isPhoneVerifying) return; // 이미 인증 요청 중이면 무시
 
     if (!formData.phoneNumber) {
-      alert('전화번호를 입력해주세요.');
+      toast.error('전화번호를 입력해주세요.');
       return;
     }
 
@@ -200,11 +205,11 @@ export default function SignUp() {
           phoneVerificationRef.current?.focus();
         }, 100);
       } else {
-        alert('인증코드 전송에 실패했습니다.');
+        toast.error('인증코드 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('전화번호 인증 요청 오류', error);
-      alert('인증코드 전송에 실패했습니다.');
+      toast.error('인증코드 전송에 실패했습니다.');
     } finally {
       setIsPhoneVerifying(false); // 인증 요청 완료
     }
@@ -232,7 +237,7 @@ export default function SignUp() {
           phoneInputRef.current?.focus();
         }, 100);
       } else {
-        alert('인증코드가 일치하지 않습니다.');
+        toast.error('인증코드가 일치하지 않습니다.');
       }
 
       console.log('이메일 인증코드 확인 응답', response);
@@ -262,7 +267,7 @@ export default function SignUp() {
         passwordInputRef.current?.focus();
       }, 100);
     } else {
-      alert('인증코드가 일치하지 않습니다.');
+      toast.error('인증코드가 일치하지 않습니다.');
     }
   }, [formData.phoneVerificationCode, formData.phoneNumber]);
 
@@ -279,6 +284,9 @@ export default function SignUp() {
       return;
     }
 
+    // 오류 메시지 초기화
+    setError(null);
+
     console.log('회원가입 요청', formData);
 
     try {
@@ -294,10 +302,10 @@ export default function SignUp() {
       const response = await api.post('/join', data);
 
       if ((response.data as { status?: string })?.status === 'CREATED') {
-        alert('회원가입이 완료되었습니다.');
+        toast.success('회원가입이 완료되었습니다.');
         router.push('/login');
       } else {
-        alert('회원가입에 실패했습니다.');
+        setError('회원가입에 실패했습니다.');
       }
     } catch (error: unknown) {
       console.error('회원가입 오류', error);
@@ -311,15 +319,13 @@ export default function SignUp() {
           };
         };
 
-        if (apiError.response?.status === 409) {
-          alert('이미 사용 중인 닉네임입니다.');
-        } else if (apiError.response?.data?.message) {
-          alert(apiError.response.data.message);
+        if (apiError.response?.data?.message) {
+          setError(apiError.response.data.message);
         } else {
-          alert('회원가입에 실패했습니다.');
+          setError('회원가입에 실패했습니다.');
         }
       } else {
-        alert('회원가입에 실패했습니다.');
+        setError('회원가입에 실패했습니다.');
       }
     }
   };
@@ -546,6 +552,47 @@ export default function SignUp() {
             showHelpText={passwordMatch !== 'none'}
             helpTextColor={passwordHelpTextColor}
           />
+
+          {/* 인증 오류 메시지 */}
+          {verificationError && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg
+                  className="w-4 h-4 text-red-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm text-red-800">{verificationError}</p>
+            </div>
+          )}
+
+          {/* 오류 메시지 */}
+          {error && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg
+                  className="w-4 h-4 text-red-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={!isFormValid}
