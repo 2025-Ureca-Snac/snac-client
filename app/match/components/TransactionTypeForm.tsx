@@ -69,8 +69,8 @@ export default function TransactionTypeForm({
           title="데이터량"
           options={filterOptions.dataAmount}
           selectedValues={selectedFilters.dataAmount}
-          onValueChange={(value) => onFilterChange('dataAmount', value, true)}
-          multiSelect={true}
+          onValueChange={(value) => onFilterChange('dataAmount', value, false)}
+          multiSelect={false}
         />
 
         <FilterGroup
