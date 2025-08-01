@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/app/(shared)/components/Header';
 import { Footer } from '@/app/(shared)/components/Footer';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
@@ -19,34 +19,65 @@ const ToastEditor = dynamic(
 
 interface BlogPostForm {
   title: string;
-  subtitle: string;
   author: string;
-  category: string;
   content: string;
   markdownContent: string;
-  featured: boolean;
   images: string[];
   imagePositions: number[];
 }
 
+interface PostApiResponse {
+  data: BlogPostForm;
+}
+
 export default function BlogAdminPage() {
   const router = useRouter();
+  const params = useSearchParams();
+  const editId = params.get('edit');
   const user = useAuthStore((state) => state.user);
 
   const [formData, setFormData] = useState<BlogPostForm>({
     title: '',
-    subtitle: '',
+
     author: '',
-    category: '',
+
     content: '',
     markdownContent: '',
-    featured: false,
+
     images: [],
     imagePositions: [],
   });
 
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
+
+  useEffect(() => {
+    if (user && !editId) {
+      setFormData((prev) => ({ ...prev, author: user }));
+    }
+  }, [user, editId]);
+
+  useEffect(() => {
+    if (!editId) return;
+    const fetchPost = async () => {
+      try {
+        const res = await api.get<PostApiResponse>(`/articles/${editId}`);
+        const post = res.data.data;
+        setFormData({
+          title: post.title || '',
+          author: post.author || '',
+          content: post.content || '',
+          markdownContent: post.markdownContent || post.content || '',
+          images: post.images || [],
+          imagePositions: post.imagePositions || [],
+        });
+      } catch (error) {
+        console.error('Failed to fetch existing post:', error);
+        toast.error('기존 포스트를 불러오지 못했습니다.');
+      }
+    };
+    fetchPost();
+  }, [editId]);
 
   const handleInputChange = (
     field: keyof BlogPostForm,
@@ -61,15 +92,16 @@ export default function BlogAdminPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.markdownContent || !mainImageFile) {
+    if (
+      !formData.title ||
+      !formData.markdownContent ||
+      (!mainImageFile && !editId)
+    ) {
       toast.error('제목, 본문 파일, 이미지 파일을 모두 첨부해야 합니다.');
       return;
     }
 
-    console.log('user:', user);
-
     const data = new FormData();
-
     const markdownBlob = new Blob([formData.markdownContent], {
       type: 'text/markdown',
     });
@@ -77,59 +109,57 @@ export default function BlogAdminPage() {
       formData.title.trim().replace(/[\s/\\?%*:|"<>]/g, '_') || 'content';
 
     data.append('file', markdownBlob, `${markdownFileName}.md`);
-    data.append('image', mainImageFile);
+    if (mainImageFile) data.append('image', mainImageFile);
     data.append('title', formData.title);
     data.append('author', formData.author);
     data.append('content', formData.content);
-    console.log('첨부된 파일:', data.get('file'));
-    try {
-      await api.post('/articles', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
 
-      toast.success('블로그 포스트가 성공적으로 등록되었습니다!');
+    try {
+      if (editId) {
+        await api.put(`/articles/${editId}`, data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        toast.success('블로그 포스트가 성공적으로 수정되었습니다!');
+      } else {
+        await api.post('/articles', data, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        toast.success('블로그 포스트가 성공적으로 등록되었습니다!');
+      }
 
       router.push('/admin/blog');
-
-      // 페이지가 이동되므로 아래 상태 초기화는 필수는 아니지만,
-      // 만약을 위해 그대로 뒀어요.
       (e.target as HTMLFormElement).reset();
-
       setFormData({
         title: '',
-        subtitle: '',
         author: '',
-        category: '',
         content: '',
         markdownContent: '',
-        featured: false,
         images: [],
         imagePositions: [],
       });
-
       setMainImageFile(null);
     } catch (error) {
       const errorMessage =
         (error as { response?: { data?: { message: string } } })?.response?.data
           ?.message ||
         (error as Error)?.message ||
-        '등록 실패';
-      toast.error(`포스트 등록 실패: ${errorMessage}`);
-      console.error('Failed to create blog post:', error);
+        (editId ? '수정 실패' : '등록 실패');
+      toast.error(`포스트 ${editId ? '수정' : '등록'} 실패: ${errorMessage}`);
+      console.error('Failed to save blog post:', error);
     }
   };
 
   const handleReset = () => {
     setFormData({
       title: '',
-      subtitle: '',
       author: '',
-      category: '',
       content: '',
       markdownContent: '',
-      featured: false,
+
       images: [],
       imagePositions: [],
     });
@@ -149,7 +179,7 @@ export default function BlogAdminPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-light p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            블로그 포스트 작성
+            {editId ? '블로그 포스트 수정' : '블로그 포스트 작성'}
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -170,7 +200,8 @@ export default function BlogAdminPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  대표 이미지 파일 <span className="text-red">*</span>
+                  대표 이미지 파일
+                  {!editId && <span className="text-red">*</span>}
                 </label>
                 <input
                   type="file"
@@ -179,8 +210,15 @@ export default function BlogAdminPage() {
                   }
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
                   accept="image/*"
-                  required
+                  required={!editId}
                 />
+                {editId && !mainImageFile && formData.images?.[0] && (
+                  <img
+                    src={formData.images[0]}
+                    alt="기존 대표 이미지"
+                    className="w-32 h-32 rounded mt-2 border"
+                  />
+                )}
               </div>
             </div>
 
@@ -231,7 +269,7 @@ export default function BlogAdminPage() {
                 type="submit"
                 className="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
-                포스트 저장
+                {editId ? '포스트 수정' : '포스트 저장'}
               </button>
             </div>
           </form>
