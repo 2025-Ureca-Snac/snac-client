@@ -151,11 +151,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       set({
         disputes: res.data.data || [],
         hasNext: !!res.data.hasNext,
-        loading: false,
       });
     } catch (error) {
-      set({ loading: false, error: '분쟁 목록 조회 실패' });
+      set({ error: '분쟁 목록 조회 실패' });
       toast.error(handleApiError(error));
+    } finally {
+      set({ loading: false });
     }
   },
 
@@ -163,10 +164,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await api.get<DisputeDetailResponse>(`/admin/disputes/${id}`);
-      set({ currentDispute: res.data.data, loading: false });
+      set({ currentDispute: res.data.data });
     } catch (error) {
-      set({ loading: false, error: '분쟁 상세 조회 실패' });
+      set({ error: '분쟁 상세 조회 실패' });
       toast.error(handleApiError(error));
+    } finally {
+      set({ loading: false });
     }
   },
 
@@ -179,10 +182,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
           params: { page, size },
         }
       );
-      set({ pendingDisputes: res.data.data || [], loading: false });
+      set({ pendingDisputes: res.data.data || [] });
     } catch (error) {
-      set({ loading: false, error: '보류 분쟁 조회 실패' });
+      set({ error: '보류 분쟁 조회 실패' });
       toast.error(handleApiError(error));
+    } finally {
+      set({ loading: false });
     }
   },
 
