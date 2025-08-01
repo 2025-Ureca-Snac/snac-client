@@ -27,7 +27,7 @@ export const actionButtons: ActionButton[] = [
     href: '/mypage/purchase-history',
   },
   {
-    label: '신고 내역',
+    label: '문의 내역',
     icon: '⚠️',
     hasNotification: false,
     href: '/mypage/report-history',

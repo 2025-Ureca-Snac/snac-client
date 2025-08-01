@@ -106,7 +106,9 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-1">
           <div className="font-bold text-2xl text-foreground">
-            {profile?.nickname || '사용자'}
+            {profile?.name
+              ? `${profile.name}(${profile.nickname || '닉네임'})`
+              : profile?.nickname || '사용자'}
           </div>
           <button
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded px-2 py-1"
