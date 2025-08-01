@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import type { Metadata, ResolvingMetadata } from 'next'; // 1. Metadata 관련 타입 import
+import type { Metadata, ResolvingMetadata } from 'next';
 import BlogPostPageClient from './blog-post-page-client';
 import BlogStructuredData from '../components/BlogStructuredData';
 import { generateBlogPostMetadata } from '../metadata';
