@@ -35,6 +35,7 @@ export interface HistoryItem {
   carrier?: string;
   dataAmount?: string;
   phoneNumber?: string;
+  cancelReason?: string;
 }
 
 /**
