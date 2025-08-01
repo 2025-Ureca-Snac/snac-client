@@ -11,7 +11,6 @@ import { useAdminStore } from '../(shared)/stores/use-admin-store';
 import ManagerIcon from '@/public/manager.svg';
 import NewReportIcon from '@/public/newReport.svg';
 import PostIcon from '@/public/post.svg';
-
 import Menu from '@/public/menu.svg';
 import DataBaseIcon from '@/public/database.svg';
 
@@ -33,7 +32,7 @@ function Sidebar() {
   const NAV_ITEMS = [
     { name: '대시보드', icon: DataBaseIcon, href: '/admin' },
     { name: '게시글 관리', icon: PostIcon, href: '/admin/blog' },
-    { name: '신고 관리', icon: NewReportIcon, href: '/admin/reports' },
+    { name: '신고 관리', icon: NewReportIcon, href: '/admin/dispute' },
   ];
 
   return (
@@ -44,7 +43,7 @@ function Sidebar() {
     >
       <div className="flex flex-col h-full shadow-light rounded-lg bg-white mr-5">
         <div className="flex items-center justify-center h-16   gap-2">
-          <ManagerIcon className="h-6 w-6 text-blue-600" />
+          <ManagerIcon className="h-6 w-6 text-gray-600" />
           <span className="text-midnight-black text-lg font-bold">
             관리자 패널
           </span>
@@ -83,7 +82,7 @@ function AdminHeader() {
   const getTitle = () => {
     if (pathname.startsWith('/admin/blog')) return '게시글 관리';
     if (pathname.startsWith('/admin/users')) return '사용자 관리';
-    if (pathname.startsWith('/admin/reports')) return '신고 관리';
+    if (pathname.startsWith('/admin/dispute')) return '신고 관리';
     return '대시보드';
   };
 
