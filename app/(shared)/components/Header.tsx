@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MenuLink } from './MenuLink';
 
-export const Header: FC = () => {
+export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const isLoggedIn: boolean = !!user;
 
@@ -18,12 +18,16 @@ export const Header: FC = () => {
       </Link>
 
       <div className="flex gap-4 items-center">
-        <MenuLink
-          href="/match"
-          imgSrc="/matching.svg"
-          alt="실시간 매칭"
-          text="실시간 매칭"
-        />
+        {isTrading ? (
+          <></>
+        ) : (
+          <MenuLink
+            href="/match"
+            imgSrc="/matching.svg"
+            alt="실시간 매칭"
+            text="실시간 매칭"
+          />
+        )}
 
         {isLoggedIn ? (
           <MenuLink

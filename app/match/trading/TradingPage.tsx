@@ -290,7 +290,7 @@ export default function TradingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+      <Header isTrading={true} />
 
       {/* 헤더 */}
       <TradingHeader timeLeft={timeLeft} currentStep={currentStep} />
