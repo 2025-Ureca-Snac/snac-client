@@ -1,18 +1,8 @@
 import Image from 'next/image';
-
-export interface BlogPost {
-  id: number;
-  title: string;
-  subtitle: string;
-  image: string;
-  featured: boolean;
-  author?: string;
-  readTime?: string;
-  category?: string;
-}
+import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
 interface BlogCardProps {
-  post: BlogPost;
+  post: Blog;
   onClick?: () => void;
   variant?: 'default' | 'compact' | 'detailed';
   showAuthor?: boolean;
@@ -29,14 +19,13 @@ interface BlogCardProps {
  * @example
  * ```tsx
  * <BlogCard
- *   post={{
- *     id: 1,
- *     title: "포스트 제목",
- *     subtitle: "포스트 설명",
- *     image: "/image.jpg",
- *     featured: true
- *   }}
- *   onClick={() => console.log('카드 클릭됨')}
+ * post={{
+ * id: 1,
+ * title: "포스트 제목",
+ * nickname: "작성자 닉네임", // subtitle -> nickname
+ * imageUrl: "/image.jpg", // image -> imageUrl
+ * }}
+ * onClick={() => console.log('카드 클릭됨')}
  * />
  * ```
  */
@@ -44,12 +33,16 @@ export const BlogCard = ({
   post,
   onClick,
   variant = 'default',
-  showAuthor = false,
-  showReadTime = false,
-  showCategory = false,
+  // showAuthor = false,
+  // showReadTime = false,
+  // showCategory = false,
 }: BlogCardProps) => {
   const isCompact = variant === 'compact';
   const isDetailed = variant === 'detailed';
+
+  const imageUrl =
+    post.imageUrl || 'https://placehold.co/400x300/E2E8F0/4A5568?text=No+Image';
+  const author = post.nickname || '';
 
   return (
     <div
@@ -63,65 +56,55 @@ export const BlogCard = ({
         className={`relative ${isCompact ? 'h-32' : isDetailed ? 'h-48' : 'h-full'}`}
       >
         <Image
-          src={post.image}
+          src={imageUrl}
           alt={post.title}
           width={400}
           height={300}
           className="object-cover transition-transform duration-300 group-hover:scale-105 w-full h-full"
           priority
+          // onError={(e) => {
+          //   e.currentTarget.src =
+          //     'https://placehold.co/400x300/E2E8F0/4A5568?text=Error';
+          // }}
         />
 
-        {/* 카테고리 배지 */}
-        {showCategory && post.category && (
+        {/* 카테고리 배지 (주석 유지) - API에 category가 없으므로 렌더링되지 않음 */}
+        {/* {showCategory && (post as any).category && (
           <div className="absolute top-2 left-2">
             <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-              {post.category}
+              {(post as any).category}
             </span>
           </div>
-        )}
+        )} */}
 
-        {/* 추천 배지 */}
-        {post.featured && (
+        {/* 추천 배지 (주석 유지) - API에 featured가 없으므로 렌더링되지 않음 */}
+        {/* {(post as any).featured && (
           <div className="absolute top-2 right-2">
             <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
               추천
             </span>
           </div>
-        )}
+        )} */}
       </div>
 
-      {/* 텍스트 오버레이 (기본/컴팩트 모드) */}
       {!isDetailed && (
         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5">
-          <h3 className="text-white text-lg font-semibold mb-2 drop-shadow-md line-clamp-2">
+          <h3 className="text-white text-regular-lg font-semibold mb-2 drop-shadow-md line-clamp-2">
             {post.title}
           </h3>
-          <p className="text-white text-sm font-medium drop-shadow-md flex items-center gap-1">
-            {post.subtitle}
+          <p className="text-white text-regular-sm font-medium drop-shadow-md flex items-center gap-1">
+            {author}
           </p>
         </div>
       )}
 
-      {/* 상세 정보 (상세 모드) */}
+      {/* 상세 정보 (상세 모드)  */}
       {isDetailed && (
         <div className="p-4 bg-white">
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-lg">
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-regular-lg">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {post.subtitle}
-          </p>
-
-          {/* 메타 정보 */}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            {showAuthor && post.author && <span>{post.author}</span>}
-            {showReadTime && post.readTime && (
-              <>
-                {showAuthor && post.author && <span>•</span>}
-                <span>{post.readTime}</span>
-              </>
-            )}
-          </div>
+          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{author}</p>
         </div>
       )}
     </div>

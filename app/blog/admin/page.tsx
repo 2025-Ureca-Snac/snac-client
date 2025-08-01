@@ -78,11 +78,7 @@ export default function BlogAdminPage() {
 
     data.append('file', markdownBlob, `${markdownFileName}.md`);
     data.append('image', mainImageFile);
-
     data.append('title', formData.title);
-    data.append('subtitle', formData.subtitle);
-    data.append('category', formData.category);
-    data.append('featured', String(formData.featured));
     data.append('author', formData.author);
     data.append('content', formData.content);
     console.log('첨부된 파일:', data.get('file'));
@@ -98,7 +94,7 @@ export default function BlogAdminPage() {
       router.push('/admin/blog');
 
       // 페이지가 이동되므로 아래 상태 초기화는 필수는 아니지만,
-      // 만약을 위해 그대로 두릅
+      // 만약을 위해 그대로 뒀어요.
       (e.target as HTMLFormElement).reset();
 
       setFormData({
@@ -174,58 +170,6 @@ export default function BlogAdminPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  부제목
-                </label>
-                <input
-                  type="text"
-                  value={formData.subtitle}
-                  onChange={(e) =>
-                    handleInputChange('subtitle', e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  작성자 <span className="text-red">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.author}
-                  onChange={(e) => handleInputChange('author', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  카테고리 <span className="text-red">*</span>
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    handleInputChange('category', e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  required
-                >
-                  <option value="">카테고리 선택</option>
-                  <option value="마케팅">마케팅</option>
-                  <option value="데이터분석">데이터분석</option>
-                  <option value="트렌드">트렌드</option>
-                  <option value="브랜딩">브랜딩</option>
-                  <option value="소셜미디어">소셜미디어</option>
-                  <option value="고객경험">고객경험</option>
-                  <option value="콘텐츠마케팅">콘텐츠마케팅</option>
-                  <option value="SEO">SEO</option>
-                  <option value="이메일마케팅">이메일마케팅</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   대표 이미지 파일 <span className="text-red">*</span>
                 </label>
                 <input
@@ -238,30 +182,13 @@ export default function BlogAdminPage() {
                   required
                 />
               </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="featured"
-                  checked={formData.featured}
-                  onChange={(e) =>
-                    handleInputChange('featured', e.target.checked)
-                  }
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="featured"
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  추천 포스트로 설정
-                </label>
-              </div>
             </div>
+
             {/* 마크다운 에디터 */}
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  마크다운 콘텐츠 *
+                  마크다운 콘텐츠 <span className="text-red">*</span>
                 </label>
                 <button
                   type="button"
@@ -289,19 +216,6 @@ export default function BlogAdminPage() {
                   }
                 />
               )}
-            </div>
-
-            {/* 일반 텍스트 콘텐츠 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                일반 텍스트 콘텐츠 (선택사항)
-              </label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => handleInputChange('content', e.target.value)}
-                className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                placeholder="마크다운을 사용하지 않을 경우 일반 텍스트로 콘텐츠를 작성하세요."
-              />
             </div>
 
             {/* 제출 버튼 */}
