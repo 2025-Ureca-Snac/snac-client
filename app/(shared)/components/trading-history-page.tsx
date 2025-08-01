@@ -189,6 +189,7 @@ export default function TradingHistoryPage({
       carrier: item.carrier,
       dataAmount: `${item.dataAmount}GB`,
       phoneNumber: item.phone || '',
+      cancelReason: item.cancelReason || '',
     };
     setSelectedItem(historyItem);
     setIsModalOpen(true);

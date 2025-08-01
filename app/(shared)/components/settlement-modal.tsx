@@ -213,11 +213,19 @@ export default function SettlementModal({
     setError(null);
 
     try {
+      // 선택된 계좌의 실제 계좌번호 찾기
+      const selectedAccount = accounts.find(
+        (acc) => acc.id === selectedAccountId
+      );
+      if (!selectedAccount) {
+        setError('선택된 계좌를 찾을 수 없습니다.');
+        return;
+      }
+
       // 정산 API 호출
-      const response = await api.post('/money/settle', {
+      const response = await api.post('/settlements', {
         amount: formData.amount,
-        accountId: selectedAccountId,
-        message: formData.message || '',
+        accountNumber: selectedAccount.accountNumber,
       });
 
       console.log('정산 성공:', response.data);
@@ -225,6 +233,14 @@ export default function SettlementModal({
       // 성공 콜백 호출
       if (onSettlementSuccess) {
         onSettlementSuccess(formData.amount, '정산');
+      }
+
+      // 사용자 정보 새로고침
+      try {
+        const { useUserStore } = await import('../stores/user-store');
+        await useUserStore.getState().fetchUserProfile();
+      } catch (error) {
+        console.error('사용자 정보 새로고침 실패:', error);
       }
 
       alert('정산이 성공적으로 완료되었습니다!');

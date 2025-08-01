@@ -93,6 +93,7 @@ export const getCurrentStep = (
       case 'ACCEPTED':
         return 2;
       case 'PAYMENT_CONFIRMED':
+      case 'PAYMENT_CONFIRMED_ACCEPTED':
         return 3; // 구매자가 결제 → 바로 매칭
       case 'DATA_SENT':
         return 4; // 판매자가 데이터 전송
