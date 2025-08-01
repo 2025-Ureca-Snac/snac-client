@@ -15,6 +15,7 @@ import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
 //import { useAuthStore } from '../(shared)/stores/auth-store';
 import TradeCancelModal from '../(shared)/components/TradeCancelModal';
+import { toast } from 'sonner';
 
 interface ServerTradeData {
   tradeId: number;
@@ -59,7 +60,7 @@ export default function MatchPage() {
   const [connectedUsers, setConnectedUsers] = useState<number>(0); // 접속자 수
   const [sellerInfo, setSellerInfo] = useState({
     dataAmount: 1,
-    price: 1500,
+    price: 100, // 최소 가격을 100원으로 설정
     carrier: 'SKT',
     isActive: false,
   });
@@ -215,7 +216,7 @@ export default function MatchPage() {
       // 판매자 모드일 때도 appliedFilters 업데이트
       setAppliedFilters(pendingFilters);
     }
-  }, [pendingFilters, matchingStatus, registerBuyerFilter]);
+  }, [pendingFilters, matchingStatus, registerBuyerFilter, setActiveSellers]);
 
   const handleResetFilters = useCallback(() => {
     const emptyFilters = {
@@ -234,7 +235,7 @@ export default function MatchPage() {
     setActiveSellers([]);
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
-  }, []);
+  }, [setActiveSellers]);
 
   // 구매자 매칭 상태에서 뒤로가기
   const handleGoBackToSearch = useCallback(() => {
@@ -250,7 +251,7 @@ export default function MatchPage() {
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
     // pendingFilters는 유지해서 사용자가 이전 선택을 볼 수 있도록 함
-  }, []);
+  }, [setActiveSellers]);
 
   // 판매자 정보 관리
   const handleSellerInfoChange = useCallback(
@@ -266,6 +267,39 @@ export default function MatchPage() {
   );
 
   const handleToggleSellerStatus = useCallback(() => {
+    // 판매 활성화 시도 시 가격 유효성 검사
+    if (!sellerInfo.isActive) {
+      // 가격이 100원 미만인 경우
+      if (sellerInfo.price < 100) {
+        toast.error('가격은 최소 100원 이상이어야 합니다.', {
+          description: '가격을 100원 이상으로 설정해주세요.',
+          duration: 3000,
+        });
+        return;
+      }
+
+      // 가격이 10000원 초과인 경우
+      if (sellerInfo.price > 10000) {
+        toast.error('가격은 최대 10,000원까지 설정 가능합니다.', {
+          description: '가격을 10,000원 이하로 설정해주세요.',
+          duration: 3000,
+        });
+        return;
+      }
+
+      // 유효성 검사 통과 시 성공 메시지
+      toast.success('판매가 시작되었습니다!', {
+        description: `${sellerInfo.dataAmount}GB를 ${sellerInfo.price.toLocaleString()}원에 판매 중입니다.`,
+        duration: 3000,
+      });
+    } else {
+      // 판매 비활성화 시 안내 메시지
+      toast.info('판매가 중단되었습니다.', {
+        description: '언제든지 다시 판매를 시작할 수 있습니다.',
+        duration: 3000,
+      });
+    }
+
     const newInfo = { ...sellerInfo, isActive: !sellerInfo.isActive };
     setSellerInfo(newInfo);
 
@@ -332,7 +366,7 @@ export default function MatchPage() {
         }, 500);
       }
     },
-    [incomingRequests, respondToTrade, sellerInfo, foundMatch, router]
+    [incomingRequests, respondToTrade, foundMatch, router]
   );
   return (
     <div className="min-h-screen flex flex-col bg-white">

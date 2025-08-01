@@ -195,6 +195,9 @@ export default function FilterSection({
               handleFilterChange('transactionType', value, false)
             }
             multiSelect={false}
+            disabled={
+              sellerInfo?.isActive && currentTransactionType === '판매자'
+            }
           />
 
           {/* 거래 방식에 따른 폼 */}

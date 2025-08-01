@@ -15,8 +15,10 @@ export default function PriceInput({
 }: PriceInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (disabled) return;
-    const newValue = parseInt(e.target.value) || 0;
-    onChange(newValue);
+    const newValue = parseInt(e.target.value) || 1500; // 최소값을 100으로 설정
+    // 범위 제한: 100원 ~ 10,000원
+    const clampedValue = Math.max(100, Math.min(10000, newValue));
+    onChange(clampedValue);
   };
 
   return (
