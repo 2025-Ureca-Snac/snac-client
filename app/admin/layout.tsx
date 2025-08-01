@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Footer } from '@/app/(shared)/components/Footer';
 import { Header } from '@/app/(shared)/components/Header';
-
+import { ConfirmationModal } from '@/app/(shared)/components/ConfirmationModal';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdminStore } from '../(shared)/stores/use-admin-store';
@@ -127,6 +127,7 @@ export default function AdminLayout({
           <main className="flex-1 p-4">{children}</main>
         </div>
       </div>
+      <ConfirmationModal />
       <Footer />
     </div>
   );

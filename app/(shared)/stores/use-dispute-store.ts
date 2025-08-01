@@ -37,18 +37,15 @@ interface DisputeStore {
   error: string | null;
   hasNext: boolean;
   currentPage: number;
-  setCurrentPage: (page: number) => void;
+  setCurrentPage: (page: number) => void; // --- 모달 공통 상태 ---
 
-  // --- 모달 공통 상태 ---
-  selectedDisputeId: string | null;
+  selectedDisputeId: string | null; // --- 삭제 모달 관련 상태 및 함수 ---
 
-  // --- 삭제 모달 관련 상태 및 함수 ---
   isDeleteModalOpen: boolean;
   openDeleteModal: (id: string) => void;
   closeDeleteModal: () => void;
-  deleteDispute: (id: string) => Promise<void>;
+  deleteDispute: (id: string) => Promise<void>; // --- 해결 모달 관련 상태 및 함수 ---
 
-  // --- 해결 모달 관련 상태 및 함수 ---
   isResolveModalOpen: boolean;
   openResolveModal: (id: string) => void;
   closeResolveModal: () => void;
@@ -57,9 +54,14 @@ interface DisputeStore {
     result: DisputeStatus,
     answer: string
   ) => Promise<boolean>;
-  fetchDisputeById: (id: string) => Promise<Dispute | null>;
+  fetchDisputeById: (id: string) => Promise<Dispute | null>; // --- 확인 모달 관련 상태 및 함수 ---
 
-  // --- 기존 액션 함수들 ---
+  isConfirmModalOpen: boolean;
+  confirmMessage: string;
+  confirmAction: (() => void) | null;
+  openConfirmModal: (message: string, onConfirm: () => void) => void;
+  closeConfirmModal: () => void; // --- 기존 액션 함수들 ---
+
   fetchDisputes: (params?: {
     status?: DisputeStatus;
     type?: DisputeType;
@@ -82,12 +84,10 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
   error: null,
   hasNext: false,
   currentPage: 0,
-  setCurrentPage: (page) => set({ currentPage: page }),
+  setCurrentPage: (page) => set({ currentPage: page }), // --- 모달 공통 상태 초기화 ---
 
-  // --- 모달 공통 상태 초기화 ---
-  selectedDisputeId: null,
+  selectedDisputeId: null, // --- 삭제 모달 관련 구현 ---
 
-  // --- 삭제 모달 관련 구현 ---
   isDeleteModalOpen: false,
   openDeleteModal: (id) =>
     set({ isDeleteModalOpen: true, selectedDisputeId: id }),
@@ -105,9 +105,8 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
-  },
+  }, // --- 해결 모달 관련 구현 ---
 
-  // --- 해결 모달 관련 구현 ---
   isResolveModalOpen: false,
   openResolveModal: (id) =>
     set({ isResolveModalOpen: true, selectedDisputeId: id }),
@@ -127,6 +126,24 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       set({ loading: false });
     }
   },
+
+  // --- 확인 모달 관련 구현 ---
+  isConfirmModalOpen: false,
+  confirmMessage: '',
+  confirmAction: null,
+  openConfirmModal: (message, onConfirm) =>
+    set({
+      isConfirmModalOpen: true,
+      confirmMessage: message,
+      confirmAction: onConfirm,
+    }),
+  closeConfirmModal: () =>
+    set({
+      isConfirmModalOpen: false,
+      confirmMessage: '',
+      confirmAction: null,
+    }),
+
   async fetchDisputeById(id) {
     set({ loading: true, error: null });
     try {
@@ -138,9 +155,8 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
-  },
+  }, // --- 기존 액션 함수들 ---
 
-  // --- 기존 액션 함수들 ---
   async fetchDisputes(params = {}) {
     set({ loading: true, error: null });
     try {
@@ -198,7 +214,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       toast.success('환불 및 취소 처리 완료');
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
-      set({ error: '환불/취소 실패', loading: false });
+      set({ error: '환불/취소 실패' });
       toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
@@ -212,7 +228,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       toast.success('판매자 패널티 부여 완료');
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
-      set({ error: '패널티 처리 실패', loading: false });
+      set({ error: '패널티 처리 실패' });
       toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
@@ -226,7 +242,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       toast.success('분쟁 최종 처리 완료');
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
-      set({ error: '최종 처리 실패', loading: false });
+      set({ error: '최종 처리 실패' });
       toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
