@@ -595,6 +595,23 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     [userRole]
   );
 
+  // 구매자 필터 제거
+  const removeBuyerFilter = useCallback(() => {
+    if (!globalStompClient?.connected || userRole !== 'buyer') {
+      console.warn(
+        '⚠️ 필터 제거 실패: WebSocket 연결되지 않음 또는 구매자가 아님'
+      );
+      return;
+    }
+
+    console.log('🗑️ 구매자 필터 제거 요청');
+
+    globalStompClient.publish({
+      destination: '/app/filter/remove',
+      body: JSON.stringify({}), // 빈 객체 또는 필요한 데이터
+    });
+  }, [userRole]);
+
   // 판매자 카드 등록
   const registerSellerCard = useCallback(
     (sellerInfo: { carrier: string; dataAmount: number; price: number }) => {
@@ -756,6 +773,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     registerSellerCard,
     deleteSellerCard,
     registerBuyerFilter,
+    removeBuyerFilter,
     respondToTrade,
     createTrade,
     sendPayment,

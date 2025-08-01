@@ -141,6 +141,7 @@ export default function MatchPage() {
     registerSellerCard,
     deleteSellerCard,
     registerBuyerFilter,
+    removeBuyerFilter,
     respondToTrade,
     createTrade,
     sendPayment,
@@ -155,13 +156,25 @@ export default function MatchPage() {
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
   });
 
-  // MatchPage 활성화
+  // MatchPage 활성화 및 초기화
   useEffect(() => {
     activatePage('match', handleTradeStatusChange);
+
+    // 페이지 진입 시 이전 판매자 목록 초기화 및 필터 제거
+    console.log('🔄 MatchPage 진입 - 이전 데이터 초기화');
+    setActiveSellers([]);
+    removeBuyerFilter(); // 서버에 필터 제거 요청
+
     return () => {
       deactivatePage('match');
     };
-  }, [activatePage, deactivatePage, handleTradeStatusChange]);
+  }, [
+    activatePage,
+    deactivatePage,
+    handleTradeStatusChange,
+    setActiveSellers,
+    removeBuyerFilter,
+  ]);
 
   // WebSocket 함수들을 store에 저장
   useEffect(() => {
@@ -252,7 +265,10 @@ export default function MatchPage() {
     setActiveSellers([]);
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
-  }, [setActiveSellers]);
+
+    // 서버에 필터 제거 요청
+    removeBuyerFilter();
+  }, [setActiveSellers, removeBuyerFilter]);
 
   // 구매자 매칭 상태에서 뒤로가기
   const handleGoBackToSearch = useCallback(() => {
@@ -268,7 +284,10 @@ export default function MatchPage() {
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
     // pendingFilters는 유지해서 사용자가 이전 선택을 볼 수 있도록 함
-  }, [setActiveSellers]);
+
+    // 서버에 필터 제거 요청
+    removeBuyerFilter();
+  }, [setActiveSellers, removeBuyerFilter]);
 
   // 판매자 정보 관리
   const handleSellerInfoChange = useCallback(

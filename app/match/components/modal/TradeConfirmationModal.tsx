@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { User } from '../../types/match';
 import { useMatchStore } from '@/app/(shared)/stores/match-store';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
 
 // Lottie Player를 동적으로 import (SSR 문제 방지)
 const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
@@ -29,9 +30,9 @@ export default function TradeConfirmationModal({
   tradeStatus,
 }: TradeConfirmationModalProps) {
   const router = useRouter();
-  const { foundMatch, partner } = useMatchStore();
+  const { partner } = useMatchStore();
   const { user } = useAuthStore();
-
+  useGlobalWebSocket();
   // profile이 없으면 테스트용 데이터 설정
   useEffect(() => {
     if (!user) {
@@ -78,6 +79,7 @@ export default function TradeConfirmationModal({
       // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
         // 1초 후 trading 페이지로 이동
+        /app/efilrt / remove;
         setTimeout(() => {
           router.push('/match/trading');
         }, 1000);
