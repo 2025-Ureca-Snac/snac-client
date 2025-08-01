@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import BlogPostPageClient from './BlogPostPageClient';
+import BlogPostPageClient from './blog-post-page-client';
 import BlogStructuredData from '../components/BlogStructuredData';
 import { generateBlogPostMetadata } from '../metadata';
 import { Blog } from '@/app/(shared)/stores/use-blog-store';
