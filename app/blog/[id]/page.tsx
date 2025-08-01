@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import type { Metadata, ResolvingMetadata } from 'next'; // 1. Metadata 관련 타입 import
 import BlogPostPageClient from './blog-post-page-client';
 import BlogStructuredData from '../components/BlogStructuredData';
 import { generateBlogPostMetadata } from '../metadata';
@@ -24,13 +25,17 @@ async function getPost(id: string): Promise<Blog | null> {
   }
 }
 
-// Props 인터페이스
-interface BlogPostPageProps {
+// 2. 페이지와 메타데이터 함수가 공유할 Props 타입 정의
+type Props = {
   params: { id: string };
-}
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-// 동적 메타데이터 (SEO)
-export async function generateMetadata({ params }: BlogPostPageProps) {
+// 3. 동적 메타데이터 (SEO) - 타입 정의 수정
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   const { id } = params;
   const post = await getPost(id);
 
@@ -41,11 +46,12 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
     };
   }
 
+  // generateBlogPostMetadata가 Metadata 객체를 반환한다고 가정합니다.
   return generateBlogPostMetadata(post);
 }
 
-// 메인 페이지 컴포넌트
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+// 4. 메인 페이지 컴포넌트 - 타입 정의 수정
+export default async function BlogPostPage({ params }: Props) {
   const { id } = params;
   const post = await getPost(id);
 
