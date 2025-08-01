@@ -6,6 +6,7 @@ import InputField from '../(shared)/components/input-field';
 import InputWithButton from '../(shared)/components/input-with-button';
 import VerificationInput from '../(shared)/components/verification-input';
 import PasswordInput from '../(shared)/components/password-input';
+import NicknameInputField from '../(shared)/components/nickname-input-field';
 import type {
   PasswordMatchState,
   SignUpFormData,
@@ -298,8 +299,28 @@ export default function SignUp() {
       } else {
         alert('회원가입에 실패했습니다.');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('회원가입 오류', error);
+
+      // 닉네임 중복 에러 처리
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as {
+          response?: {
+            data?: { message?: string };
+            status?: number;
+          };
+        };
+
+        if (apiError.response?.status === 409) {
+          alert('이미 사용 중인 닉네임입니다.');
+        } else if (apiError.response?.data?.message) {
+          alert(apiError.response.data.message);
+        } else {
+          alert('회원가입에 실패했습니다.');
+        }
+      } else {
+        alert('회원가입에 실패했습니다.');
+      }
     }
   };
 
@@ -413,7 +434,7 @@ export default function SignUp() {
             ref={nameInputRef}
           />
 
-          <InputField
+          <NicknameInputField
             label="유저 닉네임"
             id="nickname"
             name="nickname"

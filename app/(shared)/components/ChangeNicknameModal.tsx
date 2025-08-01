@@ -25,9 +25,15 @@ export default function ChangeNicknameModal({
   const [nickname, setNickname] = useState(currentNickname);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+
   const [remainingTime, setRemainingTime] = useState(0);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+  const [duplicateCheckResult, setDuplicateCheckResult] = useState<{
+    isDuplicate: boolean;
+    message: string;
+  } | null>(null);
   const nicknameRef = useRef<HTMLInputElement>(null);
+  const duplicateCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { profile, updateNickname } = useUserStore();
 
   // 실시간 타이머 업데이트
@@ -54,6 +60,7 @@ export default function ChangeNicknameModal({
   useEffect(() => {
     if (open) {
       setNickname(currentNickname);
+      setDuplicateCheckResult(null);
       setTimeout(() => {
         nicknameRef.current?.focus();
       }, 100);
@@ -62,6 +69,101 @@ export default function ChangeNicknameModal({
 
   // 닉네임 변경 가능 여부 확인
   const canChangeNickname = remainingTime <= 0;
+
+  // 닉네임 중복 체크 함수
+  const checkNicknameDuplicate = useCallback(
+    async (nicknameToCheck: string) => {
+      if (
+        !nicknameToCheck.trim() ||
+        nicknameToCheck.trim() === currentNickname
+      ) {
+        setDuplicateCheckResult(null);
+        return;
+      }
+
+      if (nicknameToCheck.trim().length < 2) {
+        setDuplicateCheckResult({
+          isDuplicate: false,
+          message: '닉네임은 2자 이상 입력해주세요.',
+        });
+        return;
+      }
+
+      setIsCheckingDuplicate(true);
+      setDuplicateCheckResult(null);
+
+      try {
+        const response = await api.post<{
+          data: { isDuplicate: boolean };
+        }>(`/member/check-nickname`, {
+          nickname: nicknameToCheck.trim(),
+        });
+
+        console.log(response);
+
+        if (response.status === 200) {
+          const isDuplicate = response.data.data?.isDuplicate || false;
+          setDuplicateCheckResult({
+            isDuplicate,
+            message: isDuplicate
+              ? '이미 사용 중인 닉네임입니다.'
+              : '사용 가능한 닉네임입니다.',
+          });
+        }
+      } catch (error: unknown) {
+        console.error('닉네임 중복 체크 오류:', error);
+
+        // API 엔드포인트가 없는 경우를 대비한 fallback
+        if (error && typeof error === 'object' && 'response' in error) {
+          const apiError = error as { response?: { status?: number } };
+          if (apiError.response?.status === 404) {
+            // API 엔드포인트가 없는 경우, 중복 체크를 건너뛰고 변경 시에만 체크
+            setDuplicateCheckResult(null);
+          } else {
+            setDuplicateCheckResult({
+              isDuplicate: false,
+              message: '중복 체크 중 오류가 발생했습니다.',
+            });
+          }
+        } else {
+          setDuplicateCheckResult({
+            isDuplicate: false,
+            message: '중복 체크 중 오류가 발생했습니다.',
+          });
+        }
+      } finally {
+        setIsCheckingDuplicate(false);
+      }
+    },
+    [currentNickname]
+  );
+
+  // 디바운싱된 중복 체크
+  useEffect(() => {
+    if (duplicateCheckTimeoutRef.current) {
+      clearTimeout(duplicateCheckTimeoutRef.current);
+    }
+
+    // 닉네임 변경이 제한된 시간 동안에는 중복 체크하지 않음
+    if (!canChangeNickname) {
+      setDuplicateCheckResult(null);
+      return;
+    }
+
+    if (nickname.trim() && nickname.trim() !== currentNickname) {
+      duplicateCheckTimeoutRef.current = setTimeout(() => {
+        checkNicknameDuplicate(nickname);
+      }, 500); // 500ms 디바운싱
+    } else {
+      setDuplicateCheckResult(null);
+    }
+
+    return () => {
+      if (duplicateCheckTimeoutRef.current) {
+        clearTimeout(duplicateCheckTimeoutRef.current);
+      }
+    };
+  }, [nickname, currentNickname, canChangeNickname, checkNicknameDuplicate]);
 
   // 닉네임 변경 처리
   const handleNicknameChange = useCallback(async () => {
@@ -75,6 +177,12 @@ export default function ChangeNicknameModal({
       return;
     }
 
+    // 중복 체크 결과가 있고 중복인 경우
+    if (duplicateCheckResult?.isDuplicate) {
+      setError('이미 사용 중인 닉네임입니다.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -84,7 +192,6 @@ export default function ChangeNicknameModal({
       });
 
       if (response.status === 200) {
-        setSuccess(true);
         // 스토어 업데이트
         updateNickname(nickname.trim());
         // 성공 시 콜백 호출
@@ -115,14 +222,20 @@ export default function ChangeNicknameModal({
     } finally {
       setIsLoading(false);
     }
-  }, [nickname, currentNickname, onSubmit, updateNickname]);
+  }, [
+    nickname,
+    currentNickname,
+    duplicateCheckResult,
+    onSubmit,
+    updateNickname,
+  ]);
 
   // 초기화
   const handleReset = () => {
     setNickname('');
     setError(null);
-    setSuccess(false);
     setIsLoading(false);
+    setDuplicateCheckResult(null);
   };
 
   const handleClose = () => {
@@ -155,6 +268,15 @@ export default function ChangeNicknameModal({
     },
     [nickname, handleNicknameChange]
   );
+
+  // 중복 체크 결과에 따른 버튼 비활성화 조건
+  const isButtonDisabled =
+    !nickname.trim() ||
+    nickname.trim() === currentNickname ||
+    isLoading ||
+    !canChangeNickname ||
+    isCheckingDuplicate ||
+    duplicateCheckResult?.isDuplicate === true;
 
   return (
     <ModalPortal isOpen={open} onClose={handleClose}>
@@ -206,15 +328,6 @@ export default function ChangeNicknameModal({
             현재 닉네임을 수정해주세요.
           </div>
 
-          {/* 성공 메시지 */}
-          {success && (
-            <div className="w-full mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800 text-center">
-                닉네임이 성공적으로 변경되었습니다.
-              </p>
-            </div>
-          )}
-
           {/* 에러 메시지 */}
           {error && (
             <div className="w-full mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -230,44 +343,93 @@ export default function ChangeNicknameModal({
               >
                 닉네임
               </label>
-              <input
-                ref={nicknameRef}
-                type="text"
-                id="nickname"
-                name="nickname"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:text-gray-500"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="닉네임을 입력하세요"
-                maxLength={10}
-                required
-                disabled={success}
-                onKeyDown={handleNicknameKeyDown}
-                tabIndex={0}
-              />
+              <div className="relative">
+                <input
+                  ref={nicknameRef}
+                  type="text"
+                  id="nickname"
+                  name="nickname"
+                  className={`w-full border rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:text-gray-500 pr-10 ${
+                    duplicateCheckResult?.isDuplicate === true
+                      ? 'border-red-300 focus:ring-red-200'
+                      : duplicateCheckResult?.isDuplicate === false
+                        ? 'border-green-300 focus:ring-green-200'
+                        : 'border-gray-200'
+                  }`}
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="닉네임을 입력하세요"
+                  maxLength={10}
+                  required
+                  onKeyDown={handleNicknameKeyDown}
+                  tabIndex={0}
+                />
+                {/* 중복 체크 로딩 아이콘 */}
+                {isCheckingDuplicate && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                  </div>
+                )}
+                {/* 중복 체크 결과 아이콘 */}
+                {!isCheckingDuplicate && duplicateCheckResult && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    {duplicateCheckResult.isDuplicate ? (
+                      <svg
+                        className="w-4 h-4 text-red-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4 text-green-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="text-xs text-gray-500 mt-1">
                 최대 10자까지 입력 가능합니다.
               </div>
+              {/* 중복 체크 결과 메시지 */}
+              {duplicateCheckResult && (
+                <div
+                  className={`text-xs mt-1 ${
+                    duplicateCheckResult.isDuplicate
+                      ? 'text-red-500'
+                      : 'text-green-500'
+                  }`}
+                >
+                  {duplicateCheckResult.message}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="w-full flex gap-2 mb-2">
             <button
               type="submit"
-              disabled={
-                !nickname.trim() ||
-                nickname.trim() === currentNickname ||
-                isLoading ||
-                success ||
-                !canChangeNickname
-              }
+              disabled={isButtonDisabled}
               className="w-2/3 py-3 rounded-lg bg-blue-200 text-black font-bold text-lg hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
               tabIndex={0}
             >
-              {success
-                ? '완료'
-                : isLoading
-                  ? '처리중...'
+              {isLoading
+                ? '처리중...'
+                : isCheckingDuplicate
+                  ? '확인중...'
                   : !canChangeNickname
                     ? formatRemainingTime(remainingTime)
                     : '변경하기'}
