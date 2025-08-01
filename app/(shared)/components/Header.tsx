@@ -10,11 +10,13 @@ import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
+
+const ADMIN_ROLE = 'ADMIN';
 export const Header: FC = () => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
-  const isAdmin: boolean = role === 'ADMIN';
+  const isAdmin: boolean = role === ADMIN_ROLE;
 
   return (
     <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center ">
