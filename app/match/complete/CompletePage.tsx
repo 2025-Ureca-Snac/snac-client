@@ -54,15 +54,20 @@ export default function CompletePage() {
   const experienceGained = 25;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+    <div className="min-h-screen flex flex-col bg-black">
+      <Header isDarkmode={true} />
 
       {/* 완료 헤더 */}
       <CompletionHeader />
 
-      {/* 메인 콘텐츠 */}
-      <main className="flex-1 px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      {/* 메인 콘텐츠 - 형광 블랙 배경 */}
+      <main className="relative flex-1 px-4 py-8 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
+        {/* 배경 글로우 효과 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 via-transparent to-purple-300/3"></div>
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-pulse delay-1000"></div>
+
+        <div className="relative z-10 max-w-4xl mx-auto">
           <div className="grid gap-6 lg:grid-cols-2">
             {/* 왼쪽 컬럼 */}
             <div className="space-y-6">
@@ -81,7 +86,7 @@ export default function CompletePage() {
 
             {/* 오른쪽 컬럼 */}
             <div className="space-y-6">
-              <ActionButtons />
+              <ActionButtons partner={partnerInfo} />
             </div>
           </div>
         </div>
