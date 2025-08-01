@@ -1,9 +1,9 @@
-// app/(shared)/stores/use-dispute-store.ts
+'use client';
+
 import { create } from 'zustand';
 import { api, handleApiError } from '@/app/(shared)/utils/api';
 import { toast } from 'sonner';
 
-// 1. Enum 정의
 export type DisputeStatus =
   | 'IN_PROGRESS'
   | 'ANSWERED'
@@ -11,7 +11,6 @@ export type DisputeStatus =
   | 'REJECTED';
 export type DisputeType = 'DATA_NONE' | 'DATA_PARTIAL' | 'OTHER';
 
-// 2. 인터페이스
 export interface Dispute {
   id: string;
   status: DisputeStatus;
@@ -19,10 +18,17 @@ export interface Dispute {
   reporter: string;
   answer?: string;
   createdAt: string;
-  // 필요 시 기타 필드 추가
 }
 
-// 3. Zustand Store 타입
+interface DisputeListResponse {
+  data: Dispute[];
+  hasNext: boolean;
+}
+
+interface DisputeDetailResponse {
+  data: Dispute;
+}
+
 interface DisputeStore {
   disputes: Dispute[];
   pendingDisputes: Dispute[];
@@ -30,10 +36,30 @@ interface DisputeStore {
   loading: boolean;
   error: string | null;
   hasNext: boolean;
-  currentPage: number; // 추가!
-  setCurrentPage: (page: number) => void; // 추가!
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
 
-  // 목록 조회
+  // --- 모달 공통 상태 ---
+  selectedDisputeId: string | null;
+
+  // --- 삭제 모달 관련 상태 및 함수 ---
+  isDeleteModalOpen: boolean;
+  openDeleteModal: (id: string) => void;
+  closeDeleteModal: () => void;
+  deleteDispute: (id: string) => Promise<void>;
+
+  // --- 해결 모달 관련 상태 및 함수 ---
+  isResolveModalOpen: boolean;
+  openResolveModal: (id: string) => void;
+  closeResolveModal: () => void;
+  resolveDispute: (
+    id: string,
+    result: DisputeStatus,
+    answer: string
+  ) => Promise<boolean>;
+  fetchDisputeById: (id: string) => Promise<Dispute | null>;
+
+  // --- 기존 액션 함수들 ---
   fetchDisputes: (params?: {
     status?: DisputeStatus;
     type?: DisputeType;
@@ -41,21 +67,14 @@ interface DisputeStore {
     page?: number;
     size?: number;
   }) => Promise<void>;
-
-  // 상세 조회
   fetchDispute: (id: string) => Promise<void>;
-
-  // 미처리(보류) 목록 조회
   fetchPendingDisputes: (page?: number, size?: number) => Promise<void>;
-
-  // 분쟁 처리 액션
   refundAndCancel: (id: string) => Promise<void>;
   penaltySeller: (id: string) => Promise<void>;
   finalize: (id: string) => Promise<void>;
   resolve: (id: string, answer: string, result: DisputeStatus) => Promise<void>;
 }
 
-// 4. Zustand Store 구현
 export const useDisputeStore = create<DisputeStore>((set, get) => ({
   disputes: [],
   pendingDisputes: [],
@@ -63,15 +82,71 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
   loading: false,
   error: null,
   hasNext: false,
-  currentPage: 0, // 추가!
-  setCurrentPage: (page) => set({ currentPage: page }), // 추가!
+  currentPage: 0,
+  setCurrentPage: (page) => set({ currentPage: page }),
 
-  // 목록 조회
+  // --- 모달 공통 상태 초기화 ---
+  selectedDisputeId: null,
+
+  // --- 삭제 모달 관련 구현 ---
+  isDeleteModalOpen: false,
+  openDeleteModal: (id) =>
+    set({ isDeleteModalOpen: true, selectedDisputeId: id }),
+  closeDeleteModal: () =>
+    set({ isDeleteModalOpen: false, selectedDisputeId: null }),
+  async deleteDispute(id: string) {
+    set({ loading: true, error: null });
+    try {
+      await api.delete(`/admin/disputes/${id}`);
+      toast.success('분쟁이 성공적으로 삭제되었습니다.');
+      set({ isDeleteModalOpen: false, selectedDisputeId: null });
+      get().fetchDisputes({ page: get().currentPage });
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // --- 해결 모달 관련 구현 ---
+  isResolveModalOpen: false,
+  openResolveModal: (id) =>
+    set({ isResolveModalOpen: true, selectedDisputeId: id }),
+  closeResolveModal: () =>
+    set({ isResolveModalOpen: false, selectedDisputeId: null }),
+  async resolveDispute(id, result, answer) {
+    set({ loading: true, error: null });
+    try {
+      await api.patch(`/admin/disputes/${id}/resolve`, { answer, result });
+      toast.success('분쟁 답변/상태 변경 완료');
+      get().fetchDisputes({ page: get().currentPage });
+      return true; // 성공 시 true 반환
+    } catch (error) {
+      handleApiError(error);
+      return false; // 실패 시 false 반환
+    } finally {
+      set({ loading: false });
+    }
+  },
+  async fetchDisputeById(id) {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.get<DisputeDetailResponse>(`/admin/disputes/${id}`);
+      return res.data.data;
+    } catch (error) {
+      handleApiError(error);
+      return null;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // --- 기존 액션 함수들 ---
   async fetchDisputes(params = {}) {
     set({ loading: true, error: null });
     try {
       const { status, type, reporter, page = 0, size = 20 } = params;
-      const res = await api.get('/admin/disputes', {
+      const res = await api.get<DisputeListResponse>('/admin/disputes', {
         params: { status, type, reporter, page, size },
       });
       set({
@@ -85,11 +160,10 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // 상세 조회
   async fetchDispute(id: string) {
     set({ loading: true, error: null });
     try {
-      const res = await api.get(`/admin/disputes/${id}`);
+      const res = await api.get<DisputeDetailResponse>(`/admin/disputes/${id}`);
       set({ currentDispute: res.data.data, loading: false });
     } catch (error) {
       set({ loading: false, error: '분쟁 상세 조회 실패' });
@@ -97,13 +171,15 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // 미처리(보류) 목록 조회
   async fetchPendingDisputes(page = 0, size = 20) {
     set({ loading: true, error: null });
     try {
-      const res = await api.get('/admin/disputes/pending', {
-        params: { page, size },
-      });
+      const res = await api.get<DisputeListResponse>(
+        '/admin/disputes/pending',
+        {
+          params: { page, size },
+        }
+      );
       set({ pendingDisputes: res.data.data || [], loading: false });
     } catch (error) {
       set({ loading: false, error: '보류 분쟁 조회 실패' });
@@ -111,13 +187,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // 환불/취소 처리
   async refundAndCancel(id: string) {
     set({ loading: true, error: null });
     try {
       await api.post(`/admin/disputes/${id}/refund-and-cancel`);
       toast.success('환불 및 취소 처리 완료');
-      // 필요시 disputes 새로고침 등 추가
+      get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '환불/취소 실패', loading: false });
       handleApiError(error);
@@ -126,12 +201,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // 판매자 패널티
   async penaltySeller(id: string) {
     set({ loading: true, error: null });
     try {
       await api.post(`/admin/disputes/${id}/penalty-seller`);
       toast.success('판매자 패널티 부여 완료');
+      get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '패널티 처리 실패', loading: false });
       handleApiError(error);
@@ -140,12 +215,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // 분쟁 최종처리
   async finalize(id: string) {
     set({ loading: true, error: null });
     try {
       await api.post(`/admin/disputes/${id}/finalize`);
       toast.success('분쟁 최종 처리 완료');
+      get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '최종 처리 실패', loading: false });
       handleApiError(error);
@@ -154,12 +229,12 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // 분쟁 resolve (답변 및 상태 변경)
   async resolve(id: string, answer: string, result: DisputeStatus) {
     set({ loading: true, error: null });
     try {
       await api.patch(`/admin/disputes/${id}/resolve`, { answer, result });
       toast.success('분쟁 답변/상태 변경 완료');
+      get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '분쟁 답변 실패', loading: false });
       handleApiError(error);

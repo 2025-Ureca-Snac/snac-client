@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-
 import { useDisputeStore } from '@/app/(shared)/stores/use-dispute-store';
 
 export function DeleteConfirmModal() {

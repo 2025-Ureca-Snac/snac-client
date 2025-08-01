@@ -5,11 +5,12 @@ import {
   useDisputeStore,
   Dispute,
 } from '@/app/(shared)/stores/use-dispute-store';
+import { toast } from 'sonner';
 
 export function DisputeResolveModal() {
   const {
-    isModalOpen,
-    closeModal,
+    isResolveModalOpen,
+    closeResolveModal,
     selectedDisputeId,
     resolveDispute,
     fetchDisputeById,
@@ -19,28 +20,24 @@ export function DisputeResolveModal() {
   const [answer, setAnswer] = useState('');
   const [currentDispute, setCurrentDispute] = useState<Dispute | null>(null);
 
-  // 모달이 열리거나 selectedDisputeId가 변경될 때 해당 분쟁의 상세 정보를 불러옴
   useEffect(() => {
     const loadDispute = async () => {
-      if (isModalOpen && selectedDisputeId) {
+      if (isResolveModalOpen && selectedDisputeId) {
         const dispute = await fetchDisputeById(selectedDisputeId);
         setCurrentDispute(dispute);
-        // 불러온 분쟁 정보로 모달 폼 초기화
+
         if (dispute) {
           setResult(dispute.status);
           setAnswer(dispute.answer || '');
         }
       } else {
-        // 모달이 닫히거나 ID가 없을 때 상태 초기화
         setCurrentDispute(null);
         setResult('');
         setAnswer('');
       }
     };
     loadDispute();
-  }, [isModalOpen, selectedDisputeId, fetchDisputeById]);
-
-  // 폼 제출 핸들러
+  }, [isResolveModalOpen, selectedDisputeId, fetchDisputeById]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedDisputeId && result && answer.trim()) {
@@ -50,24 +47,23 @@ export function DisputeResolveModal() {
         answer.trim()
       );
       if (success) {
-        closeModal(); // 성공 시 모달 닫기
+        closeResolveModal();
       }
-      // 실패 시 에러 메시지는 useDisputeStore에서 처리됨
     } else {
-      alert('처리 결과와 답변 내용을 모두 입력해주세요.');
+      toast.error('처리 결과와 답변 내용을 모두 입력해주세요.');
     }
   };
 
-  if (!isModalOpen || !selectedDisputeId) return null;
+  if (!isResolveModalOpen || !selectedDisputeId) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-lg w-full">
-        <h3 className="text-regular-lg font-semibold text-gray-800 mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
           분쟁 해결하기 (ID: {selectedDisputeId})
         </h3>
         {currentDispute ? (
-          <div className="mb-4 text-regular-sm text-gray-700">
+          <div className="mb-4 text-sm text-gray-700 space-y-1">
             <p>
               <strong>신고자:</strong> {currentDispute.reporter}
             </p>
@@ -83,7 +79,7 @@ export function DisputeResolveModal() {
             </p>
           </div>
         ) : (
-          <div className="text-center py-4 text-gray-500 text-regular">
+          <div className="text-center py-4 text-gray-500">
             분쟁 상세 정보를 불러오는 중...
           </div>
         )}
@@ -92,7 +88,7 @@ export function DisputeResolveModal() {
           <div className="mb-4">
             <label
               htmlFor="result"
-              className="block text-regular-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               처리 결과
             </label>
@@ -100,7 +96,7 @@ export function DisputeResolveModal() {
               id="result"
               value={result}
               onChange={(e) => setResult(e.target.value as Dispute['status'])}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-regular-sm"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-sm"
               required
             >
               <option value="">선택하세요</option>
@@ -113,7 +109,7 @@ export function DisputeResolveModal() {
           <div className="mb-6">
             <label
               htmlFor="answer"
-              className="block text-regular-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               답변 내용
             </label>
@@ -122,7 +118,7 @@ export function DisputeResolveModal() {
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               rows={4}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-regular-sm"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-sm"
               placeholder="분쟁 처리 내용을 입력하세요."
               required
             ></textarea>
@@ -130,14 +126,14 @@ export function DisputeResolveModal() {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={closeModal}
-              className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-regular-sm"
+              onClick={closeResolveModal}
+              className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
             >
               취소
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-md bg-gray-700 text-white hover:bg-gray-800 text-regular-sm"
+              className="px-4 py-2 rounded-md bg-gray-700 text-white hover:bg-gray-800 text-sm"
             >
               해결하기
             </button>

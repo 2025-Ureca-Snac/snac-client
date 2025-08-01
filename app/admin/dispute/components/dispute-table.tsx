@@ -14,11 +14,11 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
   const {
     disputes,
     pendingDisputes,
-    setSelectedDisputeId,
-    openModal,
+    openResolveModal, // 해결 모달 오픈
     refundAndCancel,
     penaltySeller,
-    finalizeDispute,
+    finalize,
+    openDeleteModal,
   } = useDisputeStore();
 
   const disputesToDisplay = activeTab === 'all' ? disputes : pendingDisputes;
@@ -33,12 +33,10 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
 
   const handleAction = (
     dispute: Dispute,
-    actionType: 'resolve' | 'refund' | 'penalty' | 'finalize' | 'delete' // 'delete' 추가 (만약 삭제 버튼이 있다면)
+    actionType: 'resolve' | 'refund' | 'penalty' | 'finalize' | 'delete'
   ) => {
-    setSelectedDisputeId(dispute.id);
-
     if (actionType === 'resolve') {
-      openModal(); // '해결' 모달 열기
+      openResolveModal(dispute.id); // 해결 모달 열기
     } else if (actionType === 'refund') {
       if (confirm(`분쟁 ID ${dispute.id}를 환불 및 취소 처리하시겠습니까?`)) {
         refundAndCancel(dispute.id);
@@ -53,13 +51,11 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
       }
     } else if (actionType === 'finalize') {
       if (confirm(`분쟁 ID ${dispute.id}를 종결 처리하시겠습니까?`)) {
-        finalizeDispute(dispute.id);
+        finalize(dispute.id);
       }
+    } else if (actionType === 'delete') {
+      openDeleteModal(dispute.id);
     }
-    // else if (actionType === 'delete') {
-    //   // delete-confirm-modal을 열기 위한 로직
-    //   // 예: setItemToDeleteId(dispute.id); openDeleteConfirmModal();
-    // }
   };
 
   const getStatusKorean = (status: Dispute['status']) => {
@@ -170,13 +166,13 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
                 >
                   종결
                 </button>
-                {/* 만약 삭제 버튼이 테이블에 필요하다면: */}
-                {/* <button
+
+                <button
                   onClick={() => handleAction(dispute, 'delete')}
                   className="text-red-600 hover:text-red-900 ml-2"
                 >
                   삭제
-                </button> */}
+                </button>
               </td>
             </tr>
           ))}
