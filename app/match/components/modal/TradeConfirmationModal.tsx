@@ -79,7 +79,7 @@ export default function TradeConfirmationModal({
       // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
         // 1초 후 trading 페이지로 이동
-        /app/efilrt / remove;
+
         setTimeout(() => {
           router.push('/match/trading');
         }, 1000);
