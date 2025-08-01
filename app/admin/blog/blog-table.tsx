@@ -6,7 +6,7 @@ import Edit from '@/public/edit.svg';
 import Trash from '@/public/trash.svg';
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
 import type { Blog } from '@/app/(shared)/stores/use-blog-store';
-import { BlogDetailModal } from './BlogDetailModal';
+import { BlogDetailModal } from './blog-detail-modal';
 
 export function BlogTable() {
   const { blogs, loading, error, openDeleteModal } = useBlogStore();
