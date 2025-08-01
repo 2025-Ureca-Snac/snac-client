@@ -26,14 +26,6 @@ const getHistory = async (assetType: AssetType, size: number = 20) => {
   return response.data.data;
 };
 
-// balanceAfter를 안전하게 숫자로 변환하는 유틸리티 함수
-const parseBalanceAfter = (balanceAfter: string | number): number => {
-  if (typeof balanceAfter === 'number') {
-    return balanceAfter;
-  }
-  return parseFloat(balanceAfter.replace(/,/g, ''));
-};
-
 function PointPageContent() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type') as AssetType;
@@ -56,14 +48,32 @@ function PointPageContent() {
   const [currentSize, setCurrentSize] = useState(20);
   const [hasMore, setHasMore] = useState(true);
 
-  // 포인트/머니 데이터 로드
+  // 잔액 조회 API 함수
+  const getBalance = async (): Promise<BalanceResponse> => {
+    const response =
+      await api.get<ApiResponse<BalanceResponse>>('/wallets/summary');
+    return response.data.data;
+  };
+
+  // 초기 잔액 로드 (한 번만 호출)
+  const loadInitialBalance = async () => {
+    try {
+      const balanceResponse = await getBalance();
+      setBalance(balanceResponse);
+      console.log('초기 잔액 로드 완료:', balanceResponse);
+    } catch (err) {
+      console.error('잔액 로드 실패:', err);
+    }
+  };
+
+  // 포인트/머니 데이터 로드 (거래 내역만)
   const loadPointData = async () => {
     try {
       setIsLoading(true);
       setCurrentSize(20);
       setError(null);
 
-      console.log('포인트/머니 데이터 API 호출 시작');
+      console.log('포인트/머니 거래 내역 API 호출 시작');
 
       // 현재 활성 탭에 따른 내역 조회
       const historyResponse = await getHistory(activeTab, currentSize);
@@ -74,19 +84,6 @@ function PointPageContent() {
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
-
-      // 거래 내역에서 마지막 기록의 잔액으로 현재 잔액 업데이트
-      if (newHistory.length > 0) {
-        const lastRecord = newHistory[0]; // 가장 최근 기록 (인덱스 0)
-        const lastBalance = parseBalanceAfter(lastRecord.balanceAfter);
-
-        setBalance((prevBalance) => ({
-          ...prevBalance,
-          [activeTab === 'POINT' ? 'point' : 'money']: lastBalance,
-        }));
-
-        console.log(`${activeTab} 최신 잔액 업데이트:`, lastBalance);
-      }
 
       // 더보기 버튼 표시 여부 결정
       setHasMore(newHistory.length >= currentSize);
@@ -109,9 +106,10 @@ function PointPageContent() {
     }
   }, [typeParam, activeTab]);
 
-  // 컴포넌트 마운트 시 데이터 로드
+  // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
-    loadPointData();
+    loadInitialBalance(); // 잔액 한 번만 로드
+    loadPointData(); // 거래 내역 로드
   }, []);
 
   // 탭 변경 시 해당 탭의 내역 데이터 로드
@@ -138,19 +136,6 @@ function PointPageContent() {
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
-
-      // 거래 내역에서 마지막 기록의 잔액으로 현재 잔액 업데이트
-      if (newHistory.length > 0) {
-        const lastRecord = newHistory[0]; // 가장 최근 기록 (인덱스 0)
-        const lastBalance = parseBalanceAfter(lastRecord.balanceAfter);
-
-        setBalance((prevBalance) => ({
-          ...prevBalance,
-          [activeTab === 'POINT' ? 'point' : 'money']: lastBalance,
-        }));
-
-        console.log(`${activeTab} 더보기 후 최신 잔액 업데이트:`, lastBalance);
-      }
 
       // 더보기 버튼 표시 여부 결정
       setHasMore(newHistory.length >= newSize);
