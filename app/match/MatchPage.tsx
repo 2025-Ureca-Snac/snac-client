@@ -9,7 +9,8 @@ import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
 import TestButton from './components/TestButton';
 import { Filters } from './types';
-import { User, TradeRequest } from './types/match';
+import { TradeRequest } from './types/match';
+import { User } from '../(shared)/stores/match-store';
 import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
 //import { useAuthStore } from '../(shared)/stores/auth-store';
@@ -53,7 +54,6 @@ export default function MatchPage() {
   const [pendingFilters, setPendingFilters] = useState<Filters>(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState<Filters>(initialFilters);
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
-  const [activeSellers, setActiveSellers] = useState<User[]>([]);
   const [hasStartedSearch, setHasStartedSearch] = useState(false); // 검색 시작 여부 추적
   const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([]);
   const [connectedUsers, setConnectedUsers] = useState<number>(0); // 접속자 수
@@ -71,11 +71,11 @@ export default function MatchPage() {
     null
   );
 
+  // store에서 userRole과 activeSellers, setActiveSellers 가져오기
+  const { userRole, setUserRole, activeSellers, setActiveSellers } =
+    useMatchStore();
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
-
-  // store에서 userRole 가져오기
-  const { userRole, setUserRole } = useMatchStore();
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
@@ -132,7 +132,6 @@ export default function MatchPage() {
   } = useGlobalWebSocket({
     appliedFilters,
     setIncomingRequests,
-    setActiveSellers,
     setMatchingStatus,
     setConnectedUsers,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가

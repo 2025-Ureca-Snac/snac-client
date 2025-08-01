@@ -7,8 +7,9 @@ import SockJS from 'sockjs-client';
 import { useMatchStore } from '../stores/match-store';
 import { useModalStore } from '../stores/modal-store';
 import { useWebSocketStore } from '../stores/websocket-store';
-import { User, Filters } from '../../match/types';
+import { Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
+import { User } from '../stores/match-store';
 import { CancelReason } from '../constants';
 
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
@@ -84,7 +85,6 @@ interface UseGlobalWebSocketProps {
   userRole?: 'buyer' | 'seller' | null;
   appliedFilters?: Filters;
   setIncomingRequests?: React.Dispatch<React.SetStateAction<TradeRequest[]>>;
-  setActiveSellers?: React.Dispatch<React.SetStateAction<User[]>>;
   setMatchingStatus?: React.Dispatch<React.SetStateAction<MatchingStatus>>;
   setConnectedUsers?: React.Dispatch<React.SetStateAction<number>>;
   onTradeStatusChange?: (status: string, tradeData: ServerTradeData) => void;
@@ -274,12 +274,12 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         const currentUserRole = useMatchStore.getState().userRole;
         console.log('🔍 매칭 알림 처리 조건 확인:', {
           currentUserRole,
-          hasSetActiveSellers: !!props?.setActiveSellers,
           isBuyer: userRole === 'buyer',
         });
 
-        if (currentUserRole === 'buyer' && props?.setActiveSellers) {
-          props.setActiveSellers((prev: User[]) => {
+        if (currentUserRole === 'buyer') {
+          const { setActiveSellers } = useMatchStore.getState();
+          setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
                 existing.tradeId === user.tradeId ||
@@ -341,8 +341,9 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
 
         // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트
-        if (userRole === 'buyer' && props?.setActiveSellers) {
-          props.setActiveSellers((prev: User[]) => {
+        if (userRole === 'buyer') {
+          const { setActiveSellers } = useMatchStore.getState();
+          setActiveSellers((prev: User[]) => {
             return prev.map((user) => {
               if (user.cardId === tradeData.cardId) {
                 console.log('🔄 user tradeId 업데이트:', {
