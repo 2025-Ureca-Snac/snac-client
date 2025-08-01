@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useDisputeStore } from '@/app/(shared)/stores/use-dispute-store';
+import {
+  useDisputeStore,
+  DisputeStatus,
+  DisputeType,
+} from '@/app/(shared)/stores/use-dispute-store';
 import { DisputeTable } from './components/dispute-table';
 import { DisputeResolveModal } from './components/dispute-resolve-modal';
 import { DeleteConfirmModal } from './components/delete-confirm-modal';
-
-type DisputeStatus = 'IN_PROGRESS' | 'ANSWERED' | 'NEED_MORE' | 'REJECTED';
-type DisputeType = 'DATA_NONE' | 'DATA_PARTIAL' | 'OTHER';
 
 export default function Page() {
   const { fetchDisputes, fetchPendingDisputes, loading, error } =
