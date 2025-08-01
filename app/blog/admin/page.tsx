@@ -7,7 +7,7 @@ import { Footer } from '@/app/(shared)/components/Footer';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import dynamic from 'next/dynamic';
-import { api } from '@/app/(shared)/utils/api';
+import { api, handleApiError } from '@/app/(shared)/utils/api';
 import { toast } from 'sonner';
 
 const ToastEditor = dynamic(
@@ -38,18 +38,18 @@ export default function BlogAdminPage() {
 
   const [formData, setFormData] = useState<BlogPostForm>({
     title: '',
-
     author: '',
-
     content: '',
     markdownContent: '',
-
     images: [],
     imagePositions: [],
   });
 
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && !editId) {
@@ -59,6 +59,9 @@ export default function BlogAdminPage() {
 
   useEffect(() => {
     if (!editId) return;
+    setLoading(true);
+    setFetchError(null);
+
     const fetchPost = async () => {
       try {
         const res = await api.get<PostApiResponse>(`/articles/${editId}`);
@@ -72,8 +75,10 @@ export default function BlogAdminPage() {
           imagePositions: post.imagePositions || [],
         });
       } catch (error) {
-        console.error('Failed to fetch existing post:', error);
+        setFetchError('기존 포스트를 불러오지 못했습니다.');
         toast.error('기존 포스트를 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchPost();
@@ -143,13 +148,8 @@ export default function BlogAdminPage() {
       });
       setMainImageFile(null);
     } catch (error) {
-      const errorMessage =
-        (error as { response?: { data?: { message: string } } })?.response?.data
-          ?.message ||
-        (error as Error)?.message ||
-        (editId ? '수정 실패' : '등록 실패');
-      toast.error(`포스트 ${editId ? '수정' : '등록'} 실패: ${errorMessage}`);
-      console.error('Failed to save blog post:', error);
+      const errorMessage = handleApiError(error) || '요청 실패';
+      toast.error(errorMessage);
     }
   };
 
@@ -159,7 +159,6 @@ export default function BlogAdminPage() {
       author: '',
       content: '',
       markdownContent: '',
-
       images: [],
       imagePositions: [],
     });
@@ -171,6 +170,28 @@ export default function BlogAdminPage() {
       fileInput.value = '';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full" />
+        <span className="ml-4 text-gray-600 text-lg">불러오는 중...</span>
+      </div>
+    );
+  }
+  if (fetchError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <p className="text-red-500 mb-4">{fetchError}</p>
+        <button
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-600 text-white rounded"
+        >
+          이전 페이지로 돌아가기
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen ">
@@ -201,7 +222,7 @@ export default function BlogAdminPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   대표 이미지 파일
-                  {!editId && <span className="text-red">*</span>}
+                  <span className="text-red">*</span>
                 </label>
                 <input
                   type="file"
