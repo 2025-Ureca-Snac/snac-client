@@ -65,9 +65,7 @@ export function DataAvg() {
     return () => clearInterval(intervalId);
   }, [dataList]);
 
-  if (dataList.length === 0) return null;
-
-  const current = dataList[index];
+  const current = dataList[index] || FALLBACK_MAP.SKT;
 
   return (
     <div className="text-center h-[161px] md:h-[288px] py-[40px] md:py-[80px]">
@@ -103,7 +101,7 @@ export function DataAvg() {
 
       <p className="text-regular-lg md:text-medium-3xl font-bold pt-[28px]">
         평균{' '}
-        <span className="inline-block w-[50px] md:w-[80px] text-teal-green text-right">
+        <span className="inline-block min-w-[80px] md:min-w-[100px] text-teal-green text-right">
           <AnimatePresence mode="wait">
             <motion.span
               key={current.averagePrice}
@@ -113,7 +111,7 @@ export function DataAvg() {
               transition={{ ease: 'easeInOut', duration: 0.3 }}
               className="inline-block"
             >
-              {current.averagePrice.toLocaleString()}
+              {Math.floor(current.averagePrice).toLocaleString()}
             </motion.span>
           </AnimatePresence>
         </span>
