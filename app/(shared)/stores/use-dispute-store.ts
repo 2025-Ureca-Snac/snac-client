@@ -102,7 +102,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       set({ isDeleteModalOpen: false, selectedDisputeId: null });
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
-      handleApiError(error);
+      toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
     }
@@ -122,7 +122,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes({ page: get().currentPage });
       return true; // 성공 시 true 반환
     } catch (error) {
-      handleApiError(error);
+      toast.error(handleApiError(error));
       return false; // 실패 시 false 반환
     } finally {
       set({ loading: false });
@@ -134,7 +134,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       const res = await api.get<DisputeDetailResponse>(`/admin/disputes/${id}`);
       return res.data.data;
     } catch (error) {
-      handleApiError(error);
+      toast.error(handleApiError(error));
       return null;
     } finally {
       set({ loading: false });
@@ -156,7 +156,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       });
     } catch (error) {
       set({ loading: false, error: '분쟁 목록 조회 실패' });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     }
   },
 
@@ -167,7 +167,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       set({ currentDispute: res.data.data, loading: false });
     } catch (error) {
       set({ loading: false, error: '분쟁 상세 조회 실패' });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     }
   },
 
@@ -183,7 +183,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       set({ pendingDisputes: res.data.data || [], loading: false });
     } catch (error) {
       set({ loading: false, error: '보류 분쟁 조회 실패' });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     }
   },
 
@@ -195,7 +195,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '환불/취소 실패', loading: false });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
     }
@@ -209,7 +209,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '패널티 처리 실패', loading: false });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
     }
@@ -223,7 +223,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '최종 처리 실패', loading: false });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
     }
@@ -237,7 +237,7 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes({ page: get().currentPage });
     } catch (error) {
       set({ error: '분쟁 답변 실패', loading: false });
-      handleApiError(error);
+      toast.error(handleApiError(error));
     } finally {
       set({ loading: false });
     }
