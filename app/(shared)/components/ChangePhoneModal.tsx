@@ -7,6 +7,7 @@ import PasswordInput from './password-input';
 import type { ChangePhoneModalProps } from '../types/change-phone-modal';
 import { api } from '../utils/api';
 import { useTimer } from '../hooks/useTimer';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -163,6 +164,7 @@ export default function ChangePhoneModal({
       });
 
       if (response.status === 200) {
+        toast.success('전화번호가 성공적으로 변경되었습니다.');
         setSuccess(true);
         // 성공 시 콜백 호출
         if (onSubmit) {

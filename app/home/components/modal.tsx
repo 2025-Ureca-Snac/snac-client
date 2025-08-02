@@ -179,6 +179,7 @@ export const Modal = () => {
           handleClose();
         } else {
           toast.success('상품이 성공적으로 등록되었습니다.');
+          actions.triggerRefetch();
           handleClose();
         }
       }

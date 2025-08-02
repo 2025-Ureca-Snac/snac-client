@@ -111,6 +111,7 @@ export interface VerificationInputProps {
  * @property helpText 비밀번호 일치 여부(선택)
  * @property showHelpText 비밀번호 일치 여부 표시 여부(선택)
  * @property helpTextColor 비밀번호 일치 여부(실패 | 성공 | 미입력)
+ * @property showValidation 비밀번호 유효성 검사 표시 여부(선택)
  */
 export interface PasswordInputProps {
   label: string;
@@ -124,4 +125,5 @@ export interface PasswordInputProps {
   helpText?: string;
   showHelpText?: boolean;
   helpTextColor?: 'red' | 'green' | 'gray';
+  showValidation?: boolean;
 }

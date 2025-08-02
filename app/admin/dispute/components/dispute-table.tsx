@@ -26,7 +26,7 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
 
   const disputesToDisplay = activeTab === 'all' ? disputes : pendingDisputes;
 
-  if (!disputesToDisplay || disputesToDisplay.length === 0) {
+  if (disputesToDisplay.length === 0) {
     return (
       <div className="text-center py-10 text-gray-500">
         표시할 분쟁이 없습니다.
@@ -81,6 +81,9 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
     const typeMap: Record<DisputeType, string> = {
       DATA_NONE: '데이터 없음',
       DATA_PARTIAL: '데이터 부분 제공',
+      PAYMENT: '결제 문제',
+      ACCOUNT: '계정 문제',
+      TECHNICAL_PROBLEM: '기술적 문제',
       OTHER: '기타',
     };
     return typeMap[type] || type;
@@ -114,12 +117,12 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
         <tbody className="bg-white divide-y divide-gray-200">
           {disputesToDisplay.map((dispute) => (
             <tr key={dispute.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-900">
                 {dispute.id}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-900">
                 <span
-                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                  className={`px-2 inline-flex text-regular-xs leading-5 font-semibold rounded-full ${
                     {
                       IN_PROGRESS: 'bg-blue-100 text-blue-800',
                       ANSWERED: 'bg-green-100 text-green-800',
@@ -131,16 +134,16 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
                   {getStatusKorean(dispute.status)}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-900">
                 {getTypeKorean(dispute.type)}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-900">
                 {dispute.reporter}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-500">
                 {new Date(dispute.createdAt).toLocaleDateString()}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+              <td className="px-6 py-4 whitespace-nowrap text-left text-regular-sm font-medium">
                 <button
                   onClick={() => handleAction(dispute, 'resolve')}
                   className="text-indigo-600 hover:text-indigo-900 mr-2"

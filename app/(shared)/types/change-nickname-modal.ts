@@ -13,3 +13,13 @@ export interface ChangeNicknameModalProps {
   onSubmit?: (nickname: string) => void;
   currentNickname?: string;
 }
+
+/**
+ * @author 이승우
+ * @description 닉네임 변경 API 응답 타입
+ * @interface ChangeNicknameResponse
+ * @property {string} nextNicknameChangeAllowedAt 다음 닉네임 변경 가능 시간
+ */
+export interface ChangeNicknameResponse {
+  nextNicknameChangeAllowedAt: string;
+}
