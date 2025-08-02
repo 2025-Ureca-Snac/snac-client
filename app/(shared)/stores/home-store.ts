@@ -66,7 +66,7 @@ export const homeInitialState = {
   category: 'ALL' as Category,
   carrier: '--' as Carrier,
   sortBy: 'LATEST' as SortBy,
-  transactionStatus: 'ALL' as TransactionStatus,
+  transactionStatus: 'SELLING' as TransactionStatus,
   priceRange: 'ALL' as PriceRange,
   postView: 'ALL' as PostView,
   showRegularsOnly: false,

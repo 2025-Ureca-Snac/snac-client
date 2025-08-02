@@ -8,7 +8,7 @@ import FilterGroup from '@/app/(shared)/components/FilterGroup';
 import FilterButtons from '@/app/(shared)/components/FilterButtons';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL';
-type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
+type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT';
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 
 const FILTER_OPTIONS = {
