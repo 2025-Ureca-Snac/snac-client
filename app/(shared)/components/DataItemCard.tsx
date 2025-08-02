@@ -156,47 +156,59 @@ export const DataItemCard = ({
           </Button>
         ) : (
           <div className="flex gap-2 w-full">
-            <Button
-              onClick={() => {
-                console.log(cardId);
-                // 수정하기 로직
-                if (cardId) {
-                  actions.openEditModal(cardId.toString(), {
-                    cardCategory: cardCategory as 'SELL' | 'BUY',
-                    carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
-                    dataAmount: dataAmount || 0,
-                    price: price,
-                  });
-                }
-              }}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
-              style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
-            >
-              수정하기
-            </Button>
-            <Button
-              onClick={() => {
-                // 삭제하기 로직
-                if (confirm('정말 삭제하시겠습니까?')) {
-                  if (cardId) {
-                    api
-                      .delete(`/cards/${cardId}`)
-                      .then(() => {
-                        toast.success('게시글이 삭제되었습니다.');
-                        actions.triggerRefetch();
-                      })
-                      .catch((error) => {
-                        console.error('삭제 실패:', error);
-                        toast.error('삭제에 실패했습니다.');
+            {sellStatus === 'SELLING' ? (
+              <>
+                <Button
+                  onClick={() => {
+                    console.log(cardId);
+                    // 수정하기 로직
+                    if (cardId) {
+                      actions.openEditModal(cardId.toString(), {
+                        cardCategory: cardCategory as 'SELL' | 'BUY',
+                        carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
+                        dataAmount: dataAmount || 0,
+                        price: price,
                       });
-                  }
-                }
-              }}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
-              style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
-            >
-              삭제하기
-            </Button>
+                    }
+                  }}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                  style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+                >
+                  수정하기
+                </Button>
+                <Button
+                  onClick={() => {
+                    // 삭제하기 로직
+                    if (confirm('정말 삭제하시겠습니까?')) {
+                      if (cardId) {
+                        api
+                          .delete(`/cards/${cardId}`)
+                          .then(() => {
+                            toast.success('게시글이 삭제되었습니다.');
+                            actions.triggerRefetch();
+                          })
+                          .catch((error) => {
+                            console.error('삭제 실패:', error);
+                            toast.error('삭제에 실패했습니다.');
+                          });
+                      }
+                    }
+                  }}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                  style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+                >
+                  삭제하기
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="w-full bg-gray-400 cursor-not-allowed text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+                disabled
+              >
+                {sellStatus === 'TRADING' ? '거래중' : '거래완료'}
+              </Button>
+            )}
           </div>
         )}
       </div>
