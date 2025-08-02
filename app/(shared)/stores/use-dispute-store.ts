@@ -64,11 +64,11 @@ interface DisputeStore {
   isConfirmModalOpen: boolean;
   confirmTitle: string;
   confirmMessage: string;
-  confirmAction: (() => Promise<any>) | null;
+  confirmAction: (() => Promise<void>) | null;
   openConfirmModal: (
     title: string,
     message: string,
-    onConfirm: () => Promise<any>
+    onConfirm: () => Promise<void>
   ) => void;
   closeConfirmModal: () => void;
 
