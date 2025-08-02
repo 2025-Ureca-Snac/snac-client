@@ -79,14 +79,45 @@ export default function MatchPage() {
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
 
+  // 현재 토큰 상태를 즉시 확인하는 함수
+  const checkCurrentToken = () => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // 1. Zustand persist에서 저장된 토큰 확인
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        if (parsed.state?.token) {
+          return parsed.state.token;
+        }
+      }
+
+      // 2. 다른 가능한 위치에서 토큰 확인 (fallback)
+      const fallbackToken =
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('jwt');
+
+      if (fallbackToken) {
+        return fallbackToken;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('토큰 가져오기 실패:', error);
+      return null;
+    }
+  };
+
   // 로그인 상태 체크
   useEffect(() => {
-    if (!token) {
-      console.log('❌ 토큰이 없어서 로그인 페이지로 이동합니다.');
+    const currentToken = checkCurrentToken();
+    if (!currentToken) {
       router.push('/login');
       return;
     }
-  }, [token, router]);
+  }, [router]);
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
