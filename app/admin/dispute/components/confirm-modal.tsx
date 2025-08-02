@@ -17,7 +17,7 @@ export function ConfirmModal() {
   const handleConfirm = async () => {
     if (confirmAction) {
       setIsLoading(true);
-      await Promise.resolve(confirmAction());
+      await confirmAction();
       setIsLoading(false);
     }
     closeConfirmModal();

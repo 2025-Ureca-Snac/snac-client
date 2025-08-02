@@ -64,11 +64,11 @@ interface DisputeStore {
   isConfirmModalOpen: boolean;
   confirmTitle: string;
   confirmMessage: string;
-  confirmAction: (() => void) | null;
+  confirmAction: (() => Promise<any>) | null;
   openConfirmModal: (
     title: string,
     message: string,
-    onConfirm: () => void
+    onConfirm: () => Promise<any>
   ) => void;
   closeConfirmModal: () => void;
 
@@ -220,8 +220,6 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes();
     } catch (error) {
       toast.error(handleApiError(error));
-    } finally {
-      get().closeConfirmModal();
     }
   },
 
@@ -233,8 +231,6 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes();
     } catch (error) {
       toast.error(handleApiError(error));
-    } finally {
-      get().closeConfirmModal();
     }
   },
 
@@ -246,8 +242,6 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
       get().fetchDisputes();
     } catch (error) {
       toast.error(handleApiError(error));
-    } finally {
-      get().closeConfirmModal();
     }
   },
 }));
