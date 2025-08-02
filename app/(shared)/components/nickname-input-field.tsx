@@ -98,20 +98,21 @@ const NicknameInputField = forwardRef<
           });
 
           if (response.status === 200) {
-            const isDuplicate = response.data.data?.isDuplicate || false;
+            console.log('닉네임 중복 체크 결과:', {
+              nickname: nicknameToCheck,
+              isDuplicate: false,
+              message: response.data.message,
+              fullResponse: response.data,
+            });
             setDuplicateCheckResult({
-              isDuplicate,
-              message:
-                response.data.message ||
-                (isDuplicate
-                  ? '이미 사용 중인 닉네임입니다.'
-                  : '사용 가능한 닉네임입니다.'),
+              isDuplicate: false,
+              message: response.data.message || '사용 가능한 닉네임입니다.',
             });
           }
         } catch (error: unknown) {
           console.error('닉네임 중복 체크 오류:', error);
 
-          // API에서 오는 오류 메시지 사용
+          let isDuplicate = false;
           let errorMessage = '중복 체크 중 오류가 발생했습니다.';
 
           if (error && typeof error === 'object' && 'response' in error) {
@@ -122,7 +123,13 @@ const NicknameInputField = forwardRef<
               };
             };
 
-            if (apiError.response?.status === 404) {
+            if (apiError.response?.status === 409) {
+              // 409 Conflict = 중복
+              isDuplicate = true;
+              errorMessage =
+                apiError.response.data?.message ||
+                '이미 사용 중인 닉네임입니다.';
+            } else if (apiError.response?.status === 404) {
               // API 엔드포인트가 없는 경우, 중복 체크를 건너뛰고 회원가입 시에만 체크
               setDuplicateCheckResult(null);
               setIsCheckingDuplicate(false);
@@ -133,7 +140,7 @@ const NicknameInputField = forwardRef<
           }
 
           setDuplicateCheckResult({
-            isDuplicate: false,
+            isDuplicate,
             message: errorMessage,
           });
         } finally {
@@ -188,6 +195,14 @@ const NicknameInputField = forwardRef<
       };
     }, [value, nicknameValidation.isValid, checkNicknameDuplicate]);
 
+    // 디버깅용 로그
+    console.log('닉네임 렌더링 상태:', {
+      value,
+      nicknameValidation,
+      duplicateCheckResult,
+      isCheckingDuplicate,
+    });
+
     return (
       <div>
         <label
@@ -211,12 +226,13 @@ const NicknameInputField = forwardRef<
             className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] pr-10 ${className} ${
               value.trim() && !nicknameValidation.isValid
                 ? 'border-red-300 focus:ring-red-200'
-                : value.trim() &&
-                    nicknameValidation.isValid &&
-                    duplicateCheckResult?.isDuplicate === false
-                  ? 'border-green-300 focus:ring-green-200'
-                  : duplicateCheckResult?.isDuplicate === true
-                    ? 'border-red-300 focus:ring-red-200'
+                : duplicateCheckResult && duplicateCheckResult.isDuplicate
+                  ? 'border-red-300 focus:ring-red-200'
+                  : value.trim() &&
+                      nicknameValidation.isValid &&
+                      duplicateCheckResult &&
+                      !duplicateCheckResult.isDuplicate
+                    ? 'border-green-300 focus:ring-green-200'
                     : 'border-gray-300 focus:ring-blue-500 focus:border-transparent'
             }`}
           />
@@ -230,7 +246,7 @@ const NicknameInputField = forwardRef<
           {!isCheckingDuplicate && value.trim() && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
               {!nicknameValidation.isValid ||
-              duplicateCheckResult?.isDuplicate === true ? (
+              (duplicateCheckResult && duplicateCheckResult.isDuplicate) ? (
                 // 유효성 검사 실패 또는 중복인 경우 X 표시
                 <svg
                   className="w-4 h-4 text-red-500"
@@ -243,7 +259,7 @@ const NicknameInputField = forwardRef<
                     clipRule="evenodd"
                   />
                 </svg>
-              ) : duplicateCheckResult?.isDuplicate === false ? (
+              ) : duplicateCheckResult && !duplicateCheckResult.isDuplicate ? (
                 // 사용 가능한 경우 체크 표시
                 <svg
                   className="w-4 h-4 text-green-500"
