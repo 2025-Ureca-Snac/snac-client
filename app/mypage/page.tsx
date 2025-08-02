@@ -12,29 +12,16 @@ import SocialLoginModal from '../(shared)/components/SocialLoginModal';
 import ServiceGuideModal from '../(shared)/components/ServiceGuideModal';
 import PrivacyPolicyModal from '../(shared)/components/PrivacyPolicyModal';
 import ThemeModal from '../(shared)/components/ThemeModal';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useUserStore } from '../(shared)/stores/user-store';
 import { useModalStore } from '../(shared)/stores/modal-store';
-import { useAuthStore } from '../(shared)/stores/auth-store';
 import { useWebSocketGuard } from '../(shared)/hooks/useWebSocketGuard';
-import { useRouter } from 'next/navigation';
 import { api } from '../(shared)/utils/api';
 import { ApiResponse } from '../(shared)/types/api';
 import { toast } from 'sonner';
-
-/**
- * @author 이승우
- * @description 마이페이지 페이지
- */
-// 단골 목록 타입
-interface FavoriteItem {
-  memberId: number;
-  nickname: string;
-}
-
-interface FavoriteResponse {
-  contents: FavoriteItem[];
-}
+import { FavoriteItem, FavoriteResponse } from '../(shared)/types/mypage';
+import MyPageBottomButtons from '../(shared)/components/mypage-bottom-buttons';
+import LoadingSpinner from '../(shared)/components/LoadingSpinner';
 
 export default function MyPage() {
   // WebSocket 가드 사용
@@ -43,68 +30,93 @@ export default function MyPage() {
   const { profile, fetchUserProfile, updateNickname, isLoading, error } =
     useUserStore();
   const { isOpen, modalType, closeModal } = useModalStore();
-  const { logout } = useAuthStore();
-  const router = useRouter();
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
-  // 단골 목록 조회 API 함수
-  const getFavorites = async (): Promise<FavoriteResponse> => {
+  /**
+   * @author 이승우
+   * @description 단골 목록 조회 API 함수
+   * @returns 단골 목록 데이터
+   */
+  const getFavorites = useCallback(async (): Promise<FavoriteResponse> => {
     const response = await api.get<ApiResponse<FavoriteResponse>>('/favorites');
     console.log('단골 목록 조회: ', response.data.data);
     return response.data.data;
-  };
+  }, []);
 
-  // 단골 삭제 API 함수
-  const deleteFavorite = async (memberId: number): Promise<void> => {
-    await api.delete(`/favorites/${memberId}`);
-    console.log('단골 삭제 완료: ', memberId);
-  };
+  /**
+   * @author 이승우
+   * @description 단골 삭제 API 함수
+   * @param memberId - 삭제할 회원 ID
+   */
+  const deleteFavorite = useCallback(
+    async (memberId: number): Promise<void> => {
+      await api.delete(`/favorites/${memberId}`);
+      console.log('단골 삭제 완료: ', memberId);
+    },
+    []
+  );
 
-  // 단골 목록 로드
-  const loadFavorites = async () => {
+  /**
+   * @author 이승우
+   * @description 단골 목록 로드 함수
+   */
+  const loadFavorites = useCallback(async () => {
     try {
       const response = await getFavorites();
       setFavorites(response.contents || []);
     } catch (err) {
       console.error('단골 목록 로드 실패:', err);
       setFavorites([]);
+      toast.error('단골 목록을 불러오는데 실패했습니다.');
     }
-  };
+  }, [getFavorites]);
 
-  // 단골 삭제 핸들러
-  const handleDeleteFavorite = async (memberId: number, nickname: string) => {
-    if (!confirm(`${nickname}을(를) 단골에서 삭제하시겠습니까?`)) {
-      return;
-    }
-
-    try {
-      await deleteFavorite(memberId);
-      // 삭제 후 목록 새로고침
-      await loadFavorites();
-      toast.success(`${nickname}이(가) 단골에서 삭제되었습니다.`);
-    } catch (err) {
-      console.error('단골 삭제 실패:', err);
-      toast.error('단골 삭제에 실패했습니다.');
-    }
-  };
-
-  // 로그아웃 핸들러
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('로그아웃되었습니다.');
-      router.push('/');
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-      toast.error('로그아웃 중 오류가 발생했습니다.');
-    }
-  };
+  /**
+   * @author 이승우
+   * @description 단골 삭제 핸들러
+   * @param memberId - 삭제할 회원 ID
+   * @param nickname - 삭제할 회원 닉네임
+   */
+  const handleDeleteFavorite = useCallback(
+    async (memberId: number, nickname: string) => {
+      // 사용자 확인을 위한 toast 사용
+      toast.error(`${nickname}을(를) 단골에서 삭제하시겠습니까?`, {
+        action: {
+          label: '삭제',
+          onClick: async () => {
+            try {
+              await deleteFavorite(memberId);
+              // 삭제 후 목록 새로고침
+              await loadFavorites();
+              toast.success(`${nickname}이(가) 단골에서 삭제되었습니다.`);
+            } catch (err) {
+              console.error('단골 삭제 실패:', err);
+              toast.error('단골 삭제에 실패했습니다.');
+            }
+          },
+        },
+      });
+    },
+    [deleteFavorite, loadFavorites]
+  );
 
   // 컴포넌트 마운트 시 사용자 정보와 단골 목록 가져오기
   useEffect(() => {
     fetchUserProfile();
     loadFavorites();
   }, []); // fetchUserProfile을 의존성에서 제거
+
+  // error가 있을 때 toast로 표시
+  useEffect(() => {
+    if (error) {
+      toast.error(error, {
+        action: {
+          label: '다시 시도',
+          onClick: fetchUserProfile,
+        },
+      });
+    }
+  }, [error]);
 
   // SettingList에서 항목 클릭 시 모달 오픈
   const handleSettingClick = (item: string) => {
@@ -128,7 +140,7 @@ export default function MyPage() {
     return (
       <div className="min-h-screen bg-background w-full flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <LoadingSpinner size="lg" color="border-primary" />
           <p className="text-foreground">사용자 정보를 불러오는 중...</p>
         </div>
       </div>
@@ -154,53 +166,9 @@ export default function MyPage() {
               <Accordion />
               {/* SettingList (설정 리스트) */}
               <SettingList onItemClick={handleSettingClick} />
-              {/* 오류 메시지 */}
-              {error && (
-                <div className="flex items-start gap-2 mt-6 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <svg
-                      className="w-4 h-4 text-red-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-red-800 mb-2">{error}</p>
-                    <button
-                      onClick={fetchUserProfile}
-                      className="text-xs text-red-600 hover:text-red-800 underline"
-                    >
-                      다시 시도
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* 하단 버튼들 */}
-              <div className="flex flex-col gap-3 mt-6">
-                <button
-                  onClick={handleLogout}
-                  className="w-full py-4 rounded-lg bg-yellow-600 text-white font-bold text-lg hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                  aria-label="로그아웃"
-                >
-                  로그아웃
-                </button>
-                <button
-                  onClick={() =>
-                    toast.info('탈퇴 기능은 아직 구현되지 않았습니다.')
-                  }
-                  className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  aria-label="회원 탈퇴"
-                >
-                  탈퇴하기
-                </button>
-              </div>
+              <MyPageBottomButtons />
             </section>
           </div>
         </main>
@@ -210,7 +178,7 @@ export default function MyPage() {
       <ChangePasswordModal
         open={isOpen && modalType === 'change-password'}
         onClose={closeModal}
-        onSubmit={(current, next, confirm) => {
+        onSubmit={() => {
           // 비밀번호 변경 성공 시 모달 닫기
           closeModal();
         }}
@@ -218,7 +186,7 @@ export default function MyPage() {
       <ChangePhoneModal
         open={isOpen && modalType === 'change-phone'}
         onClose={closeModal}
-        onSubmit={(current, next, code) => {
+        onSubmit={() => {
           // 전화번호 변경 성공 시 모달 닫기
           closeModal();
         }}
@@ -234,7 +202,7 @@ export default function MyPage() {
       <SocialLoginModal
         open={isOpen && modalType === 'social-login'}
         onClose={closeModal}
-        onSubmit={(provider, isLinked) => {
+        onSubmit={() => {
           // 소셜 로그인 연동/해제 성공 시 사용자 프로필 새로고침
           fetchUserProfile();
           // 모달은 닫지 않고 계속 열어둠 (사용자가 다른 계정도 연동/해제할 수 있도록)
