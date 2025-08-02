@@ -1,5 +1,6 @@
 import { useState, forwardRef } from 'react';
 import Image from 'next/image';
+import classNames from 'classnames';
 import type { PasswordInputProps } from '../types/formComponents';
 import { validatePassword } from '../utils/password-validation';
 
@@ -53,6 +54,19 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     const passwordValidation =
       showValidation && value.trim() ? validatePassword(value) : null;
 
+    // 입력 필드 스타일 클래스
+    const inputClassName = classNames('password-input-base', {
+      'password-input-valid':
+        showValidation && value.trim() && passwordValidation?.isValid,
+      'password-input-invalid':
+        showValidation &&
+        value.trim() &&
+        passwordValidation &&
+        !passwordValidation.isValid,
+      'password-input-default':
+        !showValidation || !value.trim() || !passwordValidation,
+    });
+
     return (
       <div>
         <label
@@ -72,13 +86,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             placeholder={placeholder}
             required={required}
             disabled={disabled}
-            className={`w-full px-3 py-3 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] ${
-              showValidation && value.trim() && passwordValidation
-                ? passwordValidation.isValid
-                  ? 'border-green-300 focus:ring-green-200'
-                  : 'border-red-300 focus:ring-red-200'
-                : 'border-gray-300 focus:ring-blue-500'
-            }`}
+            className={inputClassName}
             {...props}
           />
           <button
@@ -108,11 +116,12 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           <div className="text-sm mt-2 space-y-1">
             <div className="flex items-center gap-2">
               <div
-                className={`w-3 h-3 rounded-full flex items-center justify-center ${
-                  value.length >= 6 && value.length <= 12
-                    ? 'bg-green-500'
-                    : 'bg-red-300'
-                }`}
+                className={classNames('password-checklist-item', {
+                  'password-checklist-item-valid':
+                    value.length >= 6 && value.length <= 12,
+                  'password-checklist-item-invalid':
+                    value.length < 6 || value.length > 12,
+                })}
               >
                 {value.length >= 6 && value.length <= 12 && (
                   <svg
@@ -129,20 +138,22 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 )}
               </div>
               <span
-                className={
-                  value.length >= 6 && value.length <= 12
-                    ? 'text-green-600'
-                    : 'text-red-500'
-                }
+                className={classNames({
+                  'password-checklist-text-valid':
+                    value.length >= 6 && value.length <= 12,
+                  'password-checklist-text-invalid':
+                    value.length < 6 || value.length > 12,
+                })}
               >
                 6~12자 길이
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`w-3 h-3 rounded-full flex items-center justify-center ${
-                  /[a-zA-Z]/.test(value) ? 'bg-green-500' : 'bg-red-300'
-                }`}
+                className={classNames('password-checklist-item', {
+                  'password-checklist-item-valid': /[a-zA-Z]/.test(value),
+                  'password-checklist-item-invalid': !/[a-zA-Z]/.test(value),
+                })}
               >
                 {/[a-zA-Z]/.test(value) && (
                   <svg
@@ -159,18 +170,20 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 )}
               </div>
               <span
-                className={
-                  /[a-zA-Z]/.test(value) ? 'text-green-600' : 'text-red-500'
-                }
+                className={classNames({
+                  'password-checklist-text-valid': /[a-zA-Z]/.test(value),
+                  'password-checklist-text-invalid': !/[a-zA-Z]/.test(value),
+                })}
               >
                 영어 포함 (대소문자 구분 없음)
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`w-3 h-3 rounded-full flex items-center justify-center ${
-                  /\d/.test(value) ? 'bg-green-500' : 'bg-red-300'
-                }`}
+                className={classNames('password-checklist-item', {
+                  'password-checklist-item-valid': /\d/.test(value),
+                  'password-checklist-item-invalid': !/\d/.test(value),
+                })}
               >
                 {/\d/.test(value) && (
                   <svg
@@ -187,18 +200,23 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 )}
               </div>
               <span
-                className={/\d/.test(value) ? 'text-green-600' : 'text-red-500'}
+                className={classNames({
+                  'password-checklist-text-valid': /\d/.test(value),
+                  'password-checklist-text-invalid': !/\d/.test(value),
+                })}
               >
                 숫자 포함
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className={`w-3 h-3 rounded-full flex items-center justify-center ${
-                  /[!?@#$%^&*()~`+\-_]/.test(value)
-                    ? 'bg-green-500'
-                    : 'bg-red-300'
-                }`}
+                className={classNames('password-checklist-item', {
+                  'password-checklist-item-valid': /[!?@#$%^&*()~`+\-_]/.test(
+                    value
+                  ),
+                  'password-checklist-item-invalid':
+                    !/[!?@#$%^&*()~`+\-_]/.test(value),
+                })}
               >
                 {/[!?@#$%^&*()~`+\-_]/.test(value) && (
                   <svg
@@ -215,11 +233,13 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 )}
               </div>
               <span
-                className={
-                  /[!?@#$%^&*()~`+\-_]/.test(value)
-                    ? 'text-green-600'
-                    : 'text-red-500'
-                }
+                className={classNames({
+                  'password-checklist-text-valid': /[!?@#$%^&*()~`+\-_]/.test(
+                    value
+                  ),
+                  'password-checklist-text-invalid':
+                    !/[!?@#$%^&*()~`+\-_]/.test(value),
+                })}
               >
                 특수기호 포함 (! ? @ # $ % ^ & * ( ) ~ ` + - _)
               </span>

@@ -86,7 +86,7 @@ export default function SignUp() {
     const nicknameValidation = validateNickname(formData.nickname);
     const nameValidation = validateName(formData.name);
     return (
-      formData.name.trim() !== '' &&
+      formData.name !== '' &&
       nameValidation.isValid &&
       formData.nickname.trim() !== '' &&
       nicknameValidation.isValid &&
@@ -429,11 +429,28 @@ export default function SignUp() {
 
   /**
    * @author 이승우
-   * @description 이름 유효성 검사 결과
+   * @description 이름 유효성 검사 결과 (자동 공백 제거)
    */
   const nameValidation = useMemo(() => {
     return validateName(formData.name);
   }, [formData.name]);
+
+  /**
+   * @author 이승우
+   * @description 이름 입력 변경 핸들러 (자동 공백 제거)
+   */
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      const validation = validateName(value);
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: validation.trimmedName || value, // 유효한 경우 공백 제거된 값 사용
+      }));
+    },
+    []
+  );
 
   return (
     <div className="w-full flex justify-center px-6 py-8">
@@ -446,12 +463,12 @@ export default function SignUp() {
             id="name"
             name="name"
             value={formData.name}
-            onChange={handleInputChange}
+            onChange={handleNameChange}
             required
             ref={nameInputRef}
           />
           <div className="h-5 mt-1">
-            {formData.name.trim() !== '' && !nameValidation.isValid && (
+            {formData.name !== '' && !nameValidation.isValid && (
               <div className="text-red-500 text-sm">{nameValidation.error}</div>
             )}
           </div>
