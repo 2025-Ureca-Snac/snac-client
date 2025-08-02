@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Plus from '@/public/plus.svg';
+
 import { BlogTable } from './blog-table';
 import { DeleteConfirmModal } from './delete-confirm-modal';
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
