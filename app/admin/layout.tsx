@@ -32,7 +32,8 @@ function Sidebar() {
   const NAV_ITEMS = [
     { name: '대시보드', icon: DataBaseIcon, href: '/admin' },
     { name: '게시글 관리', icon: PostIcon, href: '/admin/blog' },
-    { name: '신고 관리', icon: NewReportIcon, href: '/admin/dispute' },
+    { name: '신고 관리', icon: NewReportIcon, href: '/admin/dispute/report' },
+    { name: '문의 관리', icon: NewReportIcon, href: '/admin/dispute/qna' },
   ];
 
   return (
@@ -82,7 +83,8 @@ function AdminHeader() {
   const getTitle = () => {
     if (pathname.startsWith('/admin/blog')) return '게시글 관리';
     if (pathname.startsWith('/admin/users')) return '사용자 관리';
-    if (pathname.startsWith('/admin/dispute')) return '신고 관리';
+    if (pathname.startsWith('/admin/dispute/report')) return '신고 관리';
+    if (pathname.startsWith('/admin/dispute/qna')) return '문의 관리';
     return '대시보드';
   };
 
