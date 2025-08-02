@@ -37,9 +37,11 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
 
     setIsAddingFavorite(true);
 
+    const memberId =
+      partner.type === 'seller' ? partner.buyerId : partner.sellerId;
     try {
-      const response = await api.post('/api/favorites', {
-        toMemberId: partner.cardId, // cardId를 memberId로 사용
+      const response = await api.post('/favorites', {
+        toMemberId: memberId, // cardId를 memberId로 사용
       });
 
       if (response.status === 201) {
