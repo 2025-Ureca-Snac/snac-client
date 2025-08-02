@@ -28,6 +28,11 @@ export default function CompletePage() {
         tradeId: 789,
         buyer: 'buyer@example.com',
         seller: 'seller@example.com',
+        sellerId: 1,
+        sellerNickName: 'seller',
+        buyerId: 2,
+        buyerNickName: 'buyer',
+        buyerRatingScore: 4.9,
         cardId: 789,
         carrier: 'KT',
         dataAmount: 2,
@@ -43,7 +48,6 @@ export default function CompletePage() {
         data: 2,
         price: 2000,
         rating: 4.9,
-        transactionCount: '156',
       };
 
   const completedAt = new Date().toLocaleString();
