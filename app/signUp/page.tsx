@@ -14,7 +14,7 @@ import type {
 import { useTimer } from '../(shared)/hooks/useTimer';
 import { api } from '../(shared)/utils/api';
 import { useRouter } from 'next/navigation';
-import { formatDateYYYYMMDD } from '../(shared)/utils';
+import { formatDateYYYYMMDD, validateName } from '../(shared)/utils';
 import { validatePassword } from '../(shared)/utils/password-validation';
 import { validateNickname } from '../(shared)/utils/nickname-validation';
 import { toast } from 'sonner';
@@ -84,8 +84,10 @@ export default function SignUp() {
   const isFormValid = useMemo(() => {
     const passwordValidation = validatePassword(formData.password);
     const nicknameValidation = validateNickname(formData.nickname);
+    const nameValidation = validateName(formData.name);
     return (
       formData.name.trim() !== '' &&
+      nameValidation.isValid &&
       formData.nickname.trim() !== '' &&
       nicknameValidation.isValid &&
       formData.email.trim() !== '' &&
@@ -425,6 +427,14 @@ export default function SignUp() {
         : 'gray';
   }, [passwordMatch]);
 
+  /**
+   * @author 이승우
+   * @description 이름 유효성 검사 결과
+   */
+  const nameValidation = useMemo(() => {
+    return validateName(formData.name);
+  }, [formData.name]);
+
   return (
     <div className="w-full flex justify-center px-6 py-8">
       <div className="w-full max-w-md">
@@ -440,6 +450,11 @@ export default function SignUp() {
             required
             ref={nameInputRef}
           />
+          <div className="h-5 mt-1">
+            {formData.name.trim() !== '' && !nameValidation.isValid && (
+              <div className="text-red-500 text-sm">{nameValidation.error}</div>
+            )}
+          </div>
 
           <NicknameInputField
             label="유저 닉네임"

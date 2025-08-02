@@ -24,6 +24,36 @@ export const isValidEmail = (email: string): boolean => {
 
 /**
  * @author 이승우
+ * @description 이름 유효성 검사
+ * @param name 검사할 이름
+ * @returns 유효성 검사 결과
+ */
+export const validateName = (
+  name: string
+): { isValid: boolean; error?: string } => {
+  // 길이 검사 (2-5자)
+  if (name.length < 2) {
+    return { isValid: false, error: '이름은 2자 이상이어야 합니다.' };
+  }
+  if (name.length > 5) {
+    return { isValid: false, error: '이름은 5자 이하여야 합니다.' };
+  }
+
+  // 한국어만 허용
+  if (!/^[가-힣]+$/.test(name)) {
+    return { isValid: false, error: '이름은 한글만 입력 가능합니다.' };
+  }
+
+  // 공백 검사
+  if (name.trim() !== name) {
+    return { isValid: false, error: '이름 앞뒤에 공백을 사용할 수 없습니다.' };
+  }
+
+  return { isValid: true };
+};
+
+/**
+ * @author 이승우
  * @description 날짜를 YYYYMMDD 형식으로 변환
  * @param date 날짜
  * @returns YYYYMMDD 형식의 문자열
