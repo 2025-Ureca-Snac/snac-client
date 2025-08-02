@@ -43,6 +43,7 @@ export default function Home() {
     priceRange,
     sortBy,
     carrier,
+    postView,
     actions,
     refetchTrigger,
   } = useHomeStore();
@@ -54,6 +55,7 @@ export default function Home() {
       priceRange,
       sortBy,
       carrier,
+      postView,
     });
 
     const fetchScrollCards = async () => {
@@ -104,6 +106,47 @@ export default function Home() {
             (card: { sellStatus: string }) =>
               card.sellStatus === transactionStatus
           );
+        }
+
+        // postView에 따른 필터링 추가
+        if (postView && postView !== 'ALL') {
+          // 현재 사용자의 이메일을 가져오기 위해 JWT 토큰에서 디코딩
+          const getCurrentUserEmail = () => {
+            try {
+              const authStorage = localStorage.getItem('auth-storage');
+              if (authStorage) {
+                const parsed = JSON.parse(authStorage);
+                if (parsed.state?.token) {
+                  const token = parsed.state.token;
+                  const decoded = JSON.parse(atob(token.split('.')[1]));
+                  return decoded.username; // JWT의 username 필드 사용
+                }
+              }
+              return null;
+            } catch (error) {
+              console.error('토큰 디코딩 실패:', error);
+              return null;
+            }
+          };
+
+          const currentUserEmail = getCurrentUserEmail();
+
+          if (postView === 'MY_POSTS') {
+            // 내글만 보기: email이 현재 사용자와 같은 카드들
+            if (currentUserEmail) {
+              filteredCards = filteredCards.filter(
+                (card: CardData) => card.email === currentUserEmail
+              );
+            } else {
+              // 사용자 정보를 가져올 수 없는 경우 빈 배열로 설정
+              filteredCards = [];
+            }
+          } else if (postView === 'FAVORITE_POSTS') {
+            // 단골글 보기: favorite이 true인 카드들
+            filteredCards = filteredCards.filter(
+              (card: CardData) => card.favorite === true
+            );
+          }
         }
 
         // sortBy에 따라 카드 정렬
