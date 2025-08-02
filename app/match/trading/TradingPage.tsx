@@ -48,7 +48,7 @@ export default function TradingPage() {
   const router = useRouter();
   const { partner, setUserRole, userRole } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
-  const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
+  const [timeLeft, setTimeLeft] = useState(3000); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
 
   // 현재 사용자가 판매자인지 구매자인지 판단
@@ -64,7 +64,8 @@ export default function TradingPage() {
     console.log('🔄 TradingPage partnerInfo 업데이트:', partnerInfo);
   }, [partnerInfo]);
   // 전역 WebSocket 연결 유지
-  const { activatePage, deactivatePage } = useGlobalWebSocket();
+  const { activatePage, deactivatePage, sendTradeCancel } =
+    useGlobalWebSocket();
 
   // TradingPage 활성화
   useEffect(() => {
@@ -193,6 +194,15 @@ export default function TradingPage() {
 
   const handleCancel = () => {
     if (confirm('거래를 취소하시겠습니까? 패널티가 부과될 수 있습니다.')) {
+      // WebSocket을 통해 거래 취소 메시지 전송
+      if (isSeller) {
+        // 판매자인 경우
+        sendTradeCancel('seller');
+      } else {
+        // 구매자인 경우
+        sendTradeCancel('buyer');
+      }
+
       router.push('/match');
     }
   };

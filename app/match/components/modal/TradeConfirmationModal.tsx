@@ -32,11 +32,8 @@ export default function TradeConfirmationModal({
   const router = useRouter();
   const { partner } = useMatchStore();
   const { user } = useAuthStore();
-  useGlobalWebSocket();
-  // user가 없으면 모달을 렌더링하지 않음
-  if (!user) {
-    return null;
-  }
+  const { sendBuyRequestCancel } = useGlobalWebSocket();
+
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
@@ -118,6 +115,11 @@ export default function TradeConfirmationModal({
     };
   }, [modalState, timeLeft]);
 
+  // user가 없으면 모달을 렌더링하지 않음
+  if (!user) {
+    return null;
+  }
+
   if (!isOpen || !seller) return null;
 
   // 거래 시작 핸들러
@@ -155,9 +157,13 @@ export default function TradeConfirmationModal({
   // 거래 취소 핸들러
   const handleCancelTrade = () => {
     if (canCancel) {
-      setModalState('confirm');
-      setTimeLeft(3);
-      setCanCancel(false);
+      // WebSocket을 통해 구매 요청 취소 메시지 전송
+      const cardId = partner?.cardId || seller?.cardId;
+      if (cardId) {
+        sendBuyRequestCancel(cardId);
+      }
+
+      onCancel();
     }
   };
 

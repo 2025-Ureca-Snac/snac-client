@@ -363,9 +363,9 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           tradeId: tradeData.tradeId,
           buyer: tradeData.buyer,
           seller: tradeData.seller,
-          sellerId: tradeData.sellerId,
+          sellerId: Number(tradeData.sellerId),
           sellerNickName: tradeData.sellerNickName,
-          buyerId: tradeData.buyerId,
+          buyerId: Number(tradeData.buyerId),
           buyerNickName: tradeData.buyerNickName,
           buyerRatingScore: tradeData.buyerRatingScore,
           cardId: tradeData.cardId,
@@ -419,9 +419,15 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           const request: TradeRequest = {
             tradeId: tradeData.tradeId,
             cardId: tradeData.cardId,
-            buyerId: tradeData.buyer,
+            buyerId: Number(tradeData.buyerId),
             buyerName: tradeData.buyer,
-            sellerId: tradeData.seller,
+            sellerId: Number(tradeData.sellerId),
+            seller: tradeData.seller,
+            buyer: tradeData.buyer,
+            sellerNickName: tradeData.sellerNickName,
+            buyerNickName: tradeData.buyerNickName,
+            sellerRatingScore: tradeData.sellerRatingScore || 1000,
+            buyerRatingScore: tradeData.buyerRatingScore || 1000,
             status: 'pending',
             createdAt: new Date().toISOString(),
             ratingData: tradeData.sellerRatingScore,
@@ -458,10 +464,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
               buyer: tradeData.buyer,
               seller: tradeData.seller,
               cardId: tradeData.cardId,
-              buyerId: tradeData.buyerId,
+              buyerId: Number(tradeData.buyerId),
               buyerNickName: tradeData.buyerNickName,
               buyerRatingScore: tradeData.buyerRatingScore,
-              sellerId: tradeData.sellerId,
+              sellerId: Number(tradeData.sellerId),
               sellerNickName: tradeData.sellerNickName,
               carrier: tradeData.carrier || 'unknown',
               dataAmount: tradeData.dataAmount || 0,
@@ -672,23 +678,26 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   );
 
   // 거래 응답 (판매자용)
-  const respondToTrade = useCallback((tradeId: number, accept: boolean) => {
-    if (!globalStompClient?.connected) return;
+  const respondToTrade = useCallback(
+    (tradeId: number, accept: boolean, cardId?: number) => {
+      if (!globalStompClient?.connected) return;
 
-    if (accept) {
-      console.log('✅ 거래 수락 전송:', { tradeId });
-      globalStompClient.publish({
-        destination: '/app/trade/approve',
-        body: JSON.stringify({ tradeId }),
-      });
-    } else {
-      console.log('❌ 거래 거부:', tradeId);
-      globalStompClient.publish({
-        destination: '/app/trade/buy-request/cancel/seller',
-        body: JSON.stringify({ tradeId }),
-      });
-    }
-  }, []);
+      if (accept) {
+        console.log('✅ 거래 수락 전송:', { tradeId });
+        globalStompClient.publish({
+          destination: '/app/trade/approve',
+          body: JSON.stringify({ tradeId }),
+        });
+      } else {
+        console.log('❌ 거래 거부:', cardId);
+        globalStompClient.publish({
+          destination: '/app/trade/buy-request/cancel/seller',
+          body: JSON.stringify({ cardId, reason: 'SELLER_CHANGE_MIND' }),
+        });
+      }
+    },
+    []
+  );
 
   // 거래 생성 (구매자용)
   const createTrade = useCallback((cardId: number) => {
@@ -760,6 +769,23 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     return true;
   }, []);
 
+  // 구매 요청 취소 메시지 전송
+  const sendBuyRequestCancel = useCallback((cardId: number) => {
+    if (!globalStompClient?.connected) {
+      console.error('❌ WebSocket이 연결되지 않았습니다.');
+      return false;
+    }
+
+    console.log('❌ 구매 요청 취소 메시지 전송:', { cardId });
+
+    globalStompClient.publish({
+      destination: '/app/trade/buy-request/cancel/buyer',
+      body: JSON.stringify({ cardId, reason: 'BUYER_CHANGE_MIND' }),
+    });
+
+    return true;
+  }, []);
+
   // 실제 WebSocket 연결 해제 함수
   const disconnectWebSocket = useCallback(() => {
     if (globalStompClient?.connected) {
@@ -816,6 +842,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     sendPayment,
     sendTradeConfirm,
     sendTradeCancel,
+    sendBuyRequestCancel,
     updateUserRole,
     activatePage,
     deactivatePage,

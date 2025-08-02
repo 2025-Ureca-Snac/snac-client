@@ -1,13 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useModalStore } from '../stores/modal-store';
 import ModalPortal from './modal-portal';
 import { Button } from './Button';
 import { getCancelMessage } from '../constants';
 
 export default function TradeCancelModal() {
-  const router = useRouter();
   const { isOpen, modalType, modalData, closeModal } = useModalStore();
 
   // trade-cancel 모달이 아닌 경우 렌더링하지 않음
@@ -20,8 +18,8 @@ export default function TradeCancelModal() {
 
   const handleConfirm = () => {
     closeModal();
-    // match 페이지로 이동
-    router.push('/match');
+
+    window.location.reload();
   };
 
   return (

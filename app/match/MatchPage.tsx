@@ -384,7 +384,7 @@ export default function MatchPage() {
       );
 
       // 실제 서버에 응답 전송
-      respondToTrade(requestId, accept);
+      respondToTrade(requestId, accept, request.cardId);
 
       // 거래를 수락한 경우 trading 페이지로 이동
       if (accept) {
@@ -392,7 +392,12 @@ export default function MatchPage() {
         const partnerInfo = {
           tradeId: requestId,
           buyer: request.buyerName,
-          seller: request.sellerId,
+          seller: request.seller,
+          sellerId: request.sellerId,
+          sellerNickName: request.sellerNickName,
+          buyerId: request.buyerId,
+          buyerNickName: request.buyerNickName,
+          buyerRatingScore: request.buyerRatingScore,
           cardId: request.cardId,
           carrier: sellerInfo.carrier,
           dataAmount: sellerInfo.dataAmount,
