@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import Link from 'next/link';
+
 import InputField from '../(shared)/components/input-field';
 import InputWithButton from '../(shared)/components/input-with-button';
 import VerificationInput from '../(shared)/components/verification-input';
@@ -15,7 +15,12 @@ import { useTimer } from '../(shared)/hooks/useTimer';
 import { api } from '../(shared)/utils/api';
 import { useRouter } from 'next/navigation';
 import { formatDateYYYYMMDD } from '../(shared)/utils';
+import { validatePassword } from '../(shared)/utils/password-validation';
+import { validateNickname } from '../(shared)/utils/nickname-validation';
 import { toast } from 'sonner';
+import SignUpHeader from '../(shared)/components/signup-header';
+import ErrorMessage from '../(shared)/components/error-message';
+import SubmitButton from '../(shared)/components/submit-button';
 
 /**
  * @author 이승우
@@ -29,9 +34,6 @@ export default function SignUp() {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [verificationError, setVerificationError] = useState<string | null>(
-    null
-  );
   const emailTimer = useTimer();
   const phoneTimer = useTimer();
   const router = useRouter();
@@ -80,15 +82,19 @@ export default function SignUp() {
    * @return 모든 필드가 입력되고 인증이 완료되었는지 확인(성공, 실패)
    */
   const isFormValid = useMemo(() => {
+    const passwordValidation = validatePassword(formData.password);
+    const nicknameValidation = validateNickname(formData.nickname);
     return (
       formData.name.trim() !== '' &&
       formData.nickname.trim() !== '' &&
+      nicknameValidation.isValid &&
       formData.email.trim() !== '' &&
       formData.phoneNumber.trim() !== '' &&
       formData.birthDate &&
       !isNaN(formData.birthDate.getTime()) && // 유효한 날짜인지 확인
       formData.password.trim() !== '' &&
       formData.passwordConfirm.trim() !== '' &&
+      passwordValidation.isValid &&
       isEmailVerified &&
       isPhoneVerified &&
       passwordMatch === 'match'
@@ -273,62 +279,65 @@ export default function SignUp() {
 
   /**
    * @author 이승우
-   * @description 회원가입 요청
-   * @return 회원가입 요청에 성공 여부 반환(성공, 실패)
+   * @description 회원가입 제출 처리
+   * @param e - 폼 제출 이벤트
    */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    // 모든 조건 확인
-    if (!isFormValid) {
-      return;
-    }
-
-    // 오류 메시지 초기화
-    setError(null);
-
-    console.log('회원가입 요청', formData);
-
-    try {
-      const data = {
-        email: formData.email,
-        nickname: formData.nickname,
-        password: formData.password,
-        name: formData.name,
-        phone: formData.phoneNumber,
-        birthDate: formatDateYYYYMMDD(formData.birthDate),
-      };
-
-      const response = await api.post('/join', data);
-
-      if ((response.data as { status?: string })?.status === 'CREATED') {
-        toast.success('회원가입이 완료되었습니다.');
-        router.push('/login');
-      } else {
-        setError('회원가입에 실패했습니다.');
+      // 모든 조건 확인
+      if (!isFormValid) {
+        return;
       }
-    } catch (error: unknown) {
-      console.error('회원가입 오류', error);
 
-      // 닉네임 중복 에러 처리
-      if (error && typeof error === 'object' && 'response' in error) {
-        const apiError = error as {
-          response?: {
-            data?: { message?: string };
-            status?: number;
-          };
+      // 오류 메시지 초기화
+      setError(null);
+
+      console.log('회원가입 요청', formData);
+
+      try {
+        const data = {
+          email: formData.email,
+          nickname: formData.nickname,
+          password: formData.password,
+          name: formData.name,
+          phone: formData.phoneNumber,
+          birthDate: formatDateYYYYMMDD(formData.birthDate),
         };
 
-        if (apiError.response?.data?.message) {
-          setError(apiError.response.data.message);
+        const response = await api.post('/join', data);
+
+        if ((response.data as { status?: string })?.status === 'CREATED') {
+          toast.success('회원가입이 완료되었습니다.');
+          router.push('/login');
         } else {
           setError('회원가입에 실패했습니다.');
         }
-      } else {
-        setError('회원가입에 실패했습니다.');
+      } catch (error: unknown) {
+        console.error('회원가입 오류', error);
+
+        // 닉네임 중복 에러 처리
+        if (error && typeof error === 'object' && 'response' in error) {
+          const apiError = error as {
+            response?: {
+              data?: { message?: string };
+              status?: number;
+            };
+          };
+
+          if (apiError.response?.data?.message) {
+            setError(apiError.response.data.message);
+          } else {
+            setError('회원가입에 실패했습니다.');
+          }
+        } else {
+          setError('회원가입에 실패했습니다.');
+        }
       }
-    }
-  };
+    },
+    [isFormValid, formData, router]
+  );
 
   /**
    * @author 이승우
@@ -419,15 +428,7 @@ export default function SignUp() {
   return (
     <div className="w-full flex justify-center px-6 py-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-black mb-4">회원가입</h1>
-          <p className="text-gray-600">
-            이미 계정이 있으신가요?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-800">
-              로그인
-            </Link>
-          </p>
-        </div>
+        <SignUpHeader />
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <InputField
@@ -538,6 +539,7 @@ export default function SignUp() {
             value={formData.password}
             onChange={handleInputChange}
             required
+            showValidation={true}
             ref={passwordInputRef}
           />
 
@@ -553,53 +555,10 @@ export default function SignUp() {
             helpTextColor={passwordHelpTextColor}
           />
 
-          {/* 인증 오류 메시지 */}
-          {verificationError && (
-            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex-shrink-0 mt-0.5">
-                <svg
-                  className="w-4 h-4 text-red-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <p className="text-sm text-red-800">{verificationError}</p>
-            </div>
-          )}
-
           {/* 오류 메시지 */}
-          {error && (
-            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex-shrink-0 mt-0.5">
-                <svg
-                  className="w-4 h-4 text-red-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
-          )}
+          {error && <ErrorMessage message={error} />}
 
-          <button
-            type="submit"
-            disabled={!isFormValid}
-            className="w-full py-3 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            회원가입
-          </button>
+          <SubmitButton text="회원가입" disabled={!isFormValid} />
         </form>
       </div>
     </div>
