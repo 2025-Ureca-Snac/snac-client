@@ -7,13 +7,12 @@ import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
 interface ConfirmationStepProps {
   partner: MatchPartner;
   onNext: () => void;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export default function ConfirmationStep({
   partner,
   onNext,
-  onCancel,
 }: ConfirmationStepProps) {
   useGlobalWebSocket();
   return (
@@ -145,12 +144,6 @@ export default function ConfirmationStep({
 
           {/* 액션 버튼들 */}
           <div className="flex space-x-4">
-            <button
-              onClick={onCancel}
-              className="flex-1 px-8 py-4 bg-gray-800 text-gray-300 rounded-xl border border-gray-600 hover:bg-gray-700 hover:border-gray-500 transition-all duration-300 font-medium"
-            >
-              거래 취소
-            </button>
             <button
               onClick={onNext}
               className="flex-1 px-8 py-4 bg-gradient-to-r from-green-400 to-green-500 text-black rounded-xl hover:from-green-300 hover:to-green-400 transition-all duration-300 font-bold shadow-lg hover:shadow-green-400/25 relative overflow-hidden group"
