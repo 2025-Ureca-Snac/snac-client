@@ -61,6 +61,28 @@ export const BlogDetailModal = ({
     )
     .slice(0, 3);
 
+  const renderContent = () => {
+    if (!post.articleUrl) {
+      return (
+        <p className="text-gray-600 dark:text-gray-300">콘텐츠가 없습니다.</p>
+      );
+    }
+
+    if (post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
+      return (
+        <img src={post.articleUrl} alt="업로드 이미지" className="rounded-lg" />
+      );
+    }
+
+    if (fetching) {
+      return (
+        <p className="text-gray-500 dark:text-gray-400">컨텐츠 로딩 중...</p>
+      );
+    }
+
+    return <MarkdownRenderer content={markdownContent} />;
+  };
+
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       {/* 배경 오버레이 */}
@@ -146,30 +168,7 @@ export const BlogDetailModal = ({
               MarkdownRenderer는 자체적으로 다크모드를 처리하므로 이 부분은 수정하지 않습니다.
             */}
             <div className="prose prose-lg max-w-none dark:prose-invert">
-              {post.articleUrl &&
-              post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                <img
-                  src={post.articleUrl}
-                  alt="업로드 이미지"
-                  className="rounded-lg"
-                />
-              ) : post.articleUrl ? (
-                fetching ? (
-                  <p className="text-gray-500 dark:text-gray-400">
-                    컨텐츠 로딩 중...
-                  </p>
-                ) : markdownContent ? (
-                  <MarkdownRenderer content={markdownContent} />
-                ) : (
-                  <p className="text-gray-600 dark:text-gray-300">
-                    콘텐츠가 없습니다.
-                  </p>
-                )
-              ) : (
-                <p className="text-gray-600 dark:text-gray-300">
-                  콘텐츠가 없습니다.
-                </p>
-              )}
+              {renderContent()}
             </div>
 
             {/* 관련 포스트 */}
