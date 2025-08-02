@@ -47,7 +47,7 @@ export default function Home() {
     refetchTrigger,
   } = useHomeStore();
 
-  const PAGE_SIZE = 4;
+  const PAGE_SIZE = 54;
 
   // refetchTrigger가 변경될 때 페이지네이션 상태를 리셋하는 useEffect
   const isInitialMount = useRef(true);
@@ -93,9 +93,9 @@ export default function Home() {
             : (category ?? undefined);
 
       const queryString = generateQueryParams({
-        cardCategory: (cardCategory || 'BUY') as CardCategory,
+        cardCategory: cardCategory,
         sellStatusFilter: 'ALL' as SellStatus,
-        priceRanges: [priceRange || 'ALL'],
+        priceRanges: [priceRange],
         highRatingFirst,
         size: PAGE_SIZE,
         lastCardId,
@@ -177,7 +177,6 @@ export default function Home() {
     transactionStatus,
     priceRange,
     sortBy,
-    carrier,
   ]);
 
   const handlePageChange = (page: number) => {
