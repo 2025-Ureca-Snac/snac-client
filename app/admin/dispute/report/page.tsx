@@ -1,0 +1,280 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import {
+  useDisputeStore,
+  Dispute,
+  DisputeStatus,
+  DisputeType,
+} from '@/app/(shared)/stores/use-dispute-store';
+import { ResolveModal } from '../components/resolve-modal';
+import { ConfirmModal } from '../components/confirm-modal';
+import DisputeDetailModal from '../components/dispute-detail-modal';
+
+// 라벨 매핑
+const REPORT_TYPE_LABELS: Record<string, string> = {
+  DATA_NONE: '데이터 없음',
+  DATA_PARTIAL: '데이터 일부',
+  REPORT_OTHER: '기타 신고',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  IN_PROGRESS: '처리중',
+  NEED_MORE: '자료요청',
+  ANSWERED: '답변완료',
+};
+
+const reportTypeFilterCategories: Array<{
+  value: DisputeType | 'ALL';
+  label: string;
+}> = [
+  { value: 'ALL', label: '전체 유형' },
+  { value: 'DATA_NONE', label: '데이터 없음' },
+  { value: 'DATA_PARTIAL', label: '데이터 일부' },
+  { value: 'REPORT_OTHER', label: '기타 신고' },
+];
+
+const statusFilterCategories: Array<{
+  value: DisputeStatus | 'ALL';
+  label: string;
+}> = [
+  { value: 'ALL', label: '전체 상태' },
+  { value: 'IN_PROGRESS', label: '처리중' },
+  { value: 'ANSWERED', label: '답변완료' },
+  { value: 'NEED_MORE', label: '자료요청' },
+];
+
+const StatusBadge = ({ status }: { status: DisputeStatus }) => (
+  <div className="flex items-center">
+    <span
+      className={`h-2 w-2 rounded-full mr-2 ${
+        {
+          IN_PROGRESS: 'bg-yellow-500',
+          NEED_MORE: 'bg-orange-500',
+          ANSWERED: 'bg-green-500',
+        }[status]
+      }`}
+    ></span>
+    <span className="text-regular-sm text-gray-700 dark:text-gray-300">
+      {STATUS_LABELS[status]}
+    </span>
+  </div>
+);
+
+export default function AdminReportPage() {
+  const {
+    disputes,
+    fetchDisputes,
+    loading,
+    filters,
+    setFilters,
+    openResolveModal,
+    openConfirmModal,
+    refundAndCancel,
+    penalizeSeller,
+    finalize,
+    fetchDisputeById,
+  } = useDisputeStore();
+
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
+  const [visibleStatusRowId, setVisibleStatusRowId] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    setFilters({ category: 'REPORT', type: 'ALL', status: 'ALL' });
+  }, [setFilters]);
+
+  useEffect(() => {
+    if (filters.category === 'REPORT') {
+      fetchDisputes();
+      setVisibleStatusRowId(null);
+    }
+  }, [filters, fetchDisputes]);
+
+  const handleFilterChange = (filterType: 'type' | 'status', value: any) => {
+    setFilters({ [filterType]: value });
+    setVisibleStatusRowId(null);
+  };
+
+  const handleOpenDetailModal = async (disputeId: string) => {
+    setVisibleStatusRowId(disputeId);
+    const data = await fetchDisputeById(disputeId);
+    if (data) {
+      setSelectedDispute(data);
+      setIsDetailModalOpen(true);
+    }
+  };
+
+  const renderDisputeList = () => {
+    if (loading)
+      return (
+        <div className="text-center py-20 text-regular-md text-gray-400">
+          데이터를 불러오는 중입니다...
+        </div>
+      );
+    if (disputes.length === 0)
+      return (
+        <div className="text-center py-20 text-regular-md text-gray-400">
+          조건에 맞는 신고 내역이 없습니다.
+        </div>
+      );
+
+    // 표 내부에만 가로 스크롤: overflow-x-auto + w-full + min-w-[800px] (모바일에서만 스크롤)
+    return (
+      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-light">
+        <table className="w-full min-w-[800px] divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th className="px-6 py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                상태
+              </th>
+              <th className="px-6 py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                유형
+              </th>
+              <th className="px-6 py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                제목
+              </th>
+              <th className="px-6 py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                신고자 ID
+              </th>
+              <th className="px-6 py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                접수일
+              </th>
+              <th className="px-6 py-3 text-right text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
+                관리
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {disputes.map((d) => (
+              <tr
+                key={d.id}
+                className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <td className="px-6 py-4 whitespace-nowrap text-regular-sm">
+                  {visibleStatusRowId === d.id && d.status ? (
+                    <StatusBadge status={d.status} />
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
+                  {REPORT_TYPE_LABELS[d.type] ?? d.type}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-regular-sm font-medium text-gray-900 dark:text-gray-200">
+                  <button
+                    onClick={() => handleOpenDetailModal(d.id)}
+                    className="hover:underline text-left"
+                  >
+                    {d.title}
+                  </button>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
+                  {d.reporter}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
+                  {new Date(d.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-regular-sm font-medium space-x-4">
+                  <button
+                    onClick={() => {
+                      setVisibleStatusRowId(d.id);
+                      openResolveModal(d.id);
+                    }}
+                    className="text-indigo-500 hover:text-indigo-400"
+                  >
+                    상세/답변
+                  </button>
+                  {d.status === 'ANSWERED' && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setVisibleStatusRowId(d.id);
+                          openConfirmModal(
+                            '해당 건에 대해 환불 및 거래 취소를 진행하시겠습니까?',
+                            () => refundAndCancel(d.id)
+                          );
+                        }}
+                        className="text-gray-400 hover:text-gray-300"
+                      >
+                        환불
+                      </button>
+                      <button
+                        onClick={() => {
+                          setVisibleStatusRowId(d.id);
+                          openConfirmModal(
+                            '판매자에게 패널티를 부여하시겠습니까?',
+                            () => penalizeSeller(d.id)
+                          );
+                        }}
+                        className="text-yellow-400 hover:text-yellow-300"
+                      >
+                        패널티
+                      </button>
+                      <button
+                        onClick={() => {
+                          setVisibleStatusRowId(d.id);
+                          openConfirmModal(
+                            '해당 건을 최종 처리하고 거래를 원상 복구하시겠습니까?',
+                            () => finalize(d.id)
+                          );
+                        }}
+                        className="text-gray-400 hover:text-gray-300"
+                      >
+                        최종처리
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  return (
+    <div className="container mx-auto p-4 md:p-6 bg-white dark:bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
+        신고 관리
+      </h1>
+      <div className="flex flex-col md:flex-row md:items-center gap-2 mb-6">
+        <select
+          onChange={(e) => handleFilterChange('type', e.target.value)}
+          value={filters.type}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-auto"
+        >
+          {reportTypeFilterCategories.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
+            </option>
+          ))}
+        </select>
+        <select
+          onChange={(e) => handleFilterChange('status', e.target.value)}
+          value={filters.status}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-auto"
+        >
+          {statusFilterCategories.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      {renderDisputeList()}
+      <ResolveModal />
+      <ConfirmModal />
+      {selectedDispute && (
+        <DisputeDetailModal
+          open={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          dispute={selectedDispute}
+        />
+      )}
+    </div>
+  );
+}
