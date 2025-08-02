@@ -89,8 +89,13 @@ export default function AdminQnaPage() {
     }
   }, [filters, fetchDisputes]);
 
-  const handleFilterChange = (filterType: 'type' | 'status', value: any) => {
-    setFilters({ [filterType]: value });
+  const handleTypeChange = (value: DisputeType | 'ALL') => {
+    setFilters({ type: value });
+    setVisibleStatusRowId(null);
+  };
+
+  const handleStatusChange = (value: DisputeStatus | 'ALL') => {
+    setFilters({ status: value });
     setVisibleStatusRowId(null);
   };
 
@@ -207,7 +212,9 @@ export default function AdminQnaPage() {
       </h1>
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 md:mb-6">
         <select
-          onChange={(e) => handleFilterChange('type', e.target.value)}
+          onChange={(e) =>
+            handleTypeChange(e.target.value as DisputeType | 'ALL')
+          }
           value={filters.type}
           className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-auto"
         >
@@ -218,7 +225,9 @@ export default function AdminQnaPage() {
           ))}
         </select>
         <select
-          onChange={(e) => handleFilterChange('status', e.target.value)}
+          onChange={(e) =>
+            handleStatusChange(e.target.value as DisputeStatus | 'ALL')
+          }
           value={filters.status}
           className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-auto"
         >
