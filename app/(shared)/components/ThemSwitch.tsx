@@ -1,15 +1,14 @@
 import React from 'react';
 import LightIcon from '@/public/light.svg';
 import DarkIcon from '@/public/dark.svg';
-import LightDarkModeIcon from '@/public/lightDarkMode.svg'; // 추가
+import LightDarkModeIcon from '@/public/lightDarkMode.svg';
 
-export function ThemeSwitch({
-  isDark,
-  onToggle,
-}: {
+interface ThemeSwitchProps {
   isDark: boolean;
   onToggle: () => void;
-}) {
+}
+
+export function ThemeSwitch({ isDark, onToggle }: ThemeSwitchProps) {
   return (
     <>
       {/* PC 이상: 스위치 */}
@@ -18,21 +17,22 @@ export function ThemeSwitch({
         aria-label="테마 토글"
         onClick={onToggle}
         className={`
-          w-[75px] h-7 rounded-full items-center justify-between
-          border-2
-          ${isDark ? '!border-white bg-white' : 'border-gray-800 bg-white'}
-          px-1 py-1 transition-all duration-300
-          hidden md:flex
+          hidden w-[75px] h-7 items-center justify-between
+          rounded-full border-2 bg-white px-1 py-1
+          transition-all duration-300 md:flex
+          ${isDark ? '!border-white' : 'border-gray-800'}
         `}
         style={isDark ? { borderColor: '#fff' } : undefined}
       >
         <LightIcon
-          className={`${isDark ? 'opacity-40' : 'opacity-100'} text-black`}
-          style={{ transition: 'opacity 0.3s' }}
+          className={`text-black transition-opacity duration-300 ${
+            isDark ? 'opacity-40' : 'opacity-100'
+          }`}
         />
         <DarkIcon
-          className={`${isDark ? 'opacity-100 text-black' : 'opacity-40 text-gray-600'}`}
-          style={{ transition: 'opacity 0.3s' }}
+          className={`transition-opacity duration-300 ${
+            isDark ? 'opacity-100 text-black' : 'opacity-40 text-gray-600'
+          }`}
         />
       </button>
 
@@ -41,7 +41,7 @@ export function ThemeSwitch({
         type="button"
         aria-label="다크/라이트 토글"
         onClick={onToggle}
-        className="flex md:hidden items-center justify-center p-2"
+        className="flex items-center justify-center p-2 md:hidden"
       >
         <LightDarkModeIcon width={24} height={24} />
       </button>
