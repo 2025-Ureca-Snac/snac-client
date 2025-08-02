@@ -24,6 +24,34 @@ export const isValidEmail = (email: string): boolean => {
 
 /**
  * @author 이승우
+ * @description 이름 유효성 검사 (자동으로 앞뒤 공백 제거)
+ * @param name 검사할 이름
+ * @returns 유효성 검사 결과
+ */
+export const validateName = (
+  name: string
+): { isValid: boolean; error?: string; trimmedName?: string } => {
+  // 앞뒤 공백 제거
+  const trimmedName = name.trim();
+
+  // 길이 검사 (2-5자)
+  if (trimmedName.length < 2) {
+    return { isValid: false, error: '이름은 2자 이상이어야 합니다.' };
+  }
+  if (trimmedName.length > 5) {
+    return { isValid: false, error: '이름은 5자 이하여야 합니다.' };
+  }
+
+  // 한국어만 허용
+  if (!/^[가-힣]+$/.test(trimmedName)) {
+    return { isValid: false, error: '이름은 한글만 입력 가능합니다.' };
+  }
+
+  return { isValid: true, trimmedName };
+};
+
+/**
+ * @author 이승우
  * @description 날짜를 YYYYMMDD 형식으로 변환
  * @param date 날짜
  * @returns YYYYMMDD 형식의 문자열
@@ -51,15 +79,14 @@ export const isToday = (dateString: string): boolean => {
 /**
  * @author 이승우
  * @description 닉네임 변경 가능까지 남은 시간을 계산
- * @param {Date} lastUpdatedAt 마지막 닉네임 변경 시간
+ * @param {Date} nextNicknameChangeAllowedAt 다음 닉네임 변경 가능 시간
  * @returns {number} 남은 시간 (밀리초), 0 이하면 변경 가능
  */
-export function getRemainingTimeForNicknameChange(lastUpdatedAt: Date): number {
+export function getRemainingTimeForNicknameChange(
+  nextNicknameChangeAllowedAt: Date
+): number {
   const now = new Date();
-  const nextAvailableTime = new Date(
-    lastUpdatedAt.getTime() + 24 * 60 * 60 * 1000
-  ); // 24시간 후
-  return Math.max(0, nextAvailableTime.getTime() - now.getTime());
+  return Math.max(0, nextNicknameChangeAllowedAt.getTime() - now.getTime());
 }
 
 /**
