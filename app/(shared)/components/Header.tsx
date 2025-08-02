@@ -5,11 +5,11 @@ import { AuthState } from '@/app/(shared)/types/auth-store';
 import React, { FC } from 'react';
 import Link from 'next/link';
 import { MenuLink } from './MenuLink';
-import LogoMobile from '@/public/logo_mobile.svg';
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
+import Image from 'next/image';
 
 const ADMIN_ROLE = 'ADMIN';
 export const Header: FC<{

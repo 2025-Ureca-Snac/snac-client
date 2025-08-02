@@ -22,13 +22,7 @@ export const MenuLink = ({
     }`}
     aria-label={alt}
   >
-    <Image
-      src={imgSrc}
-      alt={alt}
-      width={24}
-      height={24}
-      className={isDarkMode ? 'filter brightness-0 invert' : ''}
-    />
+    <IconComponent width={24} height={24} aria-hidden="true" />
     <span
       className={`hidden md:flex text-regular-sm font-medium ${
         isDarkMode ? 'text-gray-200 hover:text-white' : 'text-midnight-black'
