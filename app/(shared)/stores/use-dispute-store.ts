@@ -62,9 +62,14 @@ interface DisputeStore {
   openResolveModal: (id: string) => void;
   closeResolveModal: () => void;
   isConfirmModalOpen: boolean;
+  confirmTitle: string;
   confirmMessage: string;
   confirmAction: (() => void) | null;
-  openConfirmModal: (message: string, onConfirm: () => void) => void;
+  openConfirmModal: (
+    title: string,
+    message: string,
+    onConfirm: () => void
+  ) => void;
   closeConfirmModal: () => void;
 
   resolveDispute: (
@@ -112,16 +117,23 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
   closeResolveModal: () =>
     set({ isResolveModalOpen: false, selectedDisputeId: null }),
   isConfirmModalOpen: false,
+  confirmTitle: '',
   confirmMessage: '',
   confirmAction: null,
-  openConfirmModal: (message, onConfirm) =>
+  openConfirmModal: (title, message, onConfirm) =>
     set({
       isConfirmModalOpen: true,
+      confirmTitle: title,
       confirmMessage: message,
       confirmAction: onConfirm,
     }),
   closeConfirmModal: () =>
-    set({ isConfirmModalOpen: false, confirmMessage: '', confirmAction: null }),
+    set({
+      isConfirmModalOpen: false,
+      confirmTitle: '',
+      confirmMessage: '',
+      confirmAction: null,
+    }),
 
   // 전체 분쟁 목록 조회
   fetchDisputes: async (params = {}) => {

@@ -154,6 +154,7 @@ export default function AdminReportPage() {
                         onClick={() => {
                           setVisibleStatusRowId(d.id);
                           openConfirmModal(
+                            '환불 및 거래 취소 확인',
                             '해당 건에 대해 환불 및 거래 취소를 진행하시겠습니까?',
                             () => refundAndCancel(d.id)
                           );
@@ -166,6 +167,7 @@ export default function AdminReportPage() {
                         onClick={() => {
                           setVisibleStatusRowId(d.id);
                           openConfirmModal(
+                            '패널티 부여 확인',
                             '판매자에게 패널티를 부여하시겠습니까?',
                             () => penalizeSeller(d.id)
                           );
@@ -178,6 +180,7 @@ export default function AdminReportPage() {
                         onClick={() => {
                           setVisibleStatusRowId(d.id);
                           openConfirmModal(
+                            '최종 처리 확인',
                             '해당 건을 최종 처리하고 거래를 원상 복구하시겠습니까?',
                             () => finalize(d.id)
                           );
