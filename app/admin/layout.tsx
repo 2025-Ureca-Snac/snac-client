@@ -37,14 +37,14 @@ function Sidebar() {
 
   return (
     <aside
-      className={`fixed md:relative z-30 flex-shrink-0 w-64 h-full  text-white transition-transform duration-300 ease-in-out ${
+      className={`fixed md:relative z-30 flex-shrink-0 w-64 h-full text-white transition-transform duration-300 ease-in-out ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0`}
     >
-      <div className="flex flex-col h-full shadow-light rounded-lg bg-white mr-5">
-        <div className="flex items-center justify-center h-16   gap-2">
-          <ManagerIcon className="h-6 w-6 text-gray-600" />
-          <span className="text-midnight-black text-lg font-bold">
+      <div className="flex flex-col h-full shadow-light rounded-lg bg-white dark:bg-gray-900 mr-5">
+        <div className="flex items-center justify-center h-16 gap-2">
+          <ManagerIcon className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+          <span className="text-midnight-black text-lg font-bold dark:text-gray-100">
             관리자 패널
           </span>
         </div>
@@ -57,8 +57,8 @@ function Sidebar() {
                 href={item.href}
                 className={`flex items-center px-4 py-2 rounded-md transition-colors ${
                   isActive
-                    ? 'bg-gray-300 text-white'
-                    : 'text-gray-400 hover:bg-gray-500 hover:text-white'
+                    ? 'bg-gray-300 text-white dark:bg-gray-800 dark:text-white'
+                    : 'text-gray-400 hover:bg-gray-500 hover:text-white dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
                 }`}
               >
                 {item.icon && (
@@ -72,9 +72,7 @@ function Sidebar() {
       </div>
     </aside>
   );
-}
-
-// 헤더 컴포넌트
+} // 헤더 컴포넌트
 function AdminHeader() {
   const { toggleSidebar } = useAdminStore();
   const pathname = usePathname();
@@ -87,15 +85,17 @@ function AdminHeader() {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-white border-b">
+    <header className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-b dark:border-gray-700">
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
-          className="md:hidden mr-4 text-gray-500 hover:text-gray-700"
+          className="md:hidden mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
         >
           <Menu className="h-6 w-6" />
         </button>
-        <h1 className="text-xl font-bold text-gray-800">{getTitle()}</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+          {getTitle()}
+        </h1>
       </div>
     </header>
   );
@@ -110,7 +110,7 @@ export default function AdminLayout({
   const { isSidebarOpen, setSidebarOpen } = useAdminStore();
 
   return (
-    <div className=" min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <Header />
       <div className="flex flex-1">
         <Sidebar />
