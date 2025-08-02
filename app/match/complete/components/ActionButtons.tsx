@@ -41,7 +41,10 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
       const response = await api.get('/favorites/check', {
         params: { toMemberId: memberId },
       });
-      setIsFavorite(response.data === true);
+      const responseData = response.data as {
+        data: { isFavorite: boolean };
+      };
+      setIsFavorite(responseData.data.isFavorite);
     } catch (error) {
       console.error('단골 여부 확인 실패:', error);
       setIsFavorite(false);
