@@ -98,13 +98,15 @@ export const BlogCard = ({
         </div>
       )}
 
-      {/* 상세 정보 (상세 모드)  */}
+      {/* 상세 정보 (상세 모드) */}
       {isDetailed && (
-        <div className="p-4 bg-white">
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-regular-lg">
+        <div className="p-4 bg-white dark:bg-gray-800">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 text-regular-lg">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{author}</p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 line-clamp-2">
+            {author}
+          </p>
         </div>
       )}
     </div>

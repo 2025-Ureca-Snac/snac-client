@@ -61,6 +61,28 @@ export const BlogDetailModal = ({
     )
     .slice(0, 3);
 
+  const renderContent = () => {
+    if (!post.articleUrl) {
+      return (
+        <p className="text-gray-600 dark:text-gray-300">콘텐츠가 없습니다.</p>
+      );
+    }
+
+    if (post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
+      return (
+        <img src={post.articleUrl} alt="업로드 이미지" className="rounded-lg" />
+      );
+    }
+
+    if (fetching) {
+      return (
+        <p className="text-gray-500 dark:text-gray-400">컨텐츠 로딩 중...</p>
+      );
+    }
+
+    return <MarkdownRenderer content={markdownContent} />;
+  };
+
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       {/* 배경 오버레이 */}
@@ -71,14 +93,16 @@ export const BlogDetailModal = ({
 
       {/* 모달 컨텐츠 */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] shadow-light flex flex-col">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] shadow-light flex flex-col">
           {/* 헤더 */}
-          <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
+          <div className="flex-shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 rounded-t-2xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">블로그 포스트</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                블로그 포스트
+              </h2>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -113,12 +137,12 @@ export const BlogDetailModal = ({
             )}
 
             {/* 제목 */}
-            <h1 className="text-regular-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-regular-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               {post.title}
             </h1>
 
             {/* 메타 정보 */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-regular-sm text-gray-500 mb-8 pb-6 border-b border-gray-200">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-regular-sm text-gray-500 dark:text-gray-400 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
               {post.nickname && (
                 <div className="flex items-center gap-2">
                   {/* 작성자 아이콘 */}
@@ -140,28 +164,16 @@ export const BlogDetailModal = ({
               )}
             </div>
 
-            {/* 실제 본문 (마크다운 or 이미지) */}
-            <div className="prose prose-lg max-w-none">
-              {/* 이미지 파일이면 이미지, 마크다운/텍스트면 fetch해서 렌더 */}
-              {post.articleUrl &&
-              post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                <img src={post.articleUrl} alt="업로드 이미지" />
-              ) : post.articleUrl ? (
-                fetching ? (
-                  <p className="text-gray-400">컨텐츠 로딩 중...</p>
-                ) : markdownContent ? (
-                  <MarkdownRenderer content={markdownContent} />
-                ) : (
-                  <p className="text-gray-700">콘텐츠가 없습니다.</p>
-                )
-              ) : (
-                <p className="text-gray-700">콘텐츠가 없습니다.</p>
-              )}
+            {/* 실제 본문 (마크다운 or 이미지) 
+              MarkdownRenderer는 자체적으로 다크모드를 처리하므로 이 부분은 수정하지 않습니다.
+            */}
+            <div className="prose prose-lg max-w-none dark:prose-invert">
+              {renderContent()}
             </div>
 
             {/* 관련 포스트 */}
-            <div className="border-t border-gray-200 pt-8 mt-8">
-              <h3 className="text-regular-xl font-semibold text-gray-900 mb-4">
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
+              <h3 className="text-regular-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 관련 포스트
               </h3>
 
@@ -182,7 +194,9 @@ export const BlogDetailModal = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600">관련된 다른 포스트가 없습니다.</p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  관련된 다른 포스트가 없습니다.
+                </p>
               )}
             </div>
           </div>
