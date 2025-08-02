@@ -1,18 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface MenuLinkProps {
   href: string;
-  imgSrc: string;
+  IconComponent: React.ElementType;
   alt: string;
   text: string;
   isDarkMode?: boolean;
 }
-
 export const MenuLink = ({
   href,
-  imgSrc,
+  IconComponent,
   alt,
   text,
   isDarkMode = false,
@@ -22,6 +20,7 @@ export const MenuLink = ({
     className={`flex items-center gap-2 transition-all duration-300 ${
       isDarkMode ? 'hover:opacity-70 hover:scale-105' : 'hover:opacity-50'
     }`}
+    aria-label={alt}
   >
     <Image
       src={imgSrc}

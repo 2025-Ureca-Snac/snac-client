@@ -4,15 +4,22 @@ import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
 import React, { FC } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { MenuLink } from './MenuLink';
+import LogoMobile from '@/public/logo_mobile.svg';
+import Matching from '@/public/matching.svg';
+import User from '@/public/user.svg';
+import Admin from '@/public/admin.svg';
+import Login from '@/public/login.svg';
 
+const ADMIN_ROLE = 'ADMIN';
 export const Header: FC<{
   isTrading?: boolean;
   isDarkmode?: boolean;
 }> = ({ isTrading = false, isDarkmode = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
+  const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
+  const isAdmin: boolean = role === ADMIN_ROLE;
 
   return (
     <header
@@ -54,12 +61,21 @@ export const Header: FC<{
       </div>
 
       <div className="relative z-10 flex gap-4 items-center">
+        {isAdmin && (
+          <MenuLink
+            href="/admin"
+            IconComponent={Admin}
+            alt="관리자 페이지"
+            text="관리자"
+          />
+        )}
+
         {isTrading ? (
           <></>
         ) : (
           <MenuLink
             href="/match"
-            imgSrc="/matching.svg"
+            IconComponent={Matching}
             alt="실시간 매칭"
             text="실시간 매칭"
             isDarkMode={isDarkmode}
@@ -69,7 +85,7 @@ export const Header: FC<{
         {isLoggedIn ? (
           <MenuLink
             href="/mypage"
-            imgSrc="/user.svg"
+            IconComponent={User}
             alt="마이페이지"
             text="마이페이지"
             isDarkMode={isDarkmode}
@@ -77,7 +93,7 @@ export const Header: FC<{
         ) : (
           <MenuLink
             href="/login"
-            imgSrc="/login.svg"
+            IconComponent={Login}
             alt="로그인"
             text="로그인"
             isDarkMode={isDarkmode}
