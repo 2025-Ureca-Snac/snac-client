@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import CategoryFilter from './CategoryFilter';
 import UserList from './user/UserList';
-import LoadingSpinner from '@/app/(shared)/components/LoadingSpinner';
 import { User, CategoryOption } from '../types';
 
 interface ResultSectionProps {
