@@ -10,7 +10,7 @@ import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
-import { ThemeSwitch } from './ThemSwitch';
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
 import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 const ADMIN_ROLE = 'ADMIN';
