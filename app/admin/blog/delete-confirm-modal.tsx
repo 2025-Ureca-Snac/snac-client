@@ -1,10 +1,17 @@
 import React from 'react';
+import { useRouter } from 'next/navigation'; //
 import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
 import NewReportIcon from '@/public/newReport.svg';
 import ModalPortal from '@/app/(shared)/components/modal-portal';
 
 export function DeleteConfirmModal() {
   const { isDeleteModalOpen, closeDeleteModal, deleteBlog } = useBlogStore();
+  const router = useRouter();
+  const handleDeleteAndRefresh = async () => {
+    await deleteBlog();
+
+    router.refresh();
+  };
 
   return (
     <ModalPortal
@@ -28,8 +35,8 @@ export function DeleteConfirmModal() {
             취소
           </button>
           <button
-            onClick={deleteBlog}
-            className="px-6 py-2 bg-red text-white rounded-lg  transition-colors font-semibold"
+            onClick={handleDeleteAndRefresh}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
           >
             삭제 확인
           </button>

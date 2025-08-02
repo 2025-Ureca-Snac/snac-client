@@ -17,9 +17,9 @@ interface BlogState {
   loading: boolean;
   error: string | null;
   hasNext: boolean;
-  // relatedBlogs: Blog[];
-
-  // fetchRelated: (currentArticleId: number) => Promise<void>;
+  relatedBlogs: Blog[];
+  clearCurrentBlog: () => void;
+  fetchRelated: (currentArticleId: number) => Promise<void>;
 
   // 목록 조회
   fetchAll: () => Promise<void>;
@@ -45,32 +45,32 @@ interface BlogState {
 }
 
 export const useBlogStore = create<BlogState>((set, get) => ({
-  // relatedBlogs: [],
+  relatedBlogs: [],
   blogs: [],
   currentBlog: null,
   loading: false,
   error: null,
   hasNext: true,
 
-  //  관련 api
-  // fetchRelated: async (currentArticleId) => {
-  //   try {
-  //     const res = await api.get<{
-  //       data: { articleResponseList: Blog[]; hasNext: boolean };
-  //     }>('/articles', { params: { size: 4 } });
+  //  관련 게시글
+  fetchRelated: async (currentArticleId) => {
+    try {
+      const res = await api.get<{
+        data: { articleResponseList: Blog[]; hasNext: boolean };
+      }>('/articles', { params: { size: 4 } });
 
-  //     const allFetchedBlogs = res.data.data.articleResponseList ?? [];
+      const allFetchedBlogs = res.data.data.articleResponseList ?? [];
 
-  //     const related = allFetchedBlogs
-  //       .filter((blog) => blog.id !== currentArticleId)
-  //       .slice(0, 3);
+      const related = allFetchedBlogs
+        .filter((blog) => blog.id !== currentArticleId)
+        .slice(0, 3);
 
-  //     set({ relatedBlogs: related });
-  //   } catch (err) {
-  //     console.error('관련 포스트 로드 실패:', err);
-  //     set({ relatedBlogs: [] });
-  //   }
-  // },
+      set({ relatedBlogs: related });
+    } catch (err) {
+      console.error('관련 포스트 로드 실패:', err);
+      set({ relatedBlogs: [] });
+    }
+  },
 
   //  전체 조회
   fetchAll: async () => {
@@ -78,7 +78,7 @@ export const useBlogStore = create<BlogState>((set, get) => ({
     try {
       const res = await api.get<{
         data: { articleResponseList: Blog[]; hasNext: boolean };
-      }>('/articles', { params: { size: 20 } });
+      }>('/articles', { params: { size: 9 } });
 
       const { articleResponseList, hasNext } = res.data.data;
 
@@ -138,7 +138,7 @@ export const useBlogStore = create<BlogState>((set, get) => ({
           title: string | null;
         };
       }>(`/articles/${articleId}`);
-
+      console.log(res);
       const raw = res.data.data;
 
       const mappedBlog: Blog = {
@@ -157,6 +157,7 @@ export const useBlogStore = create<BlogState>((set, get) => ({
       toast.error(msg);
     }
   },
+  clearCurrentBlog: () => set({ currentBlog: null, relatedBlogs: [] }),
 
   // 수정
   updateBlog: async (articleId, title, file, image) => {

@@ -7,8 +7,9 @@ import SockJS from 'sockjs-client';
 import { useMatchStore } from '../stores/match-store';
 import { useModalStore } from '../stores/modal-store';
 import { useWebSocketStore } from '../stores/websocket-store';
-import { User, Filters } from '../../match/types';
+import { Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
+import { User } from '../stores/match-store';
 import { CancelReason } from '../constants';
 
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
@@ -70,7 +71,12 @@ interface ServerTradeData {
   cardId: number;
   status: string;
   seller: string;
+  sellerId: number;
+  sellerNickName: string;
   buyer: string;
+  buyerId: number;
+  buyerNickName: string;
+  buyerRatingScore: number;
   carrier: string;
   dataAmount: number;
   priceGb?: number;
@@ -84,10 +90,10 @@ interface UseGlobalWebSocketProps {
   userRole?: 'buyer' | 'seller' | null;
   appliedFilters?: Filters;
   setIncomingRequests?: React.Dispatch<React.SetStateAction<TradeRequest[]>>;
-  setActiveSellers?: React.Dispatch<React.SetStateAction<User[]>>;
   setMatchingStatus?: React.Dispatch<React.SetStateAction<MatchingStatus>>;
   setConnectedUsers?: React.Dispatch<React.SetStateAction<number>>;
   onTradeStatusChange?: (status: string, tradeData: ServerTradeData) => void;
+  skipAuthCheck?: boolean; // 인증 체크를 건너뛸지 여부
 }
 
 export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
@@ -182,7 +188,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   };
 
   // WebSocket 연결
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     // 이미 전역 연결이 있으면 재사용
     if (globalStompClient?.connected) {
       console.log('✅ 기존 전역 WebSocket 연결 재사용');
@@ -192,10 +198,13 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
 
     const token = getToken();
     if (!token) {
-      console.error('❌ 토큰이 없어서 WebSocket 연결할 수 없습니다.');
-      // 토큰이 없으면 로그인 페이지로 이동
-      if (typeof window !== 'undefined') {
-        router.push('/login');
+      // skipAuthCheck가 true이면 에러 로그를 출력하지 않음
+      if (!props?.skipAuthCheck) {
+        console.error('❌ 토큰이 없어서 WebSocket 연결할 수 없습니다.');
+        // 토큰이 없으면 로그인 페이지로 이동
+        if (typeof window !== 'undefined') {
+          router.push('/login');
+        }
       }
       return;
     }
@@ -228,7 +237,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     });
 
     globalStompClient.activate();
-  };
+  }, [props?.skipAuthCheck, setConnectionStatus, router]);
 
   // 구독 설정
   const setupSubscriptions = () => {
@@ -274,12 +283,12 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         const currentUserRole = useMatchStore.getState().userRole;
         console.log('🔍 매칭 알림 처리 조건 확인:', {
           currentUserRole,
-          hasSetActiveSellers: !!props?.setActiveSellers,
           isBuyer: userRole === 'buyer',
         });
 
-        if (currentUserRole === 'buyer' && props?.setActiveSellers) {
-          props.setActiveSellers((prev: User[]) => {
+        if (currentUserRole === 'buyer') {
+          const { setActiveSellers } = useMatchStore.getState();
+          setActiveSellers((prev: User[]) => {
             const existingIndex = prev.findIndex(
               (existing: User) =>
                 existing.tradeId === user.tradeId ||
@@ -321,19 +330,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       console.log('🔔 거래 알림 수신:', frame.body);
       try {
         const tradeData: ServerTradeData = JSON.parse(frame.body);
-        console.log('📋 거래 상태 변경:', {
-          tradeId: tradeData.tradeId,
-          cardId: tradeData.cardId,
-          status: tradeData.status,
-          seller: tradeData.seller,
-          buyer: tradeData.buyer,
-          carrier: tradeData.carrier,
-          dataAmount: tradeData.dataAmount,
-          priceGb: tradeData.priceGb,
-          point: tradeData.point,
-          phone: tradeData.phone,
-          cancelReason: tradeData.cancelReason,
-        });
+        console.log('📋 거래 상태 변경:', tradeData);
 
         // cardId를 store에 저장
         if (tradeData.cardId) {
@@ -341,8 +338,9 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
 
         // tradeData에서 cardId를 찾아서 해당 user의 tradeId 업데이트
-        if (userRole === 'buyer' && props?.setActiveSellers) {
-          props.setActiveSellers((prev: User[]) => {
+        if (userRole === 'buyer') {
+          const { setActiveSellers } = useMatchStore.getState();
+          setActiveSellers((prev: User[]) => {
             return prev.map((user) => {
               if (user.cardId === tradeData.cardId) {
                 console.log('🔄 user tradeId 업데이트:', {
@@ -365,6 +363,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           tradeId: tradeData.tradeId,
           buyer: tradeData.buyer,
           seller: tradeData.seller,
+          sellerId: Number(tradeData.sellerId),
+          sellerNickName: tradeData.sellerNickName,
+          buyerId: Number(tradeData.buyerId),
+          buyerNickName: tradeData.buyerNickName,
+          buyerRatingScore: tradeData.buyerRatingScore,
           cardId: tradeData.cardId,
           carrier: tradeData.carrier || 'unknown',
           dataAmount: tradeData.dataAmount || 0,
@@ -416,9 +419,15 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           const request: TradeRequest = {
             tradeId: tradeData.tradeId,
             cardId: tradeData.cardId,
-            buyerId: tradeData.buyer,
+            buyerId: Number(tradeData.buyerId),
             buyerName: tradeData.buyer,
-            sellerId: tradeData.seller,
+            sellerId: Number(tradeData.sellerId),
+            seller: tradeData.seller,
+            buyer: tradeData.buyer,
+            sellerNickName: tradeData.sellerNickName,
+            buyerNickName: tradeData.buyerNickName,
+            sellerRatingScore: tradeData.sellerRatingScore || 1000,
+            buyerRatingScore: tradeData.buyerRatingScore || 1000,
             status: 'pending',
             createdAt: new Date().toISOString(),
             ratingData: tradeData.sellerRatingScore,
@@ -455,6 +464,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
               buyer: tradeData.buyer,
               seller: tradeData.seller,
               cardId: tradeData.cardId,
+              buyerId: Number(tradeData.buyerId),
+              buyerNickName: tradeData.buyerNickName,
+              buyerRatingScore: tradeData.buyerRatingScore,
+              sellerId: Number(tradeData.sellerId),
+              sellerNickName: tradeData.sellerNickName,
               carrier: tradeData.carrier || 'unknown',
               dataAmount: tradeData.dataAmount || 0,
               phone: tradeData.phone || '010-0000-0000',
@@ -594,6 +608,23 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     [userRole]
   );
 
+  // 구매자 필터 제거
+  const removeBuyerFilter = useCallback(() => {
+    if (!globalStompClient?.connected || userRole !== 'buyer') {
+      console.warn(
+        '⚠️ 필터 제거 실패: WebSocket 연결되지 않음 또는 구매자가 아님'
+      );
+      return;
+    }
+
+    console.log('🗑️ 구매자 필터 제거 요청');
+
+    globalStompClient.publish({
+      destination: '/app/filter/remove',
+      body: JSON.stringify({}), // 빈 객체 또는 필요한 데이터
+    });
+  }, [userRole]);
+
   // 판매자 카드 등록
   const registerSellerCard = useCallback(
     (sellerInfo: { carrier: string; dataAmount: number; price: number }) => {
@@ -647,19 +678,26 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   );
 
   // 거래 응답 (판매자용)
-  const respondToTrade = useCallback((tradeId: number, accept: boolean) => {
-    if (!globalStompClient?.connected) return;
+  const respondToTrade = useCallback(
+    (tradeId: number, accept: boolean, cardId?: number) => {
+      if (!globalStompClient?.connected) return;
 
-    if (accept) {
-      console.log('✅ 거래 수락 전송:', { tradeId });
-      globalStompClient.publish({
-        destination: '/app/trade/approve',
-        body: JSON.stringify({ tradeId }),
-      });
-    } else {
-      console.log('❌ 거래 거부:', tradeId);
-    }
-  }, []);
+      if (accept) {
+        console.log('✅ 거래 수락 전송:', { tradeId });
+        globalStompClient.publish({
+          destination: '/app/trade/approve',
+          body: JSON.stringify({ tradeId }),
+        });
+      } else {
+        console.log('❌ 거래 거부:', cardId);
+        globalStompClient.publish({
+          destination: '/app/trade/buy-request/cancel/seller',
+          body: JSON.stringify({ cardId, reason: 'SELLER_CHANGE_MIND' }),
+        });
+      }
+    },
+    []
+  );
 
   // 거래 생성 (구매자용)
   const createTrade = useCallback((cardId: number) => {
@@ -709,6 +747,45 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     return true;
   }, []);
 
+  // 거래 취소 메시지 전송
+  const sendTradeCancel = useCallback((userType: 'buyer' | 'seller') => {
+    if (!globalStompClient?.connected) {
+      console.error('❌ WebSocket이 연결되지 않았습니다.');
+      return false;
+    }
+
+    const destination =
+      userType === 'buyer'
+        ? '/app/trade/payment/cancel/buyer'
+        : '/app/trade/payment/cancel/seller';
+
+    console.log('❌ 거래 취소 메시지 전송:', { userType, destination });
+
+    globalStompClient.publish({
+      destination,
+      body: JSON.stringify({}),
+    });
+
+    return true;
+  }, []);
+
+  // 구매 요청 취소 메시지 전송
+  const sendBuyRequestCancel = useCallback((cardId: number) => {
+    if (!globalStompClient?.connected) {
+      console.error('❌ WebSocket이 연결되지 않았습니다.');
+      return false;
+    }
+
+    console.log('❌ 구매 요청 취소 메시지 전송:', { cardId });
+
+    globalStompClient.publish({
+      destination: '/app/trade/buy-request/cancel/buyer',
+      body: JSON.stringify({ cardId, reason: 'BUYER_CHANGE_MIND' }),
+    });
+
+    return true;
+  }, []);
+
   // 실제 WebSocket 연결 해제 함수
   const disconnectWebSocket = useCallback(() => {
     if (globalStompClient?.connected) {
@@ -726,7 +803,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
 
   // 연결 및 정리
   useEffect(() => {
-    connectWebSocket();
+    // 토큰이 있을 때만 WebSocket 연결 시도
+    const token = getToken();
+    if (token || props?.skipAuthCheck) {
+      connectWebSocket();
+    }
 
     return () => {
       // 마지막 연결인 경우에만 정리
@@ -738,7 +819,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
       }
     };
-  }, []);
+  }, [props?.skipAuthCheck, connectWebSocket]);
 
   // userRole 변경 감지
   useEffect(() => {
@@ -755,10 +836,13 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     registerSellerCard,
     deleteSellerCard,
     registerBuyerFilter,
+    removeBuyerFilter,
     respondToTrade,
     createTrade,
     sendPayment,
     sendTradeConfirm,
+    sendTradeCancel,
+    sendBuyRequestCancel,
     updateUserRole,
     activatePage,
     deactivatePage,

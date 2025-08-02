@@ -36,9 +36,8 @@ const FILTER_OPTIONS = {
     { value: 'LG U+', label: 'LG U+' },
   ],
   dataAmount: [
-    { value: '1GB 미만', label: '1GB 미만' },
-    { value: '1GB 이상', label: '1GB 이상' },
-    { value: '2GB 이상', label: '2GB 이상' },
+    { value: '1GB', label: '1GB' },
+    { value: '2GB', label: '2GB' },
   ],
   price: [
     { value: 'ALL', label: '전체' },
@@ -195,6 +194,9 @@ export default function FilterSection({
               handleFilterChange('transactionType', value, false)
             }
             multiSelect={false}
+            disabled={
+              sellerInfo?.isActive && currentTransactionType === '판매자'
+            }
           />
 
           {/* 거래 방식에 따른 폼 */}
