@@ -38,8 +38,41 @@ export default function BuyerMatchingStatus({
   }
 
   return (
-    <div className="bg-gradient-to-b from-green-900 to-black text-white py-12 px-6 relative">
-      <div className="max-w-[524px] mx-auto text-center">
+    <div className="relative bg-black text-white py-12 px-6 overflow-hidden">
+      {/* 동적 배경 요소들 */}
+      <div className="absolute inset-0 z-0">
+        {/* 메인 그라데이션 배경 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 via-black to-black"></div>
+
+        {/* 움직이는 글로우 원들 */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse animate-float"></div>
+        <div
+          className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse delay-1000 animate-float"
+          style={{ animationDelay: '2s' }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-green-500 rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-pulse delay-2000 animate-float"
+          style={{ animationDelay: '4s' }}
+        ></div>
+
+        {/* 그리드 패턴 */}
+        <div
+          className="absolute inset-0 opacity-15"
+          style={{
+            backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.5) 1px, transparent 1px),
+                           linear-gradient(90deg, rgba(34, 197, 94, 0.5) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
+          }}
+        ></div>
+
+        {/* 상단 글로우 라인 */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60"></div>
+
+        {/* 하단 글로우 라인 */}
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-40"></div>
+      </div>
+
+      <div className="relative z-20 max-w-[524px] mx-auto text-center">
         {/* 뒤로가기 버튼 */}
         {onGoBack && (
           <button
@@ -62,16 +95,6 @@ export default function BuyerMatchingStatus({
             <span>검색 조건 수정</span>
           </button>
         )}
-
-        {/* 실시간 매칭 상태 */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm text-green-400 font-medium">
-              실시간 매칭
-            </span>
-          </div>
-        </div>
 
         {/* 검색 아이콘 - Lottie 애니메이션 */}
         <div className="mb-8 flex justify-center">
@@ -119,7 +142,7 @@ export default function BuyerMatchingStatus({
         </div>
 
         {/* 내 검색 조건 표시 */}
-        <div className="bg-black/30 rounded-lg p-4 mb-6">
+        <div className="bg-gray-800/50 backdrop-blur-sm border border-green-400/30 rounded-lg p-4 mb-6">
           <h3 className="text-lg font-medium mb-3">내 검색 조건</h3>
           <div className="space-y-2 text-sm">
             {appliedFilters.carrier.length > 0 && (
@@ -153,7 +176,7 @@ export default function BuyerMatchingStatus({
         {!isSearching && onGoBack && (
           <button
             onClick={onGoBack}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors mb-4"
+            className="w-full bg-green-500/20 border border-green-400/50 text-green-400 py-3 px-6 rounded-lg font-medium hover:bg-green-500/30 hover:border-green-400/70 transition-all duration-300 mb-4"
           >
             🔄 다른 조건으로 다시 검색하기
           </button>
@@ -162,10 +185,43 @@ export default function BuyerMatchingStatus({
         {/* 찾기 중일 때 로딩 표시 */}
         {isSearching && (
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-400"></div>
+            <div className="relative">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-transparent border-t-green-400 border-r-cyan-400"></div>
+              <div
+                className="absolute inset-0 animate-spin rounded-full h-6 w-6 border-2 border-transparent border-b-purple-400 border-l-green-400"
+                style={{
+                  animationDirection: 'reverse',
+                  animationDuration: '1.5s',
+                }}
+              ></div>
+              <div className="absolute inset-1 bg-green-400/20 rounded-full animate-pulse"></div>
+            </div>
           </div>
         )}
       </div>
+
+      {/* 동적 애니메이션 스타일 */}
+      <style jsx>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px) translateX(0px);
+          }
+          25% {
+            transform: translateY(-10px) translateX(5px);
+          }
+          50% {
+            transform: translateY(-5px) translateX(-5px);
+          }
+          75% {
+            transform: translateY(5px) translateX(10px);
+          }
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }

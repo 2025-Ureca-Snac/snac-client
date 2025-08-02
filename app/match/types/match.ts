@@ -57,10 +57,16 @@ export interface RatingData {
 // TradeRequest 타입 추가 (공통 사용)
 export interface TradeRequest {
   tradeId: number;
+  sellerId: number;
+  seller: string;
+  buyer: string;
+  sellerNickName: string;
+  buyerId: number;
+  buyerNickName: string;
+  sellerRatingScore: number;
+  buyerRatingScore: number;
   cardId: number;
-  buyerId: string;
   buyerName: string;
-  sellerId: string;
   status: 'pending' | 'accepted' | 'rejected';
   createdAt: string;
   ratingData?: number; // 판매자 평점

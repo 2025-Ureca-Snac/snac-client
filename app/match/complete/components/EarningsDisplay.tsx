@@ -17,76 +17,89 @@ export default function EarningsDisplay({
   const totalPoints = pointsEarned + bonusPoints;
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">획득한 보상</h2>
+    <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      {/* 서브틀한 글로우 효과 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 via-transparent to-yellow-300/3"></div>
 
-      <div className="space-y-4">
-        {/* 기본 포인트 */}
-        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-lg">💰</span>
-            </div>
-            <div>
-              <div className="font-medium text-blue-800">거래 포인트</div>
-              <div className="text-sm text-blue-600">기본 거래 완료 보상</div>
-            </div>
-          </div>
-          <div className="text-2xl font-bold text-blue-600">
-            +{pointsEarned}
-          </div>
-        </div>
+      <div className="relative p-8">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-white via-purple-300 to-white bg-clip-text text-transparent mb-8">
+          획득한 보상
+        </h2>
 
-        {/* 보너스 포인트 */}
-        {bonusPoints > 0 && (
-          <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-lg">⭐</span>
+        <div className="space-y-6">
+          {/* 기본 포인트 */}
+          <div className="flex items-center justify-between p-6 bg-blue-900/20 border border-blue-400/30 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-400/25">
+                <span className="text-black text-xl">💰</span>
               </div>
               <div>
-                <div className="font-medium text-yellow-800">보너스 포인트</div>
-                <div className="text-sm text-yellow-600">
-                  첫 거래 완료 보너스
-                </div>
+                <div className="font-bold text-blue-300">거래 포인트</div>
+                <div className="text-sm text-blue-200">기본 거래 완료 보상</div>
               </div>
             </div>
-            <div className="text-2xl font-bold text-yellow-600">
-              +{bonusPoints}
+            <div className="text-3xl font-bold text-blue-400 animate-pulse">
+              +{pointsEarned}
             </div>
           </div>
-        )}
 
-        {/* 경험치 */}
-        <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-burst-lime rounded-full flex items-center justify-center">
-              <Image
-                src="/logo_mini.png"
-                alt="Snac Logo"
-                width={24}
-                height={24}
-                className="w-6 h-6 object-contain"
-              />
+          {/* 보너스 포인트 */}
+          {bonusPoints > 0 && (
+            <div className="flex items-center justify-between p-6 bg-yellow-900/20 border border-yellow-400/30 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg shadow-yellow-400/25">
+                  <span className="text-black text-xl">⭐</span>
+                </div>
+                <div>
+                  <div className="font-bold text-yellow-300">보너스 포인트</div>
+                  <div className="text-sm text-yellow-200">
+                    첫 거래 완료 보너스
+                  </div>
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-yellow-400 animate-pulse">
+                +{bonusPoints}
+              </div>
             </div>
-            <div>
-              <div className="font-medium text-purple-800">스낵 포인트</div>
-              <div className="text-sm text-purple-600">거래 완료 시 획득</div>
+          )}
+
+          {/* 경험치 */}
+          <div className="flex items-center justify-between p-6 bg-purple-900/20 border border-purple-400/30 rounded-xl backdrop-blur-sm">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-400/25">
+                <Image
+                  src="/logo_mini.png"
+                  alt="Snac Logo"
+                  width={28}
+                  height={28}
+                  className="w-7 h-7 object-contain"
+                />
+              </div>
+              <div>
+                <div className="font-bold text-purple-300">스낵 포인트</div>
+                <div className="text-sm text-purple-200">거래 완료 시 획득</div>
+              </div>
             </div>
-          </div>
-          <div className="text-2xl font-bold text-purple-600">
-            +{experienceGained}
+            <div className="text-3xl font-bold text-purple-400 animate-pulse">
+              +{experienceGained}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 총 합계 */}
-      <div className="border-t pt-4 mt-6">
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold text-gray-700">총 포인트</span>
-          <span className="text-3xl font-bold text-green-600">
-            +{totalPoints}
-          </span>
+        {/* 총 합계 - 특별한 강조 */}
+        <div className="border-t border-gray-700/50 pt-8 mt-8">
+          <div className="flex items-center justify-between p-6 bg-green-900/20 border border-green-400/30 rounded-xl backdrop-blur-sm">
+            <span className="text-xl font-bold text-green-300">총 포인트</span>
+            <div className="relative">
+              <span className="text-4xl font-bold text-green-400 animate-pulse">
+                +{totalPoints}
+              </span>
+              {/* 글로우 효과 */}
+              <div className="absolute inset-0 text-4xl font-bold text-green-400 animate-ping opacity-20">
+                +{totalPoints}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

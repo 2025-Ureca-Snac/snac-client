@@ -15,6 +15,7 @@ interface FilterGroupProps {
   selectedValues: string[];
   onValueChange: (value: string, multiSelect?: boolean) => void;
   multiSelect?: boolean;
+  disabled?: boolean;
 }
 
 export default function FilterGroup({
@@ -23,6 +24,7 @@ export default function FilterGroup({
   selectedValues,
   onValueChange,
   multiSelect = true,
+  disabled = false,
 }: FilterGroupProps) {
   return (
     <div className="space-y-3">
@@ -34,9 +36,9 @@ export default function FilterGroup({
             value={option.value}
             label={option.label}
             checked={selectedValues.includes(option.value)}
-            onChange={(value) => onValueChange(value, multiSelect)}
+            onChange={(value) => !disabled && onValueChange(value, multiSelect)}
             multiSelect={multiSelect}
-            disabled={option.disabled}
+            disabled={disabled || option.disabled}
             name={title}
           />
         ))}

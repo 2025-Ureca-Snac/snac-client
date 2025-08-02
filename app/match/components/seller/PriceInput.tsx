@@ -5,12 +5,20 @@ import React from 'react';
 interface PriceInputProps {
   value: number;
   onChange: (value: number) => void;
+  disabled?: boolean;
 }
 
-export default function PriceInput({ value, onChange }: PriceInputProps) {
+export default function PriceInput({
+  value,
+  onChange,
+  disabled = false,
+}: PriceInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseInt(e.target.value) || 0;
-    onChange(newValue);
+    if (disabled) return;
+    const newValue = parseInt(e.target.value) || 1500; // 최소값을 100으로 설정
+    // 범위 제한: 100원 ~ 10,000원
+    const clampedValue = Math.max(100, Math.min(10000, newValue));
+    onChange(clampedValue);
   };
 
   return (
@@ -24,12 +32,23 @@ export default function PriceInput({ value, onChange }: PriceInputProps) {
           step="100"
           value={value}
           onChange={handleChange}
-          className="flex-1 px-3 py-3 bg-gray-800 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          disabled={disabled}
+          className={`flex-1 px-3 py-3 border rounded-lg transition-all ${
+            disabled
+              ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+              : 'bg-gray-800 text-white border-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent'
+          }`}
           placeholder="가격을 입력하세요"
         />
-        <span className="text-gray-400 text-sm font-medium">원</span>
+        <span
+          className={`text-sm font-medium ${disabled ? 'text-gray-500' : 'text-gray-400'}`}
+        >
+          원
+        </span>
       </div>
-      <div className="text-xs text-gray-400">
+      <div
+        className={`text-xs ${disabled ? 'text-gray-500' : 'text-gray-400'}`}
+      >
         100원 ~ 10,000원 범위에서 입력 가능합니다
       </div>
     </div>
