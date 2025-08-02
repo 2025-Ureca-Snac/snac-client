@@ -51,13 +51,14 @@ export const isToday = (dateString: string): boolean => {
 /**
  * @author 이승우
  * @description 닉네임 변경 가능까지 남은 시간을 계산
- * @param {Date} lastUpdatedAt 마지막 닉네임 변경 시간
+ * @param {Date} nextNicknameChangeAllowedAt 다음 닉네임 변경 가능 시간
  * @returns {number} 남은 시간 (밀리초), 0 이하면 변경 가능
  */
-export function getRemainingTimeForNicknameChange(lastUpdatedAt: Date): number {
+export function getRemainingTimeForNicknameChange(
+  nextNicknameChangeAllowedAt: Date
+): number {
   const now = new Date();
-  const nextAvailableTime = new Date(lastUpdatedAt.getTime());
-  return Math.max(0, nextAvailableTime.getTime() - now.getTime());
+  return Math.max(0, nextNicknameChangeAllowedAt.getTime() - now.getTime());
 }
 
 /**
