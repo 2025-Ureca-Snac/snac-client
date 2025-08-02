@@ -1,13 +1,16 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import SearchModal from './search-modal';
 import { SearchModalType } from '../(shared)/types';
+import { toast } from 'sonner';
 import SocialLoginButtons from '../(shared)/components/social-login-buttons';
 import { useAuthStore } from '../(shared)/stores/auth-store';
+import PasswordInputField from '../(shared)/components/password-input-field';
+import ErrorMessage from '../(shared)/components/error-message';
+import LoginBottomLinks from '../(shared)/components/login-bottom-links';
+import LoadingSpinner from '../(shared)/components/LoadingSpinner';
 
 /**
  * @author 이승우
@@ -18,10 +21,10 @@ export default function Login() {
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isOpen, setIsOpen] = useState<SearchModalType>(null);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [socialError, setSocialError] = useState<string | null>(null);
 
   // Zustand 스토어 사용
-  const { user, isLoading, login } = useAuthStore();
+  const { user, isLoading, error, login } = useAuthStore();
 
   // 아이디 입력란 ref
   const idInputRef = useRef<HTMLInputElement>(null);
@@ -38,35 +41,91 @@ export default function Login() {
     idInputRef.current?.focus();
   }, []);
 
-  const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setId(e.target.value);
-  };
+  /**
+   * @author 이승우
+   * @description 아이디 입력값 변경 핸들러
+   * @param e - 입력 이벤트
+   */
+  const handleIdChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setId(e.target.value);
+    },
+    []
+  );
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
+  /**
+   * @author 이승우
+   * @description 비밀번호 입력값 변경 핸들러
+   * @param e - 입력 이벤트
+   */
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+    },
+    []
+  );
 
-  const handleLogin = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!id || !password) {
-      alert('아이디와 비밀번호를 입력해주세요.');
-      return;
-    }
+  /**
+   * @author 이승우
+   * @description 로그인 처리 핸들러
+   * @param e - 폼 제출 이벤트 (선택사항)
+   */
+  const handleLogin = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault();
 
-    try {
-      await login(id, password);
-    } catch (error) {
-      // 에러는 스토어에서 처리됨
-      console.error('로그인 실패:', error);
-    }
-  };
+      // 입력값 검증
+      if (!id.trim() || !password.trim()) {
+        toast.error('아이디와 비밀번호를 입력해주세요.');
+        return;
+      }
 
+      try {
+        await login(id.trim(), password);
+      } catch (error) {
+        // 에러는 스토어에서 처리됨
+        console.error('로그인 실패:', error);
+      }
+    },
+    [id, password, login]
+  );
+
+  /**
+   * @author 이승우
+   * @description 이메일 찾기 모달 열기
+   */
   const findEmail = () => {
     setIsOpen('id');
   };
+
+  /**
+   * @author 이승우
+   * @description 비밀번호 찾기 모달 열기
+   */
   const findPassword = () => {
     setIsOpen('password');
   };
+
+  /**
+   * @author 이승우
+   * @description 소셜 로그인 에러 처리
+   * @param message - 에러 메시지
+   */
+  const handleSocialError = (message: string) => {
+    setSocialError(message);
+  };
+
+  // 로딩 중일 때 스피너 표시
+  if (isLoading) {
+    return (
+      <div className="w-full md:w-1/2 flex justify-center items-center px-6 py-8 md:px-0 md:h-screen">
+        <div className="w-full max-w-sm md:w-[80%] text-center">
+          <LoadingSpinner size="lg" color="border-blue-600" />
+          <p className="text-gray-600">로그인 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full md:w-1/2 flex justify-center items-center px-6 py-8 md:px-0 md:h-screen">
@@ -81,38 +140,21 @@ export default function Login() {
             ref={idInputRef}
             className="text-regular-md block w-full border-b-2 border-gray-300 p-2 py-4 focus:outline-none focus:border-b-2 focus:border-gray-700 mb-4"
           />
-          <div className="relative flex items-center w-full mb-6">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="비밀번호"
-              value={password}
-              onChange={handlePasswordChange}
-              className="text-regular-md block w-full border-b-2 border-gray-300 p-2 py-4 pr-10 focus:outline-none focus:border-b-2 focus:border-gray-700"
+          <PasswordInputField
+            value={password}
+            onChange={handlePasswordChange}
+            placeholder="비밀번호"
+            className="mb-6"
+          />
+
+          {/* 오류 메시지 */}
+          {(error || socialError) && (
+            <ErrorMessage
+              message={error || socialError || ''}
+              className="mb-4"
             />
-            <button
-              type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
-            >
-              {showPassword ? (
-                <Image
-                  src="/eye-open.png"
-                  width={22}
-                  height={22}
-                  alt="비밀번호 보기"
-                />
-              ) : (
-                // 눈 가린 아이콘 (비밀번호 숨김 상태)
-                <Image
-                  src="/eye-closed.png"
-                  width={22}
-                  height={22}
-                  alt="비밀번호 숨기기"
-                />
-              )}
-            </button>
-          </div>
+          )}
+
           <button
             type="submit"
             disabled={isLoading}
@@ -122,31 +164,11 @@ export default function Login() {
             {isLoading ? '로그인 중...' : '로그인'}
           </button>
         </form>
-        <div className="flex justify-center text-regular-md mb-8">
-          <Link
-            href="/signUp"
-            className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded px-1"
-          >
-            회원가입
-          </Link>
-          <span className="mx-4 md:mx-7">|</span>
-          <button
-            onClick={findEmail}
-            className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded px-1"
-            tabIndex={0}
-          >
-            이메일 찾기
-          </button>
-          <span className="mx-4 md:mx-7">|</span>
-          <button
-            onClick={findPassword}
-            className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded px-1"
-            tabIndex={0}
-          >
-            비밀번호 찾기
-          </button>
-        </div>
-        <SocialLoginButtons />
+        <LoginBottomLinks
+          onFindEmail={findEmail}
+          onFindPassword={findPassword}
+        />
+        <SocialLoginButtons onError={handleSocialError} />
       </div>
       {isOpen && <SearchModal isOpen={isOpen} setIsOpen={setIsOpen} />}
     </div>

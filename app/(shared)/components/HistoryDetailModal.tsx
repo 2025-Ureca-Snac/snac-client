@@ -11,14 +11,7 @@ import {
 import { getCarrierImageUrl } from '../utils/carrier-utils';
 import ProgressStepsDetail from './progress-steps-detail';
 import { getProgressSteps } from '../utils/progress-steps-utils';
-const REASON_MAP: Record<string, string> = {
-  BUYER_CHANGE_MIND: '구매자 단순 변심',
-  BUYER_LIMIT_EXCEEDED: '구매자 기다리다가 포기',
-  SELLER_CHANGE_MIND: '판매자 단순 변심',
-  SELLER_LIMIT_EXCEEDED: '판매자 기다리다가 포기',
-  BUYER_FORCED_TERMINATION: '구매자 강제 종료',
-  SELLER_FORCED_TERMINATION: '판매자 강제 종료',
-};
+import { REASON_MAP } from '../constants/cancel-reasons';
 // 취소 사유를 한글로 변환하는 함수
 const getCancelReasonText = (reason: string): string => {
   return REASON_MAP[reason] || reason || '없음';
@@ -52,7 +45,6 @@ export default function HistoryDetailModal({
     console.log('파일 선택됨:', file.name);
     setUploadedFile(file);
   };
-
   // 전송완료 핸들러
   const handleDataSent = async () => {
     if (!uploadedFile) {
@@ -102,30 +94,6 @@ export default function HistoryDetailModal({
     }
   };
 
-  // 전송실패 핸들러
-  const handleDataFail = async () => {
-    try {
-      console.log('전송실패 버튼 클릭됨:', item);
-
-      // 판매자/구매자에 따라 다른 reason 설정
-      const reason =
-        type === 'sales'
-          ? 'SELLER_FORCED_TERMINATION'
-          : 'BUYER_FORCED_TERMINATION';
-
-      const response = await api.patch(`/trades/${item.id}/cancel/request`, {
-        reason: reason,
-      });
-
-      console.log('전송실패 처리 완료:', response);
-
-      // 성공 시 페이지 새로고침
-      window.location.reload();
-    } catch (error) {
-      console.error('전송실패 처리 실패:', error);
-    }
-  };
-
   // 거래 취소 사유 토글
   const handleTradeCancelClick = () => {
     setShowCancelReason(!showCancelReason);
@@ -154,6 +122,38 @@ export default function HistoryDetailModal({
       window.location.reload();
     } catch (error) {
       console.error('거래 취소 처리 실패:', error);
+    }
+  };
+
+  // 거래 취소 거절 핸들러
+  const handleCancelReject = async () => {
+    try {
+      console.log('거래 취소 거절 버튼 클릭됨:', item);
+
+      const response = await api.patch(`/trades/${item.id}/cancel/reject`);
+
+      console.log('거래 취소 거절 처리 완료:', response);
+
+      // 성공 시 페이지 새로고침
+      window.location.reload();
+    } catch (error) {
+      console.error('거래 취소 거절 처리 실패:', error);
+    }
+  };
+
+  // 거래 취소 승낙 핸들러
+  const handleCancelAccept = async () => {
+    try {
+      console.log('거래 취소 승낙 버튼 클릭됨:', item);
+
+      const response = await api.patch(`/trades/${item.id}/cancel/accept`);
+
+      console.log('거래 취소 승낙 처리 완료:', response);
+
+      // 성공 시 페이지 새로고침
+      window.location.reload();
+    } catch (error) {
+      console.error('거래 취소 승낙 처리 실패:', error);
     }
   };
 
@@ -208,9 +208,15 @@ export default function HistoryDetailModal({
               </div>
               <div className="flex items-center gap-2">
                 <span
-                  className={`text-white text-xs px-2 py-1 rounded ${getHistoryStatusColor(type, item.status)}`}
+                  className={`text-white text-xs px-2 py-1 rounded ${
+                    item.cancelRequested
+                      ? 'bg-red-500'
+                      : getHistoryStatusColor(type, item.status)
+                  }`}
                 >
-                  {getHistoryStatusText(type, item.status)}
+                  {item.cancelRequested
+                    ? '취소 접수'
+                    : getHistoryStatusText(type, item.status)}
                 </span>
                 <span className="text-gray-900">
                   {item.price.toLocaleString()}원
@@ -239,11 +245,33 @@ export default function HistoryDetailModal({
             steps={progressSteps}
             currentStep={progressSteps.filter((step) => step.isActive).length}
             type={type}
+            cancelRequested={item.cancelRequested}
           />
+
+          {/* 거래 취소 요청 상태일 때 빨간색 화면 표시 */}
+          {item.cancelRequested && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 text-xs">⚠️</span>
+                </div>
+                <div className="text-red-800 text-sm font-medium">
+                  거래 취소가 접수되었습니다.
+                </div>
+              </div>
+              {item.cancelRequestReason && (
+                <div className="text-red-700 text-sm">
+                  취소 사유: {getCancelReasonText(item.cancelRequestReason)}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 상태에 따라 메시지 조건부 표시 */}
           {item.status !== 'DATA_SENT' &&
             item.status !== 'COMPLETED' &&
-            item.status !== 'CANCELED' && (
+            item.status !== 'CANCELED' &&
+            !item.cancelRequested && (
               <div className="text-green-600 text-sm">
                 {type === 'sales'
                   ? '판매요청이 접수되었습니다.'
@@ -252,7 +280,7 @@ export default function HistoryDetailModal({
             )}
 
           {/* DATA_SENT 상태일 때 판매자/구매자별 다른 UI */}
-          {item.status === 'DATA_SENT' && (
+          {item.status === 'DATA_SENT' && !item.cancelRequested && (
             <>
               {/* 판매자일 때 대기 메시지 */}
               {type === 'sales' && (
@@ -294,11 +322,11 @@ export default function HistoryDetailModal({
             </>
           )}
 
-          {/* 진행 중인 거래인 경우에만 추가 정보 표시 (DATA_SENT 상태가 아닐 때만) */}
           {type === 'sales' &&
             progressSteps.filter((step) => step.isActive).length >= 1 &&
             progressSteps.filter((step) => step.isActive).length < 5 &&
-            item.status !== 'DATA_SENT' && (
+            item.status !== 'DATA_SENT' &&
+            !item.cancelRequested && (
               <div className="space-y-3">
                 <div className="text-gray-700 text-sm">
                   아래 번호로{' '}
@@ -380,12 +408,6 @@ export default function HistoryDetailModal({
                   >
                     전송완료
                   </button>
-                  <button
-                    onClick={handleDataFail}
-                    className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                  >
-                    전송실패
-                  </button>
                 </div>
               </div>
             )}
@@ -393,17 +415,37 @@ export default function HistoryDetailModal({
 
         {/* 하단 버튼 */}
         <div className="flex-col p-4 border-t flex gap-2">
-          {/* 거래 취소 버튼 */}
-          {item.status !== 'CANCELED' && item.status !== 'COMPLETED' && (
-            <div className="flex w-full">
+          {/* 거래 취소 접수 상태일 때 승낙/거절 버튼 */}
+          {item.cancelRequested && type === 'sales' && (
+            <div className="flex gap-2 w-full">
               <button
-                onClick={handleTradeCancelClick}
-                className="flex-1 bg-gray-400 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-500 transition-colors"
+                onClick={handleCancelAccept}
+                className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
               >
-                거래 취소
+                승낙
+              </button>
+              <button
+                onClick={handleCancelReject}
+                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+              >
+                거절
               </button>
             </div>
           )}
+
+          {/* 거래 취소 버튼 */}
+          {item.status !== 'CANCELED' &&
+            item.status !== 'COMPLETED' &&
+            !item.cancelRequested && (
+              <div className="flex w-full">
+                <button
+                  onClick={handleTradeCancelClick}
+                  className="flex-1 bg-gray-400 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-500 transition-colors"
+                >
+                  거래 취소
+                </button>
+              </div>
+            )}
 
           {/* 거래 취소 사유 선택 */}
           {showCancelReason && (
@@ -419,9 +461,6 @@ export default function HistoryDetailModal({
                 >
                   {type === 'sales' ? (
                     <>
-                      <option value="SELLER_FORCED_TERMINATION">
-                        판매자 강제 종료
-                      </option>
                       <option value="SELLER_CHANGE_MIND">
                         판매자 단순 변심
                       </option>
@@ -431,9 +470,6 @@ export default function HistoryDetailModal({
                     </>
                   ) : (
                     <>
-                      <option value="BUYER_FORCED_TERMINATION">
-                        구매자 강제 종료
-                      </option>
                       <option value="BUYER_CHANGE_MIND">
                         구매자 단순 변심
                       </option>

@@ -36,6 +36,8 @@ export interface HistoryItem {
   dataAmount?: string;
   phoneNumber?: string;
   cancelReason?: string;
+  cancelRequested: boolean;
+  cancelRequestReason: string | null;
 }
 
 /**

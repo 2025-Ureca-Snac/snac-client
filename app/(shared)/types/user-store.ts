@@ -34,7 +34,7 @@ export interface UserPreferences {
  * @property {boolean} googleConnected 구글 연동 여부
  * @property {boolean} kakaoConnected 카카오 연동 여부
  * @property {boolean} naverConnected 네이버 연동 여부
- * @property {string} nicknameUpdatedAt 닉네임 업데이트 시간 (문자열)
+ * @property {string} nextNicknameChangeAllowedAt 다음 닉네임 변경 가능 시간 (문자열)
  */
 export interface ApiUserResponse {
   name: string;
@@ -46,7 +46,7 @@ export interface ApiUserResponse {
   googleConnected: boolean;
   kakaoConnected: boolean;
   naverConnected: boolean;
-  nicknameUpdatedAt: string;
+  nextNicknameChangeAllowedAt: string;
 }
 
 /**
@@ -59,7 +59,7 @@ export interface ApiUserResponse {
  * @property {Date} birthDate 사용자 생년월일
  * @property {number} score 바삭 스코어 점수
  * @property {number} favoriteCount 즐겨찾기 개수
- * @property {Date} nicknameUpdatedAt 닉네임 수정 일시
+ * @property {Date} nextNicknameChangeAllowedAt 다음 닉네임 변경 가능 시간
  * @property {boolean} googleConnected 구글 연동 여부
  * @property {boolean} kakaoConnected 카카오 연동 여부
  * @property {boolean} naverConnected 네이버 연동 여부
@@ -71,7 +71,7 @@ export interface UserProfile {
   birthDate: Date;
   score: number;
   favoriteCount: number;
-  nicknameUpdatedAt: Date;
+  nextNicknameChangeAllowedAt: Date;
   googleConnected: boolean;
   kakaoConnected: boolean;
   naverConnected: boolean;
@@ -88,7 +88,8 @@ export interface UserProfile {
  * @property {Function} fetchUserProfile 사용자 정보 가져오기 액션
  * @property {Function} setProfile 프로필 설정 액션
  * @property {Function} updateProfile 프로필 업데이트 액션 (닉네임 제외)
- * @property {Function} updateNickname 닉네임 업데이트 액션 (변경 시간 기록)
+ * @property {Function} updateNickname 닉네임 업데이트 액션
+ * @property {Function} updateNextNicknameChangeAllowedAt 닉네임 변경 가능 시간 업데이트 액션
  * @property {Function} setLoading 로딩 상태 설정 액션
  * @property {Function} setError 에러 설정 액션
  * @property {Function} clearProfile 프로필 초기화 액션
@@ -103,9 +104,14 @@ export interface UserState {
   fetchUserProfile: () => Promise<void>;
   setProfile: (profile: UserProfile) => void;
   updateProfile: (
-    updates: Partial<Omit<UserProfile, 'nickname' | 'nicknameUpdatedAt'>>
+    updates: Partial<
+      Omit<UserProfile, 'nickname' | 'nextNicknameChangeAllowedAt'>
+    >
   ) => void;
   updateNickname: (nickname: string) => void;
+  updateNextNicknameChangeAllowedAt: (
+    nextNicknameChangeAllowedAt: Date
+  ) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearProfile: () => void;

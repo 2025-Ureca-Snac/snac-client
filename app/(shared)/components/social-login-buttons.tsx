@@ -3,11 +3,17 @@ import { useAuthStore } from '../stores/auth-store';
 import { SOCIALS } from '../constants/social-login-data';
 import { useRouter } from 'next/navigation';
 
+interface SocialLoginButtonsProps {
+  onError?: (message: string) => void;
+}
+
 /**
  * @author 이승우
  * @description 소셜 로그인 버튼 컴포넌트( 브랜드별 맞춤 스타일 )
  */
-export default function SocialLoginButtons() {
+export default function SocialLoginButtons({
+  onError,
+}: SocialLoginButtonsProps) {
   const { linkSocialAccount } = useAuthStore();
   const router = useRouter();
 
@@ -22,9 +28,12 @@ export default function SocialLoginButtons() {
       }
     } catch (error) {
       console.error('소셜 로그인 실패:', error);
-      alert(
-        `소셜 로그인 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
-      );
+      const errorMessage = '연동된 계정이 없습니다.';
+      if (onError) {
+        onError(errorMessage);
+      } else {
+        alert(errorMessage);
+      }
     }
   };
 

@@ -7,6 +7,7 @@ import {
   SOCIAL_LOGIN_MODAL_INITIAL_STATE,
 } from '../constants/social-login-modal-constants';
 import { SocialLoginModalProps } from '../types/social-login-modal';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -25,6 +26,7 @@ export default function SocialLoginModal({
   const [linkedProviders, setLinkedProviders] = useState<{
     [key: string]: boolean;
   }>(SOCIAL_LOGIN_MODAL_INITIAL_STATE);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
 
   // 모달이 열릴 때 현재 연동 상태를 가져오기
   useEffect(() => {
@@ -38,38 +40,45 @@ export default function SocialLoginModal({
     }
   }, [open, profile]);
 
+  // 모달이 닫힐 때 로딩 상태 초기화
+  useEffect(() => {
+    if (!open) {
+      setIsLoading(null);
+    }
+  }, [open]);
+
   const handleToggleProvider = async (providerId: string) => {
     const isCurrentlyLinked = linkedProviders[providerId];
     const provider = SOCIAL_MODAL_PROVIDERS.find((p) => p.id === providerId);
 
     if (!provider) {
-      alert('지원하지 않는 소셜 로그인 제공자입니다.');
+      toast.error('지원하지 않는 소셜 로그인 제공자입니다.');
       return;
     }
+
+    setIsLoading(providerId);
 
     try {
       if (!isCurrentlyLinked) {
         // 소셜 로그인 연동
         console.log('소셜 로그인 연동 시작:', providerId);
+        const success = await linkSocialAccount(providerId);
+        console.log('소셜 로그인 연동 결과:', success);
 
-        try {
-          const success = await linkSocialAccount(providerId);
-          console.log('소셜 로그인 연동 결과:', success);
+        if (success) {
+          setLinkedProviders((prev) => ({
+            ...prev,
+            [providerId]: true,
+          }));
 
-          if (success) {
-            setLinkedProviders((prev) => ({
-              ...prev,
-              [providerId]: true,
-            }));
+          console.log('로컬 상태 업데이트 완료');
+          toast.success(`${provider.name} 계정이 연동되었습니다.`);
 
-            console.log('로컬 상태 업데이트 완료');
-
-            if (onSubmit) {
-              onSubmit(providerId, true);
-            }
+          if (onSubmit) {
+            onSubmit(providerId, true);
           }
-        } catch (error) {
-          console.log('소셜 로그인 연동 중 에러 (팝업 인증 실패 가능):', error);
+        } else {
+          toast.error('소셜 로그인 연동에 실패했습니다.');
         }
       } else {
         // 소셜 로그인 해제
@@ -82,16 +91,32 @@ export default function SocialLoginModal({
             [providerId]: false,
           }));
 
+          toast.success(`${provider.name} 계정 연동이 해제되었습니다.`);
+
           if (onSubmit) {
             onSubmit(providerId, false);
           }
+        } else {
+          toast.error('소셜 로그인 해제에 실패했습니다.');
         }
       }
     } catch (error) {
       console.error('소셜 로그인 연동 처리 중 오류:', error);
-      alert(
-        `소셜 로그인 연동 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
-      );
+
+      // 에러 타입에 따른 메시지 처리
+      if (error instanceof Error) {
+        if (error.message.includes('중복')) {
+          toast.error('이미 연동된 계정입니다.');
+        } else if (error.message.includes('연동된 계정이 없습니다')) {
+          toast.error('연동된 계정이 없습니다.');
+        } else {
+          toast.error('소셜 로그인 처리 중 오류가 발생했습니다.');
+        }
+      } else {
+        toast.error('소셜 로그인 처리 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setIsLoading(null);
     }
   };
 
@@ -157,17 +182,24 @@ export default function SocialLoginModal({
                 <button
                   type="button"
                   onClick={() => handleToggleProvider(provider.id)}
+                  disabled={isLoading === provider.id}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                     linkedProviders[provider.id] ? 'bg-blue-600' : 'bg-gray-200'
-                  }`}
+                  } ${isLoading === provider.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      linkedProviders[provider.id]
-                        ? 'translate-x-6'
-                        : 'translate-x-1'
-                    }`}
-                  />
+                  {isLoading === provider.id ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        linkedProviders[provider.id]
+                          ? 'translate-x-6'
+                          : 'translate-x-1'
+                      }`}
+                    />
+                  )}
                 </button>
               </div>
             ))}
