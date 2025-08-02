@@ -88,6 +88,7 @@ interface UseGlobalWebSocketProps {
   setMatchingStatus?: React.Dispatch<React.SetStateAction<MatchingStatus>>;
   setConnectedUsers?: React.Dispatch<React.SetStateAction<number>>;
   onTradeStatusChange?: (status: string, tradeData: ServerTradeData) => void;
+  skipAuthCheck?: boolean; // 인증 체크를 건너뛸지 여부
 }
 
 export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
@@ -192,10 +193,13 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
 
     const token = getToken();
     if (!token) {
-      console.error('❌ 토큰이 없어서 WebSocket 연결할 수 없습니다.');
-      // 토큰이 없으면 로그인 페이지로 이동
-      if (typeof window !== 'undefined') {
-        router.push('/login');
+      // skipAuthCheck가 true이면 에러 로그를 출력하지 않음
+      if (!props?.skipAuthCheck) {
+        console.error('❌ 토큰이 없어서 WebSocket 연결할 수 없습니다.');
+        // 토큰이 없으면 로그인 페이지로 이동
+        if (typeof window !== 'undefined') {
+          router.push('/login');
+        }
       }
       return;
     }
@@ -744,7 +748,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
 
   // 연결 및 정리
   useEffect(() => {
-    connectWebSocket();
+    // 토큰이 있을 때만 WebSocket 연결 시도
+    const token = getToken();
+    if (token || props?.skipAuthCheck) {
+      connectWebSocket();
+    }
 
     return () => {
       // 마지막 연결인 경우에만 정리
@@ -756,7 +764,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         }
       }
     };
-  }, []);
+  }, [props?.skipAuthCheck, connectWebSocket]);
 
   // userRole 변경 감지
   useEffect(() => {

@@ -13,7 +13,7 @@ import { TradeRequest } from './types/match';
 import { User } from '../(shared)/stores/match-store';
 import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
-//import { useAuthStore } from '../(shared)/stores/auth-store';
+import { useAuthStore } from '../(shared)/stores/auth-store';
 import TradeCancelModal from '../(shared)/components/TradeCancelModal';
 import { toast } from 'sonner';
 
@@ -42,6 +42,7 @@ type MatchingStatus =
 export default function MatchPage() {
   const router = useRouter();
   const { foundMatch, updatePartner } = useMatchStore();
+  const { token } = useAuthStore();
   // const { user } = useAuthStore();
   // const { profile } = useUserStore();
 
@@ -77,6 +78,15 @@ export default function MatchPage() {
     useMatchStore();
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    if (!token) {
+      console.log('❌ 토큰이 없어서 로그인 페이지로 이동합니다.');
+      router.push('/login');
+      return;
+    }
+  }, [token, router]);
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
@@ -154,6 +164,7 @@ export default function MatchPage() {
     setMatchingStatus,
     setConnectedUsers,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
+    skipAuthCheck: true, // 인증 체크를 건너뛰어서 에러 로그 방지
   });
 
   // MatchPage 활성화 및 초기화
@@ -404,6 +415,22 @@ export default function MatchPage() {
     },
     [incomingRequests, respondToTrade, foundMatch, router, sellerInfo]
   );
+  // 토큰이 없으면 로딩 상태 표시
+  if (!token) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">로그인 상태를 확인하는 중...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />

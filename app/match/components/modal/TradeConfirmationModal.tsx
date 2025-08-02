@@ -33,12 +33,10 @@ export default function TradeConfirmationModal({
   const { partner } = useMatchStore();
   const { user } = useAuthStore();
   useGlobalWebSocket();
-  // profile이 없으면 테스트용 데이터 설정
-  useEffect(() => {
-    if (!user) {
-      throw new Error('User not found');
-    }
-  }, [user]);
+  // user가 없으면 모달을 렌더링하지 않음
+  if (!user) {
+    return null;
+  }
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
