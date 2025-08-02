@@ -28,7 +28,7 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
   return (
     <>
       {/* 카드 그리드 */}
-      <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+      <div className="grid w-full grid-cols-2 sm:grid-cols-4 gap-3 justify-items-center md:grid-cols-2 xl:grid-cols-4 lg:grid-cols-3 md:gap-4">
         {cards.map((item) => (
           <DataItemCard
             key={item.id}

@@ -1,7 +1,11 @@
-import { BlogPost } from '@/app/(shared)/components/BlogCard';
+import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
-// 확장된 BlogPost 타입을 위한 인터페이스
-export interface ExtendedBlogPost extends BlogPost {
+// 확장된 Blog 타입을 위한 인터페이스
+export interface ExtendedBlogPost extends Omit<Blog, 'nickname'> {
+  nickname?: string;
+  subtitle?: string;
+  image?: string;
+  featured?: boolean;
   content?: string;
   markdownContent?: string; // 마크다운 콘텐츠 추가
   author?: string;
@@ -19,6 +23,7 @@ export const BLOG_POSTS: ExtendedBlogPost[] = [
     subtitle: '더 보기 →',
     image: '/blog1.png',
     featured: true,
+    nickname: '마케팅팀',
     author: '마케팅팀',
     publishDate: '2024-01-15',
     readTime: '5분',

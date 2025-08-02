@@ -24,7 +24,6 @@ const ArrowIcon = ({ direction }: { direction: 'left' | 'right' }) => {
     </svg>
   );
 };
-
 export const Pagination = ({
   currentPage,
   totalPages,
@@ -73,8 +72,10 @@ export const Pagination = ({
     'flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-md border transition-colors';
 
   const defaultButtonStyles =
-    'bg-white border-gray-300 text-gray-700 hover:bg-gray-100';
-  const activeButtonStyles = 'bg-gray-600 border-gray-600 text-white';
+    'bg-white border-gray-300 text-gray-700 hover:bg-gray-100 dark:bg-midnight-black dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800';
+
+  const activeButtonStyles = 'bg-gray-700 border-gray-700 text-white';
+
   const disabledButtonStyles = 'opacity-50 cursor-not-allowed';
 
   return (
@@ -111,7 +112,7 @@ export const Pagination = ({
           ) : (
             <li key={`ellipsis-${index}`}>
               <span
-                className={`${baseButtonStyles} bg-white border-gray-300 text-gray-700`}
+                className={`${baseButtonStyles} bg-white border-gray-300 text-gray-700 dark:bg-midnight-black dark:border-gray-700 dark:text-gray-400`}
               >
                 {number}
               </span>
