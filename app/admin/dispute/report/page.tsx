@@ -172,7 +172,7 @@ export default function AdminReportPage() {
                   </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
-                  {d.reporter}
+                  {d.id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
                   {new Date(d.createdAt).toLocaleDateString()}

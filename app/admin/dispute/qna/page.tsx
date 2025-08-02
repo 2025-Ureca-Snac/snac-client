@@ -175,7 +175,7 @@ export default function AdminQnaPage() {
                     </button>
                   </td>
                   <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
-                    {d.reporter}
+                    {d.id}
                   </td>
                   <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
                     {new Date(d.createdAt).toLocaleDateString()}
