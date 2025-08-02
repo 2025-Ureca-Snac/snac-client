@@ -13,7 +13,6 @@ import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
 import type { CardData } from '@/app/(shared)/types/card';
 
 import type {
-  CardCategory,
   SellStatus,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
@@ -177,6 +176,7 @@ export default function Home() {
     transactionStatus,
     priceRange,
     sortBy,
+    carrier,
   ]);
 
   const handlePageChange = (page: number) => {
