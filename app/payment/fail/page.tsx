@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { api } from '@/app/(shared)/utils/api';
 
 /**
  * @author 이승우
@@ -8,18 +9,37 @@ import { useSearchParams } from 'next/navigation';
  */
 function PaymentFailComponent() {
   const searchParams = useSearchParams();
+  const [failureReason, setFailureReason] = useState<string>('');
 
   useEffect(() => {
     const orderId = searchParams.get('orderId');
-    const amount = searchParams.get('amount');
+    const code = searchParams.get('code');
+    const message = searchParams.get('message');
+    setFailureReason(message || '결제 요청에 실패했습니다.');
+
+    // 백엔드에 실패 정보 전송
+    const sendFailureToBackend = async () => {
+      try {
+        await api.post('/payments/fail', {
+          errorCode: code,
+          errorMessage: message,
+          orderId: orderId,
+        });
+        console.log('결제 실패 정보가 백엔드에 전송되었습니다.');
+      } catch (error) {
+        console.error('결제 실패 정보 전송 실패:', error);
+      }
+    };
+
+    sendFailureToBackend();
 
     // 부모 창에 실패 메시지 전송
     window.opener?.postMessage(
       {
         type: 'PAYMENT_RESULT',
         success: false,
-        orderId: orderId,
-        amount: amount,
+        code: code,
+        message: message,
       },
       window.location.origin
     );
@@ -37,7 +57,7 @@ function PaymentFailComponent() {
           <span className="text-3xl text-red-600">✕</span>
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">결제 실패</h2>
-        <p className="text-gray-600">결제가 취소되었거나 실패했습니다.</p>
+        <p className="text-gray-600">{failureReason}</p>
         <p className="text-sm text-gray-500 mt-4">
           3초 후 자동으로 창이 닫힙니다...
         </p>

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { User } from '../../types/match';
 import { useMatchStore } from '@/app/(shared)/stores/match-store';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
-import { useUserStore } from '@/app/(shared)/stores/user-store';
 
 // Lottie Player를 동적으로 import (SSR 문제 방지)
 const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
@@ -32,34 +31,13 @@ export default function TradeConfirmationModal({
   const router = useRouter();
   const { foundMatch, partner } = useMatchStore();
   const { user } = useAuthStore();
-  const { profile, setProfile } = useUserStore();
 
   // profile이 없으면 테스트용 데이터 설정
   useEffect(() => {
-    if (!profile) {
-      setProfile({
-        id: '1',
-        email: user || 'test@example.com',
-        name: '테스트 사용자',
-        nickname: '테스트 사용자',
-        phone: '010-1234-5678',
-        birthDate: new Date('1999-05-02'),
-        points: 100,
-        money: 5000,
-        preferences: {
-          theme: 'light',
-          language: 'ko',
-          notifications: {
-            email: true,
-            push: true,
-            sms: false,
-          },
-        },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+    if (!user) {
+      throw new Error('User not found');
     }
-  }, [profile, setProfile, user]);
+  }, [user]);
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
@@ -97,24 +75,24 @@ export default function TradeConfirmationModal({
     if (tradeStatus === 'ACCEPTED') {
       setModalState('success');
 
+      const partnerInfo = {
+        tradeId: 1,
+        buyer: 'hardcoded-buyer@email.com',
+        seller: 'hardcoded-seller@email.com',
+        cardId: 1,
+        carrier: 'SKT',
+        dataAmount: 10,
+        phone: '010-1234-5678',
+        point: 10000,
+        priceGb: 2000,
+        sellerRatingScore: 4.8,
+        status: 'ACCEPTED',
+        cancelReason: null,
+        type: 'seller' as const,
+      };
+
       // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
-        const partnerInfo = {
-          tradeId: partner.tradeId,
-          buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
-          seller: partner.seller, // partner에서 판매자 이메일 가져오기
-          cardId: partner.cardId, // partner에서 cardId 가져오기
-          carrier: partner.carrier,
-          dataAmount: partner.dataAmount,
-          phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
-          point: profile?.points || 0, // 현재 사용자 포인트
-          priceGb: partner.priceGb,
-          sellerRatingScore: partner.sellerRatingScore,
-          status: 'ACCEPTED',
-          cancelReason: null,
-          type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
-        };
-
         foundMatch(partnerInfo);
 
         // 1초 후 trading 페이지로 이동
@@ -128,36 +106,6 @@ export default function TradeConfirmationModal({
           name: seller.name,
           email: seller.email,
           전체_데이터: seller,
-        });
-        console.log('🔍 profile 정보:', {
-          email: profile?.email,
-          phone: profile?.phone,
-          points: profile?.points,
-          전체_데이터: profile,
-        });
-        const partnerInfo = {
-          tradeId: seller.tradeId,
-          buyer: user || profile?.email || 'unknown_buyer', // 현재 구매자 이메일
-          seller: seller.email || seller.name || 'unknown_seller', // 판매자 이메일
-          cardId: seller.cardId, // cardId
-          carrier: seller.carrier,
-          dataAmount: seller.data,
-          phone: profile?.phone || '010-0000-0000', // 현재 사용자 핸드폰번호
-          point: profile?.points || 0, // 현재 사용자 포인트
-          priceGb: seller.price,
-          sellerRatingScore: seller.rating || 1000,
-          status: 'ACCEPTED',
-          cancelReason: null,
-          type: 'seller' as const, // 구매자 입장에서 상대방은 판매자
-        };
-
-        console.log('🔍 최종 partnerInfo:', {
-          buyer: partnerInfo.buyer,
-          seller: partnerInfo.seller,
-          cardId: partnerInfo.cardId,
-          phone: partnerInfo.phone,
-          point: partnerInfo.point,
-          type: partnerInfo.type,
         });
 
         foundMatch(partnerInfo);

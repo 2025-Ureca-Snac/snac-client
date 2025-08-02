@@ -193,6 +193,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     const token = getToken();
     if (!token) {
       console.error('❌ 토큰이 없어서 WebSocket 연결할 수 없습니다.');
+      // 토큰이 없으면 로그인 페이지로 이동
+      if (typeof window !== 'undefined') {
+        router.push('/login');
+      }
       return;
     }
 

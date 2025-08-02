@@ -1,28 +1,28 @@
 /**
+ * @author 이승우
  * @description 테마 타입
- * @interface ThemeType
- * @enum {string} light 라이트 모드
- * @enum {string} dark 다크 모드
- * @enum {string} auto 시스템 설정
+ * @type {'light' | 'dark' | 'auto'}
  */
-export type ThemeType = 'light' | 'dark' | 'auto';
+export type Theme = 'light' | 'dark' | 'auto';
 
 /**
- * @description ThemeModal 컴포넌트의 props 타입
+ * @author 이승우
+ * @description 테마 모달 props 인터페이스
  * @interface ThemeModalProps
  * @property {boolean} open 모달 열림 상태
  * @property {Function} onClose 모달 닫기 함수
- * @property {ThemeType} currentTheme 현재 테마
- * @property {Function} onThemeChange 테마 변경 함수
+ * @property {Theme} currentTheme 현재 테마 (선택사항)
+ * @property {Function} onThemeChange 테마 변경 함수 (선택사항)
  */
 export interface ThemeModalProps {
   open: boolean;
   onClose: () => void;
-  currentTheme: ThemeType;
-  onThemeChange: (theme: ThemeType) => void;
+  currentTheme?: Theme;
+  onThemeChange?: (theme: Theme) => void;
 }
 
 /**
+ * @author 이승우
  * @description ThemeOptionButton 컴포넌트의 props 타입
  * @interface ThemeOptionButtonProps
  * @property {string} label 버튼 라벨

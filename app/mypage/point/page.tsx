@@ -1,97 +1,199 @@
 'use client';
 
-import { useState } from 'react';
-import { useUserStore } from '@/app/(shared)/stores/user-store';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+
 import SideMenu from '@/app/(shared)/components/SideMenu';
+import { api, handleApiError } from '@/app/(shared)/utils/api';
+import { ApiResponse } from '@/app/(shared)/types/api';
+import {
+  PointHistoryItem,
+  BalanceResponse,
+  PointHistoryResponse,
+  AssetType,
+} from '@/app/(shared)/types/point-history';
 import Link from 'next/link';
 import PointContent from './PointContent';
 
-interface HistoryItem {
-  id: number;
-  description: string;
-  amount: number;
-  type: 'earned' | 'spent';
-  date: string;
-}
+// 포인트/머니 관련 타입 정의
 
-export default function PointPage() {
-  const [activeTab, setActiveTab] = useState<'points' | 'money'>('points');
-  const { profile } = useUserStore();
+// 내역 조회 API 함수
+const getHistory = async (assetType: AssetType, size: number = 20) => {
+  const response = await api.get<ApiResponse<PointHistoryResponse>>(
+    `/asset-histories/me?assetType=${assetType}&size=${size}`
+  );
+  console.log(`${assetType} 내역 API 응답 (size: ${size}):`, response);
+  return response.data.data;
+};
+
+function PointPageContent() {
+  const searchParams = useSearchParams();
+  const typeParam = searchParams.get('type') as AssetType;
+
+  // 유효한 타입인지 확인
+  const isValidType = (type: string): type is AssetType => {
+    return type === 'POINT' || type === 'MONEY';
+  };
+
+  const [activeTab, setActiveTab] = useState<AssetType>(
+    typeParam && isValidType(typeParam) ? typeParam : 'POINT'
+  );
+  const [balance, setBalance] = useState<BalanceResponse>({
+    point: 0,
+    money: 0,
+  });
+  const [allHistory, setAllHistory] = useState<PointHistoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentSize, setCurrentSize] = useState(20);
+  const [hasMore, setHasMore] = useState(true);
+
+  // 잔액 조회 API 함수
+  const getBalance = async (): Promise<BalanceResponse> => {
+    const response =
+      await api.get<ApiResponse<BalanceResponse>>('/wallets/summary');
+    return response.data.data;
+  };
+
+  // 초기 잔액 로드 (한 번만 호출)
+  const loadInitialBalance = async () => {
+    try {
+      const balanceResponse = await getBalance();
+      setBalance(balanceResponse);
+      console.log('초기 잔액 로드 완료:', balanceResponse);
+    } catch (err) {
+      console.error('잔액 로드 실패:', err);
+    }
+  };
+
+  // 포인트/머니 데이터 로드 (거래 내역만)
+  const loadPointData = async () => {
+    try {
+      setIsLoading(true);
+      setCurrentSize(20);
+      setError(null);
+
+      console.log('포인트/머니 거래 내역 API 호출 시작');
+
+      // 현재 활성 탭에 따른 내역 조회
+      const historyResponse = await getHistory(activeTab, currentSize);
+      console.log(
+        `${activeTab} 내역 API 응답 (size: ${currentSize}):`,
+        historyResponse
+      );
+
+      const newHistory = historyResponse.contents || [];
+      setAllHistory(newHistory);
+
+      // 더보기 버튼 표시 여부 결정
+      setHasMore(newHistory.length >= currentSize);
+
+      console.log(`${activeTab} 내역 저장 완료 (총 ${newHistory.length}개)`);
+      console.log('상태 업데이트 완료');
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
+      console.error('포인트/머니 데이터 로드 실패:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // URL 파라미터 변경 시 activeTab 업데이트
+  useEffect(() => {
+    if (typeParam && typeParam !== activeTab) {
+      setActiveTab(typeParam);
+    }
+  }, [typeParam, activeTab]);
+
+  // 컴포넌트 마운트 시 초기 데이터 로드
+  useEffect(() => {
+    loadInitialBalance(); // 잔액 한 번만 로드
+    loadPointData(); // 거래 내역 로드
+  }, []);
+
+  // 탭 변경 시 해당 탭의 내역 데이터 로드
+  useEffect(() => {
+    if (!isLoading) {
+      loadPointData();
+    }
+  }, [activeTab]);
+
+  // 더보기 함수
+  const handleLoadMore = async () => {
+    const newSize = currentSize + 20;
+    setCurrentSize(newSize);
+
+    try {
+      setError(null);
+
+      // 더보기 API 호출
+      const historyResponse = await getHistory(activeTab, newSize);
+      console.log(
+        `${activeTab} 더보기 API 응답 (size: ${newSize}):`,
+        historyResponse
+      );
+
+      const newHistory = historyResponse.contents || [];
+      setAllHistory(newHistory);
+
+      // 더보기 버튼 표시 여부 결정
+      setHasMore(newHistory.length >= newSize);
+
+      console.log(`${activeTab} 더보기 완료 (총 ${newHistory.length}개)`);
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      setError(errorMessage);
+      console.error('더보기 로드 실패:', err);
+    }
+  };
+
+  // 디버깅용: 상태 변화 확인
+  useEffect(() => {
+    console.log('상태 변화:', {
+      isLoading,
+      error,
+      balance,
+      allHistoryLength: allHistory?.length,
+      activeTab,
+    });
+  }, [isLoading, error, balance, allHistory, activeTab]);
+
+  // 현재 탭에 따른 내역 (API에서 이미 필터링됨)
+  const currentHistory = allHistory;
+
+  // 탭 변경 핸들러
+  const handleTabChange = (newTab: AssetType) => {
+    setActiveTab(newTab);
+    // URL 업데이트 (브라우저 히스토리에 추가)
+    const url = new URL(window.location.href);
+    url.searchParams.set('type', newTab);
+    window.history.pushState({}, '', url.toString());
+  };
 
   const tabs = [
-    { id: 'points', label: '포인트' },
-    { id: 'money', label: '머니' },
-  ];
-
-  const pointsHistory = [
-    {
-      id: 1,
-      type: 'earned',
-      amount: 2,
-      description: '출석체크',
-      date: '2025.07.03',
-    },
-    {
-      id: 2,
-      type: 'spent',
-      amount: -100,
-      description: 'KT 1GB 구매',
-      date: '2025.07.03',
-    },
-    {
-      id: 3,
-      type: 'earned',
-      amount: 2,
-      description: '출석체크',
-      date: '2025.07.03',
-    },
-    {
-      id: 4,
-      type: 'earned',
-      amount: 200,
-      description: '가입환영 포인트',
-      date: '2025.07.03',
-    },
-  ];
-
-  const moneyHistory = [
-    {
-      id: 1,
-      type: 'earned',
-      amount: 2000,
-      description: 'SKT 2GB 판매',
-      date: '2025.07.03',
-    },
-    {
-      id: 2,
-      type: 'spent',
-      amount: -1000,
-      description: 'KT 1GB 구매',
-      date: '2025.07.03',
-    },
-    {
-      id: 3,
-      type: 'earned',
-      amount: 5000,
-      description: '스낵 머니 충전',
-      date: '2025.07.01',
-    },
+    { id: 'POINT', label: '포인트' },
+    { id: 'MONEY', label: '머니' },
   ];
 
   // PC 헤더
   const DesktopHeader = () => (
     <div className="hidden md:block mb-8">
       {/* 네비게이션 */}
-      <div className="flex items-center gap-2 mb-4">
-        <Link
-          href="/mypage"
-          className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
-        >
-          마이페이지
-        </Link>
-        <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">포인트 • 머니</span>
-      </div>
+      <nav aria-label="페이지 네비게이션">
+        <div className="flex items-center gap-2 mb-4">
+          <Link
+            href="/mypage"
+            className="text-gray-500 hover:text-gray-700 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          >
+            마이페이지
+          </Link>
+          <span className="text-gray-400" aria-hidden="true">
+            /
+          </span>
+          <span className="text-gray-900 font-medium">포인트 • 머니</span>
+        </div>
+      </nav>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
@@ -109,7 +211,7 @@ export default function PointPage() {
             </span>
           </div>
           <div className="text-2xl font-bold text-blue-900">
-            {profile?.points || 104}P
+            {balance.point?.toLocaleString()}P
           </div>
         </div>
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -120,7 +222,7 @@ export default function PointPage() {
             </span>
           </div>
           <div className="text-2xl font-bold text-green-900">
-            {(profile?.money || 6000).toLocaleString()}S
+            {balance.money?.toLocaleString()}S
           </div>
         </div>
       </div>
@@ -140,7 +242,7 @@ export default function PointPage() {
             </span>
           </div>
           <div className="text-lg font-bold text-blue-900">
-            {profile?.points || 104}P
+            {balance.point?.toLocaleString()}P
           </div>
         </div>
         <div className="bg-green-50 border border-green-200 rounded-lg p-3">
@@ -151,8 +253,48 @@ export default function PointPage() {
             </span>
           </div>
           <div className="text-lg font-bold text-green-900">
-            {(profile?.money || 6000).toLocaleString()}S
+            {balance.money?.toLocaleString()}S
           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 로딩 컴포넌트
+  const LoadingState = () => (
+    <div className="bg-white rounded-lg shadow-sm border">
+      <div className="p-6">
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-3 animate-pulse"
+            >
+              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-32"></div>
+                <div className="h-3 bg-gray-200 rounded w-20"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // 에러 컴포넌트
+  const ErrorState = () => (
+    <div className="bg-white rounded-lg shadow-sm border">
+      <div className="p-6">
+        <div className="text-center py-8">
+          <div className="text-red-500 mb-2">오류가 발생했습니다</div>
+          <div className="text-gray-500 mb-4">{error}</div>
+          <button
+            onClick={loadPointData}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+          >
+            다시 시도
+          </button>
         </div>
       </div>
     </div>
@@ -175,18 +317,74 @@ export default function PointPage() {
             {/* 모바일 헤더 */}
             <MobileHeader />
 
-            <section className="w-full max-w-full">
-              <PointContent
-                tabs={tabs}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                pointsHistory={pointsHistory as HistoryItem[]}
-                moneyHistory={moneyHistory as HistoryItem[]}
-              />
+            <section
+              className="w-full max-w-full"
+              aria-labelledby="point-history-title"
+            >
+              {isLoading ? (
+                <LoadingState />
+              ) : error ? (
+                <ErrorState />
+              ) : (
+                <PointContent
+                  tabs={tabs}
+                  activeTab={activeTab}
+                  setActiveTab={handleTabChange}
+                  pointsHistory={activeTab === 'POINT' ? currentHistory : []}
+                  moneyHistory={activeTab === 'MONEY' ? currentHistory : []}
+                  hasMore={hasMore}
+                  onLoadMore={handleLoadMore}
+                  isLoading={isLoading}
+                  balance={balance}
+                />
+              )}
             </section>
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+// 로딩 컴포넌트
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-white w-full">
+      <div className="flex w-full min-h-screen">
+        <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
+          <SideMenu />
+        </div>
+        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2">
+          <div className="max-w-4xl mx-auto w-full">
+            <div className="bg-white rounded-lg shadow-sm border">
+              <div className="p-6">
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 animate-pulse"
+                    >
+                      <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                        <div className="h-3 bg-gray-200 rounded w-20"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function PointPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PointPageContent />
+    </Suspense>
   );
 }

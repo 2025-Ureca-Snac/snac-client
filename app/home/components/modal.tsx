@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, Fragment } from 'react';
+import { useRouter } from 'next/navigation';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Dialog, Transition, RadioGroup } from '@headlessui/react';
 
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
+import React from 'react';
 
 type CardCategory = 'SELL' | 'BUY' | '';
 type Carrier = 'SKT' | 'KT' | 'LGU+' | '';
@@ -41,7 +43,14 @@ const CheckboxIcon = ({ checked }: { checked: boolean }) => (
 );
 
 export const Modal = () => {
-  const { isCreateModalOpen, actions } = useHomeStore();
+  const {
+    isCreateModalOpen,
+    isEditMode,
+    editingCardId,
+    editingCardData,
+    actions,
+  } = useHomeStore();
+  const router = useRouter();
 
   const [cardCategory, setCardCategory] = useState<CardCategory>('');
   const [carrier, setCarrier] = useState<Carrier>('');
@@ -49,6 +58,17 @@ export const Modal = () => {
   const [dataUnit, setDataUnit] = useState<DataUnit>('GB');
   const [price, setPrice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // 수정 모드일 때 기존 데이터로 초기화
+  React.useEffect(() => {
+    if (isEditMode && editingCardData) {
+      setCardCategory(editingCardData.cardCategory);
+      setCarrier(editingCardData.carrier as Carrier);
+      setDataAmount(editingCardData.dataAmount.toString());
+      setDataUnit('GB'); // 기본값
+      setPrice(editingCardData.price.toString());
+    }
+  }, [isEditMode, editingCardData]);
 
   const getButtonColorClasses = () => {
     switch (carrier) {
@@ -70,7 +90,11 @@ export const Modal = () => {
     setDataUnit('GB');
     setPrice('');
     setIsLoading(false);
-    actions.toggleCreateModal();
+    if (isEditMode) {
+      actions.closeEditModal();
+    } else {
+      actions.toggleCreateModal();
+    }
   };
 
   const handleDataPresetClick = (preset: string) => {
@@ -128,11 +152,36 @@ export const Modal = () => {
     console.log('서버로 전송하는 최종 데이터:', cards);
 
     try {
-      await api.post('/cards', cards);
-      toast.success('상품이 성공적으로 등록되었습니다.');
+      if (isEditMode && editingCardId) {
+        // 수정 모드: PUT 요청
+        const response = await api.put(`/cards/${editingCardId}`, cards);
+        console.log('수정 서버 응답:', response.data);
+        toast.success('상품이 성공적으로 수정되었습니다.');
+        actions.triggerRefetch();
+        handleClose();
+      } else {
+        // 생성 모드: POST 요청
+        const response = await api.post('/cards', cards);
+        const cardId = (response.data as { data: { cardId: number } }).data
+          .cardId;
+        console.log('서버 응답:', cardId);
 
-      actions.triggerRefetch();
-      handleClose();
+        if (cardCategory === 'BUY') {
+          toast.success(
+            '상품이 성공적으로 등록되었습니다. 결제 페이지로 이동합니다.'
+          );
+
+          actions.triggerRefetch();
+          // 1초 후 payment 페이지로 이동
+          setTimeout(() => {
+            router.push(`/payment?cardId=${cardId}&pay=sell`);
+          }, 1000);
+          handleClose();
+        } else {
+          toast.success('상품이 성공적으로 등록되었습니다.');
+          handleClose();
+        }
+      }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -145,7 +194,7 @@ export const Modal = () => {
   };
 
   return (
-    <Transition appear show={isCreateModalOpen} as={Fragment}>
+    <Transition appear show={isCreateModalOpen || isEditMode} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={handleClose}>
         <Transition.Child
           as={Fragment}
@@ -177,10 +226,12 @@ export const Modal = () => {
                       as="h3"
                       className="text-heading-sm font-bold leading-6 text-gray-900"
                     >
-                      등록하기
+                      {isEditMode ? '수정하기' : '등록하기'}
                     </Dialog.Title>
                     <p className="mt-1 text-regular-sm text-gray-600">
-                      원하는 조건을 선택해주세요
+                      {isEditMode
+                        ? '수정할 내용을 입력해주세요'
+                        : '원하는 조건을 선택해주세요'}
                     </p>
                   </div>
                   <button
@@ -340,7 +391,13 @@ export const Modal = () => {
                       disabled={isLoading}
                       className={`w-full flex justify-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-regular-md font-medium text-white disabled:bg-gray-300 transition-colors ${getButtonColorClasses()}`}
                     >
-                      {isLoading ? '등록 중...' : '등록하기'}
+                      {isLoading
+                        ? isEditMode
+                          ? '수정 중...'
+                          : '등록 중...'
+                        : isEditMode
+                          ? '수정하기'
+                          : '등록하기'}
                     </button>
                     <button
                       type="button"

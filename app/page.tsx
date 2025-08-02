@@ -61,11 +61,15 @@ export default function Home() {
       try {
         const highRatingFirst = sortBy === 'RATING';
         const carrierForQuery: Carrier | undefined =
-          category === 'LGU+' ? 'LG' : (category ?? undefined);
+          category === 'ALL'
+            ? undefined
+            : category === 'LGU+'
+              ? 'LG'
+              : (category ?? undefined);
 
         const queryString = generateQueryParams({
           cardCategory: (cardCategory || 'BUY') as CardCategory,
-          sellStatusFilter: (transactionStatus || 'ALL') as SellStatus,
+          sellStatusFilter: 'ALL' as SellStatus,
           priceRanges: [priceRange || 'ALL'],
           highRatingFirst,
           size: 54,
@@ -86,7 +90,44 @@ export default function Home() {
         }
 
         const json: CardApiResponse = await res.json();
-        setCards(json.data.cardResponseList);
+
+        // transactionStatus에 따라 카드 필터링
+        let filteredCards = json.data.cardResponseList;
+
+        // CANCELLED 상태의 카드 제외
+        filteredCards = filteredCards.filter(
+          (card: { sellStatus: string }) => card.sellStatus !== 'CANCELLED'
+        );
+
+        if (transactionStatus && transactionStatus !== 'ALL') {
+          filteredCards = filteredCards.filter(
+            (card: { sellStatus: string }) =>
+              card.sellStatus === transactionStatus
+          );
+        }
+
+        // sortBy에 따라 카드 정렬
+        if (sortBy === 'RATING') {
+          // 인기순: 바삭스코어 높은 순, 같으면 등록순
+          filteredCards.sort((a, b) => {
+            if (a.ratingScore !== b.ratingScore) {
+              return b.ratingScore - a.ratingScore; // 높은 점수 먼저
+            }
+            // 점수가 같으면 등록순 (최신 등록 먼저)
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
+        } else {
+          // 최신순: 등록순 (최신 등록 먼저)
+          filteredCards.sort((a, b) => {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          });
+        }
+
+        setCards(filteredCards);
         console.log('응답 데이터:', json);
         setTotalPages(json.data.hasNext ? currentPage + 1 : currentPage);
       } catch (err) {

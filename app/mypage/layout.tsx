@@ -26,6 +26,8 @@ export default function MyPageLayout({
       router.push('/mypage');
     } else if (pathname === '/mypage') {
       router.back();
+    } else {
+      router.push('/mypage');
     }
   };
 
@@ -39,13 +41,6 @@ export default function MyPageLayout({
           className="absolute left-4 text-2xl text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-1"
           aria-label="뒤로가기"
           onClick={handleBackClick}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleBackClick();
-            }
-          }}
-          tabIndex={0}
         >
           ←
         </button>

@@ -121,7 +121,10 @@ export default function PaymentSummary({
                 <span className="text-sm text-green-700">스낵 머니</span>
                 <div className="flex items-center">
                   <span className="font-medium text-green-900">
-                    {getRemainingSnackMoney(snackMoney || 0, finalAmount)}
+                    {getRemainingSnackMoney(
+                      snackMoney || 0,
+                      finalAmount
+                    ).toLocaleString()}
                   </span>
                   <Image
                     src="/snac-price.svg"
@@ -139,7 +142,7 @@ export default function PaymentSummary({
                     {getRemainingSnackPoints(
                       snackPoints || 0,
                       snackPointsToUse
-                    )}
+                    ).toLocaleString()}
                   </span>
                   <Image
                     src="/snac-price.svg"
@@ -174,7 +177,7 @@ export default function PaymentSummary({
             <span className="text-gray-600">내 스낵포인트</span>
             <div className="flex items-center">
               <span className="font-medium text-gray-900">
-                {snackPoints || 0}
+                {(snackPoints || 0).toLocaleString()}
               </span>
               <Image
                 src="/snac-price.svg"

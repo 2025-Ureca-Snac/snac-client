@@ -53,8 +53,8 @@ export default function ProductDetails({
                     <div className="flex items-center">
                       <div className="h-6 w-6 md:w-8 md:h-8 rounded flex items-center justify-center overflow-hidden">
                         <Image
-                          src={getCarrierImageUrl(displayCarrier!)}
-                          alt={formatCarrierName(displayCarrier!)}
+                          src={getCarrierImageUrl(cardData.carrier)}
+                          alt={formatCarrierName(cardData.carrier)}
                           width={32}
                           height={32}
                           className="w-full h-full object-contain"

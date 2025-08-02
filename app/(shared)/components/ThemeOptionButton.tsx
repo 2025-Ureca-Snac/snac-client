@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ThemeOptionButtonProps } from '../types/theme-modal';
+import type { ThemeOptionButtonProps } from '../types/theme';
 
 /**
  * @author 이승우

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModalPortal from './modal-portal';
 import { useAuthStore } from '../stores/auth-store';
+import { useUserStore } from '../stores/user-store';
 import {
   SOCIAL_MODAL_PROVIDERS,
   SOCIAL_LOGIN_MODAL_INITIAL_STATE,
@@ -20,21 +21,22 @@ export default function SocialLoginModal({
   onSubmit,
 }: SocialLoginModalProps) {
   const { linkSocialAccount, unlinkSocialAccount } = useAuthStore();
+  const { profile } = useUserStore();
   const [linkedProviders, setLinkedProviders] = useState<{
     [key: string]: boolean;
   }>(SOCIAL_LOGIN_MODAL_INITIAL_STATE);
 
   // 모달이 열릴 때 현재 연동 상태를 가져오기
-  React.useEffect(() => {
-    if (open) {
-      fetchLinkedProviders();
+  useEffect(() => {
+    if (open && profile) {
+      // API에서 받은 실제 연동 상태로 설정
+      setLinkedProviders({
+        google: profile.googleConnected || false,
+        kakao: profile.kakaoConnected || false,
+        naver: profile.naverConnected || false,
+      });
     }
-  }, [open]);
-
-  const fetchLinkedProviders = async () => {
-    // 현재는 상태 조회 API가 없으므로 기본값으로 설정
-    setLinkedProviders(SOCIAL_LOGIN_MODAL_INITIAL_STATE);
-  };
+  }, [open, profile]);
 
   const handleToggleProvider = async (providerId: string) => {
     const isCurrentlyLinked = linkedProviders[providerId];
@@ -48,28 +50,45 @@ export default function SocialLoginModal({
     try {
       if (!isCurrentlyLinked) {
         // 소셜 로그인 연동
-        const success = await linkSocialAccount(providerId);
-        if (success) {
-          setLinkedProviders((prev) => ({
-            ...prev,
-            [providerId]: true,
-          }));
-          if (onSubmit) {
-            onSubmit(providerId, true);
+        console.log('소셜 로그인 연동 시작:', providerId);
+
+        try {
+          const success = await linkSocialAccount(providerId);
+          console.log('소셜 로그인 연동 결과:', success);
+
+          if (success) {
+            setLinkedProviders((prev) => ({
+              ...prev,
+              [providerId]: true,
+            }));
+
+            console.log('로컬 상태 업데이트 완료');
+
+            if (onSubmit) {
+              onSubmit(providerId, true);
+            }
           }
+        } catch (error) {
+          console.log('소셜 로그인 연동 중 에러 (팝업 인증 실패 가능):', error);
         }
       } else {
         // 소셜 로그인 해제
-        await unlinkSocialAccount(providerId);
-        setLinkedProviders((prev) => ({
-          ...prev,
-          [providerId]: false,
-        }));
-        if (onSubmit) {
-          onSubmit(providerId, false);
+        const success = await unlinkSocialAccount(providerId);
+
+        if (success) {
+          // 로컬 상태 업데이트
+          setLinkedProviders((prev) => ({
+            ...prev,
+            [providerId]: false,
+          }));
+
+          if (onSubmit) {
+            onSubmit(providerId, false);
+          }
         }
       }
     } catch (error) {
+      console.error('소셜 로그인 연동 처리 중 오류:', error);
       alert(
         `소셜 로그인 연동 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`
       );
