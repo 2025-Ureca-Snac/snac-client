@@ -26,7 +26,7 @@ export function DisputeTable({ activeTab }: DisputeTableProps) {
 
   const disputesToDisplay = activeTab === 'all' ? disputes : pendingDisputes;
 
-  if (!Array.isArray(disputesToDisplay) || disputesToDisplay.length === 0) {
+  if (disputesToDisplay.length === 0) {
     return (
       <div className="text-center py-10 text-gray-500">
         표시할 분쟁이 없습니다.
