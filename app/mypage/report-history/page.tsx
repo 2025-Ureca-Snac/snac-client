@@ -1,92 +1,107 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
 import InquiryModal from '@/app/(shared)/components/inquiry-modal';
 import InquiryDetailModal from '@/app/(shared)/components/inquiry-detail-modal';
+import {
+  getInquiryList,
+  getInquiryDetail,
+  createInquiry,
+  uploadImage,
+} from '@/app/(shared)/utils/inquiry-api';
+import {
+  InquiryItem,
+  InquiryDetailItem,
+  DisputeType,
+} from '@/app/(shared)/types/inquiry';
+import { toast } from 'sonner';
+import { handleApiError } from '@/app/(shared)/utils/api';
 import Link from 'next/link';
 
-interface InquiryItem {
-  id: number;
-  date: string;
-  title: string;
-  price: number;
-  reason?: string;
-  status?: 'pending' | 'answered';
-  content?: string;
-  category?: string;
-  createdAt?: string;
-  answer?: {
-    content: string;
-    answeredAt: string;
-  };
-}
-
+/**
+ * @author 이승우
+ * @description 문의 내역 페이지 컴포넌트
+ * @returns 문의 목록, 작성, 상세보기 기능을 포함한 문의 내역 페이지
+ */
 export default function InquiryHistoryPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'answered'>(
     'all'
   );
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedInquiry, setSelectedInquiry] = useState<{
-    id: number;
-    title: string;
-    content: string;
-    category: string;
-    status: 'pending' | 'answered';
-    createdAt: string;
-    answer?: {
-      content: string;
-      answeredAt: string;
-    };
-  } | null>(null);
+  const [selectedInquiry, setSelectedInquiry] =
+    useState<InquiryDetailItem | null>(null);
+  const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const allInquiries: InquiryItem[] = [
-    {
-      id: 1,
-      date: '2025.07.03',
-      title: '거래 중 문제가 발생했습니다',
-      price: 2000,
-      status: 'answered',
-      category: '거래 관련',
-      content:
-        '거래 중 상대방이 응답하지 않아서 문제가 발생했습니다. 어떻게 해야 하나요?',
-      answer: {
-        content:
-          '안녕하세요. 거래 중 상대방이 응답하지 않는 경우, 거래를 취소하고 새로운 거래를 진행하시는 것을 권장드립니다. 추가 문의사항이 있으시면 언제든 연락주세요.',
-        answeredAt: '2025.07.04',
-      },
-    },
-    {
-      id: 2,
-      date: '2025.07.02',
-      title: '결제 오류 문의',
-      price: 5000,
-      status: 'pending',
-      category: '결제 관련',
-      content: '결제 시 오류가 발생하여 문의드립니다.',
-    },
-    {
-      id: 3,
-      date: '2025.07.01',
-      title: '계정 관련 문의',
-      price: 0,
-      status: 'answered',
-      category: '계정 관련',
-      content: '계정 정보 변경에 대한 문의입니다.',
-      answer: {
-        content: '계정 정보 변경은 마이페이지에서 가능합니다.',
-        answeredAt: '2025.07.02',
-      },
-    },
-  ];
+  /**
+   * @author 이승우
+   * @description 문의 목록 조회 함수
+   * @param page - 페이지 번호 (기본값: 0)
+   * @param loadMore - 추가 로드 여부 (기본값: false)
+   */
+  const loadInquiries = useCallback(
+    async (page: number = 0, loadMore: boolean = false) => {
+      try {
+        setIsLoading(!loadMore);
+        setIsLoadingMore(loadMore);
 
-  const filteredInquiries = allInquiries.filter((inquiry) => {
-    if (activeTab === 'all') return true;
-    return inquiry.status === activeTab;
-  });
+        const response = await getInquiryList(page, 20);
+
+        console.log('문의 목록 API 응답:', response);
+
+        if (loadMore) {
+          setInquiries((prev) => [...prev, ...response.content]);
+        } else {
+          setInquiries(response.content);
+        }
+
+        setCurrentPage(response.number);
+        setHasNext(!response.last);
+      } catch (error) {
+        toast.error(handleApiError(error));
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    []
+  );
+
+  // 초기 로드
+  useEffect(() => {
+    loadInquiries(0, false);
+  }, [loadInquiries]);
+
+  /**
+   * @author 이승우
+   * @description 더보기 로드 핸들러
+   */
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasNext) {
+      loadInquiries(currentPage + 1, true);
+    }
+  }, [isLoadingMore, hasNext, currentPage, loadInquiries]);
+
+  /**
+   * @author 이승우
+   * @description 탭별 필터링된 문의 목록
+   */
+  const filteredInquiries = useMemo(() => {
+    if (!inquiries) return [];
+    if (activeTab === 'all') return inquiries;
+    return inquiries.filter((inquiry) => {
+      if (activeTab === 'pending') return inquiry.status === 'IN_PROGRESS';
+      if (activeTab === 'answered') return inquiry.answerAt !== null;
+      return true;
+    });
+  }, [inquiries, activeTab]);
 
   const tabs = [
     { id: 'all', label: '전체' },
@@ -94,40 +109,62 @@ export default function InquiryHistoryPage() {
     { id: 'answered', label: '답변 완료' },
   ];
 
-  // 문의 제출 핸들러
+  /**
+   * @author 이승우
+   * @description 문의 제출 핸들러
+   * @param inquiry - 제출할 문의 데이터
+   */
   const handleInquirySubmit = async (inquiry: {
     title: string;
     content: string;
     category: string;
+    images?: File[];
   }) => {
     try {
-      // TODO: API 호출로 문의 제출
-      console.log('문의 제출:', inquiry);
+      // 이미지가 있으면 먼저 업로드
+      let attachmentKeys: string[] = [];
+      if (inquiry.images && inquiry.images.length > 0) {
+        const uploadPromises = inquiry.images.map((image) =>
+          uploadImage(image)
+        );
+        attachmentKeys = await Promise.all(uploadPromises);
+      }
 
-      // 임시로 성공 메시지 표시
-      alert('문의가 성공적으로 제출되었습니다.');
+      // 문의 데이터 생성
+      const inquiryData = {
+        title: inquiry.title,
+        type: inquiry.category as DisputeType,
+        description: inquiry.content,
+        attachmentKeys: attachmentKeys.length > 0 ? attachmentKeys : undefined,
+      };
 
-      // TODO: 문의 목록 새로고침
+      await createInquiry(inquiryData);
+      toast.success('문의가 성공적으로 제출되었습니다.');
+      setIsInquiryModalOpen(false);
+      // 문의 목록 새로고침
+      loadInquiries(0, false);
     } catch (error) {
-      console.error('문의 제출 실패:', error);
-      throw error;
+      toast.error(handleApiError(error));
     }
   };
 
-  // 문의 상세 보기 핸들러
-  const handleInquiryClick = (inquiry: InquiryItem) => {
-    // InquiryItem을 InquiryDetail로 변환
-    const inquiryDetail = {
-      id: inquiry.id,
-      title: inquiry.title,
-      content: inquiry.content || '',
-      category: inquiry.category || '기타',
-      status: inquiry.status || 'pending',
-      createdAt: inquiry.createdAt || inquiry.date,
-      answer: inquiry.answer,
-    };
-    setSelectedInquiry(inquiryDetail);
-    setIsDetailModalOpen(true);
+  /**
+   * @author 이승우
+   * @description 문의 상세 보기 핸들러
+   * @param inquiry - 조회할 문의 아이템
+   */
+  const handleInquiryClick = async (inquiry: InquiryItem) => {
+    try {
+      console.log('문의 상세 조회 시작:', inquiry.disputeId);
+      const inquiryDetail = await getInquiryDetail(inquiry.disputeId);
+      console.log('문의 상세 조회 결과:', inquiryDetail);
+      setSelectedInquiry(inquiryDetail);
+      setIsDetailModalOpen(true);
+      console.log('모달 상태 설정 완료');
+    } catch (error) {
+      console.error('문의 상세 조회 에러:', error);
+      toast.error(handleApiError(error));
+    }
   };
 
   // PC 헤더
@@ -185,6 +222,18 @@ export default function InquiryHistoryPage() {
     </div>
   );
 
+  // 초기 로딩 중일 때 스피너 표시
+  if (isLoading && inquiries.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">문의 내역을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white w-full">
       <div className="flex w-full min-h-screen">
@@ -208,9 +257,10 @@ export default function InquiryHistoryPage() {
                 <TabNavigation
                   tabs={tabs}
                   activeTab={activeTab}
-                  onTabChange={(tabId: string) =>
-                    setActiveTab(tabId as typeof activeTab)
-                  }
+                  onTabChange={(tabId: string) => {
+                    setActiveTab(tabId as typeof activeTab);
+                    setCurrentPage(0); // 탭 변경 시 페이지 초기화
+                  }}
                   activeTextColor="text-green-600"
                   inactiveTextColor="text-gray-500"
                   underlineColor="bg-green-600"
@@ -219,11 +269,15 @@ export default function InquiryHistoryPage() {
                 {/* 문의 내역 리스트 */}
                 <AnimatedTabContent tabKey={activeTab}>
                   <div className="p-6">
-                    {filteredInquiries.length > 0 ? (
+                    {isLoading ? (
+                      <div className="text-center py-8 text-gray-500">
+                        로딩 중...
+                      </div>
+                    ) : (filteredInquiries?.length || 0) > 0 ? (
                       <div className="space-y-4">
-                        {filteredInquiries.map((item: InquiryItem) => (
+                        {filteredInquiries?.map((item: InquiryItem) => (
                           <div
-                            key={item.id}
+                            key={item.disputeId}
                             className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
                             onClick={() => handleInquiryClick(item)}
                           >
@@ -237,36 +291,47 @@ export default function InquiryHistoryPage() {
                             {/* 내용 */}
                             <div className="flex-1">
                               <div className="text-sm text-gray-500 mb-1">
-                                {item.date}
+                                {new Date(item.createdAt).toLocaleDateString(
+                                  'ko-KR'
+                                )}
                               </div>
                               <div className="font-semibold text-gray-900 mb-1">
                                 {item.title}
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-gray-900">
-                                  {item.price.toLocaleString()}원
-                                </span>
+                              <div className="text-sm text-gray-600 mb-2">
+                                {item.type}
                               </div>
 
                               {/* 상태 표시 */}
-                              {item.status && (
-                                <div className="mt-2">
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                      item.status === 'pending'
-                                        ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-green-100 text-green-800'
-                                    }`}
-                                  >
-                                    {item.status === 'pending'
-                                      ? '답변 대기'
-                                      : '답변 완료'}
-                                  </span>
-                                </div>
-                              )}
+                              <div className="mt-2">
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    item.status === 'IN_PROGRESS'
+                                      ? 'bg-yellow-100 text-yellow-800'
+                                      : 'bg-green-100 text-green-800'
+                                  }`}
+                                >
+                                  {item.status === 'IN_PROGRESS'
+                                    ? '답변 대기'
+                                    : '답변 완료'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         ))}
+
+                        {/* 더보기 버튼 */}
+                        {hasNext && (
+                          <div className="text-center pt-4">
+                            <button
+                              onClick={handleLoadMore}
+                              disabled={isLoadingMore}
+                              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                            >
+                              {isLoadingMore ? '로딩 중...' : '더보기'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-500">
