@@ -46,7 +46,7 @@ const SELLER_TRADING_STEPS: TradingStep[] = [
 
 export default function TradingPage() {
   const router = useRouter();
-  const { partner, setUserRole, userRole } = useMatchStore();
+  const { partner, setUserRole, userRole, updatePartner } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
   const [timeLeft, setTimeLeft] = useState(3000); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
@@ -119,14 +119,21 @@ export default function TradingPage() {
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
 
-  // userRole 설정
+  // userRole 설정 및 partner.type 수정
   useEffect(() => {
     if (partner) {
       const role = isSeller ? 'seller' : 'buyer';
       setUserRole(role);
+
+      // partner.type을 현재 사용자의 역할로 올바르게 설정
+      if (partner.type !== role) {
+        updatePartner({ type: role });
+        console.log('🔄 partner.type 업데이트:', role);
+      }
+
       console.log('🔄 userRole 설정:', role);
     }
-  }, [partner, isSeller, setUserRole]);
+  }, [partner, isSeller, setUserRole, updatePartner]);
 
   // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
   useEffect(() => {
