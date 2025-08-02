@@ -195,12 +195,13 @@ export default function TradingPage() {
   const handleCancel = () => {
     if (confirm('거래를 취소하시겠습니까? 패널티가 부과될 수 있습니다.')) {
       // WebSocket을 통해 거래 취소 메시지 전송
+      const tradeId = partnerInfo?.tradeId;
       if (isSeller) {
         // 판매자인 경우
-        sendTradeCancel('seller');
+        sendTradeCancel('seller', currentStep, tradeId);
       } else {
         // 구매자인 경우
-        sendTradeCancel('buyer');
+        sendTradeCancel('buyer', currentStep, tradeId);
       }
 
       router.push('/match');

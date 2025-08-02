@@ -748,26 +748,50 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   }, []);
 
   // 거래 취소 메시지 전송
-  const sendTradeCancel = useCallback((userType: 'buyer' | 'seller') => {
-    if (!globalStompClient?.connected) {
-      console.error('❌ WebSocket이 연결되지 않았습니다.');
-      return false;
-    }
+  const sendTradeCancel = useCallback(
+    (userType: 'buyer' | 'seller', currentStep?: string, tradeId?: number) => {
+      if (!globalStompClient?.connected) {
+        console.error('❌ WebSocket이 연결되지 않았습니다.');
+        return false;
+      }
 
-    const destination =
-      userType === 'buyer'
-        ? '/app/trade/payment/cancel/buyer'
-        : '/app/trade/payment/cancel/seller';
+      // 특정 상태에서는 accepted/cancel 엔드포인트 사용
+      const shouldUseAcceptedCancel =
+        (userType === 'seller' &&
+          (currentStep === 'confirmation' ||
+            currentStep === 'waiting_payment')) ||
+        (userType === 'buyer' && currentStep === 'confirmation');
 
-    console.log('❌ 거래 취소 메시지 전송:', { userType, destination });
+      const destination = shouldUseAcceptedCancel
+        ? userType === 'buyer'
+          ? '/app/trade/accepted/cancel/buyer'
+          : '/app/trade/accepted/cancel/seller'
+        : userType === 'buyer'
+          ? '/app/trade/payment/cancel/buyer'
+          : '/app/trade/payment/cancel/seller';
 
-    globalStompClient.publish({
-      destination,
-      body: JSON.stringify({}),
-    });
+      // reason 설정
+      const reason =
+        userType === 'seller' ? 'SELLER_CHANGE_MIND' : 'BUYER_CHANGE_MIND';
 
-    return true;
-  }, []);
+      console.log('❌ 거래 취소 메시지 전송:', {
+        userType,
+        currentStep,
+        destination,
+        shouldUseAcceptedCancel,
+        tradeId,
+        reason,
+      });
+
+      globalStompClient.publish({
+        destination,
+        body: JSON.stringify({ tradeId, reason }),
+      });
+
+      return true;
+    },
+    []
+  );
 
   // 구매 요청 취소 메시지 전송
   const sendBuyRequestCancel = useCallback((cardId: number) => {
