@@ -92,6 +92,7 @@ const NicknameInputField = forwardRef<
         try {
           const response = await api.post<{
             data: { isDuplicate: boolean };
+            message?: string;
           }>(`/member/check-nickname`, {
             nickname: nicknameToCheck.trim(),
           });
@@ -100,32 +101,39 @@ const NicknameInputField = forwardRef<
             const isDuplicate = response.data.data?.isDuplicate || false;
             setDuplicateCheckResult({
               isDuplicate,
-              message: isDuplicate
+              message: response.data.message || (isDuplicate
                 ? '이미 사용 중인 닉네임입니다.'
-                : '사용 가능한 닉네임입니다.',
+                : '사용 가능한 닉네임입니다.'),
             });
           }
         } catch (error: unknown) {
           console.error('닉네임 중복 체크 오류:', error);
 
-          // API 엔드포인트가 없는 경우를 대비한 fallback
+          // API에서 오는 오류 메시지 사용
+          let errorMessage = '중복 체크 중 오류가 발생했습니다.';
+          
           if (error && typeof error === 'object' && 'response' in error) {
-            const apiError = error as { response?: { status?: number } };
+            const apiError = error as { 
+              response?: { 
+                status?: number;
+                data?: { message?: string };
+              } 
+            };
+            
             if (apiError.response?.status === 404) {
               // API 엔드포인트가 없는 경우, 중복 체크를 건너뛰고 회원가입 시에만 체크
               setDuplicateCheckResult(null);
-            } else {
-              setDuplicateCheckResult({
-                isDuplicate: false,
-                message: '중복 체크 중 오류가 발생했습니다.',
-              });
+              setIsCheckingDuplicate(false);
+              return;
+            } else if (apiError.response?.data?.message) {
+              errorMessage = apiError.response.data.message;
             }
-          } else {
-            setDuplicateCheckResult({
-              isDuplicate: false,
-              message: '중복 체크 중 오류가 발생했습니다.',
-            });
           }
+
+          setDuplicateCheckResult({
+            isDuplicate: false,
+            message: errorMessage,
+          });
         } finally {
           setIsCheckingDuplicate(false);
         }
