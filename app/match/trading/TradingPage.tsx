@@ -279,7 +279,7 @@ export default function TradingPage() {
           );
 
         case 'transfer':
-          return <TransferStep onNext={handleNextStep} />;
+          return <TransferStep />;
 
         case 'verification':
           return (

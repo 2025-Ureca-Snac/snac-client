@@ -2,11 +2,7 @@
 
 import React from 'react';
 
-interface TransferStepProps {
-  onNext: () => void;
-}
-
-export default function TransferStep({ onNext }: TransferStepProps) {
+export default function TransferStep() {
   return (
     <div className="max-w-3xl mx-auto px-4">
       {/* 메인 카드 - 투명 배경 */}
