@@ -101,9 +101,11 @@ const NicknameInputField = forwardRef<
             const isDuplicate = response.data.data?.isDuplicate || false;
             setDuplicateCheckResult({
               isDuplicate,
-              message: response.data.message || (isDuplicate
-                ? '이미 사용 중인 닉네임입니다.'
-                : '사용 가능한 닉네임입니다.'),
+              message:
+                response.data.message ||
+                (isDuplicate
+                  ? '이미 사용 중인 닉네임입니다.'
+                  : '사용 가능한 닉네임입니다.'),
             });
           }
         } catch (error: unknown) {
@@ -111,15 +113,15 @@ const NicknameInputField = forwardRef<
 
           // API에서 오는 오류 메시지 사용
           let errorMessage = '중복 체크 중 오류가 발생했습니다.';
-          
+
           if (error && typeof error === 'object' && 'response' in error) {
-            const apiError = error as { 
-              response?: { 
+            const apiError = error as {
+              response?: {
                 status?: number;
                 data?: { message?: string };
-              } 
+              };
             };
-            
+
             if (apiError.response?.status === 404) {
               // API 엔드포인트가 없는 경우, 중복 체크를 건너뛰고 회원가입 시에만 체크
               setDuplicateCheckResult(null);
