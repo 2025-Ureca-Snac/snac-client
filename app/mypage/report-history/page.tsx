@@ -91,6 +91,31 @@ export default function InquiryHistoryPage() {
 
   /**
    * @author 이승우
+   * @description 문의 카테고리를 한글로 변환
+   * @param type 문의 타입
+   * @returns 한글 카테고리명
+   */
+  const getCategoryName = (type: string): string => {
+    switch (type) {
+      case DisputeType.DATA_NONE:
+        return '데이터 안옴';
+      case DisputeType.DATA_PARTIAL:
+        return '일부만 수신';
+      case DisputeType.PAYMENT:
+        return '결제 관련';
+      case DisputeType.ACCOUNT:
+        return '계정 관련';
+      case DisputeType.TECHNICAL_PROBLEM:
+        return '기술적 문제';
+      case DisputeType.OTHER:
+        return '기타';
+      default:
+        return type;
+    }
+  };
+
+  /**
+   * @author 이승우
    * @description 탭별 필터링된 문의 목록
    */
   const filteredInquiries = useMemo(() => {
@@ -299,7 +324,7 @@ export default function InquiryHistoryPage() {
                                 {item.title}
                               </div>
                               <div className="text-sm text-gray-600 mb-2">
-                                {item.type}
+                                {getCategoryName(item.type)}
                               </div>
 
                               {/* 상태 표시 */}

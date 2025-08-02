@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import ModalPortal from './modal-portal';
 import { InquiryDetailModalProps } from '../types/inquiry-detail-modal';
+import { DisputeType } from '../types/inquiry';
 
 /**
  * @author 이승우
@@ -17,6 +18,31 @@ export default function InquiryDetailModal({
 }: InquiryDetailModalProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  /**
+   * @author 이승우
+   * @description 문의 카테고리를 한글로 변환
+   * @param type 문의 타입
+   * @returns 한글 카테고리명
+   */
+  const getCategoryName = (type: string): string => {
+    switch (type) {
+      case DisputeType.DATA_NONE:
+        return '데이터 안옴';
+      case DisputeType.DATA_PARTIAL:
+        return '일부만 수신';
+      case DisputeType.PAYMENT:
+        return '결제 관련';
+      case DisputeType.ACCOUNT:
+        return '계정 관련';
+      case DisputeType.TECHNICAL_PROBLEM:
+        return '기술적 문제';
+      case DisputeType.OTHER:
+        return '기타';
+      default:
+        return type;
+    }
+  };
 
   if (!inquiry) {
     console.log('InquiryDetailModal: inquiry is null');
@@ -109,7 +135,7 @@ export default function InquiryDetailModal({
                 </div>
 
                 <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span>카테고리: {inquiry.type}</span>
+                  <span>카테고리: {getCategoryName(inquiry.type)}</span>
                   <span>
                     작성일:{' '}
                     {new Date(inquiry.createdAt).toLocaleDateString('ko-KR')}
