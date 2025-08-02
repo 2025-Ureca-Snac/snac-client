@@ -10,16 +10,22 @@ import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
+import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 const ADMIN_ROLE = 'ADMIN';
+
 export const Header: FC = () => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
 
+  const { actualTheme, changeTheme } = useTheme();
+  const isDark = actualTheme === 'dark';
+
   return (
-    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center  ">
+    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center">
       <Link href="/" className="dark:text-white" aria-label="스낵 로고">
         <LogoMobile
           width={100}
@@ -61,6 +67,11 @@ export const Header: FC = () => {
             text="로그인"
           />
         )}
+
+        <ThemeSwitch
+          isDark={isDark}
+          onToggle={() => changeTheme(isDark ? 'light' : 'dark')}
+        />
       </div>
     </header>
   );

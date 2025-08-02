@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.4",
+    "@headlessui/react": "^2.2.7",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@stomp/stompjs": "^7.1.1",
     "@svgr/webpack": "^8.1.0",
