@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
@@ -18,7 +18,9 @@ interface ActionButtonsProps {
 
 export default function ActionButtons({ partner }: ActionButtonsProps) {
   const router = useRouter();
-  const [isAddingFavorite, setIsAddingFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
+  const [isToggling, setIsToggling] = useState(false);
 
   const handleNewMatch = () => {
     router.push('/match');
@@ -28,37 +30,81 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
     router.push('/');
   };
 
-  // 단골 등록 API 호출
-  const handleAddToFavorites = async () => {
+  // 단골 여부 확인
+  const checkFavoriteStatus = useCallback(async () => {
+    if (!partner?.cardId) return;
+
+    const memberId =
+      partner.type === 'seller' ? partner.buyerId : partner.sellerId;
+
+    try {
+      const response = await api.get('/favorites/check', {
+        params: { toMemberId: memberId },
+      });
+      setIsFavorite(response.data === true);
+    } catch (error) {
+      console.error('단골 여부 확인 실패:', error);
+      setIsFavorite(false);
+    } finally {
+      setIsCheckingFavorite(false);
+    }
+  }, [partner?.cardId, partner?.type, partner?.buyerId, partner?.sellerId]);
+
+  // 컴포넌트 마운트 시 단골 여부 확인
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [checkFavoriteStatus]);
+
+  // 단골 등록/해제 토글
+  const handleToggleFavorite = async () => {
     if (!partner?.cardId) {
       toast.error('거래 상대방 정보를 찾을 수 없습니다.');
       return;
     }
 
-    setIsAddingFavorite(true);
+    setIsToggling(true);
 
     const memberId =
       partner.type === 'seller' ? partner.buyerId : partner.sellerId;
-    try {
-      const response = await api.post('/favorites', {
-        toMemberId: memberId, // cardId를 memberId로 사용
-      });
 
-      if (response.status === 201) {
-        toast.success('단골 등록이 완료되었습니다!', {
-          description: `${partner.name}님이 단골 목록에 추가되었습니다.`,
-          duration: 3000,
+    try {
+      if (isFavorite) {
+        // 단골 해제
+        const response = await api.delete(`/favorites/${memberId}`);
+
+        if (response.status === 200 || response.status === 204) {
+          setIsFavorite(false);
+          toast.success('단골 해제가 완료되었습니다!', {
+            description: `${partner.name}님이 단골 목록에서 제거되었습니다.`,
+            duration: 3000,
+          });
+        }
+      } else {
+        // 단골 등록
+        const response = await api.post('/favorites', {
+          toMemberId: memberId,
         });
+
+        if (response.status === 201) {
+          setIsFavorite(true);
+          toast.success('단골 등록이 완료되었습니다!', {
+            description: `${partner.name}님이 단골 목록에 추가되었습니다.`,
+            duration: 3000,
+          });
+        }
       }
     } catch (error) {
-      console.error('단골 등록 실패:', error);
+      console.error('단골 등록/해제 실패:', error);
       const errorInfo = getApiErrorInfo(error);
-      toast.error('단골 등록에 실패했습니다.', {
-        description: errorInfo.userMessage,
-        duration: 3000,
-      });
+      toast.error(
+        isFavorite ? '단골 해제에 실패했습니다.' : '단골 등록에 실패했습니다.',
+        {
+          description: errorInfo.userMessage,
+          duration: 3000,
+        }
+      );
     } finally {
-      setIsAddingFavorite(false);
+      setIsToggling(false);
     }
   };
 
@@ -92,26 +138,33 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
             </div>
           </div>
 
-          {/* 단골 등록 버튼 */}
+          {/* 단골 등록/해제 버튼 */}
           <button
-            onClick={handleAddToFavorites}
-            disabled={isAddingFavorite}
+            onClick={handleToggleFavorite}
+            disabled={isCheckingFavorite || isToggling}
             className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 relative overflow-hidden group mb-4 ${
-              isAddingFavorite
+              isCheckingFavorite || isToggling
                 ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                : 'bg-gradient-to-r from-pink-400 to-purple-500 text-white hover:from-pink-300 hover:to-purple-400 shadow-lg hover:shadow-pink-400/25'
+                : isFavorite
+                  ? 'bg-gradient-to-r from-red-400 to-red-500 text-white hover:from-red-300 hover:to-red-400 shadow-lg hover:shadow-red-400/25'
+                  : 'bg-gradient-to-r from-pink-400 to-purple-500 text-white hover:from-pink-300 hover:to-purple-400 shadow-lg hover:shadow-pink-400/25'
             }`}
           >
-            {isAddingFavorite ? (
+            {isCheckingFavorite ? (
               <span className="flex items-center justify-center space-x-2">
                 <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                <span>등록 중...</span>
+                <span>확인 중...</span>
+              </span>
+            ) : isToggling ? (
+              <span className="flex items-center justify-center space-x-2">
+                <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                <span>{isFavorite ? '해제 중...' : '등록 중...'}</span>
               </span>
             ) : (
               <>
                 <span className="relative z-10 flex items-center justify-center space-x-2">
-                  <span>❤️</span>
-                  <span>단골 등록하기</span>
+                  <span>{isFavorite ? '💔' : '❤️'}</span>
+                  <span>{isFavorite ? '단골 해제하기' : '단골 등록하기'}</span>
                 </span>
                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
               </>
