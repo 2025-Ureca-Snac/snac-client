@@ -63,16 +63,6 @@ export default function BuyerMatchingStatus({
           </button>
         )}
 
-        {/* 실시간 매칭 상태 */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm text-green-400 font-medium">
-              실시간 매칭
-            </span>
-          </div>
-        </div>
-
         {/* 검색 아이콘 - Lottie 애니메이션 */}
         <div className="mb-8 flex justify-center">
           {isSearching && animationData ? (
