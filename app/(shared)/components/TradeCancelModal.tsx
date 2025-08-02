@@ -4,10 +4,12 @@ import { useModalStore } from '../stores/modal-store';
 import ModalPortal from './modal-portal';
 import { Button } from './Button';
 import { getCancelMessage } from '../constants';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function TradeCancelModal() {
   const { isOpen, modalType, modalData, closeModal } = useModalStore();
-
+  const router = useRouter();
+  const pathname = usePathname();
   // trade-cancel 모달이 아닌 경우 렌더링하지 않음
   if (modalType !== 'trade-cancel' || !isOpen) {
     return null;
@@ -19,7 +21,17 @@ export default function TradeCancelModal() {
   const handleConfirm = () => {
     closeModal();
 
-    window.location.reload();
+    // 현재 경로에 따라 다른 동작 수행
+    if (pathname.includes('/match/trading')) {
+      // trading 페이지에서는 match로 이동
+      router.push('/match');
+    } else if (pathname === '/match') {
+      // match 페이지에서는 새로고침
+      window.location.reload();
+    } else {
+      // 그 외의 경우는 기본적으로 match로 이동
+      router.push('/match');
+    }
   };
 
   return (
