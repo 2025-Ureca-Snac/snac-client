@@ -29,7 +29,9 @@ export const useUserStore = create<UserState>()((set, get) => ({
           birthDate: new Date(userData.birthDate),
           score: userData.score,
           favoriteCount: userData.favoriteCount,
-          nicknameUpdatedAt: new Date(userData.nicknameUpdatedAt),
+          nextNicknameChangeAllowedAt: new Date(
+            userData.nextNicknameChangeAllowedAt
+          ),
           googleConnected: userData.googleConnected,
           kakaoConnected: userData.kakaoConnected,
           naverConnected: userData.naverConnected,
@@ -55,7 +57,9 @@ export const useUserStore = create<UserState>()((set, get) => ({
 
   // 프로필 업데이트 (닉네임 제외)
   updateProfile: (
-    updates: Partial<Omit<UserProfile, 'nickname' | 'nicknameUpdatedAt'>>
+    updates: Partial<
+      Omit<UserProfile, 'nickname' | 'nextNicknameChangeAllowedAt'>
+    >
   ) => {
     const currentProfile = get().profile;
     if (currentProfile) {
@@ -68,7 +72,7 @@ export const useUserStore = create<UserState>()((set, get) => ({
     }
   },
 
-  // 닉네임 업데이트 (변경 시간 기록)
+  // 닉네임 업데이트
   updateNickname: (nickname: string) => {
     const currentProfile = get().profile;
     if (currentProfile) {
@@ -76,7 +80,19 @@ export const useUserStore = create<UserState>()((set, get) => ({
         profile: {
           ...currentProfile,
           nickname,
-          nicknameUpdatedAt: new Date(),
+        },
+      });
+    }
+  },
+
+  // 닉네임 변경 시간 업데이트
+  updateNextNicknameChangeAllowedAt: (nextNicknameChangeAllowedAt: Date) => {
+    const currentProfile = get().profile;
+    if (currentProfile) {
+      set({
+        profile: {
+          ...currentProfile,
+          nextNicknameChangeAllowedAt,
         },
       });
     }

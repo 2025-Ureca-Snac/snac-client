@@ -18,11 +18,23 @@ import PointContent from './PointContent';
 // 포인트/머니 관련 타입 정의
 
 // 내역 조회 API 함수
-const getHistory = async (assetType: AssetType, size: number = 20) => {
-  const response = await api.get<ApiResponse<PointHistoryResponse>>(
-    `/asset-histories/me?assetType=${assetType}&size=${size}`
+const getHistory = async (
+  assetType: AssetType,
+  size: number = 20,
+  year?: number,
+  month?: number
+) => {
+  let url = `/asset-histories/me?assetType=${assetType}&size=${size}`;
+
+  if (year && month) {
+    url += `&year=${year}&month=${month}`;
+  }
+
+  const response = await api.get<ApiResponse<PointHistoryResponse>>(url);
+  console.log(
+    `${assetType} 내역 API 응답 (size: ${size}, year: ${year}, month: ${month}):`,
+    response
   );
-  console.log(`${assetType} 내역 API 응답 (size: ${size}):`, response);
   return response.data.data;
 };
 
@@ -46,7 +58,14 @@ function PointPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentSize, setCurrentSize] = useState(20);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasNext, setHasNext] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    new Date().getMonth() + 1
+  );
 
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
@@ -70,23 +89,69 @@ function PointPageContent() {
   const loadPointData = async () => {
     try {
       setIsLoading(true);
-      setCurrentSize(20);
+      // 포인트와 머니 모두 20개씩 불러오기
+      const size = 20;
+      setCurrentSize(size);
       setError(null);
 
       console.log('포인트/머니 거래 내역 API 호출 시작');
 
-      // 현재 활성 탭에 따른 내역 조회
-      const historyResponse = await getHistory(activeTab, currentSize);
+      // 현재 활성 탭에 따른 내역 조회 (포인트는 월별 조회, 머니는 전체 조회)
+      const historyResponse =
+        activeTab === 'POINT'
+          ? await getHistory(activeTab, size, selectedYear, selectedMonth)
+          : await getHistory(activeTab, size);
       console.log(
-        `${activeTab} 내역 API 응답 (size: ${currentSize}):`,
+        `${activeTab} 내역 API 응답 (size: ${size}):`,
         historyResponse
       );
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
 
-      // 더보기 버튼 표시 여부 결정
-      setHasMore(newHistory.length >= currentSize);
+      // hasNext 값에 따라 더보기 여부 결정
+      setHasNext(historyResponse.hasNext);
+
+      // 포인트 탭에서 월별 조회 시 잔액 업데이트
+      if (activeTab === 'POINT' && newHistory.length > 0) {
+        // 해당 월의 가장 최신 거래 내역의 balanceAfter로 잔액 업데이트
+        const latestTransaction = newHistory[0];
+        const balanceAfterValue =
+          typeof latestTransaction.balanceAfter === 'number'
+            ? latestTransaction.balanceAfter
+            : parseFloat(latestTransaction.balanceAfter.replace(/,/g, ''));
+
+        setBalance((prev) => ({
+          ...prev,
+          point: balanceAfterValue,
+        }));
+
+        console.log(`포인트 잔액 업데이트: ${balanceAfterValue}P`);
+      } else if (activeTab === 'POINT' && newHistory.length === 0) {
+        // 해당 월에 거래 내역이 없으면 이전 상태 유지
+        console.log('해당 월에 포인트 거래 내역이 없어 잔액을 유지합니다.');
+      }
+
+      // 머니 탭에서 전체 조회 시 잔액 업데이트 (최신 값과 다르면)
+      if (activeTab === 'MONEY' && newHistory.length > 0) {
+        const latestTransaction = newHistory[0];
+        const balanceAfterValue =
+          typeof latestTransaction.balanceAfter === 'number'
+            ? latestTransaction.balanceAfter
+            : parseFloat(latestTransaction.balanceAfter.replace(/,/g, ''));
+
+        // 현재 잔액과 다르면 업데이트
+        if (balance.money !== balanceAfterValue) {
+          setBalance((prev) => ({
+            ...prev,
+            money: balanceAfterValue,
+          }));
+
+          console.log(
+            `머니 잔액 업데이트: ${balance.money}S → ${balanceAfterValue}S`
+          );
+        }
+      }
 
       console.log(`${activeTab} 내역 저장 완료 (총 ${newHistory.length}개)`);
       console.log('상태 업데이트 완료');
@@ -119,16 +184,31 @@ function PointPageContent() {
     }
   }, [activeTab]);
 
-  // 더보기 함수
+  // 포인트 탭에서 월별 조회 변경 시 데이터 다시 로드
+  useEffect(() => {
+    if (activeTab === 'POINT' && !isLoading) {
+      loadPointData();
+    }
+  }, [selectedYear, selectedMonth]);
+
+  // 무한 스크롤 더보기 함수
   const handleLoadMore = async () => {
-    const newSize = currentSize + 20;
-    setCurrentSize(newSize);
+    if (isLoadingMore || !hasNext) return;
 
     try {
+      setIsLoadingMore(true);
       setError(null);
 
-      // 더보기 API 호출
-      const historyResponse = await getHistory(activeTab, newSize);
+      // 포인트와 머니 모두 20개씩 추가
+      const increment = 20;
+      const newSize = currentSize + increment;
+      setCurrentSize(newSize);
+
+      // 더보기 API 호출 (포인트는 월별 조회, 머니는 전체 조회)
+      const historyResponse =
+        activeTab === 'POINT'
+          ? await getHistory(activeTab, newSize, selectedYear, selectedMonth)
+          : await getHistory(activeTab, newSize);
       console.log(
         `${activeTab} 더보기 API 응답 (size: ${newSize}):`,
         historyResponse
@@ -137,14 +217,59 @@ function PointPageContent() {
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
 
-      // 더보기 버튼 표시 여부 결정
-      setHasMore(newHistory.length >= newSize);
+      // hasNext 값에 따라 더보기 여부 결정
+      setHasNext(historyResponse.hasNext);
+
+      // 포인트 탭에서 더보기 시에도 잔액 업데이트
+      if (activeTab === 'POINT' && newHistory.length > 0) {
+        // 해당 월의 가장 최신 거래 내역의 balanceAfter로 잔액 업데이트
+        const latestTransaction = newHistory[0];
+        const balanceAfterValue =
+          typeof latestTransaction.balanceAfter === 'number'
+            ? latestTransaction.balanceAfter
+            : parseFloat(latestTransaction.balanceAfter.replace(/,/g, ''));
+
+        setBalance((prev) => ({
+          ...prev,
+          point: balanceAfterValue,
+        }));
+
+        console.log(`포인트 잔액 업데이트 (더보기): ${balanceAfterValue}P`);
+      } else if (activeTab === 'POINT' && newHistory.length === 0) {
+        // 해당 월에 거래 내역이 없으면 이전 상태 유지
+        console.log(
+          '해당 월에 포인트 거래 내역이 없어 잔액을 유지합니다. (더보기)'
+        );
+      }
+
+      // 머니 탭에서 더보기 시에도 잔액 업데이트 (최신 값과 다르면)
+      if (activeTab === 'MONEY' && newHistory.length > 0) {
+        const latestTransaction = newHistory[0];
+        const balanceAfterValue =
+          typeof latestTransaction.balanceAfter === 'number'
+            ? latestTransaction.balanceAfter
+            : parseFloat(latestTransaction.balanceAfter.replace(/,/g, ''));
+
+        // 현재 잔액과 다르면 업데이트
+        if (balance.money !== balanceAfterValue) {
+          setBalance((prev) => ({
+            ...prev,
+            money: balanceAfterValue,
+          }));
+
+          console.log(
+            `머니 잔액 업데이트 (더보기): ${balance.money}S → ${balanceAfterValue}S`
+          );
+        }
+      }
 
       console.log(`${activeTab} 더보기 완료 (총 ${newHistory.length}개)`);
     } catch (err) {
       const errorMessage = handleApiError(err);
       setError(errorMessage);
       console.error('더보기 로드 실패:', err);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -205,7 +330,7 @@ function PointPageContent() {
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-blue-600">🥔</span>
+            <img src="/snac-price.svg" alt="스낵 포인트" className="w-5 h-5" />
             <span className="text-sm font-medium text-blue-700">
               스낵 포인트
             </span>
@@ -216,7 +341,7 @@ function PointPageContent() {
         </div>
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-green-600">💰</span>
+            <img src="/snac-price.svg" alt="스낵 머니" className="w-5 h-5" />
             <span className="text-sm font-medium text-green-700">
               스낵 머니
             </span>
@@ -236,7 +361,7 @@ function PointPageContent() {
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-blue-600 text-sm">🥔</span>
+            <img src="/snac-price.svg" alt="스낵 포인트" className="w-4 h-4" />
             <span className="text-xs font-medium text-blue-700">
               스낵 포인트
             </span>
@@ -247,7 +372,7 @@ function PointPageContent() {
         </div>
         <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-green-600 text-sm">💰</span>
+            <img src="/snac-price.svg" alt="스낵 머니" className="w-4 h-4" />
             <span className="text-xs font-medium text-green-700">
               스낵 머니
             </span>
@@ -332,10 +457,14 @@ function PointPageContent() {
                   setActiveTab={handleTabChange}
                   pointsHistory={activeTab === 'POINT' ? currentHistory : []}
                   moneyHistory={activeTab === 'MONEY' ? currentHistory : []}
-                  hasMore={hasMore}
+                  hasNext={hasNext}
                   onLoadMore={handleLoadMore}
-                  isLoading={isLoading}
+                  isLoadingMore={isLoadingMore}
                   balance={balance}
+                  selectedYear={selectedYear}
+                  selectedMonth={selectedMonth}
+                  onYearChange={setSelectedYear}
+                  onMonthChange={setSelectedMonth}
                 />
               )}
             </section>
@@ -381,6 +510,11 @@ function LoadingFallback() {
   );
 }
 
+/**
+ * @author 이승우
+ * @description 포인트/머니 내역 페이지 컴포넌트
+ * @returns 포인트와 머니 거래 내역을 탭으로 구분하여 표시하는 페이지
+ */
 export default function PointPage() {
   return (
     <Suspense fallback={<LoadingFallback />}>
