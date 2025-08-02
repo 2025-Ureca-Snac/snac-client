@@ -168,8 +168,41 @@ export default function FilterSection({
   }, [sellerInfo]);
 
   return (
-    <section className="bg-gradient-to-b from-green-900 to-black text-white py-16 px-6">
-      <div className="max-w-[524px] mx-auto">
+    <section className="relative bg-black text-white py-16 px-6 overflow-hidden">
+      {/* 동적 배경 요소들 */}
+      <div className="absolute inset-0 z-0">
+        {/* 메인 그라데이션 배경 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 via-black to-black"></div>
+
+        {/* 움직이는 글로우 원들 */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse animate-float"></div>
+        <div
+          className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse delay-1000 animate-float"
+          style={{ animationDelay: '2s' }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-500 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-pulse delay-2000 animate-float"
+          style={{ animationDelay: '4s' }}
+        ></div>
+
+        {/* 그리드 패턴 */}
+        <div
+          className="absolute inset-0 opacity-15"
+          style={{
+            backgroundImage: `linear-gradient(rgba(34, 197, 94, 0.5) 1px, transparent 1px),
+                           linear-gradient(90deg, rgba(34, 197, 94, 0.5) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
+          }}
+        ></div>
+
+        {/* 상단 글로우 라인 */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60"></div>
+
+        {/* 하단 글로우 라인 */}
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-40"></div>
+      </div>
+
+      <div className="relative z-20 max-w-[524px] mx-auto">
         {/* 실시간 매칭 상태 표시 */}
         <div className="flex items-center justify-center mb-4">
           <div className="flex items-center space-x-2">
@@ -224,6 +257,47 @@ export default function FilterSection({
           )}
         </div>
       </div>
+
+      {/* 동적 애니메이션 스타일 */}
+      <style jsx>{`
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px) translateX(0px);
+          }
+          25% {
+            transform: translateY(-150px) translateX(150px);
+          }
+          50% {
+            transform: translateY(-150px) translateX(-150px);
+          }
+          75% {
+            transform: translateY(25px) translateX(30px);
+          }
+        }
+
+        @keyframes scan {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-scan {
+          animation: scan 3s linear infinite;
+        }
+      `}</style>
     </section>
   );
 }
