@@ -1,8 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ModalPortal from './modal-portal';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import type { ChangePasswordModalProps } from '../types/change-password-modal';
-import { checkPasswordMatch } from '../utils/password-validation';
+import {
+  checkPasswordMatch,
+  validatePassword,
+} from '../utils/password-validation';
 import { api } from '../utils/api';
 import { useAuthStore } from '../stores/auth-store';
 import { toast } from 'sonner';
@@ -19,6 +23,7 @@ export default function ChangePasswordModal({
   onClose,
   onSubmit,
 }: ChangePasswordModalProps) {
+  const router = useRouter();
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -33,9 +38,15 @@ export default function ChangePasswordModal({
     'none' | 'match' | 'mismatch'
   >('none');
 
+  // 새 비밀번호 유효성 검사 상태
+  const [passwordValidation, setPasswordValidation] = useState<{
+    isValid: boolean;
+    errors: string[];
+    strength: 'weak' | 'medium' | 'strong';
+  }>({ isValid: false, errors: [], strength: 'weak' });
+
   // API 호출 상태
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // 키보드 접근성을 위한 ref들
   const currentPasswordRef = useRef<HTMLInputElement>(null);
@@ -63,20 +74,36 @@ export default function ChangePasswordModal({
     }
   }, [next, confirm]);
 
+  // 새 비밀번호 유효성 검사
+  useEffect(() => {
+    if (next.trim()) {
+      const validation = validatePassword(next);
+      setPasswordValidation(validation);
+    } else {
+      setPasswordValidation({ isValid: false, errors: [], strength: 'weak' });
+    }
+  }, [next]);
+
   // 비밀번호 변경 API 호출
   const handlePasswordChange = useCallback(async () => {
     if (!current.trim() || !next.trim() || !confirm.trim()) {
-      setError('모든 필드를 입력해주세요.');
+      toast.error('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    // 새 비밀번호 유효성 검사
+    const validation = validatePassword(next);
+    if (!validation.isValid) {
+      toast.error(validation.errors[0]);
       return;
     }
 
     if (passwordMatch !== 'match') {
-      setError('비밀번호가 일치하지 않습니다.');
+      toast.error('비밀번호가 일치하지 않습니다.');
       return;
     }
 
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await api.post('/member/change-pwd', {
@@ -85,7 +112,9 @@ export default function ChangePasswordModal({
       });
 
       if (response.status === 200) {
-        toast.success('비밀번호가 성공적으로 변경되었습니다.');
+        toast.success(
+          '비밀번호가 성공적으로 변경되었습니다. 다시 로그인해주세요.'
+        );
 
         // 성공 시 콜백 호출
         if (onSubmit) {
@@ -98,8 +127,11 @@ export default function ChangePasswordModal({
 
         // 모달 닫기
         onClose();
+
+        // 로그인 페이지로 리다이렉트
+        router.push('/login');
       } else {
-        setError('비밀번호 변경에 실패했습니다.');
+        toast.error('비밀번호 변경에 실패했습니다.');
       }
     } catch (error: unknown) {
       console.error('비밀번호 변경 오류:', error);
@@ -110,16 +142,16 @@ export default function ChangePasswordModal({
           response?: { data?: { message?: string }; status?: number };
         };
         if (apiError.response?.data?.message) {
-          setError(apiError.response.data.message);
+          toast.error(apiError.response.data.message);
         } else if (apiError.response?.status === 400) {
-          setError('현재 비밀번호가 올바르지 않습니다.');
+          toast.error('현재 비밀번호가 올바르지 않습니다.');
         } else if (apiError.response?.status === 401) {
-          setError('인증이 필요합니다. 다시 로그인해주세요.');
+          toast.error('인증이 필요합니다. 다시 로그인해주세요.');
         } else {
-          setError('비밀번호 변경 중 오류가 발생했습니다.');
+          toast.error('비밀번호 변경 중 오류가 발생했습니다.');
         }
       } else {
-        setError('비밀번호 변경 중 오류가 발생했습니다.');
+        toast.error('비밀번호 변경 중 오류가 발생했습니다.');
       }
     } finally {
       setIsLoading(false);
@@ -131,7 +163,6 @@ export default function ChangePasswordModal({
     setCurrent('');
     setNext('');
     setConfirm('');
-    setError(null);
     setIsLoading(false);
   };
 
@@ -318,7 +349,13 @@ export default function ChangePasswordModal({
                   ref={newPasswordRef}
                   id="new-password"
                   type={showNewPassword ? 'text' : 'password'}
-                  className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
+                  className={`w-full px-3 py-3 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] ${
+                    next.trim() && !passwordValidation.isValid
+                      ? 'border-red-300 focus:ring-red-200'
+                      : next.trim() && passwordValidation.isValid
+                        ? 'border-green-300 focus:ring-green-200'
+                        : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                   value={next}
                   onChange={(e) => setNext(e.target.value)}
                   onKeyDown={handleNewPasswordKeyDown}
@@ -343,6 +380,129 @@ export default function ChangePasswordModal({
                     height={20}
                   />
                 </button>
+              </div>
+              {/* 비밀번호 요구사항 체크리스트 */}
+              <div className="text-sm mt-2 space-y-1">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                      next.length >= 6 && next.length <= 12
+                        ? 'bg-green-500'
+                        : 'bg-red-300'
+                    }`}
+                  >
+                    {next.length >= 6 && next.length <= 12 && (
+                      <svg
+                        className="w-2 h-2 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    className={
+                      next.length >= 6 && next.length <= 12
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }
+                  >
+                    6~12자 길이
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                      /[a-zA-Z]/.test(next) ? 'bg-green-500' : 'bg-red-300'
+                    }`}
+                  >
+                    {/[a-zA-Z]/.test(next) && (
+                      <svg
+                        className="w-2 h-2 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    className={
+                      /[a-zA-Z]/.test(next) ? 'text-green-600' : 'text-red-500'
+                    }
+                  >
+                    영어 포함 (대소문자 구분 없음)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                      /\d/.test(next) ? 'bg-green-500' : 'bg-red-300'
+                    }`}
+                  >
+                    {/\d/.test(next) && (
+                      <svg
+                        className="w-2 h-2 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    className={
+                      /\d/.test(next) ? 'text-green-600' : 'text-red-500'
+                    }
+                  >
+                    숫자 포함
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                      /[!?@#$%^&*()~`+\-_]/.test(next)
+                        ? 'bg-green-500'
+                        : 'bg-red-300'
+                    }`}
+                  >
+                    {/[!?@#$%^&*()~`+\-_]/.test(next) && (
+                      <svg
+                        className="w-2 h-2 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    className={
+                      /[!?@#$%^&*()~`+\-_]/.test(next)
+                        ? 'text-green-600'
+                        : 'text-red-500'
+                    }
+                  >
+                    특수기호 포함 (! ? @ # $ % ^ & * ( ) ~ ` + - _)
+                  </span>
+                </div>
               </div>
             </div>
             <div>
@@ -401,18 +561,15 @@ export default function ChangePasswordModal({
               </p>
             </div>
           </div>
-          {/* 에러 메시지 표시 */}
-          {error && (
-            <div className="w-full mb-4">
-              <p className="text-sm text-red-500 text-center">{error}</p>
-            </div>
-          )}
           <div className="w-full flex gap-2 mb-2">
             <button
               ref={submitButtonRef}
               type="submit"
               disabled={
-                passwordMatch !== 'match' || !current.trim() || isLoading
+                passwordMatch !== 'match' ||
+                !current.trim() ||
+                !passwordValidation.isValid ||
+                isLoading
               }
               className="w-2/3 py-3 rounded-lg bg-green-200 text-black font-medium hover:bg-green-300 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               tabIndex={0}
