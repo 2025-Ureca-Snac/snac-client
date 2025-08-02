@@ -27,6 +27,11 @@ export interface MatchPartner {
   tradeId: number;
   buyer: string;
   seller: string;
+  sellerId: number;
+  sellerNickName: string;
+  buyerId: number;
+  buyerNickName: string;
+  buyerRatingScore: number;
   cardId: number;
   carrier: string;
   dataAmount: number;

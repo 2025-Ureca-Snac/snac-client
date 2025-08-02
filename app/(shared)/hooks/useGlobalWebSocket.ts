@@ -71,7 +71,12 @@ interface ServerTradeData {
   cardId: number;
   status: string;
   seller: string;
+  sellerId: number;
+  sellerNickName: string;
   buyer: string;
+  buyerId: number;
+  buyerNickName: string;
+  buyerRatingScore: number;
   carrier: string;
   dataAmount: number;
   priceGb?: number;
@@ -183,7 +188,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   };
 
   // WebSocket 연결
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     // 이미 전역 연결이 있으면 재사용
     if (globalStompClient?.connected) {
       console.log('✅ 기존 전역 WebSocket 연결 재사용');
@@ -232,7 +237,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     });
 
     globalStompClient.activate();
-  };
+  }, [props?.skipAuthCheck, setConnectionStatus, router]);
 
   // 구독 설정
   const setupSubscriptions = () => {
@@ -325,19 +330,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       console.log('🔔 거래 알림 수신:', frame.body);
       try {
         const tradeData: ServerTradeData = JSON.parse(frame.body);
-        console.log('📋 거래 상태 변경:', {
-          tradeId: tradeData.tradeId,
-          cardId: tradeData.cardId,
-          status: tradeData.status,
-          seller: tradeData.seller,
-          buyer: tradeData.buyer,
-          carrier: tradeData.carrier,
-          dataAmount: tradeData.dataAmount,
-          priceGb: tradeData.priceGb,
-          point: tradeData.point,
-          phone: tradeData.phone,
-          cancelReason: tradeData.cancelReason,
-        });
+        console.log('📋 거래 상태 변경:', tradeData);
 
         // cardId를 store에 저장
         if (tradeData.cardId) {
@@ -370,6 +363,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           tradeId: tradeData.tradeId,
           buyer: tradeData.buyer,
           seller: tradeData.seller,
+          sellerId: tradeData.sellerId,
+          sellerNickName: tradeData.sellerNickName,
+          buyerId: tradeData.buyerId,
+          buyerNickName: tradeData.buyerNickName,
+          buyerRatingScore: tradeData.buyerRatingScore,
           cardId: tradeData.cardId,
           carrier: tradeData.carrier || 'unknown',
           dataAmount: tradeData.dataAmount || 0,
@@ -460,6 +458,11 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
               buyer: tradeData.buyer,
               seller: tradeData.seller,
               cardId: tradeData.cardId,
+              buyerId: tradeData.buyerId,
+              buyerNickName: tradeData.buyerNickName,
+              buyerRatingScore: tradeData.buyerRatingScore,
+              sellerId: tradeData.sellerId,
+              sellerNickName: tradeData.sellerNickName,
               carrier: tradeData.carrier || 'unknown',
               dataAmount: tradeData.dataAmount || 0,
               phone: tradeData.phone || '010-0000-0000',
@@ -680,6 +683,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       });
     } else {
       console.log('❌ 거래 거부:', tradeId);
+      globalStompClient.publish({
+        destination: '/app/trade/buy-request/cancel/seller',
+        body: JSON.stringify({ tradeId }),
+      });
     }
   }, []);
 
@@ -726,6 +733,28 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     globalStompClient.publish({
       destination: '/app/trade/confirm',
       body: JSON.stringify({ tradeId }),
+    });
+
+    return true;
+  }, []);
+
+  // 거래 취소 메시지 전송
+  const sendTradeCancel = useCallback((userType: 'buyer' | 'seller') => {
+    if (!globalStompClient?.connected) {
+      console.error('❌ WebSocket이 연결되지 않았습니다.');
+      return false;
+    }
+
+    const destination =
+      userType === 'buyer'
+        ? '/app/trade/payment/cancel/buyer'
+        : '/app/trade/payment/cancel/seller';
+
+    console.log('❌ 거래 취소 메시지 전송:', { userType, destination });
+
+    globalStompClient.publish({
+      destination,
+      body: JSON.stringify({}),
     });
 
     return true;
@@ -786,6 +815,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     createTrade,
     sendPayment,
     sendTradeConfirm,
+    sendTradeCancel,
     updateUserRole,
     activatePage,
     deactivatePage,
