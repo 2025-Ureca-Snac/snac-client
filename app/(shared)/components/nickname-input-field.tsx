@@ -8,6 +8,7 @@ import React, {
   forwardRef,
 } from 'react';
 import { api } from '../utils/api';
+import { validateNickname } from '../utils/nickname-validation';
 
 interface NicknameInputFieldProps {
   label: string;
@@ -37,7 +38,7 @@ const NicknameInputField = forwardRef<
       name,
       value,
       onChange,
-      placeholder = '닉네임을 입력하세요',
+      placeholder = '닉네임을 입력하세요 (영어/한글로 시작, 2-10자)',
       required = false,
       disabled = false,
       className = '',
@@ -50,6 +51,23 @@ const NicknameInputField = forwardRef<
       isDuplicate: boolean;
       message: string;
     } | null>(null);
+    const [nicknameValidation, setNicknameValidation] = useState<{
+      isValid: boolean;
+      errors: string[];
+      criteria: {
+        hasLength: boolean;
+        startsWithLetter: boolean;
+        hasValidChars: boolean;
+      };
+    }>({
+      isValid: false,
+      errors: [],
+      criteria: {
+        hasLength: false,
+        startsWithLetter: false,
+        hasValidChars: false,
+      },
+    });
     const duplicateCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // 닉네임 중복 체크 함수
@@ -115,10 +133,34 @@ const NicknameInputField = forwardRef<
       []
     );
 
+    // 닉네임 유효성 검사
+    useEffect(() => {
+      if (value.trim()) {
+        const validation = validateNickname(value.trim());
+        setNicknameValidation(validation);
+      } else {
+        setNicknameValidation({
+          isValid: false,
+          errors: [],
+          criteria: {
+            hasLength: false,
+            startsWithLetter: false,
+            hasValidChars: false,
+          },
+        });
+      }
+    }, [value]);
+
     // 디바운싱된 중복 체크
     useEffect(() => {
       if (duplicateCheckTimeoutRef.current) {
         clearTimeout(duplicateCheckTimeoutRef.current);
+      }
+
+      // 유효성 검사를 통과하지 못하면 중복 체크하지 않음
+      if (!nicknameValidation.isValid) {
+        setDuplicateCheckResult(null);
+        return;
       }
 
       if (value.trim()) {
@@ -134,7 +176,7 @@ const NicknameInputField = forwardRef<
           clearTimeout(duplicateCheckTimeoutRef.current);
         }
       };
-    }, [value, checkNicknameDuplicate]);
+    }, [value, nicknameValidation.isValid, checkNicknameDuplicate]);
 
     return (
       <div>
@@ -156,12 +198,16 @@ const NicknameInputField = forwardRef<
             required={required}
             disabled={disabled}
             maxLength={maxLength}
-            className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] pr-10 ${className} ${
-              duplicateCheckResult?.isDuplicate === true
+            className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] pr-10 ${className} ${
+              value.trim() && !nicknameValidation.isValid
                 ? 'border-red-300 focus:ring-red-200'
-                : duplicateCheckResult?.isDuplicate === false
+                : value.trim() &&
+                    nicknameValidation.isValid &&
+                    duplicateCheckResult?.isDuplicate === false
                   ? 'border-green-300 focus:ring-green-200'
-                  : 'border-gray-300'
+                  : duplicateCheckResult?.isDuplicate === true
+                    ? 'border-red-300 focus:ring-red-200'
+                    : 'border-gray-300 focus:ring-blue-500 focus:border-transparent'
             }`}
           />
           {/* 중복 체크 로딩 아이콘 */}
@@ -171,9 +217,11 @@ const NicknameInputField = forwardRef<
             </div>
           )}
           {/* 중복 체크 결과 아이콘 */}
-          {!isCheckingDuplicate && duplicateCheckResult && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              {duplicateCheckResult.isDuplicate ? (
+          {!isCheckingDuplicate && value.trim() && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+              {!nicknameValidation.isValid ||
+              duplicateCheckResult?.isDuplicate === true ? (
+                // 유효성 검사 실패 또는 중복인 경우 X 표시
                 <svg
                   className="w-4 h-4 text-red-500"
                   fill="currentColor"
@@ -185,7 +233,8 @@ const NicknameInputField = forwardRef<
                     clipRule="evenodd"
                   />
                 </svg>
-              ) : (
+              ) : duplicateCheckResult?.isDuplicate === false ? (
+                // 사용 가능한 경우 체크 표시
                 <svg
                   className="w-4 h-4 text-green-500"
                   fill="currentColor"
@@ -197,23 +246,136 @@ const NicknameInputField = forwardRef<
                     clipRule="evenodd"
                   />
                 </svg>
+              ) : (
+                // 아이콘이 없을 때도 공간 유지
+                <div className="w-4 h-4"></div>
               )}
             </div>
           )}
         </div>
-        <div className="min-h-[20px] mt-2">
-          {/* 중복 체크 결과 메시지 */}
-          {duplicateCheckResult && (
-            <div
-              className={`text-xs ${
-                duplicateCheckResult.isDuplicate
-                  ? 'text-red-500'
-                  : 'text-green-500'
-              }`}
-            >
-              {duplicateCheckResult.message}
+        {/* 닉네임 유효성 검사 체크리스트 */}
+        <div className="text-sm mt-2 space-y-1 h-[80px]">
+          {value.trim() ? (
+            <>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                    nicknameValidation.criteria.hasLength
+                      ? 'bg-green-500'
+                      : 'bg-red-300'
+                  }`}
+                >
+                  {nicknameValidation.criteria.hasLength && (
+                    <svg
+                      className="w-2 h-2 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <span
+                  className={
+                    nicknameValidation.criteria.hasLength
+                      ? 'text-green-600'
+                      : 'text-red-500'
+                  }
+                >
+                  2~10자 길이
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                    nicknameValidation.criteria.startsWithLetter
+                      ? 'bg-green-500'
+                      : 'bg-red-300'
+                  }`}
+                >
+                  {nicknameValidation.criteria.startsWithLetter && (
+                    <svg
+                      className="w-2 h-2 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <span
+                  className={
+                    nicknameValidation.criteria.startsWithLetter
+                      ? 'text-green-600'
+                      : 'text-red-500'
+                  }
+                >
+                  영어 또는 한글로 시작
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                    nicknameValidation.criteria.hasValidChars
+                      ? 'bg-green-500'
+                      : 'bg-red-300'
+                  }`}
+                >
+                  {nicknameValidation.criteria.hasValidChars && (
+                    <svg
+                      className="w-2 h-2 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <span
+                  className={
+                    nicknameValidation.criteria.hasValidChars
+                      ? 'text-green-600'
+                      : 'text-red-500'
+                  }
+                >
+                  허용된 문자만 사용 (! ? @ # $ % ^ & * ( ) ~ ` + - _)
+                </span>
+              </div>
+            </>
+          ) : null}
+        </div>
+        {/* 중복 체크 결과 메시지 */}
+        <div className="h-[20px] mt-3">
+          {value.trim() && !nicknameValidation.isValid && (
+            <div className="text-xs text-red-500">
+              닉네임 규칙을 확인해주세요.
             </div>
           )}
+          {value.trim() &&
+            nicknameValidation.isValid &&
+            duplicateCheckResult && (
+              <div
+                className={`text-xs ${
+                  duplicateCheckResult.isDuplicate
+                    ? 'text-red-500'
+                    : 'text-green-500'
+                }`}
+              >
+                {duplicateCheckResult.message}
+              </div>
+            )}
         </div>
       </div>
     );

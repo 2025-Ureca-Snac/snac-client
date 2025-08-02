@@ -6,6 +6,7 @@ import {
   getRemainingTimeForNicknameChange,
   formatRemainingTime,
 } from '../utils';
+import { validateNickname } from '../utils/nickname-validation';
 import { useUserStore } from '../stores/user-store';
 import { toast } from 'sonner';
 
@@ -25,7 +26,6 @@ export default function ChangeNicknameModal({
 }: ChangeNicknameModalProps) {
   const [nickname, setNickname] = useState(currentNickname);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [remainingTime, setRemainingTime] = useState(0);
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
@@ -33,17 +33,37 @@ export default function ChangeNicknameModal({
     isDuplicate: boolean;
     message: string;
   } | null>(null);
+
+  // 닉네임 유효성 검사 상태
+  const [nicknameValidation, setNicknameValidation] = useState<{
+    isValid: boolean;
+    errors: string[];
+    criteria: {
+      hasLength: boolean;
+      startsWithLetter: boolean;
+      hasValidChars: boolean;
+    };
+  }>({
+    isValid: false,
+    errors: [],
+    criteria: {
+      hasLength: false,
+      startsWithLetter: false,
+      hasValidChars: false,
+    },
+  });
   const nicknameRef = useRef<HTMLInputElement>(null);
   const duplicateCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { profile, updateNickname } = useUserStore();
+  const { profile, updateNickname, updateNextNicknameChangeAllowedAt } =
+    useUserStore();
 
   // 실시간 타이머 업데이트
   useEffect(() => {
-    if (!open || !profile?.nicknameUpdatedAt) return;
+    if (!open || !profile?.nextNicknameChangeAllowedAt) return;
 
     const updateTimer = () => {
       const remaining = getRemainingTimeForNicknameChange(
-        profile.nicknameUpdatedAt
+        profile.nextNicknameChangeAllowedAt
       );
       setRemainingTime(remaining);
     };
@@ -55,7 +75,7 @@ export default function ChangeNicknameModal({
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [open, profile?.nicknameUpdatedAt]);
+  }, [open, profile?.nextNicknameChangeAllowedAt]);
 
   // 모달이 열릴 때 자동 포커스
   useEffect(() => {
@@ -67,6 +87,24 @@ export default function ChangeNicknameModal({
       }, 100);
     }
   }, [open, currentNickname]);
+
+  // 닉네임 유효성 검사
+  useEffect(() => {
+    if (nickname.trim()) {
+      const validation = validateNickname(nickname.trim());
+      setNicknameValidation(validation);
+    } else {
+      setNicknameValidation({
+        isValid: false,
+        errors: [],
+        criteria: {
+          hasLength: false,
+          startsWithLetter: false,
+          hasValidChars: false,
+        },
+      });
+    }
+  }, [nickname]);
 
   // 닉네임 변경 가능 여부 확인
   const canChangeNickname = remainingTime <= 0;
@@ -151,6 +189,12 @@ export default function ChangeNicknameModal({
       return;
     }
 
+    // 유효성 검사를 통과하지 못하면 중복 체크하지 않음
+    if (!nicknameValidation.isValid) {
+      setDuplicateCheckResult(null);
+      return;
+    }
+
     if (nickname.trim() && nickname.trim() !== currentNickname) {
       duplicateCheckTimeoutRef.current = setTimeout(() => {
         checkNicknameDuplicate(nickname);
@@ -164,44 +208,66 @@ export default function ChangeNicknameModal({
         clearTimeout(duplicateCheckTimeoutRef.current);
       }
     };
-  }, [nickname, currentNickname, canChangeNickname, checkNicknameDuplicate]);
+  }, [
+    nickname,
+    currentNickname,
+    canChangeNickname,
+    nicknameValidation.isValid,
+    checkNicknameDuplicate,
+  ]);
 
   // 닉네임 변경 처리
   const handleNicknameChange = useCallback(async () => {
     if (!nickname.trim()) {
-      setError('닉네임을 입력해주세요.');
+      toast.error('닉네임을 입력해주세요.');
+      return;
+    }
+
+    // 닉네임 유효성 검사
+    const validation = validateNickname(nickname.trim());
+    if (!validation.isValid) {
+      toast.error(validation.errors[0]);
       return;
     }
 
     if (nickname.trim() === currentNickname) {
-      setError('현재 닉네임과 동일합니다.');
+      toast.error('현재 닉네임과 동일합니다.');
       return;
     }
 
     // 중복 체크 결과가 있고 중복인 경우
     if (duplicateCheckResult?.isDuplicate) {
-      setError('이미 사용 중인 닉네임입니다.');
+      toast.error('이미 사용 중인 닉네임입니다.');
       return;
     }
 
     setIsLoading(true);
-    setError(null);
 
     try {
-      const response = await api.post('/member/change-nickname', {
-        nickname: nickname.trim(),
-      });
+      const response = await api.post<{ data: string }>(
+        '/member/change-nickname',
+        {
+          nickname: nickname.trim(),
+        }
+      );
 
       if (response.status === 200) {
         toast.success(`닉네임이 "${nickname.trim()}"로 변경되었습니다.`);
+
         // 스토어 업데이트
         updateNickname(nickname.trim());
+
+        // 새로운 닉네임 변경 가능 시간 업데이트
+        if (response.data.data) {
+          updateNextNicknameChangeAllowedAt(new Date(response.data.data));
+        }
+
         // 성공 시 콜백 호출
         if (onSubmit) {
           onSubmit(nickname.trim());
         }
       } else {
-        setError('닉네임 변경에 실패했습니다.');
+        toast.error('닉네임 변경에 실패했습니다.');
       }
     } catch (error: unknown) {
       console.error('닉네임 변경 오류:', error);
@@ -212,14 +278,14 @@ export default function ChangeNicknameModal({
           response?: { data?: { message?: string }; status?: number };
         };
         if (apiError.response?.data?.message) {
-          setError(apiError.response.data.message);
+          toast.error(apiError.response.data.message);
         } else if (apiError.response?.status === 409) {
-          setError('이미 사용 중인 닉네임입니다.');
+          toast.error('이미 사용 중인 닉네임입니다.');
         } else {
-          setError('닉네임 변경 중 오류가 발생했습니다.');
+          toast.error('닉네임 변경 중 오류가 발생했습니다.');
         }
       } else {
-        setError('닉네임 변경 중 오류가 발생했습니다.');
+        toast.error('닉네임 변경 중 오류가 발생했습니다.');
       }
     } finally {
       setIsLoading(false);
@@ -230,12 +296,12 @@ export default function ChangeNicknameModal({
     duplicateCheckResult,
     onSubmit,
     updateNickname,
+    updateNextNicknameChangeAllowedAt,
   ]);
 
   // 초기화
   const handleReset = () => {
     setNickname('');
-    setError(null);
     setIsLoading(false);
     setDuplicateCheckResult(null);
   };
@@ -275,6 +341,7 @@ export default function ChangeNicknameModal({
   const isButtonDisabled =
     !nickname.trim() ||
     nickname.trim() === currentNickname ||
+    !nicknameValidation.isValid ||
     isLoading ||
     !canChangeNickname ||
     isCheckingDuplicate ||
@@ -330,13 +397,6 @@ export default function ChangeNicknameModal({
             현재 닉네임을 수정해주세요.
           </div>
 
-          {/* 에러 메시지 */}
-          {error && (
-            <div className="w-full mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800 text-center">{error}</p>
-            </div>
-          )}
-
           <div className="w-full flex flex-col gap-3 mb-4">
             <div>
               <label
@@ -351,16 +411,20 @@ export default function ChangeNicknameModal({
                   type="text"
                   id="nickname"
                   name="nickname"
-                  className={`w-full border rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100 disabled:text-gray-500 pr-10 ${
-                    duplicateCheckResult?.isDuplicate === true
+                  className={`w-full border rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:text-gray-500 pr-10 ${
+                    nickname.trim() && !nicknameValidation.isValid
                       ? 'border-red-300 focus:ring-red-200'
-                      : duplicateCheckResult?.isDuplicate === false
+                      : nickname.trim() &&
+                          nicknameValidation.isValid &&
+                          duplicateCheckResult?.isDuplicate === false
                         ? 'border-green-300 focus:ring-green-200'
-                        : 'border-gray-200'
+                        : duplicateCheckResult?.isDuplicate === true
+                          ? 'border-red-300 focus:ring-red-200'
+                          : 'border-gray-200 focus:ring-blue-200'
                   }`}
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
-                  placeholder="닉네임을 입력하세요"
+                  placeholder="닉네임을 입력하세요 (영어/한글로 시작, 2-10자)"
                   maxLength={10}
                   required
                   onKeyDown={handleNicknameKeyDown}
@@ -373,9 +437,11 @@ export default function ChangeNicknameModal({
                   </div>
                 )}
                 {/* 중복 체크 결과 아이콘 */}
-                {!isCheckingDuplicate && duplicateCheckResult && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    {duplicateCheckResult.isDuplicate ? (
+                {!isCheckingDuplicate && nickname.trim() && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+                    {!nicknameValidation.isValid ||
+                    duplicateCheckResult?.isDuplicate === true ? (
+                      // 유효성 검사 실패 또는 중복인 경우 X 표시
                       <svg
                         className="w-4 h-4 text-red-500"
                         fill="currentColor"
@@ -387,7 +453,8 @@ export default function ChangeNicknameModal({
                           clipRule="evenodd"
                         />
                       </svg>
-                    ) : (
+                    ) : duplicateCheckResult?.isDuplicate === false ? (
+                      // 사용 가능한 경우 체크 표시
                       <svg
                         className="w-4 h-4 text-green-500"
                         fill="currentColor"
@@ -399,6 +466,9 @@ export default function ChangeNicknameModal({
                           clipRule="evenodd"
                         />
                       </svg>
+                    ) : (
+                      // 아이콘이 없을 때도 공간 유지
+                      <div className="w-4 h-4"></div>
                     )}
                   </div>
                 )}
@@ -406,18 +476,130 @@ export default function ChangeNicknameModal({
               <div className="text-xs text-gray-500 mt-1">
                 최대 10자까지 입력 가능합니다.
               </div>
+              {/* 닉네임 유효성 검사 체크리스트 */}
+              <div className="text-sm mt-2 space-y-1 h-[80px]">
+                {nickname.trim() ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                          nicknameValidation.criteria.hasLength
+                            ? 'bg-green-500'
+                            : 'bg-red-300'
+                        }`}
+                      >
+                        {nicknameValidation.criteria.hasLength && (
+                          <svg
+                            className="w-2 h-2 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span
+                        className={
+                          nicknameValidation.criteria.hasLength
+                            ? 'text-green-600'
+                            : 'text-red-500'
+                        }
+                      >
+                        2~10자 길이
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                          nicknameValidation.criteria.startsWithLetter
+                            ? 'bg-green-500'
+                            : 'bg-red-300'
+                        }`}
+                      >
+                        {nicknameValidation.criteria.startsWithLetter && (
+                          <svg
+                            className="w-2 h-2 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span
+                        className={
+                          nicknameValidation.criteria.startsWithLetter
+                            ? 'text-green-600'
+                            : 'text-red-500'
+                        }
+                      >
+                        영어 또는 한글로 시작
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-3 h-3 rounded-full flex items-center justify-center ${
+                          nicknameValidation.criteria.hasValidChars
+                            ? 'bg-green-500'
+                            : 'bg-red-300'
+                        }`}
+                      >
+                        {nicknameValidation.criteria.hasValidChars && (
+                          <svg
+                            className="w-2 h-2 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span
+                        className={
+                          nicknameValidation.criteria.hasValidChars
+                            ? 'text-green-600'
+                            : 'text-red-500'
+                        }
+                      >
+                        허용된 문자만 사용 (! ? @ # $ % ^ & * ( ) ~ ` + - _)
+                      </span>
+                    </div>
+                  </>
+                ) : null}
+              </div>
               {/* 중복 체크 결과 메시지 */}
-              {duplicateCheckResult && (
-                <div
-                  className={`text-xs mt-1 ${
-                    duplicateCheckResult.isDuplicate
-                      ? 'text-red-500'
-                      : 'text-green-500'
-                  }`}
-                >
-                  {duplicateCheckResult.message}
-                </div>
-              )}
+              <div className="h-[20px] mt-3">
+                {nickname.trim() && !nicknameValidation.isValid && (
+                  <div className="text-xs text-red-500">
+                    닉네임 규칙을 확인해주세요.
+                  </div>
+                )}
+                {nickname.trim() &&
+                  nicknameValidation.isValid &&
+                  duplicateCheckResult && (
+                    <div
+                      className={`text-xs ${
+                        duplicateCheckResult.isDuplicate
+                          ? 'text-red-500'
+                          : 'text-green-500'
+                      }`}
+                    >
+                      {duplicateCheckResult.message}
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
 
