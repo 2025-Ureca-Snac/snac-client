@@ -10,56 +10,12 @@ import {
 import { ResolveModal } from '../components/resolve-modal';
 import { ConfirmModal } from '../components/confirm-modal';
 import DisputeDetailModal from '../components/dispute-detail-modal';
-
-// 라벨 매핑
-const REPORT_TYPE_LABELS: Record<string, string> = {
-  DATA_NONE: '데이터 없음',
-  DATA_PARTIAL: '데이터 일부',
-  REPORT_OTHER: '기타 신고',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  IN_PROGRESS: '처리중',
-  NEED_MORE: '자료요청',
-  ANSWERED: '답변완료',
-};
-
-const reportTypeFilterCategories: Array<{
-  value: DisputeType | 'ALL';
-  label: string;
-}> = [
-  { value: 'ALL', label: '전체 유형' },
-  { value: 'DATA_NONE', label: '데이터 없음' },
-  { value: 'DATA_PARTIAL', label: '데이터 일부' },
-  { value: 'REPORT_OTHER', label: '기타 신고' },
-];
-
-const statusFilterCategories: Array<{
-  value: DisputeStatus | 'ALL';
-  label: string;
-}> = [
-  { value: 'ALL', label: '전체 상태' },
-  { value: 'IN_PROGRESS', label: '처리중' },
-  { value: 'ANSWERED', label: '답변완료' },
-  { value: 'NEED_MORE', label: '자료요청' },
-];
-
-const StatusBadge = ({ status }: { status: DisputeStatus }) => (
-  <div className="flex items-center">
-    <span
-      className={`h-2 w-2 rounded-full mr-2 ${
-        {
-          IN_PROGRESS: 'bg-yellow-500',
-          NEED_MORE: 'bg-orange-500',
-          ANSWERED: 'bg-green-500',
-        }[status]
-      }`}
-    ></span>
-    <span className="text-regular-sm text-gray-700 dark:text-gray-300">
-      {STATUS_LABELS[status]}
-    </span>
-  </div>
-);
+import { StatusBadge } from '../components/StatusBadge';
+import {
+  REPORT_TYPE_LABELS,
+  reportTypeFilterCategories,
+  statusFilterCategories,
+} from '../lib/constants';
 
 export default function AdminReportPage() {
   const {

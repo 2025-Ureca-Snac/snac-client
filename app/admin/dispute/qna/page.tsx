@@ -9,57 +9,12 @@ import {
 } from '@/app/(shared)/stores/use-dispute-store';
 import { ResolveModal } from '../components/resolve-modal';
 import DisputeDetailModal from '../components/dispute-detail-modal';
-
-const QNA_TYPE_LABELS: Record<string, string> = {
-  PAYMENT: '결제 관련',
-  ACCOUNT: '계정 관련',
-  TECHNICAL_PROBLEM: '기술적 문제',
-  QNA_OTHER: '기타 문의',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  IN_PROGRESS: '처리중',
-  NEED_MORE: '자료요청',
-  ANSWERED: '답변완료',
-};
-
-const qnaTypeFilterCategories: Array<{
-  value: DisputeType | 'ALL';
-  label: string;
-}> = [
-  { value: 'ALL', label: '전체 유형' },
-  { value: 'PAYMENT', label: '결제 관련' },
-  { value: 'ACCOUNT', label: '계정 관련' },
-  { value: 'TECHNICAL_PROBLEM', label: '기술적 문제' },
-  { value: 'QNA_OTHER', label: '기타 문의' },
-];
-
-const statusFilterCategories: Array<{
-  value: DisputeStatus | 'ALL';
-  label: string;
-}> = [
-  { value: 'ALL', label: '전체 상태' },
-  { value: 'IN_PROGRESS', label: '처리중' },
-  { value: 'ANSWERED', label: '답변완료' },
-  { value: 'NEED_MORE', label: '자료요청' },
-];
-
-const StatusBadge = ({ status }: { status: DisputeStatus }) => (
-  <div className="flex items-center">
-    <span
-      className={`h-2 w-2 rounded-full mr-2 ${
-        {
-          IN_PROGRESS: 'bg-yellow-500',
-          NEED_MORE: 'bg-orange-500',
-          ANSWERED: 'bg-green-500',
-        }[status]
-      }`}
-    ></span>
-    <span className="text-regular-sm text-gray-700 dark:text-gray-300">
-      {STATUS_LABELS[status]}
-    </span>
-  </div>
-);
+import { StatusBadge } from '../components/StatusBadge';
+import {
+  QNA_TYPE_LABELS,
+  qnaTypeFilterCategories,
+  statusFilterCategories,
+} from '../lib/constants';
 
 export default function AdminQnaPage() {
   const {
