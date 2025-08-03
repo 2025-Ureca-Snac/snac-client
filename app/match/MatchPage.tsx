@@ -15,6 +15,8 @@ import { useMatchStore } from '../(shared)/stores/match-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import TradeCancelModal from '../(shared)/components/TradeCancelModal';
 import { toast } from 'sonner';
+import { Header } from '../(shared)/components/Header';
+import { Footer } from '../(shared)/components/Footer';
 
 interface ServerTradeData {
   tradeId: number;
