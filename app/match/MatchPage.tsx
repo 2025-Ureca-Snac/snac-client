@@ -97,6 +97,14 @@ export default function MatchPage() {
     }
   }, [pathname]);
 
+  // 매칭 상태가 'searching'으로 변경될 때 판매자 목록 초기화
+  useEffect(() => {
+    if (matchingStatus === 'searching') {
+      console.log('🔄 매칭 검색 시작 - 판매자 목록 초기화');
+      setActiveSellers([]);
+    }
+  }, [matchingStatus, setActiveSellers]);
+
   // 현재 토큰 상태를 즉시 확인하는 함수
   const checkCurrentToken = () => {
     if (typeof window === 'undefined') return null;

@@ -229,6 +229,14 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       onConnect: () => {
         console.log('✅ 전역 WebSocket 연결 성공');
         setConnectionStatus(true);
+
+        // 연결 시 판매자 목록 초기화
+        if (userRole === 'buyer') {
+          const { setActiveSellers } = useMatchStore.getState();
+          setActiveSellers([]);
+          console.log('🔄 판매자 목록 초기화 완료');
+        }
+
         setupSubscriptions();
       },
       onStompError: (frame) => {
@@ -290,16 +298,17 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         if (currentUserRole === 'buyer') {
           const { setActiveSellers } = useMatchStore.getState();
           setActiveSellers((prev: User[]) => {
+            // 더 정확한 중복 체크: 이름과 캐리어, 데이터, 가격이 모두 동일한 경우에만 중복으로 처리
             const existingIndex = prev.findIndex(
               (existing: User) =>
-                existing.tradeId === user.tradeId ||
-                (existing.name === user.name &&
-                  existing.carrier === user.carrier &&
-                  existing.data === user.data &&
-                  existing.price === user.price)
+                existing.name === user.name &&
+                existing.carrier === user.carrier &&
+                existing.data === user.data &&
+                existing.price === user.price
             );
 
             if (existingIndex !== -1) {
+              // 기존 항목이 있으면 업데이트
               const updated = [...prev];
               updated[existingIndex] = {
                 ...updated[existingIndex],
@@ -307,9 +316,18 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
                 rating: updated[existingIndex].rating,
                 transactionCount: updated[existingIndex].transactionCount,
               };
+              console.log('🔄 기존 판매자 업데이트:', user.name);
               return updated;
             } else {
+              // 새로운 판매자 추가
               const updated = [...prev, user];
+              console.log(
+                '➕ 새로운 판매자 추가:',
+                user.name,
+                '총 판매자 수:',
+                updated.length
+              );
+
               if (
                 prev.length === 0 &&
                 updated.length > 0 &&
