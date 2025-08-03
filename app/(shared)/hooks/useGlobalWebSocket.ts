@@ -559,7 +559,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
   // 통신사 이름을 서버 형식으로 변환
   const convertCarrierToServer = (carrier: string): string => {
     switch (carrier) {
-      case 'LGU+':
+      case 'LG U+':
         return 'LG';
       case 'SKT':
         return 'SKT';
