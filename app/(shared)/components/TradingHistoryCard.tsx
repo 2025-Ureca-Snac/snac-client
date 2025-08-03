@@ -32,6 +32,8 @@ interface TradingHistoryCardProps {
   onCardKeyDown: (e: React.KeyboardEvent, item: TradingHistoryItem) => void;
   getCarrierImageUrl: (carrier: string) => string;
   getStatusText: (status: string) => string;
+  partnerNickname: string;
+  partnerFavorite: boolean;
 }
 
 export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
@@ -42,6 +44,8 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
   onCardKeyDown,
   getCarrierImageUrl,
   getStatusText,
+  partnerNickname,
+  partnerFavorite,
 }) => {
   return (
     <div
@@ -75,7 +79,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
         <div className="font-semibold text-gray-900 mb-1">
           {item.carrier} {item.dataAmount}GB
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-2">
           <span
             className={`text-white text-xs px-2 py-1 rounded ${
               item.status === 'BUY_REQUESTED' ||
@@ -98,6 +102,23 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
             {item.priceGb.toLocaleString()}원
           </span>
         </div>
+
+        {/* 거래자 정보 */}
+        {partnerNickname && (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-gray-500">거래자:</span>
+              <span className="text-xs font-medium text-gray-700">
+                {partnerNickname}
+              </span>
+            </div>
+            {partnerFavorite && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">
+                단골
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

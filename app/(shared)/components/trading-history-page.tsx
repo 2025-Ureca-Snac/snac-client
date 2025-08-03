@@ -450,6 +450,8 @@ export default function TradingHistoryPage({
                               onCardKeyDown={handleCardKeyDown}
                               getCarrierImageUrl={getCarrierImageUrl}
                               getStatusText={getStatusText}
+                              partnerNickname={item.partnerNickname}
+                              partnerFavorite={item.partnerFavorite}
                             />
                           ))}
                         </div>
