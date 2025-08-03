@@ -470,7 +470,6 @@ export default function MatchPage() {
 
   return (
     <div className="min-h-screen   flex flex-col bg-black">
-      <Header />
       <main className="flex-1">
         <MatchContent
           appliedFilters={appliedFilters}
