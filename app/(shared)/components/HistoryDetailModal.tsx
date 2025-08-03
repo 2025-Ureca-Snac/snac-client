@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
 import api from '../utils/api';
@@ -34,8 +34,47 @@ export default function HistoryDetailModal({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [showCancelReason, setShowCancelReason] = useState(false);
   const [selectedCancelReason, setSelectedCancelReason] = useState<string>('');
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
+
+  // 단골 상태 초기화
+  useEffect(() => {
+    if (item?.partnerId) {
+      setIsFavorite(item.partnerFavorite);
+    }
+  }, [item?.partnerId, item?.partnerFavorite]);
 
   if (!open || !item) return null;
+
+  // 단골 등록
+  const handleAddFavorite = async () => {
+    if (!item?.partnerId) return;
+
+    try {
+      setIsLoadingFavorite(true);
+      await api.post('/favorites', { toMemberId: item.partnerId });
+      setIsFavorite(true);
+    } catch (error) {
+      console.error('단골 등록 실패:', error);
+    } finally {
+      setIsLoadingFavorite(false);
+    }
+  };
+
+  // 단골 삭제
+  const handleRemoveFavorite = async () => {
+    if (!item?.partnerId) return;
+
+    try {
+      setIsLoadingFavorite(true);
+      await api.delete(`/favorites/${item.partnerId}`);
+      setIsFavorite(false);
+    } catch (error) {
+      console.error('단골 삭제 실패:', error);
+    } finally {
+      setIsLoadingFavorite(false);
+    }
+  };
 
   // 파일 업로드 핸들러
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,6 +264,48 @@ export default function HistoryDetailModal({
             </div>
           </div>
 
+          {/* 파트너 정보 */}
+          {item.partnerId && item.partnerNickname && (
+            <div className="bg-blue-50 rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 text-sm">👤</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">
+                      거래자: {item.partnerNickname}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {isFavorite ? '단골 거래자' : '일반 거래자'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={
+                    isFavorite ? handleRemoveFavorite : handleAddFavorite
+                  }
+                  disabled={isLoadingFavorite}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    isFavorite
+                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                  } ${isLoadingFavorite ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isLoadingFavorite ? (
+                    <span className="flex items-center gap-1">
+                      <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin"></div>
+                      처리중
+                    </span>
+                  ) : isFavorite ? (
+                    '단골 해제'
+                  ) : (
+                    '단골 등록'
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
           {/* 거래 정보 */}
           <div className="bg-gray-50 rounded-lg p-3 space-y-2">
             <div className="text-sm text-gray-600">
