@@ -26,6 +26,61 @@ interface CardApiResponse {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+// 유틸리티 함수들
+const getCurrentUserEmail = (): string | null => {
+  try {
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      const parsed = JSON.parse(authStorage);
+      if (parsed.state?.token) {
+        const token = parsed.state.token;
+        const decoded = JSON.parse(atob(token.split('.')[1]));
+        return decoded.username; // JWT의 username 필드 사용
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('토큰 디코딩 실패:', error);
+    return null;
+  }
+};
+
+const filterCardsByPostView = (
+  cards: CardData[],
+  postView: string
+): CardData[] => {
+  if (!postView || postView === 'ALL') return cards;
+
+  if (postView === 'MY_POSTS') {
+    const currentUserEmail = getCurrentUserEmail();
+    return currentUserEmail
+      ? cards.filter((card: CardData) => card.email === currentUserEmail)
+      : [];
+  } else if (postView === 'FAVORITE_POSTS') {
+    return cards.filter((card: CardData) => card.favorite === true);
+  }
+
+  return cards;
+};
+
+const sortCards = (cards: CardData[], sortBy: string): CardData[] => {
+  if (sortBy === 'RATING') {
+    // 인기순: 바삭스코어 높은 순, 같으면 등록순
+    return cards.sort((a, b) => {
+      if (a.ratingScore !== b.ratingScore) {
+        return b.ratingScore - a.ratingScore; // 높은 점수 먼저
+      }
+      // 점수가 같으면 등록순 (최신 등록 먼저)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  } else {
+    // 최신순: 등록순 (최신 등록 먼저)
+    return cards.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+};
+
 export default function Home() {
   // WebSocket 가드 사용
   useWebSocketGuard();
@@ -128,108 +183,11 @@ export default function Home() {
           );
         }
 
-        // postView에 따른 필터링 추가
-        if (postView && postView !== 'ALL') {
-          // 현재 사용자의 이메일을 가져오기 위해 JWT 토큰에서 디코딩
-          const getCurrentUserEmail = () => {
-            try {
-              const authStorage = localStorage.getItem('auth-storage');
-              if (authStorage) {
-                const parsed = JSON.parse(authStorage);
-                if (parsed.state?.token) {
-                  const token = parsed.state.token;
-                  const decoded = JSON.parse(atob(token.split('.')[1]));
-                  return decoded.username; // JWT의 username 필드 사용
-                }
-              }
-              return null;
-            } catch (error) {
-              console.error('토큰 디코딩 실패:', error);
-              return null;
-            }
-          };
-
-          const currentUserEmail = getCurrentUserEmail();
-
-          if (postView === 'MY_POSTS') {
-            // 내글만 보기: email이 현재 사용자와 같은 카드들
-            if (currentUserEmail) {
-              filteredCards = filteredCards.filter(
-                (card: CardData) => card.email === currentUserEmail
-              );
-            } else {
-              // 사용자 정보를 가져올 수 없는 경우 빈 배열로 설정
-              filteredCards = [];
-            }
-          } else if (postView === 'FAVORITE_POSTS') {
-            // 단골글 보기: favorite이 true인 카드들
-            filteredCards = filteredCards.filter(
-              (card: CardData) => card.favorite === true
-            );
-          }
-        }
-
-        // postView에 따른 필터링 추가
-        if (postView && postView !== 'ALL') {
-          // 현재 사용자의 이메일을 가져오기 위해 JWT 토큰에서 디코딩
-          const getCurrentUserEmail = () => {
-            try {
-              const authStorage = localStorage.getItem('auth-storage');
-              if (authStorage) {
-                const parsed = JSON.parse(authStorage);
-                if (parsed.state?.token) {
-                  const token = parsed.state.token;
-                  const decoded = JSON.parse(atob(token.split('.')[1]));
-                  return decoded.username; // JWT의 username 필드 사용
-                }
-              }
-              return null;
-            } catch (error) {
-              console.error('토큰 디코딩 실패:', error);
-              return null;
-            }
-          };
-
-          const currentUserEmail = getCurrentUserEmail();
-
-          if (postView === 'MY_POSTS') {
-            // 내글만 보기: email이 현재 사용자와 같은 카드들
-            if (currentUserEmail) {
-              filteredCards = filteredCards.filter(
-                (card: CardData) => card.email === currentUserEmail
-              );
-            } else {
-              // 사용자 정보를 가져올 수 없는 경우 빈 배열로 설정
-              filteredCards = [];
-            }
-          } else if (postView === 'FAVORITE_POSTS') {
-            // 단골글 보기: favorite이 true인 카드들
-            filteredCards = filteredCards.filter(
-              (card: CardData) => card.favorite === true
-            );
-          }
-        }
+        // postView에 따른 필터링
+        filteredCards = filterCardsByPostView(filteredCards, postView);
 
         // sortBy에 따라 카드 정렬
-        if (sortBy === 'RATING') {
-          // 인기순: 바삭스코어 높은 순, 같으면 등록순
-          filteredCards.sort((a, b) => {
-            if (a.ratingScore !== b.ratingScore) {
-              return b.ratingScore - a.ratingScore; // 높은 점수 먼저
-            }
-            // 점수가 같으면 등록순 (최신 등록 먼저)
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        } else {
-          // 최신순: 등록순 (최신 등록 먼저)
-          filteredCards.sort((a, b) => {
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        }
+        filteredCards = sortCards(filteredCards, sortBy);
 
         // 카드 페이지 배열에 추가 (캐시)
         setCardPages((prev) => {
