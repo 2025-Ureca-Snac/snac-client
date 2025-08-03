@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { api, handleApiError } from '../utils/api';
 import { ApiResponse } from '../types/api';
 import { RechargeModalProps } from '../types/recharge-modal';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -15,7 +16,7 @@ export default function RechargeModal({
   onClose,
   currentPoints,
   shortage,
-  onRechargeSuccess,
+  onRefreshData,
 }: RechargeModalProps) {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
 
@@ -53,16 +54,6 @@ export default function RechargeModal({
             const responseData = response.data as ApiResponse<unknown>;
             if (responseData.status === 'OK') {
               console.log('결제가 성공적으로 완료되었습니다!');
-
-              // 충전된 금액 계산 (보너스 포인트 없음)
-              const rechargedAmount = selectedAmount || 0;
-
-              // 콜백 호출하여 부모 컴포넌트에 알림
-              if (onRechargeSuccess) {
-                onRechargeSuccess(rechargedAmount);
-              }
-
-              alert('결제가 성공적으로 완료되었습니다!');
             } else {
               // 백엔드에서 실패 응답을 보낸 경우
               try {
@@ -75,10 +66,6 @@ export default function RechargeModal({
               } catch (apiError) {
                 console.error('백엔드 처리 실패 정보 전송 실패:', apiError);
               }
-
-              alert(
-                '결제 처리 중 문제가 발생했습니다. 고객센터로 문의해주세요.'
-              );
             }
           } catch (error) {
             console.error('충전 성공 처리 오류:', error);
@@ -95,29 +82,37 @@ export default function RechargeModal({
             } catch (apiError) {
               console.error('충전 처리 실패 정보 전송 실패:', apiError);
             }
-
-            alert('결제 처리 중 문제가 발생했습니다. 고객센터로 문의해주세요.');
           }
         } else {
           // 결제 실패 처리
           console.log('결제가 실패했습니다:', event.data);
-          alert('결제가 실패했습니다. 다시 시도해주세요.');
-
-          // 실패 시 모달 닫기
-          onClose();
         }
       } else if (event.data.type === 'PAYMENT_ERROR') {
-        alert(event.data.error);
-        onClose();
+        console.log('결제 오류가 발생했습니다:', event.data);
       }
+
+      // ✅ 모든 경우에 대해 모달 닫고 데이터 새로고침
+      onClose();
+      // 부모 컴포넌트의 데이터 새로고침 함수 호출
+      onRefreshData?.();
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onClose, onRechargeSuccess, selectedAmount]);
+  }, [selectedAmount]);
 
   const handleRecharge = async () => {
-    if (selectedAmount && selectedAmount >= 1000) {
+    if (!selectedAmount) {
+      toast.error('충전할 금액을 입력해주세요.');
+      return;
+    }
+
+    if (selectedAmount < 1000) {
+      toast.error('최소 1,000원부터 충전 가능합니다.');
+      return;
+    }
+
+    if (selectedAmount >= 1000) {
       try {
         // money/recharge/prepare API 호출
         const response = await api.post('/money/recharge/prepare', {
@@ -168,7 +163,9 @@ export default function RechargeModal({
           console.error('충전 준비 실패 정보 전송 실패:', apiError);
         }
 
-        alert('충전 준비 중 문제가 발생했습니다. 고객센터로 문의해주세요.');
+        // ✅ alert 대신 모달 닫고 데이터 새로고침
+        onClose();
+        onRefreshData?.();
       }
     }
   };
@@ -269,8 +266,6 @@ export default function RechargeModal({
         >
           충전하기
         </button>
-
-        {/* 부가세 안내 문구 제거됨 */}
       </div>
     </div>
   );

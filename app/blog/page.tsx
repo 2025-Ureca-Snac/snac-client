@@ -1,7 +1,7 @@
-// import { BLOG_POSTS } from './data/blogPosts';
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
 import { blogPageMetadata } from './metadata';
-import { Header } from '@/app/(shared)/components/Header';
-import { Footer } from '@/app/(shared)/components/Footer';
+
+// 상대 경로 임포트
 import { BlogHero } from './components/BlogHero';
 import BlogPageClient from './BlogPageClient';
 import BlogStructuredData from './components/BlogStructuredData';
@@ -13,10 +13,8 @@ export default function BlogPage() {
     <>
       <BlogStructuredData />
       <div className="min-h-screen">
-        <Header />
         <BlogHero />
         <BlogPageClient />
-        <Footer />
       </div>
     </>
   );

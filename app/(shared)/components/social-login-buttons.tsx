@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { useAuthStore } from '../stores/auth-store';
 import { SOCIALS } from '../constants/social-login-data';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface SocialLoginButtonsProps {
   onError?: (message: string) => void;
@@ -28,11 +29,12 @@ export default function SocialLoginButtons({
       }
     } catch (error) {
       console.error('소셜 로그인 실패:', error);
-      const errorMessage = '연동된 계정이 없습니다.';
+      const errorMessage =
+        error instanceof Error ? error.message : '소셜 로그인에 실패했습니다.';
       if (onError) {
         onError(errorMessage);
       } else {
-        alert(errorMessage);
+        toast.error(errorMessage);
       }
     }
   };

@@ -7,10 +7,11 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
+import Image from 'next/image';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import RechargeModal from '@/app/(shared)/components/recharge-modal';
 import SettlementModal from '@/app/(shared)/components/settlement-modal';
-import RefundModal from '@/app/(shared)/components/refund-modal';
+import CancelModal from '@/app/(shared)/components/cancel-modal';
 import {
   PointHistoryItem,
   AssetType,
@@ -41,14 +42,15 @@ export default function PointContent({
   selectedMonth,
   onYearChange,
   onMonthChange,
+  onRefreshData,
 }: PointContentProps) {
   const [pointsFilter, setPointsFilter] = useState<PointFilterType>('all');
   const [moneyFilter, setMoneyFilter] = useState<MoneyFilterType>('all');
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
   const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
-  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
-  const [selectedRefundAmount, setSelectedRefundAmount] = useState<number>(0);
-  const [selectedRefundPaymentKey, setSelectedRefundPaymentKey] =
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedCancelAmount, setSelectedCancelAmount] = useState<number>(0);
+  const [selectedCancelPaymentKey, setSelectedCancelPaymentKey] =
     useState<string>('');
 
   // 무한 스크롤을 위한 ref
@@ -182,6 +184,18 @@ export default function PointContent({
       >
         취소
       </button>
+
+      {/* 포인트 적립 버튼 */}
+      <button
+        onClick={() => {
+          // TODO: 포인트 적립 기능 구현 예정
+          console.log('포인트 적립 버튼 클릭');
+        }}
+        className="ml-auto px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1"
+      >
+        <Image src="/snac-price.svg" alt="스낵" width={16} height={16} />
+        적립
+      </button>
     </div>
   );
 
@@ -248,6 +262,22 @@ export default function PointContent({
       >
         정산
       </button>
+
+      {/* 머니 충전 및 정산 버튼 */}
+      <div className="ml-auto flex gap-2">
+        <button
+          onClick={() => setIsRechargeModalOpen(true)}
+          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+        >
+          충전
+        </button>
+        <button
+          onClick={() => setIsSettlementModalOpen(true)}
+          className="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors"
+        >
+          정산
+        </button>
+      </div>
     </div>
   );
 
@@ -293,19 +323,19 @@ export default function PointContent({
               {balanceAfter.toLocaleString()}S
             </div>
           )}
-          {/* 머니 탭에서 충전 내역인 경우 환불 버튼 표시 */}
+          {/* 머니 탭에서 충전 내역인 경우 취소 버튼 표시 */}
           {activeTab === 'MONEY' && isPositive && item.category === '충전' && (
             <button
               onClick={() => {
-                setSelectedRefundAmount(amount);
-                setSelectedRefundPaymentKey(
+                setSelectedCancelAmount(amount);
+                setSelectedCancelPaymentKey(
                   item.paymentKey || item.id.toString()
                 );
-                setIsRefundModalOpen(true);
+                setIsCancelModalOpen(true);
               }}
               className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors mt-1"
             >
-              환불
+              취소
             </button>
           )}
         </div>
@@ -421,11 +451,8 @@ export default function PointContent({
       <RechargeModal
         open={isRechargeModalOpen}
         onClose={() => setIsRechargeModalOpen(false)}
-        currentPoints={balance.point}
-        onRechargeSuccess={(amount) => {
-          console.log('충전 성공:', amount);
-          setIsRechargeModalOpen(false);
-        }}
+        currentPoints={balance.money}
+        onRefreshData={onRefreshData}
       />
       <SettlementModal
         open={isSettlementModalOpen}
@@ -434,17 +461,19 @@ export default function PointContent({
         onSettlementSuccess={(amount, type) => {
           console.log('정산 성공:', amount, type);
           setIsSettlementModalOpen(false);
+          onRefreshData?.();
         }}
       />
-      <RefundModal
-        open={isRefundModalOpen}
-        onClose={() => setIsRefundModalOpen(false)}
-        amount={selectedRefundAmount}
-        paymentKey={selectedRefundPaymentKey}
-        onRefundSuccess={(amount) => {
-          console.log('환불 성공:', amount);
-          setIsRefundModalOpen(false);
+      <CancelModal
+        open={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        amount={selectedCancelAmount}
+        paymentKey={selectedCancelPaymentKey}
+        onCancelSuccess={(amount: number) => {
+          console.log('취소 성공:', amount);
+          setIsCancelModalOpen(false);
         }}
+        onRefreshData={onRefreshData}
       />
     </div>
   );

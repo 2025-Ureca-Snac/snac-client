@@ -8,7 +8,7 @@ import FilterGroup from '@/app/(shared)/components/FilterGroup';
 import FilterButtons from '@/app/(shared)/components/FilterButtons';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL';
-type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
+type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT';
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 
 const FILTER_OPTIONS = {
@@ -31,11 +31,22 @@ const FILTER_OPTIONS = {
     { value: 'P0_2000', label: '2,000원 이하' },
     { value: 'P0_2500', label: '2,500원 이하' },
   ],
+  postView: [
+    { value: 'ALL', label: '전체글 보기' },
+    { value: 'MY_POSTS', label: '내글만 보기' },
+    { value: 'FAVORITE_POSTS', label: '단골글 보기' },
+  ],
 };
 
 export const Filter = () => {
-  const { isFilterOpen, actions, category, transactionStatus, priceRange } =
-    useHomeStore();
+  const {
+    isFilterOpen,
+    actions,
+    category,
+    transactionStatus,
+    priceRange,
+    postView,
+  } = useHomeStore();
 
   // 필터가 실제로 변경되었는지 확인
 
@@ -48,7 +59,7 @@ export const Filter = () => {
     <>
       {/* PC 사이드바 */}
       <div className="hidden md:block md:w-72 md:flex-shrink-0 mr-8">
-        <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[840px] bg-white md:max-h-full md:rounded-2xl shadow-light">
+        <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[1015px] bg-white md:max-h-full md:rounded-2xl shadow-light">
           <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
             <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
               <Image
@@ -87,6 +98,18 @@ export const Filter = () => {
               selectedValues={priceRange ? [priceRange] : []}
               onValueChange={(value) =>
                 actions.setPriceRange(value as PriceRange)
+              }
+              variant="radio"
+            />
+
+            <FilterGroup
+              title="글 보기"
+              options={FILTER_OPTIONS.postView}
+              selectedValues={postView ? [postView] : ['ALL']}
+              onValueChange={(value) =>
+                actions.setPostView(
+                  value as 'ALL' | 'MY_POSTS' | 'FAVORITE_POSTS'
+                )
               }
               variant="radio"
             />
@@ -160,6 +183,18 @@ export const Filter = () => {
                       selectedValues={priceRange ? [priceRange] : []}
                       onValueChange={(value) =>
                         actions.setPriceRange(value as PriceRange)
+                      }
+                      variant="radio"
+                    />
+
+                    <FilterGroup
+                      title="글 보기"
+                      options={FILTER_OPTIONS.postView}
+                      selectedValues={postView ? [postView] : ['ALL']}
+                      onValueChange={(value) =>
+                        actions.setPostView(
+                          value as 'ALL' | 'MY_POSTS' | 'FAVORITE_POSTS'
+                        )
                       }
                       variant="radio"
                     />

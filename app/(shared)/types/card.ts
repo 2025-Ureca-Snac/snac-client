@@ -1,5 +1,6 @@
 export interface CardData {
   id: number;
+  authorId: number;
   name: string;
   email: string;
   cardCategory: string;
@@ -8,6 +9,7 @@ export interface CardData {
   price: number;
   sellStatus: string;
   ratingScore: number;
+  favorite: boolean;
   createdAt: string;
   updatedAt: string;
 }

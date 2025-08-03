@@ -2,8 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Header } from '@/app/(shared)/components/Header';
-import { Footer } from '@/app/(shared)/components/Footer';
+
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import dynamic from 'next/dynamic';
@@ -192,7 +191,6 @@ function BlogAdminFormComponent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="bg-white rounded-lg shadow-light p-8">
@@ -287,7 +285,6 @@ function BlogAdminFormComponent() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

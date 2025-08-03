@@ -1,10 +1,11 @@
 'use client';
 
+// React 관련 임포트
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Footer } from '@/app/(shared)/components/Footer';
-import { Header } from '@/app/(shared)/components/Header';
-import BlogDetailPage from '../components/BlogDetailPage';
+
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
+import { BlogCard } from '@/app/(shared)/components/BlogCard';
 import { useBlogStore, Blog } from '@/app/(shared)/stores/use-blog-store';
 
 interface BlogPostPageClientProps {
@@ -14,70 +15,48 @@ interface BlogPostPageClientProps {
 export default function BlogPostPageClient({ id }: BlogPostPageClientProps) {
   const router = useRouter();
 
-  const {
-    currentBlog,
-    relatedBlogs,
-    loading,
-    error,
-    fetchOne,
-    fetchRelated,
-    clearCurrentBlog,
-  } = useBlogStore();
+  const { relatedBlogs, fetchRelated, clearCurrentBlog } = useBlogStore();
 
   useEffect(() => {
     const postId = parseInt(id, 10);
     if (!isNaN(postId)) {
-      fetchOne(postId);
       fetchRelated(postId);
     }
 
     return () => {
       clearCurrentBlog();
     };
-  }, [id, fetchOne, fetchRelated, clearCurrentBlog]);
+  }, [id, fetchRelated, clearCurrentBlog]);
 
   const handlePostClick = (post: Blog) => {
     router.push(`/blog/${post.id}`);
   };
 
-  if (loading && !currentBlog) {
+  // 관련 포스트가 있을 때만 렌더링
+  if (relatedBlogs && relatedBlogs.length > 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>게시글을 불러오는 중...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl font-semibold text-red-500">
-            오류가 발생했습니다
-          </p>
-          <p className="text-gray-600 mt-2">{error}</p>
-          <button
-            onClick={() => router.push('/blog')}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            블로그 홈으로 돌아가기
-          </button>
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-2xl p-6 shadow-light">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              관련 포스트
+            </h3>
+            <p className="text-gray-600">더 많은 유용한 정보를 확인해보세요</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedBlogs.map((post) => (
+              <div
+                key={post.id}
+                onClick={() => handlePostClick(post)}
+                className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <BlogCard post={post} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
-
-  return (
-    <div className="min-h-screen">
-      <Header />
-
-      <BlogDetailPage
-        post={currentBlog}
-        relatedPosts={relatedBlogs}
-        onPostSelect={handlePostClick}
-      />
-
-      <Footer />
-    </div>
-  );
+  return null;
 }
