@@ -62,7 +62,7 @@ export interface TradeRequest {
   buyer: string;
   sellerNickName: string;
   buyerId: number;
-  buyerNickName: string;
+  buyerNickname: string;
   sellerRatingScore: number;
   buyerRatingScore: number;
   cardId: number;

@@ -29,6 +29,8 @@ interface ServerTradeData {
   priceGb?: number;
   point?: number;
   phone?: string;
+  buyerNickname?: string;
+  sellerNickName?: string;
   cancelReason?: string;
 }
 
@@ -174,6 +176,8 @@ export default function MatchPage() {
         priceGb: tradeData.priceGb || 0,
         sellerRatingScore: 1000, // 기본값
         status: tradeData.status,
+        buyerNickname: tradeData.buyerNickname,
+        sellerNickName: tradeData.sellerNickName,
         cancelReason: tradeData.cancelReason || null,
         type: 'seller' as const,
       });
@@ -442,7 +446,7 @@ export default function MatchPage() {
           sellerId: request.sellerId,
           sellerNickName: request.sellerNickName,
           buyerId: request.buyerId,
-          buyerNickName: request.buyerNickName,
+          buyerNickname: request.buyerNickname,
           buyerRatingScore: request.buyerRatingScore,
           cardId: request.cardId,
           carrier: sellerInfo.carrier,

@@ -56,6 +56,8 @@ interface ServerCardData {
   cardId: number;
   name: string;
   email: string;
+  sellerNickName: string;
+  buyerNickname: string;
   sellStatus: string;
   cardCategory: string;
   carrier: string;
@@ -75,7 +77,7 @@ interface ServerTradeData {
   sellerNickName: string;
   buyer: string;
   buyerId: number;
-  buyerNickName: string;
+  buyerNickname: string;
   buyerRatingScore: number;
   carrier: string;
   dataAmount: number;
@@ -365,7 +367,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           sellerId: Number(tradeData.sellerId),
           sellerNickName: tradeData.sellerNickName,
           buyerId: Number(tradeData.buyerId),
-          buyerNickName: tradeData.buyerNickName,
+          buyerNickname: tradeData.buyerNickname,
           buyerRatingScore: tradeData.buyerRatingScore,
           cardId: tradeData.cardId,
           carrier: tradeData.carrier || 'unknown',
@@ -424,7 +426,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
             seller: tradeData.seller,
             buyer: tradeData.buyer,
             sellerNickName: tradeData.sellerNickName,
-            buyerNickName: tradeData.buyerNickName,
+            buyerNickname: tradeData.buyerNickname,
             sellerRatingScore: tradeData.sellerRatingScore || 1000,
             buyerRatingScore: tradeData.buyerRatingScore || 1000,
             status: 'pending',
@@ -464,7 +466,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
               seller: tradeData.seller,
               cardId: tradeData.cardId,
               buyerId: Number(tradeData.buyerId),
-              buyerNickName: tradeData.buyerNickName,
+              buyerNickname: tradeData.buyerNickname,
               buyerRatingScore: tradeData.buyerRatingScore,
               sellerId: Number(tradeData.sellerId),
               sellerNickName: tradeData.sellerNickName,

@@ -63,7 +63,7 @@ export default function TradingPage() {
   const isSeller = partner?.seller === user;
 
   // matchStore에서 파트너 정보 직접 사용 (null 체크 후 사용)
-  const partnerInfo = partner;
+  const partnerInfo = useMatchStore.getState().partner;
 
   // 디버깅: 파트너 정보 변경 시 로그 출력
   useEffect(() => {

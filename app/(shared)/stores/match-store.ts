@@ -30,7 +30,7 @@ export interface MatchPartner {
   sellerId: number;
   sellerNickName: string;
   buyerId: number;
-  buyerNickName: string;
+  buyerNickname: string;
   buyerRatingScore: number;
   cardId: number;
   carrier: string;
