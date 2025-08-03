@@ -1,21 +1,22 @@
 /**
  * @author 이승우
- * @description 환불 모달 관련 타입 정의
+ * @description 취소 모달 관련 타입 정의
  */
 
-export interface RefundModalProps {
+export interface CancelModalProps {
   open: boolean;
   onClose: () => void;
   amount: number;
   paymentKey: string;
-  onRefundSuccess: (amount: number) => void;
+  onCancelSuccess: (amount: number) => void;
+  onRefreshData?: () => void; // 데이터 새로고침 함수 (선택적)
 }
 
-export interface RefundRequest {
+export interface CancelRequest {
   reason: string;
 }
 
-export interface RefundHistory {
+export interface CancelHistory {
   id: string;
   amount: number;
   reason: string;

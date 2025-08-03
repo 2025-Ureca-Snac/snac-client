@@ -287,6 +287,17 @@ function PointPageContent() {
   // 현재 탭에 따른 내역 (API에서 이미 필터링됨)
   const currentHistory = allHistory;
 
+  // 데이터 새로고침 함수
+  const handleRefreshData = async () => {
+    try {
+      // 내역만 새로고침
+      await loadPointData();
+      console.log('데이터 새로고침 완료');
+    } catch (error) {
+      console.error('데이터 새로고침 실패:', error);
+    }
+  };
+
   // 탭 변경 핸들러
   const handleTabChange = (newTab: AssetType) => {
     setActiveTab(newTab);
@@ -465,6 +476,7 @@ function PointPageContent() {
                   selectedMonth={selectedMonth}
                   onYearChange={setSelectedYear}
                   onMonthChange={setSelectedMonth}
+                  onRefreshData={handleRefreshData}
                 />
               )}
             </section>

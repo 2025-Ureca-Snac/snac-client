@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import ModalPortal from './modal-portal';
 import { InquiryModalProps } from '../types/inquiry-modal';
+import { toast } from 'sonner';
 
 const INQUIRY_CATEGORIES = [
   { value: 'PAYMENT', label: '결제 관련' },
@@ -40,18 +41,18 @@ export default function InquiryModal({
 
     // 이미지 개수 제한 확인
     if (images.length + files.length > MAX_IMAGES) {
-      alert(`이미지는 최대 ${MAX_IMAGES}개까지 첨부할 수 있습니다.`);
+      toast.error(`이미지는 최대 ${MAX_IMAGES}개까지 첨부할 수 있습니다.`);
       return;
     }
 
     // 파일 크기 및 타입 검증
     const validFiles = files.filter((file) => {
       if (file.size > MAX_IMAGE_SIZE) {
-        alert(`${file.name}의 크기가 5MB를 초과합니다.`);
+        toast.error(`${file.name}의 크기가 5MB를 초과합니다.`);
         return false;
       }
       if (!file.type.startsWith('image/')) {
-        alert(`${file.name}은 이미지 파일이 아닙니다.`);
+        toast.error(`${file.name}은 이미지 파일이 아닙니다.`);
         return false;
       }
       return true;
@@ -110,7 +111,7 @@ export default function InquiryModal({
     e.preventDefault();
 
     if (!title.trim() || !content.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.');
+      toast.error('제목과 내용을 모두 입력해주세요.');
       return;
     }
 
@@ -136,7 +137,7 @@ export default function InquiryModal({
       onClose();
     } catch (error) {
       console.error('문의 제출 실패:', error);
-      alert('문의 제출에 실패했습니다. 다시 시도해주세요.');
+      toast.error('문의 제출에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }
