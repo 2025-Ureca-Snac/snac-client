@@ -11,7 +11,6 @@ import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 import { MenuLink } from './MenuLink';
 import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
-import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
 
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
@@ -19,7 +18,6 @@ import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
 
 const ADMIN_ROLE = 'ADMIN';
-
 
 interface HeaderProps {
   isTrading?: boolean;
@@ -53,7 +51,6 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
       className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${
         isDarkmode
           ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
-          : 'bg-white border-b'
           : 'bg-white border-b'
       }`}
     >
@@ -93,18 +90,15 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             alt="관리자 페이지"
             text="관리자"
             isDarkmode={isDarkmode}
-            isDarkmode={isDarkmode}
           />
         )}
 
-        {isTrading ? null : (
         {isTrading ? null : (
           <MenuLink
             href="/match"
             IconComponent={Matching}
             alt="실시간 매칭"
             text="실시간 매칭"
-            isDarkmode={isDarkmode}
             isDarkmode={isDarkmode}
           />
         )}
@@ -123,7 +117,6 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             IconComponent={Login}
             alt="로그인"
             text="로그인"
-            isDarkmode={isDarkmode}
             isDarkmode={isDarkmode}
           />
         )}
