@@ -5,6 +5,7 @@ import FilterGroup from './filter/FilterGroup';
 import TransactionTypeForm from './TransactionTypeForm';
 import { Filters } from '../types';
 import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
+import { useWebSocketStore } from '@/app/(shared)/stores/websocket-store';
 
 interface FilterSectionProps {
   onFilterChange?: (filters: Filters) => void;
@@ -68,14 +69,13 @@ export default function FilterSection({
     }
   );
 
-  // 연결된 사용자 수 상태
-  const [connectedUsers, setConnectedUsers] = useState<number>(0);
-
-  // WebSocket 연결 및 연결된 사용자 수 구독
+  // WebSocket 연결
   useGlobalWebSocket({
-    setConnectedUsers,
     skipAuthCheck: true,
   });
+
+  // store에서 연결된 사용자 수 가져오기
+  const { connectedUsers } = useWebSocketStore();
 
   // 현재 선택된 거래 방식
   const currentTransactionType = selectedFilters.transactionType[0] || '';

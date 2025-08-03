@@ -91,7 +91,6 @@ interface UseGlobalWebSocketProps {
   appliedFilters?: Filters;
   setIncomingRequests?: React.Dispatch<React.SetStateAction<TradeRequest[]>>;
   setMatchingStatus?: React.Dispatch<React.SetStateAction<MatchingStatus>>;
-  setConnectedUsers?: React.Dispatch<React.SetStateAction<number>>;
   onTradeStatusChange?: (status: string, tradeData: ServerTradeData) => void;
   skipAuthCheck?: boolean; // 인증 체크를 건너뛸지 여부
 }
@@ -107,8 +106,12 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     setUserRole,
     setCurrentCardId,
   } = useMatchStore();
-  const { setConnectionStatus, setDisconnectFunction, isConnected } =
-    useWebSocketStore();
+  const {
+    setConnectionStatus,
+    setDisconnectFunction,
+    isConnected,
+    setConnectedUsers,
+  } = useWebSocketStore();
   const connectionId = useRef(++globalConnectionCount);
   // JWT 토큰 가져오기
   const getToken = () => {
@@ -248,16 +251,12 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     // 1. 연결된 사용자 수 구독
     globalStompClient.subscribe('/topic/connected-users', (frame) => {
       console.log('👥 전체 연결된 사용자 수:', frame.body);
-      if (props?.setConnectedUsers) {
-        props.setConnectedUsers(parseInt(frame.body) || 0);
-      }
+      setConnectedUsers(parseInt(frame.body) || 0);
     });
 
     globalStompClient.subscribe('/user/queue/connected-users', (frame) => {
       console.log('👤 개인 연결된 사용자 수:', frame.body);
-      if (props?.setConnectedUsers) {
-        props.setConnectedUsers(parseInt(frame.body) || 0);
-      }
+      setConnectedUsers(parseInt(frame.body) || 0);
     });
 
     // 2. 필터 정보 구독
