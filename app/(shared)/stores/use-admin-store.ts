@@ -38,6 +38,32 @@ interface ChartData {
   value: number;
 }
 
+const QNA_TYPE_LABELS: { [key: string]: string } = {
+  TECHNICAL_PROBLEM: '기술 문의',
+  ACCOUNT: '계정 문의',
+  PAYMENT: '결제 문의',
+};
+
+const REPORT_TYPE_LABELS: { [key: string]: string } = {
+  DATA_NONE: '데이터 미수신',
+  DATA_PARTIAL: '데이터 일부 수신',
+};
+
+const transformStatsToChartData = (
+  stats: CountByType | undefined,
+  labels: { [key: string]: string }
+): ChartData[] => {
+  if (stats && typeof stats === 'object') {
+    return Object.keys(stats)
+      .filter((key) => key in labels)
+      .map((key) => ({
+        name: labels[key],
+        value: stats[key],
+      }));
+  }
+  return [];
+};
+
 interface AdminState {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
@@ -93,7 +119,7 @@ export const useAdminStore = create<AdminState>((set) => ({
           dashboardMetrics: {
             memberCount: memberCount,
             activePostsCount: articleCount,
-            countByCategory: countByCategory, // ✅ Include countByCategory
+            countByCategory: countByCategory,
           },
           loading: false,
         });
@@ -101,7 +127,7 @@ export const useAdminStore = create<AdminState>((set) => ({
         throw new Error('API 응답 데이터 형식이 올바르지 않습니다.');
       }
     } catch (err) {
-      console.error('대시보드 데이터 로딩 실패:', err);
+      console.error('[useAdminStore] fetchDashboardMetrics 실패:', err);
       set({
         error: '대시보드 정보를 불러오는데 실패했습니다.',
         loading: false,
@@ -119,26 +145,11 @@ export const useAdminStore = create<AdminState>((set) => ({
         '/admin/disputes/statistics'
       );
       const stats = response.data.data.countByType;
+      const transformedData = transformStatsToChartData(stats, QNA_TYPE_LABELS);
 
-      const TYPE_LABELS: { [key: string]: string } = {
-        TECHNICAL_PROBLEM: '기술 문의',
-        ACCOUNT: '계정 문의',
-        PAYMENT: '결제 문의',
-      };
-
-      if (stats && typeof stats === 'object') {
-        const transformedData = Object.keys(stats)
-          .filter((key) => key in TYPE_LABELS)
-          .map((key) => ({
-            name: TYPE_LABELS[key],
-            value: stats[key],
-          }));
-        set({ qnaChartData: transformedData, qnaChartLoading: false });
-      } else {
-        set({ qnaChartData: [], qnaChartLoading: false });
-      }
+      set({ qnaChartData: transformedData, qnaChartLoading: false });
     } catch (err) {
-      console.error(err);
+      console.error('[useAdminStore] fetchQnaChartData 실패:', err);
       set({
         qnaChartError: '통계 데이터를 불러오는 데 실패했습니다.',
         qnaChartLoading: false,
@@ -156,25 +167,14 @@ export const useAdminStore = create<AdminState>((set) => ({
         '/admin/disputes/statistics'
       );
       const stats = response.data.data.countByType;
+      const transformedData = transformStatsToChartData(
+        stats,
+        REPORT_TYPE_LABELS
+      );
 
-      const TYPE_LABELS: { [key: string]: string } = {
-        DATA_NONE: '데이터 미수신',
-        DATA_PARTIAL: '데이터 일부 수신',
-      };
-
-      if (stats && typeof stats === 'object') {
-        const transformedData = Object.keys(stats)
-          .filter((key) => key in TYPE_LABELS)
-          .map((key) => ({
-            name: TYPE_LABELS[key],
-            value: stats[key],
-          }));
-        set({ reportChartData: transformedData, reportChartLoading: false });
-      } else {
-        set({ reportChartData: [], reportChartLoading: false });
-      }
+      set({ reportChartData: transformedData, reportChartLoading: false });
     } catch (err) {
-      console.error(err);
+      console.error('[useAdminStore] fetchReportChartData 실패:', err);
       set({
         reportChartError: '통계 데이터를 불러오는 데 실패했습니다.',
         reportChartLoading: false,
