@@ -446,6 +446,8 @@ export default function MatchPage() {
         setTimeout(() => {
           router.push('/match/trading');
         }, 500);
+      } else {
+        window.location.reload();
       }
     },
     [incomingRequests, respondToTrade, foundMatch, router, sellerInfo]
