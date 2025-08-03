@@ -24,6 +24,7 @@ export interface AuthState {
   token: string | null;
   tokenExp: number | null;
   isLoading: boolean;
+  error: string | null;
 
   // 액션
   resetAuthState: () => void;

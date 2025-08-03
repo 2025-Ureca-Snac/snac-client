@@ -13,6 +13,7 @@ export const useAuthStore = create<AuthState>()(
       role: null,
       tokenExp: null,
       isLoading: false,
+      error: null,
 
       // 초기화 함수
       resetAuthState: () => {
@@ -21,6 +22,7 @@ export const useAuthStore = create<AuthState>()(
           role: null,
           token: null,
           tokenExp: null,
+          error: null,
         });
       },
 
@@ -49,6 +51,18 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           useAuthStore.getState().resetAuthState();
           console.log(handleApiError(error));
+
+          // 오류 메시지 설정
+          let errorMessage = '로그인에 실패했습니다.';
+          if (error && typeof error === 'object' && 'response' in error) {
+            const apiError = error as {
+              response?: { status?: number; data?: { message?: string } };
+            };
+            if (apiError.response?.data?.message) {
+              errorMessage = apiError.response.data.message;
+            }
+          }
+          set({ error: errorMessage });
         } finally {
           set({ isLoading: false });
         }

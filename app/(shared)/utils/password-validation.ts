@@ -22,31 +22,28 @@ export const validatePassword = (
 ): PasswordValidationResult => {
   const errors: string[] = [];
 
-  // 길이 검사 (8-20자)
-  if (password.length < 8) {
-    errors.push('비밀번호는 8자 이상이어야 합니다.');
-  } else if (password.length > 20) {
-    errors.push('비밀번호는 20자 이하여야 합니다.');
+  // 길이 검사 (6-12자)
+  if (password.length < 6) {
+    errors.push('비밀번호는 6자 이상이어야 합니다.');
+  } else if (password.length > 12) {
+    errors.push('비밀번호는 12자 이하여야 합니다.');
   }
 
-  // 영문 대문자 포함
-  if (!/[A-Z]/.test(password)) {
-    errors.push('영문 대문자를 포함해야 합니다.');
+  // 대소문자 상관없이 영어 하나 이상
+  if (!/[a-zA-Z]/.test(password)) {
+    errors.push('영어를 하나 이상 포함해야 합니다.');
   }
 
-  // 영문 소문자 포함
-  if (!/[a-z]/.test(password)) {
-    errors.push('영문 소문자를 포함해야 합니다.');
-  }
-
-  // 숫자 포함
+  // 숫자 하나 이상
   if (!/\d/.test(password)) {
-    errors.push('숫자를 포함해야 합니다.');
+    errors.push('숫자를 하나 이상 포함해야 합니다.');
   }
 
-  // 특수문자 포함
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('특수문자를 포함해야 합니다.');
+  // 특수기호 하나 이상 (! ? @ # $ % ^ & * ( ) ~ ` + - _)
+  if (!/[!?@#$%^&*()~`+\-_]/.test(password)) {
+    errors.push(
+      '특수기호를 하나 이상 포함해야 합니다. (! ? @ # $ % ^ & * ( ) ~ ` + - _)'
+    );
   }
 
   // 연속된 문자 검사 (3개 이상)
@@ -71,21 +68,17 @@ export const validatePassword = (
 
   // 강도 평가
   let strength: 'weak' | 'medium' | 'strong' = 'weak';
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
+  const hasEnglish = /[a-zA-Z]/.test(password);
   const hasNumbers = /\d/.test(password);
-  const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const hasSpecialChars = /[!?@#$%^&*()~`+\-_]/.test(password);
 
-  const criteriaCount = [
-    hasUpperCase,
-    hasLowerCase,
-    hasNumbers,
-    hasSpecialChars,
-  ].filter(Boolean).length;
+  const criteriaCount = [hasEnglish, hasNumbers, hasSpecialChars].filter(
+    Boolean
+  ).length;
 
-  if (password.length >= 12 && criteriaCount >= 4) {
+  if (password.length >= 10 && criteriaCount >= 3) {
     strength = 'strong';
-  } else if (password.length >= 10 && criteriaCount >= 3) {
+  } else if (password.length >= 8 && criteriaCount >= 2) {
     strength = 'medium';
   }
 

@@ -468,8 +468,8 @@ export default function MatchPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
+    <div className="min-h-screen   flex flex-col bg-black">
+      <Header isDarkmode={true} />
       <main className="flex-1">
         <MatchContent
           appliedFilters={appliedFilters}

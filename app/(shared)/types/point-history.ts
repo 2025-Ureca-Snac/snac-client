@@ -6,6 +6,18 @@ export type AssetType = 'POINT' | 'MONEY';
 
 /**
  * @author 이승우
+ * @description 머니 카테고리 (백엔드 enum과 일치)
+ */
+export type MoneyCategory = '충전' | '머니 구매' | '판매' | '취소' | '정산';
+
+/**
+ * @author 이승우
+ * @description 포인트 카테고리 (백엔드 enum과 일치)
+ */
+export type PointCategory = '적립' | '포인트 사용' | '취소';
+
+/**
+ * @author 이승우
  * @description 포인트/머니 내역 아이템 (API 응답 구조)
  * @interface PointHistoryItem
  * @property {number} id 내역 아이템 ID
@@ -42,8 +54,10 @@ export interface BalanceResponse {
  * @author 이승우
  * @description 포인트/머니 내역 응답
  * @interface PointHistoryResponse
- * @property {PointHistoryItem[]} historyList 내역 목록
+ * @property {PointHistoryItem[]} contents 내역 목록
+ * @property {boolean} hasNext 다음 페이지 존재 여부
  */
 export interface PointHistoryResponse {
   contents: PointHistoryItem[];
+  hasNext: boolean;
 }

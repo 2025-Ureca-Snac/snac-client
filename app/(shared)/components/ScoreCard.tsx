@@ -106,7 +106,9 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-1">
           <div className="font-bold text-2xl text-foreground">
-            {profile?.nickname || '사용자'}
+            {profile?.name
+              ? `${profile.name}(${profile.nickname || '닉네임'})`
+              : profile?.nickname || '사용자'}
           </div>
           <button
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded px-2 py-1"
@@ -149,7 +151,11 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
             aria-label="포인트 내역 페이지로 이동"
           >
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">🥔</span>
+              <img
+                src="/snac-price.svg"
+                alt="스낵 포인트"
+                className="w-6 h-6"
+              />
               <span className="font-semibold text-sm">스낵 포인트</span>
             </div>
             <div className="flex items-center justify-between mb-4">
@@ -178,7 +184,7 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
             aria-label="머니 내역 페이지로 이동"
           >
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">💰</span>
+              <img src="/snac-price.svg" alt="스낵 머니" className="w-6 h-6" />
               <span className="font-semibold text-sm">스낵 머니</span>
             </div>
             <div className="flex items-center justify-between mb-4">

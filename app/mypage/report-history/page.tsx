@@ -1,64 +1,196 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
+import InquiryModal from '@/app/(shared)/components/inquiry-modal';
+import InquiryDetailModal from '@/app/(shared)/components/inquiry-detail-modal';
+import {
+  getInquiryList,
+  getInquiryDetail,
+  createInquiry,
+  uploadImage,
+} from '@/app/(shared)/utils/inquiry-api';
+import {
+  InquiryItem,
+  InquiryDetailItem,
+  DisputeType,
+} from '@/app/(shared)/types/inquiry';
+import { toast } from 'sonner';
+import { handleApiError } from '@/app/(shared)/utils/api';
 import Link from 'next/link';
 
-interface ReportItem {
-  id: number;
-  date: string;
-  title: string;
-  price: number;
-  reason?: string;
-}
+/**
+ * @author 이승우
+ * @description 문의 내역 페이지 컴포넌트
+ * @returns 문의 목록, 작성, 상세보기 기능을 포함한 문의 내역 페이지
+ */
+export default function InquiryHistoryPage() {
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'answered'>(
+    'all'
+  );
+  const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedInquiry, setSelectedInquiry] =
+    useState<InquiryDetailItem | null>(null);
+  const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-export default function ReportHistoryPage() {
-  const [activeTab, setActiveTab] = useState<'reported' | 'received'>(
-    'reported'
+  /**
+   * @author 이승우
+   * @description 문의 목록 조회 함수
+   * @param page - 페이지 번호 (기본값: 0)
+   * @param loadMore - 추가 로드 여부 (기본값: false)
+   */
+  const loadInquiries = useCallback(
+    async (page: number = 0, loadMore: boolean = false) => {
+      try {
+        setIsLoading(!loadMore);
+        setIsLoadingMore(loadMore);
+
+        const response = await getInquiryList(page, 20);
+
+        console.log('문의 목록 API 응답:', response);
+
+        if (loadMore) {
+          setInquiries((prev) => [...prev, ...response.content]);
+        } else {
+          setInquiries(response.content);
+        }
+
+        setCurrentPage(response.number);
+        setHasNext(!response.last);
+      } catch (error) {
+        toast.error(handleApiError(error));
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    []
   );
 
-  const reportedTransactions: ReportItem[] = [
-    {
-      id: 1,
-      date: '2025.07.03',
-      title: '통신사 2GB',
-      price: 2000,
-    },
-  ];
+  // 초기 로드
+  useEffect(() => {
+    loadInquiries(0, false);
+  }, [loadInquiries]);
 
-  const receivedReports: ReportItem[] = [
-    {
-      id: 1,
-      date: '2025.07.03',
-      title: '통신사 2GB',
-      price: 2000,
-      reason: '실시간 거래에서 이탈했어요',
-    },
-    {
-      id: 2,
-      date: '2025.07.03',
-      title: '통신사 2GB',
-      price: 2000,
-      reason: '데이터를 전송하지 않았어요',
-    },
-    {
-      id: 3,
-      date: '2025.07.03',
-      title: '통신사 2GB',
-      price: 2000,
-      reason: '수신확정을 누르지 않았어요',
-    },
-  ];
+  /**
+   * @author 이승우
+   * @description 더보기 로드 핸들러
+   */
+  const handleLoadMore = useCallback(() => {
+    if (!isLoadingMore && hasNext) {
+      loadInquiries(currentPage + 1, true);
+    }
+  }, [isLoadingMore, hasNext, currentPage, loadInquiries]);
 
-  const filteredReports =
-    activeTab === 'reported' ? reportedTransactions : receivedReports;
+  /**
+   * @author 이승우
+   * @description 문의 카테고리를 한글로 변환
+   * @param type 문의 타입
+   * @returns 한글 카테고리명
+   */
+  const getCategoryName = (type: string): string => {
+    switch (type) {
+      case DisputeType.DATA_NONE:
+        return '데이터 안옴';
+      case DisputeType.DATA_PARTIAL:
+        return '일부만 수신';
+      case DisputeType.PAYMENT:
+        return '결제 관련';
+      case DisputeType.ACCOUNT:
+        return '계정 관련';
+      case DisputeType.TECHNICAL_PROBLEM:
+        return '기술적 문제';
+      case DisputeType.OTHER:
+        return '기타';
+      default:
+        return type;
+    }
+  };
+
+  /**
+   * @author 이승우
+   * @description 탭별 필터링된 문의 목록
+   */
+  const filteredInquiries = useMemo(() => {
+    if (!inquiries) return [];
+    if (activeTab === 'all') return inquiries;
+    return inquiries.filter((inquiry) => {
+      if (activeTab === 'pending') return inquiry.status === 'IN_PROGRESS';
+      if (activeTab === 'answered') return inquiry.answerAt !== null;
+      return true;
+    });
+  }, [inquiries, activeTab]);
 
   const tabs = [
-    { id: 'reported', label: '신고한 거래' },
-    { id: 'received', label: '신고 받은 거래' },
+    { id: 'all', label: '전체' },
+    { id: 'pending', label: '답변 대기' },
+    { id: 'answered', label: '답변 완료' },
   ];
+
+  /**
+   * @author 이승우
+   * @description 문의 제출 핸들러
+   * @param inquiry - 제출할 문의 데이터
+   */
+  const handleInquirySubmit = async (inquiry: {
+    title: string;
+    content: string;
+    category: string;
+    images?: File[];
+  }) => {
+    try {
+      // 이미지가 있으면 먼저 업로드
+      let attachmentKeys: string[] = [];
+      if (inquiry.images && inquiry.images.length > 0) {
+        const uploadPromises = inquiry.images.map((image) =>
+          uploadImage(image)
+        );
+        attachmentKeys = await Promise.all(uploadPromises);
+      }
+
+      // 문의 데이터 생성
+      const inquiryData = {
+        title: inquiry.title,
+        type: inquiry.category as DisputeType,
+        description: inquiry.content,
+        attachmentKeys: attachmentKeys.length > 0 ? attachmentKeys : undefined,
+      };
+
+      await createInquiry(inquiryData);
+      toast.success('문의가 성공적으로 제출되었습니다.');
+      setIsInquiryModalOpen(false);
+      // 문의 목록 새로고침
+      loadInquiries(0, false);
+    } catch (error) {
+      toast.error(handleApiError(error));
+    }
+  };
+
+  /**
+   * @author 이승우
+   * @description 문의 상세 보기 핸들러
+   * @param inquiry - 조회할 문의 아이템
+   */
+  const handleInquiryClick = async (inquiry: InquiryItem) => {
+    try {
+      console.log('문의 상세 조회 시작:', inquiry.disputeId);
+      const inquiryDetail = await getInquiryDetail(inquiry.disputeId);
+      console.log('문의 상세 조회 결과:', inquiryDetail);
+      setSelectedInquiry(inquiryDetail);
+      setIsDetailModalOpen(true);
+      console.log('모달 상태 설정 완료');
+    } catch (error) {
+      console.error('문의 상세 조회 에러:', error);
+      toast.error(handleApiError(error));
+    }
+  };
 
   // PC 헤더
   const DesktopHeader = () => (
@@ -72,15 +204,25 @@ export default function ReportHistoryPage() {
           마이페이지
         </Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">신고 내역</span>
+        <span className="text-gray-900 font-medium">문의 내역</span>
       </div>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">신고 내역</h1>
-        <p className="text-gray-600 text-lg">
-          신고한 거래와 신고 받은 거래 내역을 확인하세요
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">문의 내역</h1>
+            <p className="text-gray-600 text-lg">
+              문의한 거래와 문의 받은 거래 내역을 확인하세요
+            </p>
+          </div>
+          <button
+            onClick={() => setIsInquiryModalOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            문의 작성
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -97,13 +239,25 @@ export default function ReportHistoryPage() {
           마이페이지
         </Link>
         <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">신고 내역</span>
+        <span className="text-gray-900 font-medium">문의 내역</span>
       </div>
 
       {/* 제목 */}
-      <h1 className="text-xl font-bold text-gray-900">신고 내역</h1>
+      <h1 className="text-xl font-bold text-gray-900">문의 내역</h1>
     </div>
   );
+
+  // 초기 로딩 중일 때 스피너 표시
+  if (isLoading && inquiries.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">문의 내역을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white w-full">
@@ -128,23 +282,29 @@ export default function ReportHistoryPage() {
                 <TabNavigation
                   tabs={tabs}
                   activeTab={activeTab}
-                  onTabChange={(tabId: string) =>
-                    setActiveTab(tabId as typeof activeTab)
-                  }
+                  onTabChange={(tabId: string) => {
+                    setActiveTab(tabId as typeof activeTab);
+                    setCurrentPage(0); // 탭 변경 시 페이지 초기화
+                  }}
                   activeTextColor="text-green-600"
                   inactiveTextColor="text-gray-500"
                   underlineColor="bg-green-600"
                 />
 
-                {/* 신고 내역 리스트 */}
+                {/* 문의 내역 리스트 */}
                 <AnimatedTabContent tabKey={activeTab}>
                   <div className="p-6">
-                    {filteredReports.length > 0 ? (
+                    {isLoading ? (
+                      <div className="text-center py-8 text-gray-500">
+                        로딩 중...
+                      </div>
+                    ) : (filteredInquiries?.length || 0) > 0 ? (
                       <div className="space-y-4">
-                        {filteredReports.map((item) => (
+                        {filteredInquiries?.map((item: InquiryItem) => (
                           <div
-                            key={item.id}
-                            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3"
+                            key={item.disputeId}
+                            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                            onClick={() => handleInquiryClick(item)}
                           >
                             {/* 아이콘 */}
                             <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -156,32 +316,55 @@ export default function ReportHistoryPage() {
                             {/* 내용 */}
                             <div className="flex-1">
                               <div className="text-sm text-gray-500 mb-1">
-                                {item.date}
+                                {new Date(item.createdAt).toLocaleDateString(
+                                  'ko-KR'
+                                )}
                               </div>
                               <div className="font-semibold text-gray-900 mb-1">
                                 {item.title}
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-gray-900">
-                                  {item.price.toLocaleString()}원
-                                </span>
+                              <div className="text-sm text-gray-600 mb-2">
+                                {getCategoryName(item.type)}
                               </div>
 
-                              {/* 신고 받은 거래인 경우 신고 사유 표시 */}
-                              {activeTab === 'received' && item.reason && (
-                                <div className="mt-2 text-sm text-red-600">
-                                  신고 사유: {item.reason}
-                                </div>
-                              )}
+                              {/* 상태 표시 */}
+                              <div className="mt-2">
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    item.status === 'IN_PROGRESS'
+                                      ? 'bg-yellow-100 text-yellow-800'
+                                      : 'bg-green-100 text-green-800'
+                                  }`}
+                                >
+                                  {item.status === 'IN_PROGRESS'
+                                    ? '답변 대기'
+                                    : '답변 완료'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         ))}
+
+                        {/* 더보기 버튼 */}
+                        {hasNext && (
+                          <div className="text-center pt-4">
+                            <button
+                              onClick={handleLoadMore}
+                              disabled={isLoadingMore}
+                              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                            >
+                              {isLoadingMore ? '로딩 중...' : '더보기'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-500">
-                        {activeTab === 'reported'
-                          ? '신고한 거래가 없습니다.'
-                          : '신고 받은 거래가 없습니다.'}
+                        {activeTab === 'all'
+                          ? '문의 내역이 없습니다.'
+                          : activeTab === 'pending'
+                            ? '답변 대기 중인 문의가 없습니다.'
+                            : '답변 완료된 문의가 없습니다.'}
                       </div>
                     )}
                   </div>
@@ -191,6 +374,23 @@ export default function ReportHistoryPage() {
           </div>
         </main>
       </div>
+
+      {/* 문의 작성 모달 */}
+      <InquiryModal
+        open={isInquiryModalOpen}
+        onClose={() => setIsInquiryModalOpen(false)}
+        onSubmit={handleInquirySubmit}
+      />
+
+      {/* 문의 상세 모달 */}
+      <InquiryDetailModal
+        open={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedInquiry(null);
+        }}
+        inquiry={selectedInquiry}
+      />
     </div>
   );
 }
