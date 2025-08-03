@@ -15,10 +15,16 @@ export default function UserCard({ user, onClick }: UserCardProps) {
 
   return (
     <div
-      className="flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+      className="relative flex items-center justify-between p-3 md:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg hover:border-cyan-400/50 hover:bg-gray-800/70 transition-all duration-300 cursor-pointer group overflow-hidden"
       onClick={handleClick}
     >
-      <div className="flex items-center space-x-3 md:space-x-4">
+      {/* 호버 시 글로우 효과 */}
+      <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      {/* 사이드 글로우 라인 */}
+      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-green-400 to-transparent opacity-60"></div>
+
+      <div className="relative flex items-center space-x-3 md:space-x-4 z-10">
         <UserTypeButton type={user.type} />
         <UserInfo user={user} />
       </div>
@@ -30,13 +36,24 @@ export default function UserCard({ user, onClick }: UserCardProps) {
 // 유저 타입 버튼 (구매/판매)
 function UserTypeButton({ type }: { type: 'buyer' | 'seller' }) {
   return (
-    <button
-      className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-white text-xs md:text-sm font-medium ${
-        type === 'buyer' ? 'bg-green-500' : 'bg-pink-500'
+    <div
+      className={`relative px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium border transition-all duration-300 ${
+        type === 'buyer'
+          ? 'bg-green-400/20 border-green-400/50 text-green-400'
+          : 'bg-pink-400/20 border-pink-400/50 text-pink-400'
       }`}
     >
-      {type === 'buyer' ? '구매자' : '판매자'}
-    </button>
+      {/* 내부 글로우 */}
+      <div
+        className={`absolute inset-0 rounded-lg opacity-50 ${
+          type === 'buyer' ? 'bg-green-400/10' : 'bg-pink-400/10'
+        }`}
+      ></div>
+
+      <span className="relative z-10">
+        {type === 'buyer' ? '구매자' : '판매자'}
+      </span>
+    </div>
   );
 }
 
@@ -58,12 +75,14 @@ function UserInfo({ user }: { user: User }) {
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
       <UserAvatar />
-      <span className="text-midnight-black font-medium text-sm md:text-base">
+      <span className="text-white font-medium text-sm md:text-base">
         {user.name}
       </span>
-      <span className="text-gray-500 text-sm md:text-base">|</span>
-      <span className="text-midnight-black text-sm md:text-base">
-        {user.carrier} | {formatData(user.data)} | {formatPrice(user.price)}
+      <span className="text-gray-400 text-sm md:text-base">|</span>
+      <span className="text-gray-300 text-sm md:text-base">
+        <span className="text-cyan-400">{user.carrier}</span> |
+        <span className="text-green-400 ml-1">{formatData(user.data)}</span> |
+        <span className="text-yellow-400 ml-1">{formatPrice(user.price)}</span>
       </span>
     </div>
   );
@@ -72,7 +91,10 @@ function UserInfo({ user }: { user: User }) {
 // 유저 아바타
 function UserAvatar() {
   return (
-    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-amber-600"></div>
+    <div className="relative w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border border-amber-400/50">
+      {/* 내부 글로우 */}
+      <div className="absolute inset-0.5 rounded-full bg-amber-400/20 animate-pulse"></div>
+    </div>
   );
 }
 
@@ -80,7 +102,7 @@ function UserAvatar() {
 function ArrowIcon() {
   return (
     <svg
-      className="w-4 h-4 md:w-5 md:h-5 text-gray-400"
+      className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-cyan-400 transition-colors duration-300"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

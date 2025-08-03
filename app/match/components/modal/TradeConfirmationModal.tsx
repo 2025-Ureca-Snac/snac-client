@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { User } from '../../types/match';
 import { useMatchStore } from '@/app/(shared)/stores/match-store';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
 
 // Lottie Player를 동적으로 import (SSR 문제 방지)
 const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false });
@@ -29,15 +30,10 @@ export default function TradeConfirmationModal({
   tradeStatus,
 }: TradeConfirmationModalProps) {
   const router = useRouter();
-  const { foundMatch, partner } = useMatchStore();
+  const { partner } = useMatchStore();
   const { user } = useAuthStore();
+  const { sendBuyRequestCancel } = useGlobalWebSocket();
 
-  // profile이 없으면 테스트용 데이터 설정
-  useEffect(() => {
-    if (!user) {
-      throw new Error('User not found');
-    }
-  }, [user]);
   const [modalState, setModalState] = useState<ModalState>('confirm');
   const [timeLeft, setTimeLeft] = useState(3);
   const [canCancel, setCanCancel] = useState(false);
@@ -75,27 +71,10 @@ export default function TradeConfirmationModal({
     if (tradeStatus === 'ACCEPTED') {
       setModalState('success');
 
-      const partnerInfo = {
-        tradeId: 1,
-        buyer: 'hardcoded-buyer@email.com',
-        seller: 'hardcoded-seller@email.com',
-        cardId: 1,
-        carrier: 'SKT',
-        dataAmount: 10,
-        phone: '010-1234-5678',
-        point: 10000,
-        priceGb: 2000,
-        sellerRatingScore: 4.8,
-        status: 'ACCEPTED',
-        cancelReason: null,
-        type: 'seller' as const,
-      };
-
       // partner가 있으면 partner 사용, 없으면 seller 사용
       if (partner) {
-        foundMatch(partnerInfo);
-
         // 1초 후 trading 페이지로 이동
+
         setTimeout(() => {
           router.push('/match/trading');
         }, 1000);
@@ -107,8 +86,6 @@ export default function TradeConfirmationModal({
           email: seller.email,
           전체_데이터: seller,
         });
-
-        foundMatch(partnerInfo);
 
         // 2초 후 trading 페이지로 이동
         setTimeout(() => {
@@ -137,6 +114,11 @@ export default function TradeConfirmationModal({
       if (timer) clearTimeout(timer);
     };
   }, [modalState, timeLeft]);
+
+  // user가 없으면 모달을 렌더링하지 않음
+  if (!user) {
+    return null;
+  }
 
   if (!isOpen || !seller) return null;
 
@@ -175,9 +157,13 @@ export default function TradeConfirmationModal({
   // 거래 취소 핸들러
   const handleCancelTrade = () => {
     if (canCancel) {
-      setModalState('confirm');
-      setTimeLeft(3);
-      setCanCancel(false);
+      // WebSocket을 통해 구매 요청 취소 메시지 전송
+      const cardId = partner?.cardId || seller?.cardId;
+      if (cardId) {
+        sendBuyRequestCancel(cardId);
+      }
+
+      onCancel();
     }
   };
 
