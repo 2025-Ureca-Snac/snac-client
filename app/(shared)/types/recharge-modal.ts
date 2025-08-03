@@ -6,12 +6,11 @@
  * @property {function} onClose: 모달 닫기 이벤트
  * @property {number} currentPoints: 현재 스낵 포인트
  * @property {number} shortage: 부족한 금액 (선택적)
- * @property {function} onRechargeSuccess: 충전 성공 이벤트
  */
 export interface RechargeModalProps {
   open: boolean;
   onClose: () => void;
   currentPoints: number;
   shortage?: number; // 부족한 금액 (선택적)
-  onRechargeSuccess?: (rechargedAmount: number) => void;
+  onRefreshData?: () => void; // 데이터 새로고침 함수 (선택적)
 }
