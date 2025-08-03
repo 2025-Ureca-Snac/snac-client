@@ -11,6 +11,7 @@ import {
   BankAccount,
   BankAccountRequest,
 } from '../types/settlement-modal';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -170,7 +171,7 @@ export default function SettlementModal({
         accountHolder: '',
       });
 
-      alert('계좌가 성공적으로 등록되었습니다!');
+      toast.success('계좌가 성공적으로 등록되었습니다!');
     } catch (err) {
       console.error('계좌 등록 실패:', err);
       const errorMessage = handleApiError(err);
@@ -243,7 +244,7 @@ export default function SettlementModal({
         console.error('사용자 정보 새로고침 실패:', error);
       }
 
-      alert('정산이 성공적으로 완료되었습니다!');
+      toast.success('정산이 성공적으로 완료되었습니다!');
       onClose();
     } catch (err) {
       console.error('정산 실패:', err);

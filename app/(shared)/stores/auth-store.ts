@@ -4,6 +4,29 @@ import { api, handleApiError } from '../utils/api';
 import { jwtDecode } from 'jwt-decode';
 import { AuthState, JwtPayload } from '../types/auth-store';
 
+// 에러 코드에 따른 메시지를 생성하는 헬퍼 함수
+const getAuthErrorMessage = (
+  errorCode: string,
+  isUnlink: boolean = false
+): string => {
+  const defaultMessage = isUnlink
+    ? '소셜 로그인 해제 인증에 실패했습니다.'
+    : '소셜 로그인 인증에 실패했습니다.';
+
+  switch (errorCode) {
+    case 'OAUTH_DB_ACCOUNT_NOT_FOUND_404':
+      return isUnlink
+        ? '소셜 계정에 연동된 계정이 없습니다.'
+        : '소셜 계정에 연동된 계정이 없습니다. 회원가입을 먼저 진행해주세요.';
+    case 'MEMBER_NOT_FOUND_404':
+      return '존재하지 않는 회원입니다.';
+    case 'OAUTH_DB_ALREADY_LINKED_409':
+      return '이미 다른 계정에 연동된 소셜 계정입니다.';
+    default:
+      return defaultMessage;
+  }
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -137,7 +160,14 @@ export const useAuthStore = create<AuthState>()(
                 }
               } else if (event.data.type === 'AUTH_ERROR') {
                 console.log('소셜 로그인 인증 실패:', event.data.data);
-                reject(new Error('소셜 로그인 인증에 실패했습니다.'));
+
+                // 헬퍼 함수를 사용하여 에러 메시지 생성
+                const errorCode = event.data.data?.error;
+                const errorMessage = getAuthErrorMessage(
+                  errorCode || '',
+                  false
+                );
+                reject(new Error(errorMessage));
               }
             };
 
@@ -208,7 +238,10 @@ export const useAuthStore = create<AuthState>()(
                   authWindow.close();
                 }
 
-                reject(new Error('소셜 로그인 해제 인증에 실패했습니다.'));
+                // 헬퍼 함수를 사용하여 에러 메시지 생성
+                const errorCode = event.data.data?.error;
+                const errorMessage = getAuthErrorMessage(errorCode || '', true);
+                reject(new Error(errorMessage));
               }
             };
 

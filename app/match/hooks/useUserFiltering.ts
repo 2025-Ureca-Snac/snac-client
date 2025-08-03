@@ -58,9 +58,8 @@ function matchesDataAmountFilter(
   dataFilters: string[]
 ): boolean {
   return dataFilters.some((filter) => {
-    if (filter === '1GB 미만') return userData < 1;
-    if (filter === '1GB 이상') return userData >= 1;
-    if (filter === '2GB 이상') return userData >= 2;
+    if (filter === '1GB') return userData >= 1;
+    if (filter === '2GB') return userData >= 2;
     return false;
   });
 }

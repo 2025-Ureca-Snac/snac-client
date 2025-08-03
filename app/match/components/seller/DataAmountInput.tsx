@@ -5,11 +5,13 @@ import React, { useState, useEffect } from 'react';
 interface DataAmountInputProps {
   value: number; // GB 단위로 저장
   onChange: (value: number) => void;
+  disabled?: boolean;
 }
 
 export default function DataAmountInput({
   value,
   onChange,
+  disabled = false,
 }: DataAmountInputProps) {
   const [isCustomInput, setIsCustomInput] = useState(false);
   const [inputValue, setInputValue] = useState('1');
@@ -28,17 +30,20 @@ export default function DataAmountInput({
 
   // 빠른 선택 버튼 클릭
   const handleQuickSelect = (amount: number) => {
+    if (disabled) return;
     setIsCustomInput(false);
     onChange(amount);
   };
 
   // 직접 입력 모드 활성화
   const handleCustomInputToggle = () => {
+    if (disabled) return;
     setIsCustomInput(!isCustomInput);
   };
 
   // 입력 값 변경
   const handleInputChange = (newValue: string) => {
+    if (disabled) return;
     setInputValue(newValue);
     const numValue = parseFloat(newValue) || 0;
     const gbValue = unit === 'GB' ? numValue : numValue / 1000;
@@ -47,6 +52,7 @@ export default function DataAmountInput({
 
   // 단위 변경
   const handleUnitChange = (newUnit: 'GB' | 'MB') => {
+    if (disabled) return;
     setUnit(newUnit);
     const currentValue = parseFloat(inputValue) || 0;
 
@@ -71,7 +77,7 @@ export default function DataAmountInput({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-medium text-white">데이터량</h3>
+      <h3 className={`text-lg font-medium text-white`}>데이터량</h3>
 
       {!isCustomInput ? (
         <div className="space-y-3">
@@ -81,10 +87,13 @@ export default function DataAmountInput({
               <button
                 key={option.value}
                 onClick={() => handleQuickSelect(option.value)}
+                disabled={disabled}
                 className={`px-3 py-3 text-sm rounded-lg border transition-all ${
-                  Math.abs(value - option.value) < 0.01
-                    ? 'bg-white text-black border-white'
-                    : 'bg-transparent text-white border-gray-400 hover:border-white hover:bg-white hover:bg-opacity-10'
+                  disabled
+                    ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+                    : Math.abs(value - option.value) < 0.01
+                      ? 'bg-white text-black border-white'
+                      : 'bg-transparent text-white border-gray-400 hover:border-white hover:bg-white hover:bg-opacity-10'
                 }`}
               >
                 {option.label}
@@ -110,28 +119,41 @@ export default function DataAmountInput({
               max="10000"
               value={inputValue}
               onChange={(e) => handleInputChange(e.target.value)}
-              className="flex-1 px-3 py-3 bg-gray-800 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              disabled={disabled}
+              className={`flex-1 px-3 py-3 border rounded-lg transition-all ${
+                disabled
+                  ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+                  : 'bg-gray-800 text-white border-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent'
+              }`}
               placeholder="데이터량 입력"
             />
 
             {/* 단위 선택 버튼 */}
-            <div className="flex bg-gray-700 rounded-lg overflow-hidden">
+            <div
+              className={`flex rounded-lg overflow-hidden ${disabled ? 'bg-gray-600' : 'bg-gray-700'}`}
+            >
               <button
                 onClick={() => handleUnitChange('GB')}
+                disabled={disabled}
                 className={`px-4 py-3 text-sm font-medium transition-all ${
-                  unit === 'GB'
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                  disabled
+                    ? 'text-gray-500 cursor-not-allowed'
+                    : unit === 'GB'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-300 hover:text-white hover:bg-gray-600'
                 }`}
               >
                 GB
               </button>
               <button
                 onClick={() => handleUnitChange('MB')}
+                disabled={disabled}
                 className={`px-4 py-3 text-sm font-medium transition-all ${
-                  unit === 'MB'
-                    ? 'bg-green-600 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                  disabled
+                    ? 'text-gray-500 cursor-not-allowed'
+                    : unit === 'MB'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-300 hover:text-white hover:bg-gray-600'
                 }`}
               >
                 MB
@@ -140,7 +162,9 @@ export default function DataAmountInput({
           </div>
 
           {/* 현재 값 표시 */}
-          <div className="text-xs text-gray-400 text-center">
+          <div
+            className={`text-xs text-center ${disabled ? 'text-gray-500' : 'text-gray-400'}`}
+          >
             {unit === 'GB'
               ? `${parseFloat(inputValue) || 0}GB`
               : `${parseFloat(inputValue) || 0}MB (${((parseFloat(inputValue) || 0) / 1000).toFixed(2)}GB)`}
@@ -149,7 +173,12 @@ export default function DataAmountInput({
           {/* 빠른 선택으로 돌아가기 */}
           <button
             onClick={handleCustomInputToggle}
-            className="w-full py-2 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+            disabled={disabled}
+            className={`w-full py-2 text-xs transition-colors ${
+              disabled
+                ? 'text-gray-500 cursor-not-allowed'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
           >
             빠른 선택으로 돌아가기
           </button>
