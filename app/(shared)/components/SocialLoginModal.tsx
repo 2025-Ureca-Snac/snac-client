@@ -103,18 +103,12 @@ export default function SocialLoginModal({
     } catch (error) {
       console.error('소셜 로그인 연동 처리 중 오류:', error);
 
-      // 에러 타입에 따른 메시지 처리
-      if (error instanceof Error) {
-        if (error.message.includes('중복')) {
-          toast.error('이미 연동된 계정입니다.');
-        } else if (error.message.includes('연동된 계정이 없습니다')) {
-          toast.error('연동된 계정이 없습니다.');
-        } else {
-          toast.error('소셜 로그인 처리 중 오류가 발생했습니다.');
-        }
-      } else {
-        toast.error('소셜 로그인 처리 중 오류가 발생했습니다.');
-      }
+      // 실제 에러 메시지 사용
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : '소셜 로그인 처리 중 오류가 발생했습니다.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(null);
     }
