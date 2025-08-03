@@ -11,31 +11,76 @@ export default function BlogStructuredData({
 }: BlogStructuredDataProps) {
   if (post) {
     // 개별 포스트용 구조화된 데이터
+    const cleanContent = post.content?.replace(/<[^>]*>/g, '') || '';
+    const wordCount = cleanContent.split(/\s+/).length;
+
     const structuredData = {
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
       headline: post.title,
-      description: post.content?.substring(0, 160) || post.title,
-      image: post.image,
+      description: cleanContent.substring(0, 160) || post.title,
+      image:
+        post.imageUrl ||
+        post.image ||
+        'https://snac-app.com/blog-bg-pattern.png',
       author: {
         '@type': 'Person',
-        name: post.author || '스낵팀',
+        name: post.nickname || post.author || '스낵팀',
+        url: 'https://snac-app.com',
       },
       publisher: {
         '@type': 'Organization',
         name: '스낵',
+        url: 'https://snac-app.com',
         logo: {
           '@type': 'ImageObject',
-          url: '/logo.png',
+          url: 'https://snac-app.com/logo.png',
+          width: 200,
+          height: 60,
         },
       },
       datePublished: post.publishDate,
       dateModified: post.publishDate,
       mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': `https://snac.com/blog/${post.id}`,
+        '@id': `https://snac-app.com/blog/${post.id}`,
       },
       articleSection: post.category || '블로그',
+      inLanguage: 'ko-KR',
+      isAccessibleForFree: true,
+      keywords: [
+        post.category || '블로그',
+        '스낵',
+        '데이터거래',
+        '데이터마켓플레이스',
+        ...(post.title.split(' ').filter((word) => word.length > 1) || []),
+      ].join(', '),
+      wordCount: wordCount,
+      // BreadcrumbList 추가
+      breadcrumb: {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: '홈',
+            item: 'https://snac-app.com',
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: '블로그',
+            item: 'https://snac-app.com/blog',
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: post.title,
+            item: `https://snac-app.com/blog/${post.id}`,
+          },
+        ],
+      },
     };
 
     return (
@@ -54,26 +99,36 @@ export default function BlogStructuredData({
       name: '스낵 블로그',
       description:
         '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
-      url: 'https://snac.com/blog',
+      url: 'https://snac-app.com/blog',
+      inLanguage: 'ko-KR',
       publisher: {
         '@type': 'Organization',
         name: '스낵',
+        url: 'https://snac-app.com',
         logo: {
           '@type': 'ImageObject',
-          url: '/logo.png',
+          url: 'https://snac-app.com/logo.png',
+          width: 200,
+          height: 60,
         },
       },
       blogPost: posts.map((post) => ({
         '@type': 'BlogPosting',
         headline: post.title,
-        description: post.content?.substring(0, 160) || post.title,
-        image: post.image,
+        description:
+          post.content?.replace(/<[^>]*>/g, '').substring(0, 160) || post.title,
+        image:
+          post.imageUrl ||
+          post.image ||
+          'https://snac-app.com/blog-bg-pattern.png',
         author: {
           '@type': 'Person',
-          name: post.author || '스낵팀',
+          name: post.nickname || post.author || '스낵팀',
+          url: 'https://snac-app.com',
         },
         datePublished: post.publishDate,
-        url: `https://snac.com/blog/${post.id}`,
+        url: `https://snac-app.com/blog/${post.id}`,
+        inLanguage: 'ko-KR',
       })),
     };
 
