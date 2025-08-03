@@ -3,7 +3,18 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
+import type { SendDataResponse } from '../types/api';
 import api from '../utils/api';
+import { API_STATUS, UPLOAD_ERROR_MESSAGE } from '../constants/api-status';
+
+// 첨부 이미지 URL 응답 타입 정의
+interface AttachmentUrlResponse {
+  data: string;
+  code: string;
+  status: string;
+  message: string;
+  timestamp: string;
+}
 import {
   getHistoryStatusText,
   getHistoryStatusColor,
@@ -16,6 +27,12 @@ import { REASON_MAP } from '../constants/cancel-reasons';
 const getCancelReasonText = (reason: string): string => {
   return REASON_MAP[reason] || reason || '없음';
 };
+
+// 메시지 타입별 CSS 클래스 매핑
+const messageTypeClasses = {
+  success: 'bg-green-50 border border-green-200 text-green-800',
+  error: 'bg-red-50 border border-red-200 text-red-800',
+} as const;
 
 /**
  * @author 이승우
@@ -36,6 +53,13 @@ export default function HistoryDetailModal({
   const [selectedCancelReason, setSelectedCancelReason] = useState<string>('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string>('');
+  const [uploadMessageType, setUploadMessageType] = useState<
+    'success' | 'error' | ''
+  >('');
+  const [attachmentImageUrl, setAttachmentImageUrl] = useState<string>('');
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   // 단골 상태 초기화
   useEffect(() => {
@@ -43,6 +67,33 @@ export default function HistoryDetailModal({
       setIsFavorite(item.partnerFavorite);
     }
   }, [item?.partnerId, item?.partnerFavorite]);
+
+  // 첨부 이미지 URL 가져오기
+  useEffect(() => {
+    const fetchAttachmentImage = async () => {
+      // 데이터 수신완료 상태일 때만 이미지 가져오기
+      if (item?.status === 'DATA_SENT' || item?.status === 'COMPLETED') {
+        try {
+          setIsLoadingImage(true);
+          const response = await api.get<AttachmentUrlResponse>(
+            `/trades/${item.id}/attachment-url`
+          );
+
+          if (response.data.status === 'OK' && response.data.data) {
+            setAttachmentImageUrl(response.data.data);
+          }
+        } catch (error) {
+          console.error('첨부 이미지 URL 가져오기 실패:', error);
+        } finally {
+          setIsLoadingImage(false);
+        }
+      }
+    };
+
+    if (open && item) {
+      fetchAttachmentImage();
+    }
+  }, [open, item]);
 
   if (!open || !item) return null;
 
@@ -92,12 +143,16 @@ export default function HistoryDetailModal({
     }
 
     try {
+      setIsUploading(true);
+      setUploadMessage('');
+      setUploadMessageType('');
+
       console.log('전송완료 버튼 클릭됨:', item);
 
       const formData = new FormData();
       formData.append('file', uploadedFile);
 
-      const response = await api.patch(
+      const response = await api.patch<SendDataResponse>(
         `/trades/${item.id}/send-data`,
         formData,
         {
@@ -108,12 +163,33 @@ export default function HistoryDetailModal({
       );
 
       console.log('데이터 전송 완료 처리됨', response);
-      setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
 
-      // 성공 시 페이지 새로고침
-      window.location.reload();
+      // 응답 상태에 따른 처리
+      if (response.data.status === API_STATUS.OK) {
+        // 성공 시 페이지 새로고침
+        window.location.reload();
+        return;
+      }
+
+      let errorMessage: string = UPLOAD_ERROR_MESSAGE.DEFAULT;
+      switch (response.data.status) {
+        case API_STATUS.BAD_REQUEST:
+          errorMessage = response.data.data || UPLOAD_ERROR_MESSAGE.BAD_IMAGE;
+          break;
+        case API_STATUS.GATEWAY_TIMEOUT:
+          errorMessage = UPLOAD_ERROR_MESSAGE.TIMEOUT;
+          break;
+      }
+      setUploadMessage(errorMessage);
+      setUploadMessageType('error');
+
+      setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
     } catch (error) {
       console.error('데이터 전송 완료 처리 실패:', error);
+      setUploadMessage(UPLOAD_ERROR_MESSAGE.DEFAULT);
+      setUploadMessageType('error');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -364,6 +440,50 @@ export default function HistoryDetailModal({
               </div>
             )}
 
+          {/* 첨부 이미지 표시 */}
+          {(item.status === 'DATA_SENT' || item.status === 'COMPLETED') &&
+            attachmentImageUrl && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600 text-xs">📷</span>
+                  </div>
+                  <div className="text-gray-800 text-sm font-medium">
+                    전송된 데이터 확인
+                  </div>
+                </div>
+                <a
+                  href={attachmentImageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-shadow cursor-pointer"
+                >
+                  <div className="relative w-full h-80 bg-white">
+                    <Image
+                      src={attachmentImageUrl}
+                      alt="전송된 데이터"
+                      fill
+                      className="object-contain hover:scale-105 transition-transform duration-200"
+                      sizes="(max-width: 768px) 100vw, 600px"
+                    />
+                  </div>
+                </a>
+              </div>
+            )}
+
+          {/* 이미지 로딩 중 표시 */}
+          {(item.status === 'DATA_SENT' || item.status === 'COMPLETED') &&
+            isLoadingImage && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-gray-600 text-sm">
+                    이미지 로딩 중...
+                  </span>
+                </div>
+              </div>
+            )}
+
           {/* DATA_SENT 상태일 때 판매자/구매자별 다른 UI */}
           {item.status === 'DATA_SENT' && !item.cancelRequested && (
             <>
@@ -471,6 +591,17 @@ export default function HistoryDetailModal({
                   </div>
                 )}
 
+                {/* 업로드 메시지 표시 */}
+                {uploadMessage &&
+                  uploadMessageType &&
+                  messageTypeClasses[uploadMessageType] && (
+                    <div
+                      className={`p-3 rounded-lg text-sm ${messageTypeClasses[uploadMessageType]}`}
+                    >
+                      {uploadMessage}
+                    </div>
+                  )}
+
                 {/* 액션 버튼 */}
                 <div className="flex gap-2">
                   <label className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer text-center">
@@ -479,19 +610,26 @@ export default function HistoryDetailModal({
                       type="file"
                       onChange={handleFileUpload}
                       className="hidden"
-                      accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".webp,.jpg,.jpeg,.png"
                     />
                   </label>
                   <button
                     onClick={handleDataSent}
-                    disabled={!uploadedFile}
+                    disabled={!uploadedFile || isUploading}
                     className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
-                      uploadedFile
+                      uploadedFile && !isUploading
                         ? 'bg-green-500 text-white hover:bg-green-600'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    전송완료
+                    {isUploading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        업로드 중입니다
+                      </div>
+                    ) : (
+                      '전송완료'
+                    )}
                   </button>
                 </div>
               </div>
