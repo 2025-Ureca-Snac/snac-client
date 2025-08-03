@@ -14,6 +14,9 @@ interface TradingHistoryItem {
   tradeType: string;
   createdAt: string;
   phone: string | null;
+  partnerId?: number;
+  partnerFavorite: boolean;
+  partnerNickname: string;
   cancelReason?: string;
   cancelRequested: boolean;
   cancelRequestReason: string | null;

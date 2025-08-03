@@ -33,6 +33,9 @@ interface TradingHistoryItem {
   tradeType: string;
   createdAt: string;
   phone: string | null;
+  partnerId?: number;
+  partnerFavorite: boolean;
+  partnerNickname: string;
   cancelReason?: string;
   cancelRequested: boolean;
   cancelRequestReason: string | null;
@@ -194,6 +197,9 @@ export default function TradingHistoryPage({
       cancelReason: item.cancelReason || '',
       cancelRequested: item.cancelRequested || false,
       cancelRequestReason: item.cancelRequestReason || null,
+      partnerId: item.partnerId || undefined,
+      partnerFavorite: item.partnerFavorite || false,
+      partnerNickname: item.partnerNickname || '',
     };
     setSelectedItem(historyItem);
     setIsModalOpen(true);
