@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
 import api from '../utils/api';
+
+// API 응답 타입 정의
+interface SendDataResponse {
+  data: string;
+  code: string;
+  status: string;
+  message: string;
+  timestamp: string;
+}
 import {
   getHistoryStatusText,
   getHistoryStatusColor,
@@ -36,6 +45,11 @@ export default function HistoryDetailModal({
   const [selectedCancelReason, setSelectedCancelReason] = useState<string>('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string>('');
+  const [uploadMessageType, setUploadMessageType] = useState<
+    'success' | 'error' | ''
+  >('');
 
   // 단골 상태 초기화
   useEffect(() => {
@@ -92,12 +106,16 @@ export default function HistoryDetailModal({
     }
 
     try {
+      setIsUploading(true);
+      setUploadMessage('');
+      setUploadMessageType('');
+
       console.log('전송완료 버튼 클릭됨:', item);
 
       const formData = new FormData();
       formData.append('file', uploadedFile);
 
-      const response = await api.patch(
+      const response = await api.patch<SendDataResponse>(
         `/trades/${item.id}/send-data`,
         formData,
         {
@@ -108,12 +126,38 @@ export default function HistoryDetailModal({
       );
 
       console.log('데이터 전송 완료 처리됨', response);
-      setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
 
-      // 성공 시 페이지 새로고침
-      window.location.reload();
+      // 응답 상태에 따른 처리
+      if (response.data.status === 'OK') {
+        // 성공 시 페이지 새로고침
+        window.location.reload();
+      } else if (response.data.status === 'BAD_REQUEST') {
+        // 이미지 기준 미충족 시 안내 메시지 표시
+        setUploadMessage(response.data.data || '다른 사진을 보내주세요.');
+        setUploadMessageType('error');
+      } else if (response.data.status === 'GATEWAY_TIMEOUT') {
+        // 타임아웃 시 안내 메시지 표시
+        setUploadMessage(
+          '이미지 검증 중에 문제가 발생했습니다. 잠시후 다시시도해주세요.'
+        );
+        setUploadMessageType('error');
+      } else {
+        // 기타 오류 시 기본 메시지
+        setUploadMessage(
+          '이미지 업로드 중 오류가 발생했습니다. 다시 시도해주세요.'
+        );
+        setUploadMessageType('error');
+      }
+
+      setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
     } catch (error) {
       console.error('데이터 전송 완료 처리 실패:', error);
+      setUploadMessage(
+        '이미지 업로드 중 오류가 발생했습니다. 다시 시도해주세요.'
+      );
+      setUploadMessageType('error');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -471,6 +515,19 @@ export default function HistoryDetailModal({
                   </div>
                 )}
 
+                {/* 업로드 메시지 표시 */}
+                {uploadMessage && (
+                  <div
+                    className={`p-3 rounded-lg text-sm ${
+                      uploadMessageType === 'error'
+                        ? 'bg-red-50 border border-red-200 text-red-800'
+                        : 'bg-green-50 border border-green-200 text-green-800'
+                    }`}
+                  >
+                    {uploadMessage}
+                  </div>
+                )}
+
                 {/* 액션 버튼 */}
                 <div className="flex gap-2">
                   <label className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer text-center">
@@ -479,19 +536,26 @@ export default function HistoryDetailModal({
                       type="file"
                       onChange={handleFileUpload}
                       className="hidden"
-                      accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".webp,.jpg,.jpeg,.png"
                     />
                   </label>
                   <button
                     onClick={handleDataSent}
-                    disabled={!uploadedFile}
+                    disabled={!uploadedFile || isUploading}
                     className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
-                      uploadedFile
+                      uploadedFile && !isUploading
                         ? 'bg-green-500 text-white hover:bg-green-600'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    전송완료
+                    {isUploading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        업로드 중입니다
+                      </div>
+                    ) : (
+                      '전송완료'
+                    )}
                   </button>
                 </div>
               </div>
