@@ -15,6 +15,8 @@ interface TradingHistoryItem {
   createdAt: string;
   phone: string | null;
   cancelReason?: string;
+  cancelRequested: boolean;
+  cancelRequestReason: string | null;
 }
 
 interface TradingHistoryCardProps {
