@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+// import { useState } from 'react';
 import { BlogCard } from '@/app/(shared)/components/BlogCard';
-import { BlogTabNavigation } from './BlogTabNavigation';
-import { ExtendedBlogPost } from '../data/blogPosts';
+// import { BlogTabNavigation } from './BlogTabNavigation';
+import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
 interface BlogContentProps {
-  posts: ExtendedBlogPost[];
+  posts: Blog[];
+  isLoading?: boolean;
+  hasNext?: boolean;
   onShowMore?: () => void;
-  onPostClick?: (post: ExtendedBlogPost) => void;
+  onPostClick?: (post: Blog) => void;
   onSortChange?: (sortBy: string) => void;
 }
 
@@ -21,36 +23,44 @@ interface BlogContentProps {
  */
 export const BlogContent = ({
   posts,
+  isLoading,
+  hasNext,
   onShowMore,
   onPostClick,
-  onSortChange,
+  // onSortChange,
 }: BlogContentProps) => {
-  const [activeTab, setActiveTab] = useState<'all' | 'featured'>('all');
+  // const [activeTab, setActiveTab] = useState<'all' | 'featured'>('all');
 
-  const filteredPosts =
-    activeTab === 'all' ? posts : posts.filter((post) => post.featured);
+  const displayedPosts = posts;
+  console.log('BlogContent가 받은 hasNext 값:', hasNext);
+  // const handleTabChange = (tab: 'all' | 'featured') => {
+  //   setActiveTab(tab);
+  // };
 
-  const handleTabChange = (tab: 'all' | 'featured') => {
-    setActiveTab(tab);
-  };
-
-  const handlePostClick = (post: ExtendedBlogPost) => {
-    // 모달 대신 바로 라우터 이동
+  const handlePostClick = (post: Blog) => {
     onPostClick?.(post);
   };
 
+  if (isLoading && posts.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center text-gray-500">
+          게시글을 불러오는 중입니다...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* 탭 네비게이션 */}
-      <BlogTabNavigation
+      {/* <BlogTabNavigation
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onSortChange={onSortChange}
-      />
+      /> */}
 
-      {/* 블로그 카드 그리드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-        {filteredPosts.map((post) => (
+        {displayedPosts.map((post) => (
           <BlogCard
             key={post.id}
             post={post}
@@ -59,14 +69,16 @@ export const BlogContent = ({
         ))}
       </div>
 
-      {/* Show more 버튼 */}
       <div className="text-center">
-        <button
-          onClick={onShowMore}
-          className="bg-white border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-full font-medium hover:bg-gray-50 transition-colors"
-        >
-          Show more
-        </button>
+        {hasNext && (
+          <button
+            onClick={onShowMore}
+            disabled={isLoading}
+            className="bg-white border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-full font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-200 disabled:cursor-not-allowed"
+          >
+            {isLoading ? '로딩 중...' : 'Show more'}
+          </button>
+        )}
       </div>
     </div>
   );

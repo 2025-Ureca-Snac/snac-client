@@ -99,7 +99,7 @@ export const DataItemCard = ({
   const buttonConfig = getButtonConfig();
 
   return (
-    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md max-w-[150px] max-h-[203px] md:max-w-[238px] md:max-h-[348px] flex flex-col p-3">
+    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md max-w-[150px] max-h-[203px] md:w-[238px] md:max-w-none md:max-h-[348px] flex flex-col p-3">
       {isNew && (
         <span className="absolute z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px]  md:w-[57px] h-[20px] md:h-[24px]  rounded-[16px] flex items-center justify-center ">
           {newBadgeText}
@@ -171,10 +171,11 @@ export const DataItemCard = ({
                       });
                     }
                   }}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
-                  style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                  style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
                 >
-                  수정하기
+                  <span className="md:hidden">수정</span>
+                  <span className="hidden md:inline">수정하기</span>
                 </Button>
                 <Button
                   onClick={() => {
@@ -194,10 +195,11 @@ export const DataItemCard = ({
                       }
                     }
                   }}
-                  className="flex-1 bg-red-500 hover:bg-red-600 text-white transition text-regular-md border rounded-lg flex items-center justify-center"
-                  style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+                  className="flex-1 bg-red-500 hover:bg-red-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                  style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
                 >
-                  삭제하기
+                  <span className="md:hidden">삭제</span>
+                  <span className="hidden md:inline">삭제하기</span>
                 </Button>
               </>
             ) : (

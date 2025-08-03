@@ -34,6 +34,8 @@ interface TradingHistoryItem {
   createdAt: string;
   phone: string | null;
   cancelReason?: string;
+  cancelRequested: boolean;
+  cancelRequestReason: string | null;
 }
 
 // 거래 내역 타입
@@ -190,6 +192,8 @@ export default function TradingHistoryPage({
       dataAmount: `${item.dataAmount}GB`,
       phoneNumber: item.phone || '',
       cancelReason: item.cancelReason || '',
+      cancelRequested: item.cancelRequested || false,
+      cancelRequestReason: item.cancelRequestReason || null,
     };
     setSelectedItem(historyItem);
     setIsModalOpen(true);

@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import RechargeModal from '@/app/(shared)/components/recharge-modal';
 import SettlementModal from '@/app/(shared)/components/settlement-modal';
@@ -8,42 +14,69 @@ import RefundModal from '@/app/(shared)/components/refund-modal';
 import {
   PointHistoryItem,
   AssetType,
-  BalanceResponse,
 } from '@/app/(shared)/types/point-history';
+import {
+  PointContentProps,
+  MoneyFilterType,
+  PointFilterType,
+} from '@/app/(shared)/types/point-content';
 
-interface PointContentProps {
-  tabs: { id: string; label: string }[];
-  activeTab: AssetType;
-  setActiveTab: (tabId: AssetType) => void;
-  pointsHistory: PointHistoryItem[];
-  moneyHistory: PointHistoryItem[];
-  hasMore: boolean;
-  onLoadMore: () => void;
-  isLoading: boolean;
-  balance: BalanceResponse;
-}
-
-type FilterType = 'all' | 'earned' | 'spent';
-
+/**
+ * @author 이승우
+ * @description 포인트/머니 내역 컨텐츠 컴포넌트
+ * @param props - 컴포넌트 props
+ * @returns 포인트와 머니 거래 내역을 표시하는 컨텐츠
+ */
 export default function PointContent({
   tabs,
   activeTab,
   setActiveTab,
   pointsHistory,
   moneyHistory,
-  hasMore,
+  hasNext,
   onLoadMore,
-  isLoading,
+  isLoadingMore,
   balance,
+  selectedYear,
+  selectedMonth,
+  onYearChange,
+  onMonthChange,
 }: PointContentProps) {
-  const [pointsFilter, setPointsFilter] = useState<FilterType>('all');
-  const [moneyFilter, setMoneyFilter] = useState<FilterType>('all');
+  const [pointsFilter, setPointsFilter] = useState<PointFilterType>('all');
+  const [moneyFilter, setMoneyFilter] = useState<MoneyFilterType>('all');
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
   const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
   const [selectedRefundAmount, setSelectedRefundAmount] = useState<number>(0);
   const [selectedRefundPaymentKey, setSelectedRefundPaymentKey] =
     useState<string>('');
+
+  // 무한 스크롤을 위한 ref
+  const observerRef = useRef<HTMLDivElement>(null);
+
+  // Intersection Observer 콜백
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasNext && !isLoadingMore) {
+        onLoadMore();
+      }
+    },
+    [hasNext, isLoadingMore, onLoadMore]
+  );
+
+  // Intersection Observer 설정
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+    });
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   // URL 파라미터에서 모달 타입 확인
   useEffect(() => {
@@ -98,307 +131,302 @@ export default function PointContent({
   // 필터링된 거래 내역
   const filteredPointsHistory = useMemo(() => {
     if (pointsFilter === 'all') return pointsHistory;
-    return pointsHistory.filter(
-      (item) => getTransactionType(item.signedAmount) === pointsFilter
-    );
+    return pointsHistory.filter((item) => item.category === pointsFilter);
   }, [pointsHistory, pointsFilter]);
 
   const filteredMoneyHistory = useMemo(() => {
     if (moneyFilter === 'all') return moneyHistory;
-    return moneyHistory.filter(
-      (item) => getTransactionType(item.signedAmount) === moneyFilter
-    );
+    return moneyHistory.filter((item) => item.category === moneyFilter);
   }, [moneyHistory, moneyFilter]);
 
   // 포인트 필터 버튼 컴포넌트
   const PointsFilterButtons = () => (
-    <div className="flex gap-2 mb-4">
+    <div className="flex flex-wrap gap-2 mb-4">
       <button
         onClick={() => setPointsFilter('all')}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === 'all'
-            ? 'bg-gray-800 text-white'
+            ? 'bg-blue-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
         전체
       </button>
       <button
-        onClick={() => setPointsFilter('earned')}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-          pointsFilter === 'earned'
-            ? 'bg-green-600 text-white'
-            : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+        onClick={() => setPointsFilter('적립')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          pointsFilter === '적립'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
-        충전
+        적립
       </button>
       <button
-        onClick={() => setPointsFilter('spent')}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-          pointsFilter === 'spent'
-            ? 'bg-orange-600 text-white'
-            : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200'
+        onClick={() => setPointsFilter('포인트 사용')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          pointsFilter === '포인트 사용'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
-        사용
+        포인트 사용
+      </button>
+      <button
+        onClick={() => setPointsFilter('취소')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          pointsFilter === '취소'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        취소
       </button>
     </div>
   );
 
   // 머니 필터 버튼 컴포넌트
   const MoneyFilterButtons = () => (
-    <div className="flex gap-2 mb-4">
+    <div className="flex flex-wrap gap-2 mb-4">
       <button
         onClick={() => setMoneyFilter('all')}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === 'all'
-            ? 'bg-gray-800 text-white'
+            ? 'bg-green-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
         전체
       </button>
       <button
-        onClick={() => setMoneyFilter('earned')}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-          moneyFilter === 'earned'
+        onClick={() => setMoneyFilter('충전')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          moneyFilter === '충전'
             ? 'bg-green-600 text-white'
-            : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
         충전
       </button>
       <button
-        onClick={() => setMoneyFilter('spent')}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-          moneyFilter === 'spent'
-            ? 'bg-orange-600 text-white'
-            : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200'
+        onClick={() => setMoneyFilter('머니 구매')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          moneyFilter === '머니 구매'
+            ? 'bg-green-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
-        사용
+        구매
+      </button>
+      <button
+        onClick={() => setMoneyFilter('판매')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          moneyFilter === '판매'
+            ? 'bg-green-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        판매
+      </button>
+      <button
+        onClick={() => setMoneyFilter('취소')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          moneyFilter === '취소'
+            ? 'bg-green-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        취소
+      </button>
+      <button
+        onClick={() => setMoneyFilter('정산')}
+        className={`px-3 py-1 text-sm rounded-full transition-colors ${
+          moneyFilter === '정산'
+            ? 'bg-green-600 text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        정산
       </button>
     </div>
   );
 
+  // 거래 내역 아이템 컴포넌트
+  const HistoryItem = ({ item }: { item: PointHistoryItem }) => {
+    const isPositive = getTransactionType(item.signedAmount) === 'earned';
+    const amount = getAmountValue(item.signedAmount);
+    const balanceAfter = getBalanceAfterValue(item.balanceAfter);
+
+    return (
+      <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-medium text-gray-900">
+              {item.title}
+            </span>
+            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+              {item.category}
+            </span>
+          </div>
+          <div className="text-sm text-gray-500">
+            {new Date(item.createdAt).toLocaleDateString('ko-KR', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </div>
+        </div>
+        <div className="text-right">
+          <div
+            className={`text-lg font-semibold ${
+              isPositive ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {isPositive ? '+' : '-'}
+            {amount.toLocaleString()}
+            {activeTab === 'POINT' ? 'P' : 'S'}
+          </div>
+          {activeTab === 'MONEY' && (
+            <div className="text-sm text-gray-500">
+              {balanceAfter.toLocaleString()}S
+            </div>
+          )}
+          {/* 머니 탭에서 충전 내역인 경우 환불 버튼 표시 */}
+          {activeTab === 'MONEY' && isPositive && item.category === '충전' && (
+            <button
+              onClick={() => {
+                setSelectedRefundAmount(amount);
+                setSelectedRefundPaymentKey(
+                  item.paymentKey || item.id.toString()
+                );
+                setIsRefundModalOpen(true);
+              }}
+              className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors mt-1"
+            >
+              환불
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // 월별 선택 컴포넌트
+  const MonthSelector = () => (
+    <div className="flex items-center gap-3 mb-4">
+      <span className="text-sm font-medium text-gray-700">조회 기간:</span>
+      <select
+        value={selectedYear}
+        onChange={(e) => onYearChange?.(Number(e.target.value))}
+        className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(
+          (year) => (
+            <option key={year} value={year}>
+              {year}년
+            </option>
+          )
+        )}
+      </select>
+      <select
+        value={selectedMonth}
+        onChange={(e) => onMonthChange?.(Number(e.target.value))}
+        className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+          <option key={month} value={month}>
+            {month}월
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  // 포인트 탭 컨텐츠
+  const PointsTabContent = () => (
+    <div>
+      <MonthSelector />
+      <PointsFilterButtons />
+      <div className="bg-white rounded-lg shadow-sm border">
+        {filteredPointsHistory.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            {pointsFilter === 'all'
+              ? '거래 내역이 없습니다.'
+              : '해당 카테고리의 거래 내역이 없습니다.'}
+          </div>
+        ) : (
+          <div>
+            {filteredPointsHistory.map((item) => (
+              <HistoryItem key={item.id} item={item} />
+            ))}
+            {/* 무한 스크롤 관찰자 */}
+            {hasNext && (
+              <div ref={observerRef} className="p-4 text-center">
+                {isLoadingMore && (
+                  <div className="text-gray-500">로딩 중...</div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // 머니 탭 컨텐츠
+  const MoneyTabContent = () => (
+    <div>
+      <MoneyFilterButtons />
+      <div className="bg-white rounded-lg shadow-sm border">
+        {filteredMoneyHistory.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            {moneyFilter === 'all'
+              ? '거래 내역이 없습니다.'
+              : '해당 카테고리의 거래 내역이 없습니다.'}
+          </div>
+        ) : (
+          <div>
+            {filteredMoneyHistory.map((item) => (
+              <HistoryItem key={item.id} item={item} />
+            ))}
+            {/* 무한 스크롤 관찰자 */}
+            {hasNext && (
+              <div ref={observerRef} className="p-4 text-center">
+                {isLoadingMore && (
+                  <div className="text-gray-500">로딩 중...</div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border">
+    <div className="space-y-6">
       {/* 탭 네비게이션 */}
       <TabNavigation
         tabs={tabs}
         activeTab={activeTab}
-        onTabChange={(tabId) => setActiveTab(tabId as AssetType)}
-        activeTextColor="text-blue-600"
-        inactiveTextColor="text-gray-500"
-        underlineColor="bg-blue-600"
+        onTabChange={(tabId: string) => setActiveTab(tabId as AssetType)}
       />
 
-      <div className="p-6">
-        {activeTab === 'POINT' ? (
-          <div>
-            {/* Snac 포인트 더 모으기 */}
-            <div className="bg-green-500 rounded-lg p-4 mb-6 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-white">🥔</span>
-                <span className="text-white font-medium">
-                  Snac 포인트 더 모으기
-                </span>
-              </div>
-              <span className="text-white">▶</span>
-            </div>
+      {/* 탭별 컨텐츠 */}
+      {activeTab === 'POINT' ? <PointsTabContent /> : <MoneyTabContent />}
 
-            {/* 필터 버튼 */}
-            <PointsFilterButtons />
-
-            {/* 거래 내역 */}
-            <div className="space-y-4">
-              {filteredPointsHistory.length > 0 ? (
-                filteredPointsHistory.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3 p-3">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900">
-                          {item.title}
-                        </span>
-                        <div className="text-right">
-                          <span
-                            className={`font-semibold block ${
-                              getTransactionType(item.signedAmount) === 'earned'
-                                ? 'text-green-600'
-                                : 'text-pink-600'
-                            }`}
-                          >
-                            {getTransactionType(item.signedAmount) === 'earned'
-                              ? '+'
-                              : ''}
-                            {getAmountValue(item.signedAmount).toLocaleString()}
-                            P
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {getBalanceAfterValue(
-                              item.balanceAfter
-                            ).toLocaleString()}
-                            P
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {item.createdAt}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  {pointsFilter === 'all'
-                    ? '거래 내역이 없습니다.'
-                    : `${pointsFilter === 'earned' ? '충전' : '사용'} 내역이 없습니다.`}
-                </div>
-              )}
-
-              {/* 더보기 버튼 */}
-              {activeTab === 'POINT' && hasMore && (
-                <div className="text-center pt-4">
-                  <button
-                    onClick={onLoadMore}
-                    disabled={isLoading}
-                    className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                      isLoading
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-                    }`}
-                  >
-                    {isLoading ? '로딩 중...' : '더보기'}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div>
-            {/* 충전/정산 버튼 */}
-            <div className="flex gap-3 mb-6">
-              <button
-                onClick={() => setIsRechargeModalOpen(true)}
-                className="flex-1 bg-green-500 text-white py-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
-              >
-                충전
-              </button>
-              <button
-                onClick={() => setIsSettlementModalOpen(true)}
-                className="flex-1 bg-blue-500 text-white py-4 rounded-lg font-medium hover:bg-blue-600 transition-colors"
-              >
-                정산
-              </button>
-            </div>
-
-            {/* 필터 버튼 */}
-            <MoneyFilterButtons />
-
-            {/* 거래 내역 */}
-            <div className="space-y-4">
-              {filteredMoneyHistory.length > 0 ? (
-                filteredMoneyHistory.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3 p-3">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-900">
-                          {item.title}
-                        </span>
-                        <div className="text-right">
-                          <span
-                            className={`font-semibold block ${
-                              getTransactionType(item.signedAmount) === 'earned'
-                                ? 'text-green-600'
-                                : 'text-pink-600'
-                            }`}
-                          >
-                            {getTransactionType(item.signedAmount) === 'earned'
-                              ? '+'
-                              : ''}
-                            {getAmountValue(item.signedAmount).toLocaleString()}
-                            S
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {getBalanceAfterValue(
-                              item.balanceAfter
-                            ).toLocaleString()}
-                            S
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-sm text-gray-500">
-                          {item.createdAt}
-                        </span>
-                        {getTransactionType(item.signedAmount) === 'earned' && (
-                          <button
-                            onClick={() => {
-                              // 충전 내역인 경우에만 환불 버튼 표시
-                              const amount = getAmountValue(item.signedAmount);
-                              // paymentKey는 item에서 가져와야 합니다 (실제 필드명에 따라 조정 필요)
-                              const paymentKey =
-                                (item as { paymentKey?: string }).paymentKey ||
-                                item.id.toString();
-                              setSelectedRefundAmount(amount);
-                              setSelectedRefundPaymentKey(paymentKey);
-                              setIsRefundModalOpen(true);
-                            }}
-                            className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors"
-                          >
-                            환불
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  {moneyFilter === 'all'
-                    ? '거래 내역이 없습니다.'
-                    : `${moneyFilter === 'earned' ? '충전' : '사용'} 내역이 없습니다.`}
-                </div>
-              )}
-
-              {/* 더보기 버튼 */}
-              {activeTab === 'MONEY' && hasMore && (
-                <div className="text-center pt-4">
-                  <button
-                    onClick={onLoadMore}
-                    disabled={isLoading}
-                    className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                      isLoading
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
-                    }`}
-                  >
-                    {isLoading ? '로딩 중...' : '더보기'}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 충전 모달 */}
+      {/* 모달들 */}
       <RechargeModal
         open={isRechargeModalOpen}
         onClose={() => setIsRechargeModalOpen(false)}
-        currentPoints={0}
-        shortage={0}
+        currentPoints={balance.point}
         onRechargeSuccess={(amount) => {
           console.log('충전 성공:', amount);
           setIsRechargeModalOpen(false);
-          // 필요시 페이지 새로고침 또는 데이터 다시 로드
         }}
       />
-
-      {/* 정산 모달 */}
       <SettlementModal
         open={isSettlementModalOpen}
         onClose={() => setIsSettlementModalOpen(false)}
@@ -406,26 +434,16 @@ export default function PointContent({
         onSettlementSuccess={(amount, type) => {
           console.log('정산 성공:', amount, type);
           setIsSettlementModalOpen(false);
-          // 필요시 페이지 새로고침 또는 데이터 다시 로드
         }}
       />
-
-      {/* 환불 모달 */}
       <RefundModal
         open={isRefundModalOpen}
-        onClose={() => {
-          setIsRefundModalOpen(false);
-          setSelectedRefundAmount(0);
-          setSelectedRefundPaymentKey('');
-        }}
+        onClose={() => setIsRefundModalOpen(false)}
         amount={selectedRefundAmount}
         paymentKey={selectedRefundPaymentKey}
         onRefundSuccess={(amount) => {
           console.log('환불 성공:', amount);
           setIsRefundModalOpen(false);
-          setSelectedRefundAmount(0);
-          setSelectedRefundPaymentKey('');
-          // 필요시 페이지 새로고침 또는 데이터 다시 로드
         }}
       />
     </div>

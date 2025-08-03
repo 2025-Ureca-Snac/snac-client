@@ -4,7 +4,10 @@ import InputWithButton from './input-with-button';
 import VerificationInput from './verification-input';
 import PasswordInput from './password-input';
 import type { FindPasswordSectionProps } from '../types/find-section';
-import { checkPasswordMatch } from '../utils/password-validation';
+import {
+  checkPasswordMatch,
+  validatePassword,
+} from '../utils/password-validation';
 
 /**
  * @author 이승우
@@ -76,6 +79,11 @@ export default function FindPasswordSection({
       setPasswordMatch('mismatch');
     }
   }, [passwordFormData.password, passwordFormData.passwordConfirm]);
+
+  // 비밀번호 유효성 검사
+  const passwordValidation = passwordFormData.password.trim()
+    ? validatePassword(passwordFormData.password)
+    : null;
 
   return (
     <motion.form
@@ -220,6 +228,7 @@ export default function FindPasswordSection({
               value={passwordFormData.password}
               onChange={handlePasswordFormChange('password')}
               placeholder="비밀번호"
+              showValidation={true}
               data-new-password-input
               ref={newPasswordInputRef}
             />
@@ -247,7 +256,10 @@ export default function FindPasswordSection({
       <div className="flex gap-2 mt-2">
         <button
           type="submit"
-          disabled={!verified}
+          disabled={
+            !verified ||
+            (passwordValidation ? !passwordValidation.isValid : false)
+          }
           tabIndex={0}
           data-find-password-button
           className="flex-1 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

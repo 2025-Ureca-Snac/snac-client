@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.4",
+    "@headlessui/react": "^2.2.7",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@stomp/stompjs": "^7.1.1",
     "@svgr/webpack": "^8.1.0",
@@ -22,6 +22,7 @@
     "@toast-ui/react-editor": "^3.2.3",
     "@tosspayments/payment-sdk": "^1.9.1",
     "axios": "^1.10.0",
+    "classnames": "^2.5.1",
     "framer-motion": "^12.23.3",
     "jwt-decode": "^4.0.0",
     "next": "15.3.5",

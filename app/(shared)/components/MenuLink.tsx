@@ -1,21 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface MenuLinkProps {
   href: string;
-  imgSrc: string;
+  IconComponent: React.ElementType;
   alt: string;
   text: string;
 }
-
-export const MenuLink = ({ href, imgSrc, alt, text }: MenuLinkProps) => (
+export const MenuLink = ({ href, IconComponent, alt, text }: MenuLinkProps) => (
   <Link
     href={href}
-    className="flex items-center gap-2 transition-opacity hover:opacity-50"
+    className="flex items-center gap-1 transition-opacity hover:opacity-50"
+    aria-label={alt}
   >
-    <Image src={imgSrc} alt={alt} width={24} height={24} />
-    <span className="hidden md:flex text-midnight-black text-regular-sm">
+    <IconComponent width={24} height={24} aria-hidden="true" />
+    <span className="hidden md:flex text-midnight-black dark:text-white text-regular-sm ">
       {text}
     </span>
   </Link>
