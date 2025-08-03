@@ -2,13 +2,16 @@ import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
 // 확장된 Blog 타입을 위한 인터페이스
 export interface ExtendedBlogPost extends Omit<Blog, 'nickname'> {
-  nickname?: string;
+  nickname?: string; // API 응답과 일치
   subtitle?: string;
-  image?: string;
+  image?: string; // 기존 호환성을 위한 속성
+  imageUrl?: string; // API 응답과 일치하는 속성
   featured?: boolean;
-  content?: string;
-  markdownContent?: string; // 마크다운 콘텐츠 추가
-  author?: string;
+  content?: string; // 기존 호환성을 위한 속성
+  markdownContent?: string | Promise<string>; // API 응답과 일치
+  contentFileUrl?: string; // API 응답과 일치하는 속성
+  articleUrl?: string; // API 응답과 일치하는 속성
+  author?: string; // 기존 호환성을 위한 속성
   publishDate?: string;
   readTime?: string;
   category?: string;

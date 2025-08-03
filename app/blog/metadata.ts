@@ -121,7 +121,7 @@ export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
       '스낵',
       ...(post.title.split(' ') || []),
     ],
-    authors: [{ name: post.author || '스낵팀' }],
+    authors: [{ name: post.nickname || post.author || '스낵팀' }],
     openGraph: {
       title: post.title,
       description:
@@ -130,7 +130,7 @@ export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
       siteName: '스낵',
       images: [
         {
-          url: post.image || '/blog-bg-pattern.png',
+          url: post.imageUrl || post.image || '/blog-bg-pattern.png',
           width: 1200,
           height: 630,
           alt: post.title,
@@ -139,14 +139,14 @@ export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
       locale: 'ko_KR',
       type: 'article',
       publishedTime: post.publishDate,
-      authors: [post.author || '스낵팀'],
+      authors: [post.nickname || post.author || '스낵팀'],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description:
         post.content?.substring(0, 160) || '스낵 블로그 포스트입니다.',
-      images: [post.image || '/blog-bg-pattern.png'],
+      images: [post.imageUrl || post.image || '/blog-bg-pattern.png'],
     },
     alternates: {
       canonical: `/blog/${post.id}`,

@@ -16,10 +16,10 @@ export default function BlogStructuredData({
       '@type': 'BlogPosting',
       headline: post.title,
       description: post.content?.substring(0, 160) || post.title,
-      image: post.image,
+      image: post.imageUrl || post.image,
       author: {
         '@type': 'Person',
-        name: post.author || '스낵팀',
+        name: post.nickname || post.author || '스낵팀',
       },
       publisher: {
         '@type': 'Organization',
@@ -67,10 +67,10 @@ export default function BlogStructuredData({
         '@type': 'BlogPosting',
         headline: post.title,
         description: post.content?.substring(0, 160) || post.title,
-        image: post.image,
+        image: post.imageUrl || post.image,
         author: {
           '@type': 'Person',
-          name: post.author || '스낵팀',
+          name: post.nickname || post.author || '스낵팀',
         },
         datePublished: post.publishDate,
         url: `https://snac.com/blog/${post.id}`,

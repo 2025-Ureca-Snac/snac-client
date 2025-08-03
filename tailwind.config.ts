@@ -1,7 +1,8 @@
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
+import typography from '@tailwindcss/typography';
 
-const typography = {
+const customTypography = {
   heading: {
     xs: '14px',
     sm: '16px',
@@ -181,13 +182,14 @@ const config: Config = {
     },
   },
   plugins: [
+    typography,
     plugin(({ addUtilities }) => {
       const newUtilities: Record<
         string,
         { fontSize: string; fontWeight?: string }
       > = {};
 
-      Object.entries(typography).forEach(([type, sizes]) => {
+      Object.entries(customTypography).forEach(([type, sizes]) => {
         Object.entries(sizes).forEach(([size, value]) => {
           const key = `.text-${type}-${size}`;
 
