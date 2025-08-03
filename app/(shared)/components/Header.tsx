@@ -18,8 +18,8 @@ import Login from '@/public/login.svg';
 const ADMIN_ROLE = 'ADMIN';
 
 interface HeaderProps {
-  isDarkmode: boolean;
-  onToggle: () => void;
+  isDarkmode?: boolean;
+  onToggle?: () => void;
   isTrading?: boolean;
 }
 
@@ -109,7 +109,7 @@ export const Header: FC<HeaderProps> = ({
         )}
 
         {/* ThemeSwitch에 isDarkmode onToggle props 전달 */}
-        <ThemeSwitch isDark={isDarkmode} onToggle={onToggle} />
+        {onToggle && <ThemeSwitch isDark={isDarkmode} onToggle={onToggle} />}
       </div>
     </header>
   );
