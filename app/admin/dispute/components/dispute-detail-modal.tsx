@@ -60,7 +60,7 @@ export default function DisputeDetailModal({
             {/* 헤더 */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 sticky top-0 bg-white dark:bg-midnight-black z-10">
               <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                문의/신고 상세 정보
+                상세 정보
               </h2>
               <button
                 onClick={onClose}
