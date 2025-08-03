@@ -163,7 +163,7 @@ export default function Home() {
         lastCardId,
         lastUpdatedAt,
         carrier: carrierForQuery,
-        favoriteOnly: true,
+        favoriteOnly: false,
       });
 
       const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
