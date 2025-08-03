@@ -2,8 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '../(shared)/components/Header';
-import { Footer } from '../(shared)/components/Footer';
+
 import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
@@ -455,21 +454,18 @@ export default function MatchPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
             <p className="text-gray-600">로그인 상태를 확인하는 중...</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen   flex flex-col bg-black">
-      <Header isDarkmode={true} />
       <main className="flex-1">
         <MatchContent
           appliedFilters={appliedFilters}
@@ -529,7 +525,6 @@ export default function MatchPage() {
         )}
       </main>
       <TradeCancelModal />
-      <Footer />
     </div>
   );
 }

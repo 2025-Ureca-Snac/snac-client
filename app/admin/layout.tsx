@@ -5,8 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { useAdminStore } from '../(shared)/stores/use-admin-store';
-import { Footer } from '@/app/(shared)/components/Footer';
-import { Header } from '@/app/(shared)/components/Header';
+
 import { ConfirmationModal } from '@/app/(shared)/components/ConfirmationModal';
 
 import ManagerIcon from '@/public/manager.svg';
@@ -108,7 +107,6 @@ export default function AdminLayout({
 
   return (
     <>
-      <Header />
       <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -127,7 +125,6 @@ export default function AdminLayout({
         )}
       </div>
       <ConfirmationModal />
-      <Footer />
     </>
   );
 }

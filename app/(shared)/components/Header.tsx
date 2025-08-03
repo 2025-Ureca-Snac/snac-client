@@ -6,7 +6,6 @@ import Image from 'next/image';
 
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
-import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 import { MenuLink } from './MenuLink';
 import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
@@ -18,10 +17,17 @@ import Login from '@/public/login.svg';
 
 const ADMIN_ROLE = 'ADMIN';
 
-export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
-  const { actualTheme, changeTheme } = useTheme();
-  const isDark = actualTheme === 'dark';
+interface HeaderProps {
+  isDarkmode: boolean;
+  onToggle: () => void;
+  isTrading?: boolean;
+}
 
+export const Header: FC<HeaderProps> = ({
+  isDarkmode,
+  onToggle,
+  isTrading = false,
+}) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
@@ -39,12 +45,12 @@ export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
   return (
     <header
       className={`w-full h-[57px] md:h-[67px] px-6 flex md:px-0 justify-between items-center relative transition-colors duration-300 ${
-        isDark
+        isDarkmode
           ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
           : 'bg-white border-b'
       }`}
     >
-      {isDark && (
+      {isDarkmode && (
         <>
           <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-transparent to-blue-300/3"></div>
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-16 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5"></div>
@@ -54,7 +60,7 @@ export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
       <div className="relative z-10">
         <Link href="/">
           <Image
-            src={isDark ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
+            src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
             alt="스낙 로고"
             width={100}
             height={25}
@@ -70,7 +76,7 @@ export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
             IconComponent={Admin}
             alt="관리자 페이지"
             text="관리자"
-            isDarkMode={isDark}
+            isDarkmode={isDarkmode}
           />
         )}
 
@@ -80,7 +86,7 @@ export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
             IconComponent={Matching}
             alt="실시간 매칭"
             text="실시간 매칭"
-            isDarkMode={isDark}
+            isDarkmode={isDarkmode}
           />
         )}
 
@@ -90,7 +96,6 @@ export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
             IconComponent={User}
             alt="마이페이지"
             text="마이페이지"
-            isDarkMode={isDark}
           />
         ) : (
           <MenuLink
@@ -98,14 +103,12 @@ export const Header: FC<{ isTrading?: boolean }> = ({ isTrading = false }) => {
             IconComponent={Login}
             alt="로그인"
             text="로그인"
-            isDarkMode={isDark}
+            isDarkmode={isDarkmode}
           />
         )}
 
-        <ThemeSwitch
-          isDark={isDark}
-          onToggle={() => changeTheme(isDark ? 'light' : 'dark')}
-        />
+        {/* ThemeSwitch에 isDarkmode onToggle props 전달 */}
+        <ThemeSwitch isDarkmode={isDarkmode} onToggle={onToggle} />
       </div>
     </header>
   );
