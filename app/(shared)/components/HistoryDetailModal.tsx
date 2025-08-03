@@ -276,7 +276,11 @@ export default function HistoryDetailModal({
                     <div className="text-sm font-medium text-gray-900">
                       거래자: {item.partnerNickname}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div
+                      className={`text-xs font-medium ${
+                        isFavorite ? 'text-blue-700' : 'text-gray-500'
+                      }`}
+                    >
                       {isFavorite ? '단골 거래자' : '일반 거래자'}
                     </div>
                   </div>
