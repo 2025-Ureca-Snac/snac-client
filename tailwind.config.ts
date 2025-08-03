@@ -62,6 +62,131 @@ const config: Config = {
         'noto-sans-kr': ['Noto Sans KR', 'sans-serif'],
         sans: ['Noto Sans KR', 'sans-serif'],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            color: '#374151', // text-gray-700
+            lineHeight: '1.75', // leading-relaxed
+            maxWidth: 'none',
+            h1: {
+              fontSize: '2.25rem', // text-4xl
+              fontWeight: '700', // font-bold
+              marginBottom: '1.5rem', // mb-6
+              color: '#111827', // text-gray-900
+            },
+            h2: {
+              fontSize: '1.875rem', // text-3xl
+              fontWeight: '700', // font-bold
+              marginBottom: '1rem', // mb-4
+              color: '#111827', // text-gray-900
+            },
+            h3: {
+              fontSize: '1.5rem', // text-2xl
+              fontWeight: '700', // font-bold
+              marginBottom: '0.75rem', // mb-3
+              color: '#111827', // text-gray-900
+            },
+            h4: {
+              fontSize: '1.25rem', // text-xl
+              fontWeight: '600', // font-semibold
+              marginBottom: '0.5rem', // mb-2
+              color: '#111827', // text-gray-900
+            },
+            p: {
+              marginBottom: '1rem', // mb-4
+              lineHeight: '1.75', // leading-7
+            },
+            ul: {
+              listStyleType: 'disc',
+              paddingLeft: '1.5rem', // pl-6
+              marginBottom: '1rem', // mb-4
+            },
+            ol: {
+              listStyleType: 'decimal',
+              paddingLeft: '1.5rem', // pl-6
+              marginBottom: '1rem', // mb-4
+            },
+            li: {
+              marginBottom: '0.5rem', // mb-2
+              lineHeight: '1.5', // leading-6
+            },
+            strong: {
+              fontWeight: '700', // font-bold
+              color: '#111827', // text-gray-900
+            },
+            em: {
+              fontStyle: 'italic',
+            },
+            code: {
+              backgroundColor: '#F3F4F6', // bg-gray-100
+              padding: '0.25rem 0.5rem', // px-2 py-1
+              borderRadius: '0.25rem', // rounded
+              fontSize: '0.875rem', // text-sm
+              fontFamily:
+                'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace', // font-mono
+            },
+            pre: {
+              backgroundColor: '#F3F4F6', // bg-gray-100
+              padding: '1rem', // p-4
+              borderRadius: '0.5rem', // rounded-lg
+              overflowX: 'auto',
+              marginBottom: '1rem', // mb-4
+            },
+            hr: {
+              marginTop: '2rem', // my-8
+              marginBottom: '2rem',
+              borderColor: '#D1D5DB', // border-gray-300
+            },
+            blockquote: {
+              borderLeftWidth: '4px', // border-l-4
+              borderLeftColor: '#3B82F6', // border-blue-500
+              paddingLeft: '1rem', // pl-4
+              fontStyle: 'italic',
+              color: '#4B5563', // text-gray-600
+              backgroundColor: '#EFF6FF', // bg-blue-50
+              paddingTop: '0.5rem', // py-2
+              paddingBottom: '0.5rem',
+              borderTopRightRadius: '0.25rem', // rounded-r
+              borderBottomRightRadius: '0.25rem',
+            },
+            a: {
+              color: '#2563EB', // text-blue-600
+              textDecoration: 'underline',
+              '&:hover': {
+                color: '#1E40AF', // hover:text-blue-800
+                transitionProperty: 'color',
+                transitionDuration: '200ms',
+              },
+            },
+            table: {
+              width: '100%', // w-full
+              borderCollapse: 'collapse', // border-collapse
+              marginBottom: '1rem', // mb-4
+            },
+            th: {
+              border: '1px solid #D1D5DB', // border border-gray-300
+              padding: '0.5rem 1rem', // px-4 py-2
+              backgroundColor: '#F3F4F6', // bg-gray-100
+              fontWeight: '700', // font-bold
+            },
+            td: {
+              border: '1px solid #D1D5DB', // border border-gray-300
+              padding: '0.5rem 1rem', // px-4 py-2
+            },
+            img: {
+              width: '100%', // w-full
+              height: 'auto', // h-auto
+              borderRadius: '0.5rem', // rounded-lg
+              boxShadow:
+                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', // shadow-md
+              marginTop: '1rem', // my-4
+              marginBottom: '1rem',
+              maxWidth: '100%', // max-w-full
+              objectFit: 'contain', // object-contain
+            },
+          },
+        },
+      },
       animation: {
         glow: 'glow 2s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 1.5s ease-in-out infinite',

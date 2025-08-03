@@ -1,3 +1,4 @@
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
 import { BlogPostInfoProps } from '../types/blog-post';
 
 export default function BlogPostInfo({ post, readingTime }: BlogPostInfoProps) {

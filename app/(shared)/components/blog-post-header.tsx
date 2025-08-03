@@ -1,5 +1,7 @@
+// React 관련 임포트
 import Link from 'next/link';
 
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
 import { BlogPostHeaderProps } from '../types/blog-post';
 
 export default function BlogPostHeader({ title }: BlogPostHeaderProps) {

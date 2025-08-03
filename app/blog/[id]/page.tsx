@@ -1,12 +1,17 @@
+// React 관련 임포트
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
+import { Header } from '@/app/(shared)/components/Header';
+import { Footer } from '@/app/(shared)/components/Footer';
+
+// 상대 경로 임포트
 import BlogPostPageClient from './blog-post-page-client';
 import BlogPostContent from './blog-post-content';
 import BlogStructuredData from '../components/BlogStructuredData';
 import { generateBlogPostMetadata } from '../metadata';
 import { getPost } from './utils';
-import { Header } from '@/app/(shared)/components/Header';
-import { Footer } from '@/app/(shared)/components/Footer';
 
 // Props 인터페이스
 interface Props {

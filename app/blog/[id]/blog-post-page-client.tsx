@@ -1,7 +1,10 @@
 'use client';
 
+// React 관련 임포트
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
 import { BlogCard } from '@/app/(shared)/components/BlogCard';
 import { useBlogStore, Blog } from '@/app/(shared)/stores/use-blog-store';
 

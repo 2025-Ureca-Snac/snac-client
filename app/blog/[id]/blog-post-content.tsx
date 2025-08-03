@@ -1,9 +1,12 @@
-import { calculateReadingTime, generateTableOfContents } from './utils';
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
 import BlogPostHeader from '@/app/(shared)/components/blog-post-header';
 import BlogPostMeta from '@/app/(shared)/components/blog-post-meta';
 import BlogPostRenderer from '@/app/(shared)/components/blog-post-renderer';
 import BlogPostTOC from '@/app/(shared)/components/blog-post-toc';
 import { BlogPostContentProps } from '@/app/(shared)/types/blog-post';
+
+// 상대 경로 임포트
+import { calculateReadingTime, generateTableOfContents } from './utils';
 
 // 서버 컴포넌트로 블로그 포스트 내용 렌더링
 export default async function BlogPostContent({ post }: BlogPostContentProps) {

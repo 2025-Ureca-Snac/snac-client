@@ -1,10 +1,14 @@
 'use client';
 
+// React 관련 임포트
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
+
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
+import { useBlogStore, Blog } from '@/app/(shared)/stores/use-blog-store';
+
+// 상대 경로 임포트
 import { BlogContent } from './components/BlogContent';
-import { Blog } from '@/app/(shared)/stores/use-blog-store';
 
 export default function BlogPageClient() {
   const router = useRouter();

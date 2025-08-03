@@ -1,6 +1,11 @@
-import Image from 'next/image';
+// React 관련 임포트
 import React from 'react';
+import Image from 'next/image';
+
+// 외부 라이브러리 임포트
 import { marked } from 'marked';
+
+// 내부 라이브러리/유틸리티 임포트 (절대 경로)
 import { BlogPostRendererProps } from '../types/blog-post';
 
 export default async function BlogPostRenderer({
@@ -18,7 +23,7 @@ export default async function BlogPostRenderer({
         });
         return (
           <div
-            className="text-gray-700 leading-relaxed prose prose-lg max-w-none [&>h1]:text-4xl [&>h1]:font-bold [&>h1]:mb-6 [&>h1]:text-gray-900 [&>h2]:text-3xl [&>h2]:font-bold [&>h2]:mb-4 [&>h2]:text-gray-900 [&>h3]:text-2xl [&>h3]:font-bold [&>h3]:mb-3 [&>h3]:text-gray-900 [&>h4]:text-xl [&>h4]:font-semibold [&>h4]:mb-2 [&>h4]:text-gray-900 [&>p]:mb-4 [&>p]:leading-7 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-4 [&>li]:mb-2 [&>li]:leading-6 [&>strong]:font-bold [&>strong]:text-gray-900 [&>em]:italic [&>code]:bg-gray-100 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>pre]:bg-gray-100 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:mb-4 [&>hr]:my-8 [&>hr]:border-gray-300 [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-gray-600 [&>blockquote]:bg-blue-50 [&>blockquote]:py-2 [&>blockquote]:rounded-r [&>a]:text-blue-600 [&>a]:underline [&>a]:hover:text-blue-800 [&>a]:transition-colors [&>a]:duration-200 [&>table]:w-full [&>table]:border-collapse [&>table]:mb-4 [&>th]:border [&>th]:border-gray-300 [&>th]:px-4 [&>th]:py-2 [&>th]:bg-gray-100 [&>th]:font-bold [&>td]:border [&>td]:border-gray-300 [&>td]:px-4 [&>td]:py-2 [&>img]:w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:shadow-md [&>img]:my-4 [&>img]:max-w-full [&>img]:object-contain"
+            className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         );
