@@ -2,8 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Footer } from '@/app/(shared)/components/Footer';
-import { Header } from '@/app/(shared)/components/Header';
+
 import BlogDetailPage from '../components/BlogDetailPage';
 import { useBlogStore, Blog } from '@/app/(shared)/stores/use-blog-store';
 
@@ -69,15 +68,11 @@ export default function BlogPostPageClient({ id }: BlogPostPageClientProps) {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <BlogDetailPage
         post={currentBlog}
         relatedPosts={relatedBlogs}
         onPostSelect={handlePostClick}
       />
-
-      <Footer />
     </div>
   );
 }

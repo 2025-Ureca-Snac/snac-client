@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Header } from '../../(shared)/components/Header';
-import { Footer } from '../../(shared)/components/Footer';
+
 import { useMatchStore } from '../../(shared)/stores/match-store';
 import CompletionHeader from './components/CompletionHeader';
 import TransactionSummary from './components/TransactionSummary';
 import EarningsDisplay from './components/EarningsDisplay';
 import ActionButtons from './components/ActionButtons';
+import { Header } from '@/app/(shared)/components/Header';
 
 export default function CompletePage() {
   const { partner, userRole } = useMatchStore();
@@ -95,8 +95,6 @@ export default function CompletePage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

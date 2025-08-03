@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import LightIcon from '@/public/light.svg';
 import DarkIcon from '@/public/dark.svg';
@@ -36,14 +38,14 @@ export function ThemeSwitch({ isDark, onToggle }: ThemeSwitchProps) {
         />
       </button>
 
-      {/* 모바일:  한 개만 */}
+      {/* 모바일: 한 개만 */}
       <button
         type="button"
         aria-label="다크/라이트 토글"
         onClick={onToggle}
         className="flex items-center justify-center p-2 md:hidden"
       >
-        <LightDarkModeIcon width={24} height={24} />
+        <LightDarkModeIcon width={24} height={24} className="dark:text-white" />
       </button>
     </>
   );
