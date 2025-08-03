@@ -12,6 +12,7 @@ export interface GenerateQueryParamsOptions {
   carrier?: Carrier; // 선택
   lastCardId?: number; // 선택
   lastUpdatedAt?: string; // 선택
+  favoriteOnly?: boolean; // 선택
 }
 
 export function generateQueryParams({
@@ -23,6 +24,7 @@ export function generateQueryParams({
   carrier,
   lastCardId,
   lastUpdatedAt,
+  favoriteOnly,
 }: GenerateQueryParamsOptions): string {
   const params = new URLSearchParams();
 
@@ -37,6 +39,8 @@ export function generateQueryParams({
   if (lastCardId !== undefined)
     params.append('lastCardId', lastCardId.toString());
   if (lastUpdatedAt) params.append('lastUpdatedAt', lastUpdatedAt);
+  if (favoriteOnly !== undefined)
+    params.append('favoriteOnly', favoriteOnly.toString());
 
   return params.toString();
 }

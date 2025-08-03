@@ -12,6 +12,7 @@ import { ArticleSection } from './home/components/article-section';
 
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
 import type { CardData } from '@/app/(shared)/types/card';
+import { api } from '@/app/(shared)/utils/api';
 
 import type {
   SellStatus,
@@ -20,8 +21,8 @@ import type {
 
 interface CardApiResponse {
   data: {
-    cardResponseList: CardData[];
     hasNext: boolean;
+    cardResponseList: CardData[];
   };
 }
 
@@ -162,20 +163,22 @@ export default function Home() {
         lastCardId,
         lastUpdatedAt,
         carrier: carrierForQuery,
+        favoriteOnly: true,
       });
 
       const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
       console.log('[요청 URL]', fullUrl);
 
       try {
-        const res = await fetch(fullUrl, { cache: 'no-store' });
-        if (!res.ok) {
-          console.error('fetch data 실패:', res.status, res.statusText);
-          throw new Error('fetch error');
-        }
+        const endpoint = fullUrl.replace(API_BASE || '', '');
+        const res = await api.get(endpoint);
 
-        const json: CardApiResponse = await res.json();
+        console.log('Response 객체:', res);
+        console.log('Response status:', res.status);
+        console.log('Response headers:', res.headers);
 
+        const json = res.data as CardApiResponse;
+        console.log('Parsed JSON:', json);
         // CANCELLED 상태의 카드 제외
         let filteredCards = json.data.cardResponseList.filter(
           (card) => card.sellStatus !== 'CANCELLED'
