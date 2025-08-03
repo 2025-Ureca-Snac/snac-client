@@ -11,6 +11,7 @@ import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 import { MenuLink } from './MenuLink';
 import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
 
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
@@ -18,6 +19,7 @@ import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
 
 const ADMIN_ROLE = 'ADMIN';
+
 
 interface HeaderProps {
   isTrading?: boolean;
@@ -52,6 +54,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
         isDarkmode
           ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
           : 'bg-white border-b'
+          : 'bg-white border-b'
       }`}
     >
       {isDarkmode && (
@@ -71,6 +74,15 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             priority
           />
         </Link>
+        <Link href="/">
+          <Image
+            src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
+            alt="스낙 로고"
+            width={100}
+            height={25}
+            priority
+          />
+        </Link>
       </div>
 
       <div className="relative z-10 flex gap-4 items-center">
@@ -81,15 +93,18 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             alt="관리자 페이지"
             text="관리자"
             isDarkmode={isDarkmode}
+            isDarkmode={isDarkmode}
           />
         )}
 
+        {isTrading ? null : (
         {isTrading ? null : (
           <MenuLink
             href="/match"
             IconComponent={Matching}
             alt="실시간 매칭"
             text="실시간 매칭"
+            isDarkmode={isDarkmode}
             isDarkmode={isDarkmode}
           />
         )}
@@ -108,6 +123,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             IconComponent={Login}
             alt="로그인"
             text="로그인"
+            isDarkmode={isDarkmode}
             isDarkmode={isDarkmode}
           />
         )}

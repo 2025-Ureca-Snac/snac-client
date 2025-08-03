@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { Header } from '../../(shared)/components/Header';
 import { useMatchStore } from '../../(shared)/stores/match-store';
 import { useAuthStore } from '../../(shared)/stores/auth-store';
 import { useGlobalWebSocket } from '../../(shared)/hooks/useGlobalWebSocket';
