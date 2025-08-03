@@ -13,6 +13,15 @@ interface SendDataResponse {
   message: string;
   timestamp: string;
 }
+
+// 첨부 이미지 URL 응답 타입 정의
+interface AttachmentUrlResponse {
+  data: string;
+  code: string;
+  status: string;
+  message: string;
+  timestamp: string;
+}
 import {
   getHistoryStatusText,
   getHistoryStatusColor,
@@ -50,6 +59,8 @@ export default function HistoryDetailModal({
   const [uploadMessageType, setUploadMessageType] = useState<
     'success' | 'error' | ''
   >('');
+  const [attachmentImageUrl, setAttachmentImageUrl] = useState<string>('');
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   // 단골 상태 초기화
   useEffect(() => {
@@ -57,6 +68,33 @@ export default function HistoryDetailModal({
       setIsFavorite(item.partnerFavorite);
     }
   }, [item?.partnerId, item?.partnerFavorite]);
+
+  // 첨부 이미지 URL 가져오기
+  useEffect(() => {
+    const fetchAttachmentImage = async () => {
+      // 데이터 수신완료 상태일 때만 이미지 가져오기
+      if (item?.status === 'DATA_SENT' || item?.status === 'COMPLETED') {
+        try {
+          setIsLoadingImage(true);
+          const response = await api.get<AttachmentUrlResponse>(
+            `/trades/${item.id}/attachment-url`
+          );
+
+          if (response.data.status === 'OK' && response.data.data) {
+            setAttachmentImageUrl(response.data.data);
+          }
+        } catch (error) {
+          console.error('첨부 이미지 URL 가져오기 실패:', error);
+        } finally {
+          setIsLoadingImage(false);
+        }
+      }
+    };
+
+    if (open && item) {
+      fetchAttachmentImage();
+    }
+  }, [open, item]);
 
   if (!open || !item) return null;
 
@@ -405,6 +443,50 @@ export default function HistoryDetailModal({
                 {type === 'sales'
                   ? '판매요청이 접수되었습니다.'
                   : '구매글이 등록 되었습니다.'}
+              </div>
+            )}
+
+          {/* 첨부 이미지 표시 */}
+          {(item.status === 'DATA_SENT' || item.status === 'COMPLETED') &&
+            attachmentImageUrl && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600 text-xs">📷</span>
+                  </div>
+                  <div className="text-gray-800 text-sm font-medium">
+                    전송된 데이터 확인
+                  </div>
+                </div>
+                <a
+                  href={attachmentImageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-shadow cursor-pointer"
+                >
+                  <div className="relative w-full h-80 bg-white">
+                    <Image
+                      src={attachmentImageUrl}
+                      alt="전송된 데이터"
+                      fill
+                      className="object-contain hover:scale-105 transition-transform duration-200"
+                      sizes="(max-width: 768px) 100vw, 600px"
+                    />
+                  </div>
+                </a>
+              </div>
+            )}
+
+          {/* 이미지 로딩 중 표시 */}
+          {(item.status === 'DATA_SENT' || item.status === 'COMPLETED') &&
+            isLoadingImage && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-gray-600 text-sm">
+                    이미지 로딩 중...
+                  </span>
+                </div>
               </div>
             )}
 
