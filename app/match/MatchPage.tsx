@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
@@ -42,6 +42,7 @@ type MatchingStatus =
 
 export default function MatchPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { foundMatch, updatePartner } = useMatchStore();
   const { token } = useAuthStore();
   // const { user } = useAuthStore();
@@ -78,6 +79,21 @@ export default function MatchPage() {
     useMatchStore();
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
+
+  // 강제 새로고침 기능 - MatchPage 진입 시 한 번만 실행
+  useEffect(() => {
+    // /match 경로에 진입했을 때만 새로고침 실행
+    if (pathname === '/match') {
+      const hasRefreshed = sessionStorage.getItem('matchPageRefreshed');
+
+      if (hasRefreshed === 'false') {
+        console.log('🔄 MatchPage 진입 - 강제 새로고침 실행');
+        sessionStorage.setItem('matchPageRefreshed', 'true');
+        window.location.reload();
+        return;
+      }
+    }
+  }, [pathname]);
 
   // 현재 토큰 상태를 즉시 확인하는 함수
   const checkCurrentToken = () => {
