@@ -35,6 +35,7 @@ type MetricCardProps = {
   colorClass: string;
   valueColorClass?: string;
   isLoading?: boolean;
+  onClick?: () => void;
 };
 
 function MetricCard({
@@ -44,10 +45,11 @@ function MetricCard({
   colorClass,
   valueColorClass = 'text-gray-800 dark:text-gray-100',
   isLoading,
+  onClick,
 }: MetricCardProps) {
   const Icon = icon;
-  return (
-    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex items-center justify-between">
+  const CardContent = (
+    <>
       <div>
         <p className="text-regular-sm font-medium text-gray-500 dark:text-gray-300">
           {title}
@@ -63,6 +65,21 @@ function MetricCard({
       <div className={`${colorClass} p-3 rounded-full`}>
         <Icon className="h-6 w-6" />
       </div>
+    </>
+  );
+
+  return onClick ? (
+    <button
+      onClick={onClick}
+      className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex items-center justify-between w-full text-left
+                   cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-green focus:ring-opacity-50"
+      disabled={isLoading}
+    >
+      {CardContent}
+    </button>
+  ) : (
+    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex items-center justify-between">
+      {CardContent}
     </div>
   );
 }
@@ -81,7 +98,6 @@ export function Dashboard() {
 
   return (
     <div className="flex-1 overflow-x-hidden overflow-y-auto p-6">
-      {/* 메트릭 카드 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
         <MetricCard
           title="총 사용자"
@@ -91,29 +107,31 @@ export function Dashboard() {
           isLoading={loading}
         />
         <MetricCard
-          title="활성 게시글"
+          title="총 게시글"
           value={dashboardMetrics?.activePostsCount ?? '...'}
           icon={PostIcon}
           colorClass="bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300"
           isLoading={loading}
+          onClick={() => (window.location.href = '/blog/admin')}
         />
         <MetricCard
-          title="신고 수"
+          title="총 신고"
           value={dashboardMetrics?.countByCategory?.REPORT ?? '...'}
           icon={NewReportIcon}
           colorClass="bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-300"
           isLoading={loading}
+          onClick={() => (window.location.href = '/admin/dispute/report')}
         />
         <MetricCard
-          title="문의 수"
+          title="총 문의"
           value={dashboardMetrics?.countByCategory?.QNA ?? '...'}
           icon={QnaIcon}
           colorClass="bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300"
           isLoading={loading}
+          onClick={() => (window.location.href = '/dispute/qna')}
         />
       </div>
 
-      {/* 신고 유형 분포 + QNA 유형 분포 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex flex-col">
           <h3 className="text-regular-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
