@@ -59,7 +59,7 @@ export default function CompletePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-black">
-      <Header isDarkmode={true} />
+      <Header />
 
       {/* 완료 헤더 */}
       <CompletionHeader />
