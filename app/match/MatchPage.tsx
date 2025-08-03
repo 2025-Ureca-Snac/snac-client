@@ -222,6 +222,7 @@ export default function MatchPage() {
     setIncomingRequests,
     setMatchingStatus,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
+    onCardNotFound: () => setShowConfirmModal(false), // 카드가 존재하지 않을 때 모달 닫기
     skipAuthCheck: true, // 인증 체크를 건너뛰어서 에러 로그 방지
   });
 

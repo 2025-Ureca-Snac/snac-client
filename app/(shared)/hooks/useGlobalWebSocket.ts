@@ -94,6 +94,7 @@ interface UseGlobalWebSocketProps {
   setIncomingRequests?: React.Dispatch<React.SetStateAction<TradeRequest[]>>;
   setMatchingStatus?: React.Dispatch<React.SetStateAction<MatchingStatus>>;
   onTradeStatusChange?: (status: string, tradeData: ServerTradeData) => void;
+  onCardNotFound?: () => void; // 카드가 존재하지 않을 때 호출될 콜백
   skipAuthCheck?: boolean; // 인증 체크를 건너뛸지 여부
 }
 
@@ -533,6 +534,10 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           toast.error(`해당 유저는 이미 거래중입니다.`);
         } else if (error === 'CARD_NOT_FOUND') {
           toast.error(`카드가 서버에 존재하지 않음`);
+          // 카드가 존재하지 않을 때 콜백 함수 호출
+          if (props?.onCardNotFound) {
+            props.onCardNotFound();
+          }
         } else {
           toast.error(`에러: ${error || frame.body}`);
         }
