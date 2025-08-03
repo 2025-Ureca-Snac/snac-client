@@ -8,19 +8,30 @@ import { useBlogStore } from '@/app/(shared)/stores/use-blog-store';
 import type { Blog } from '@/app/(shared)/stores/use-blog-store';
 import { BlogDetailModal } from './blog-detail-modal';
 
-export function BlogTable() {
+// search: string을 props로 받음!
+export function BlogTable({ search = '' }: { search?: string }) {
   const { blogs, loading, error, openDeleteModal } = useBlogStore();
   const [detailPost, setDetailPost] = useState<Blog | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
+  // 검색어 필터링 (제목, 작성자, 내용)
+  const filteredBlogs = blogs.filter((blog) => {
+    const lower = search.toLowerCase();
+    return (
+      blog.title?.toLowerCase().includes(lower) ||
+      blog.nickname?.toLowerCase().includes(lower) ||
+      blog.contentFileUrl?.toLowerCase().includes(lower)
+    );
+  });
+
   if (loading) return <p className="p-6 text-center">로딩 중...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
-  if (blogs.length === 0)
+  if (filteredBlogs.length === 0)
     return <p className="p-6 text-center">게시글이 없습니다.</p>;
 
   return (
     <div className="overflow-x-auto">
-      <div className="mb-4 p-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg">
+      <div className="mb-4 p-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg dark:bg-yellow-950 dark:text-yellow-100 dark:border-yellow-700">
         <strong>안내:</strong> 제목을 클릭하면 기존 게시글 정보를 수정할 수
         있습니다.
         <br />
@@ -30,8 +41,8 @@ export function BlogTable() {
         <span className="font-semibold">새 파일로 교체</span>됩니다.
       </div>
 
-      <table className="w-full text-regular-sm text-left text-gray-500">
-        <thead className="text-regular-xs text-gray-700 uppercase bg-gray-50">
+      <table className="w-full text-regular-sm text-left text-gray-500 dark:text-gray-200">
+        <thead className="text-regular-xs text-gray-700 dark:text-gray-100 uppercase bg-gray-50 dark:bg-gray-800">
           <tr>
             <th scope="col" className="px-6 py-3">
               ID
@@ -48,15 +59,18 @@ export function BlogTable() {
           </tr>
         </thead>
         <tbody>
-          {blogs.map((blog) => (
-            <tr key={blog.id} className="bg-white border-b hover:bg-gray-50">
-              <td className="px-6 py-4 font-medium text-gray-900">
+          {filteredBlogs.map((blog) => (
+            <tr
+              key={blog.id}
+              className="bg-white border-b hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+            >
+              <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
                 #{blog.id}
               </td>
 
               {/* 제목 클릭 시 모달 오픈 */}
               <td
-                className="px-6 py-4 font-semibold text-gray-900 cursor-pointer hover:underline"
+                className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:underline"
                 onClick={() => {
                   setDetailPost(blog);
                   setDetailOpen(true);
@@ -68,7 +82,7 @@ export function BlogTable() {
               <td className="px-6 py-4">{blog.nickname}</td>
               <td className="px-6 py-4 flex justify-center space-x-3">
                 <Link href={`/blog/admin?edit=${blog.id}`} title="수정">
-                  <Edit className="h-6 w-6 text-midnight-black" />
+                  <Edit className="h-6 w-6 text-midnight-black dark:text-gray-200" />
                 </Link>
                 <button
                   onClick={() => openDeleteModal(blog.id)}

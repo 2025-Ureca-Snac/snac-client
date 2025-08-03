@@ -52,6 +52,34 @@ export default function BlogDetailPage({
     );
   }
 
+  const renderContent = () => {
+    if (!post.articleUrl) {
+      return <p className="text-gray-700">콘텐츠가 없습니다.</p>;
+    }
+
+    if (post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
+      return (
+        <div className="relative aspect-video">
+          <Image
+            src={post.articleUrl}
+            alt="업로드 이미지"
+            fill
+            className="object-contain rounded-lg"
+          />
+        </div>
+      );
+    }
+
+    if (fetching) {
+      return <p className="text-gray-400">컨텐츠 로딩 중...</p>;
+    }
+
+    if (markdownContent) {
+      return <MarkdownRenderer content={markdownContent} />;
+    }
+    return <p className="text-gray-700">콘텐츠가 없습니다.</p>;
+  };
+
   return (
     <div className="max-w-6xl mx-auto bg-white rounded-2xl my-8 shadow-light flex flex-col">
       {/* 헤더 */}
@@ -105,29 +133,7 @@ export default function BlogDetailPage({
         </div>
 
         {/* 실제 본문 */}
-        <div className="prose prose-lg max-w-none">
-          {post.articleUrl &&
-          post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-            <div className="relative aspect-video">
-              <Image
-                src={post.articleUrl}
-                alt="업로드 이미지"
-                fill
-                className="object-contain rounded-lg"
-              />
-            </div>
-          ) : post.articleUrl ? (
-            fetching ? (
-              <p className="text-gray-400">컨텐츠 로딩 중...</p>
-            ) : markdownContent ? (
-              <MarkdownRenderer content={markdownContent} />
-            ) : (
-              <p className="text-gray-700">콘텐츠가 없습니다.</p>
-            )
-          ) : (
-            <p className="text-gray-700">콘텐츠가 없습니다.</p>
-          )}
-        </div>
+        <div className="prose prose-lg max-w-none">{renderContent()}</div>
 
         {/* 관련 포스트 */}
         <div className="border-t border-gray-200 pt-8 mt-8">
