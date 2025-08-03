@@ -11,7 +11,7 @@ import { Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
 import { User } from '../stores/match-store';
 import { CancelReason } from '../constants';
-
+import { toast } from 'sonner';
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
 let globalStompClient: StompClient | null = null;
 let globalConnectionCount = 0;
@@ -527,16 +527,17 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     globalStompClient.subscribe('/user/queue/errors', (frame) => {
       console.error('❗에러 메시지 수신:', frame.body);
       try {
-        const error = JSON.parse(frame.body);
-        if (error.error === 'CARD_INVALID_STATUS') {
-          alert(
-            `카드 상태 오류: ${error.message}\n\n현재 상태: ${error.currentStatus}\n필요한 상태: ${error.requiredStatus}`
-          );
+        const error = frame.body;
+        console.log(error, 'error');
+        if (error === 'CARD_INVALID_STATUS') {
+          toast.error(`해당 유저는 이미 거래중입니다.`);
+        } else if (error === 'CARD_NOT_FOUND') {
+          toast.error(`카드가 서버에 존재하지 않음`);
         } else {
-          alert(`에러: ${error.message || frame.body}`);
+          toast.error(`에러: ${error || frame.body}`);
         }
       } catch {
-        alert(`에러: ${frame.body}`);
+        toast.error(`에러: ${frame.body}`);
       }
     });
 
