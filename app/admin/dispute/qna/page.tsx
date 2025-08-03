@@ -78,100 +78,64 @@ export default function AdminQnaPage() {
       );
 
     return (
-      <div className="relative w-full">
-        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-light">
-          <table
-            className="
-              w-full
-              min-w-[800px]
-              md:min-w-0
-              divide-y divide-gray-200 dark:divide-gray-700
-            "
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {disputes.map((d) => (
+          <div
+            key={d.id}
+            className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-light flex flex-col justify-between"
           >
-            <thead className="bg-gray-100 dark:bg-gray-800">
-              <tr>
-                <th className="px-3 py-2 md:px-6 md:py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                  상태
-                </th>
-                <th className="px-3 py-2 md:px-6 md:py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                  유형
-                </th>
-                <th className="px-3 py-2 md:px-6 md:py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                  제목
-                </th>
-                <th className="px-3 py-2 md:px-6 md:py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                  문의자 ID
-                </th>
-                <th className="px-3 py-2 md:px-6 md:py-3 text-left text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                  접수일
-                </th>
-                <th className="px-3 py-2 md:px-6 md:py-3 text-right text-regular-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                  답변
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {disputes.map((d) => (
-                <tr
-                  key={d.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                >
-                  <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm">
-                    {visibleStatusRowId === d.id && d.status ? (
-                      <StatusBadge status={d.status} />
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
+            <div>
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex flex-col mr-2">
+                  <span className="text-regular-xs text-gray-500 dark:text-gray-400">
                     {QNA_TYPE_LABELS[d.type] ?? d.type}
-                  </td>
-                  <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm font-medium text-gray-900 dark:text-gray-200">
-                    <button
-                      onClick={() => handleOpenDetailModal(d.id)}
-                      className="hover:underline text-left break-all"
-                    >
-                      {d.title}
-                    </button>
-                  </td>
-                  <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
-                    {d.id}
-                  </td>
-                  <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-regular-sm text-gray-600 dark:text-gray-400">
-                    {new Date(d.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-3 py-3 md:px-6 md:py-4 whitespace-nowrap text-right text-regular-sm font-medium">
-                    <button
-                      onClick={() => {
-                        setVisibleStatusRowId(d.id);
-                        openResolveModal(d.id);
-                      }}
-                      className="text-indigo-500 hover:text-indigo-400"
-                    >
-                      상세/답변
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </span>
+                  <button
+                    onClick={() => handleOpenDetailModal(d.id)}
+                    className="text-regular-md font-bold text-gray-900 dark:text-gray-100 hover:underline text-left mt-1 break-words"
+                  >
+                    {d.title}
+                  </button>
+                </div>
+                {d.status && <StatusBadge status={d.status} />}
+              </div>
+              <div className="text-regular-sm text-gray-600 dark:text-gray-400 space-y-2 border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-500">문의자 ID:</span>
+                  <span className="truncate ml-2">{d.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-500">접수일:</span>
+                  <span>{new Date(d.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 text-right">
+              <button
+                onClick={() => {
+                  setVisibleStatusRowId(d.id);
+                  openResolveModal(d.id);
+                }}
+                className="text-teal-green hover:font-semibold font-medium"
+              >
+                상세/답변 보기
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     );
   };
 
   return (
-    <div className="w-full max-w-full mx-auto px-2 md:px-6 py-4 md:py-6 bg-white dark:bg-gray-900 min-h-screen">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-gray-900 dark:text-gray-100">
-        문의 관리
-      </h1>
+    <div className="w-full max-w-full mx-auto px-2 md:px-6 py-4 md:py-6  dark:bg-gray-900 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 md:mb-6">
         <select
           onChange={(e) =>
             handleTypeChange(e.target.value as DisputeType | 'ALL')
           }
           value={filters.type}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-auto"
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-teal-green focus:outline-none w-full md:w-auto"
         >
           {qnaTypeFilterCategories.map((cat) => (
             <option key={cat.value} value={cat.value}>
@@ -184,7 +148,7 @@ export default function AdminQnaPage() {
             handleStatusChange(e.target.value as DisputeStatus | 'ALL')
           }
           value={filters.status}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-auto"
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-teal-green focus:outline-none w-full md:w-auto"
         >
           {statusFilterCategories.map((cat) => (
             <option key={cat.value} value={cat.value}>
