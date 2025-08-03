@@ -17,7 +17,7 @@ export const MenuLink = ({
 }: MenuLinkProps) => (
   <Link
     href={href}
-    className={`flex items-center gap-2 transition-all duration-300 ${
+    className={`flex items-center gap-1 transition-all duration-300 ${
       isDarkMode ? 'hover:opacity-70 hover:scale-105' : 'hover:opacity-50'
     }`}
     aria-label={alt}
