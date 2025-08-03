@@ -59,7 +59,6 @@ export default function MatchPage() {
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
   const [hasStartedSearch, setHasStartedSearch] = useState(false); // 검색 시작 여부 추적
   const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([]);
-  const [connectedUsers, setConnectedUsers] = useState<number>(0); // 접속자 수
   const [sellerInfo, setSellerInfo] = useState({
     dataAmount: 1,
     price: 100, // 최소 가격을 100원으로 설정
@@ -194,7 +193,6 @@ export default function MatchPage() {
     appliedFilters,
     setIncomingRequests,
     setMatchingStatus,
-    setConnectedUsers,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
     skipAuthCheck: true, // 인증 체크를 건너뛰어서 에러 로그 방지
   });
@@ -506,7 +504,6 @@ export default function MatchPage() {
         {process.env.NODE_ENV === 'development' && (
           <TestPanel
             isConnected={isConnected}
-            connectedUsers={connectedUsers}
             userRole={userRole}
             matchingStatus={matchingStatus}
             activeSellers={activeSellers}
