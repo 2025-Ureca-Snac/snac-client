@@ -1,32 +1,47 @@
 'use client';
 
+import React, { FC, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
-import React, { FC } from 'react';
-import Link from 'next/link';
+
 import { MenuLink } from './MenuLink';
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch'; // 오타 수정: ThemSwitch -> ThemeSwitch
+
 import LogoMobile from '@/public/logo_mobile.svg';
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
-import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
-import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 const ADMIN_ROLE = 'ADMIN';
 
-export const Header: FC = () => {
+// isDarkmode onToggle을 props로 받도록 인터페이스 정의
+interface HeaderProps {
+  isDarkmode: boolean;
+  onToggle: () => void;
+}
+
+export const Header: FC<HeaderProps> = ({ isDarkmode, onToggle }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
 
-  const { actualTheme, changeTheme } = useTheme();
-  const isDark = actualTheme === 'dark';
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <header className="w-full h-[57px] md:h-[67px]" />;
+  }
 
   return (
-    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center">
-      <Link href="/" className="dark:text-white" aria-label="스낵 로고">
+    <header
+      className={`w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center ${isDarkmode ? 'dark' : ''}`}
+    >
+      <Link href="/" aria-label="스낵 로고">
         <LogoMobile
           width={100}
           height={25}
@@ -68,10 +83,8 @@ export const Header: FC = () => {
           />
         )}
 
-        <ThemeSwitch
-          isDark={isDark}
-          onToggle={() => changeTheme(isDark ? 'light' : 'dark')}
-        />
+        {/* isDarkmode onToggle props를 그대로 전달 */}
+        <ThemeSwitch isDarkmode={isDarkmode} onToggle={onToggle} />
       </div>
     </header>
   );

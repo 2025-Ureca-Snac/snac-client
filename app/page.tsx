@@ -3,12 +3,12 @@ import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
-import { Header } from './(shared)/components/Header';
+
 import Banner from './home/banner';
 import { DataAvg } from './home/data-avgs';
 import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
-import { Footer } from './(shared)/components/Footer';
+
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
 import type { CardData } from '@/app/(shared)/types/card';
 
@@ -187,7 +187,6 @@ export default function Home() {
 
   return (
     <>
-      <Header />
       <Banner />
       <DataAvg />
 
@@ -212,8 +211,6 @@ export default function Home() {
       <div className="w-full">
         <ArticleSection />
       </div>
-
-      <Footer />
     </>
   );
 }
