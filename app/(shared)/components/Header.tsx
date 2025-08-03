@@ -9,56 +9,30 @@ import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
-import Image from 'next/image';
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
+import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 const ADMIN_ROLE = 'ADMIN';
-export const Header: FC<{
-  isTrading?: boolean;
-  isDarkmode?: boolean;
-}> = ({ isTrading = false, isDarkmode = false }) => {
+
+export const Header: FC = () => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
 
-  return (
-    <header
-      className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center md:pl-[160px] md:pr-[51px] relative ${
-        isDarkmode
-          ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
-          : 'bg-white'
-      }`}
-    >
-      {/* 다크모드일 때 서브틀한 글로우 효과 */}
-      {isDarkmode && (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-transparent to-blue-300/3"></div>
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-16 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5"></div>
-        </>
-      )}
+  const { actualTheme, changeTheme } = useTheme();
+  const isDark = actualTheme === 'dark';
 
-      <div className="relative z-10">
-        {isDarkmode ? (
-          <Link href="/">
-            <Image
-              src="/logo_mobile_dark.png"
-              alt="스낙 로고"
-              width={100}
-              height={25}
-            />
-          </Link>
-        ) : (
-          <Link href="/">
-            <Image
-              src="/logo_mobile.svg"
-              alt="스낙 로고"
-              width={100}
-              height={25}
-              className={isDarkmode ? 'filter brightness-0 invert' : ''}
-            />
-          </Link>
-        )}
-      </div>
+  return (
+    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center">
+      <Link href="/" className="dark:text-white" aria-label="스낵 로고">
+        <LogoMobile
+          width={100}
+          height={25}
+          className="text-black dark:text-white"
+          aria-hidden="true"
+        />
+      </Link>
 
       <div className="relative z-10 flex gap-4 items-center">
         {isAdmin && (
@@ -99,6 +73,11 @@ export const Header: FC<{
             isDarkMode={isDarkmode}
           />
         )}
+
+        <ThemeSwitch
+          isDark={isDark}
+          onToggle={() => changeTheme(isDark ? 'light' : 'dark')}
+        />
       </div>
     </header>
   );
