@@ -2,8 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '../(shared)/components/Header';
-import { Footer } from '../(shared)/components/Footer';
+
 import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
@@ -337,7 +336,6 @@ export default function MatchPage() {
   );
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Header />
       <main className="flex-1">
         <MatchContent
           appliedFilters={appliedFilters}
@@ -397,7 +395,6 @@ export default function MatchPage() {
         )}
       </main>
       <TradeCancelModal />
-      <Footer />
     </div>
   );
 }

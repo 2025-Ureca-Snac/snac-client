@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Header } from '../../(shared)/components/Header';
-import { Footer } from '../../(shared)/components/Footer';
+
 import { useMatchStore } from '../../(shared)/stores/match-store';
 import CompletionHeader from './components/CompletionHeader';
 import TransactionSummary from './components/TransactionSummary';
@@ -55,8 +54,6 @@ export default function CompletePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-
       {/* 완료 헤더 */}
       <CompletionHeader />
 
@@ -86,8 +83,6 @@ export default function CompletePage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

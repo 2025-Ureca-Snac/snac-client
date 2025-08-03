@@ -9,15 +9,15 @@ import type { Components } from 'react-markdown';
 interface MarkdownRendererProps {
   content: string;
   images?: string[];
-  imagePositions?: number[]; // 이미지가 삽입될 위치 (단락 인덱스)
-  showGallery?: boolean; // 갤러리 표시 여부 props
+  imagePositions?: number[];
+  showGallery?: boolean;
 }
 
 export function MarkdownRenderer({
   content,
   images,
   imagePositions,
-  showGallery = true, // 기본값은 true로 설정
+  showGallery = true,
 }: MarkdownRendererProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -29,7 +29,7 @@ export function MarkdownRenderer({
     setSelectedImage(null);
   };
 
-  // 마크다운 내용을 단락으로 분리하고 이미지 삽입
+  // 기존 로직은 그대로 유지합니다.
   const renderContentWithImages = () => {
     if (!images || images.length === 0) {
       return (
@@ -38,13 +38,9 @@ export function MarkdownRenderer({
         </ReactMarkdown>
       );
     }
-
-    // 마크다운 내용을 단락으로 분리
     const paragraphs = content.split('\n\n');
     const result = [];
-
     for (let i = 0; i < paragraphs.length; i++) {
-      // 단락 렌더링
       result.push(
         <div key={`paragraph-${i}`}>
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
@@ -52,8 +48,6 @@ export function MarkdownRenderer({
           </ReactMarkdown>
         </div>
       );
-
-      // 이미지 삽입 위치 확인
       if (imagePositions && imagePositions.includes(i)) {
         const imageIndex = imagePositions.indexOf(i);
         if (images[imageIndex]) {
@@ -72,93 +66,95 @@ export function MarkdownRenderer({
         }
       }
     }
-
     return result;
   };
 
+  // components 객체에 dark: 클래스를 추가하여 다크 모드 스타일을 직접 지정합니다.
   const components: Components = {
-    // 제목 스타일링
     h1: ({ children }) => (
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 mt-8">{children}</h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 mt-8">
+        {children}
+      </h1>
     ),
     h2: ({ children }) => (
-      <h2 className="text-2xl font-semibold text-gray-900 mb-4 mt-6">
+      <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-6">
         {children}
       </h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-5">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 mt-5">
         {children}
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-lg font-semibold text-gray-900 mb-2 mt-4">
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 mt-4">
         {children}
       </h4>
     ),
-    // 단락 스타일링
     p: ({ children }) => (
-      <p className="mb-4 text-gray-700 leading-relaxed">{children}</p>
+      <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+        {children}
+      </p>
     ),
-    // 목록 스타일링
     ul: ({ children }) => <ul className="mb-4 pl-6 list-disc">{children}</ul>,
     ol: ({ children }) => (
       <ol className="mb-4 pl-6 list-decimal">{children}</ol>
     ),
     li: ({ children }) => <li className="mb-1">{children}</li>,
-    // 강조 스타일링
     strong: ({ children }) => (
-      <strong className="font-semibold text-gray-900">{children}</strong>
+      <strong className="font-semibold text-gray-900 dark:text-gray-100">
+        {children}
+      </strong>
     ),
     em: ({ children }) => <em className="italic">{children}</em>,
-    // 코드 블록 스타일링
     code({ className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || '');
       const isInline = !match;
       return !isInline ? (
-        <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
+        <pre className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
           <code className={className} {...props}>
             {children}
           </code>
         </pre>
       ) : (
         <code
-          className="bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-sm font-mono"
+          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1 py-0.5 rounded text-sm font-mono"
           {...props}
         >
           {children}
         </code>
       );
     },
-    // 테이블 스타일링
     table: ({ children }) => (
       <div className="overflow-x-auto my-4">
-        <table className="min-w-full border-collapse border border-gray-300">
+        <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
           {children}
         </table>
       </div>
     ),
     th: ({ children }) => (
-      <th className="border border-gray-300 px-4 py-2 bg-gray-50 font-semibold text-left">
+      <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-50 dark:bg-gray-800 font-semibold text-left">
         {children}
       </th>
     ),
     td: ({ children }) => (
-      <td className="border border-gray-300 px-4 py-2">{children}</td>
+      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">
+        {children}
+      </td>
     ),
-    // 인용구 스타일링
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 italic">
+      <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 my-4 bg-blue-50 dark:bg-gray-800 italic text-gray-800 dark:text-gray-200">
         {children}
       </blockquote>
     ),
-    // 링크 스타일링
     a: ({ href, children }) => (
-      <a href={href} className="text-blue-600 hover:text-blue-800 underline">
+      <a
+        href={href}
+        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+      >
         {children}
       </a>
     ),
-    // 이미지 스타일링 (마크다운 내부 이미지)
     img({ src, alt }) {
       if (!src || typeof src !== 'string') return null;
       return (
@@ -177,13 +173,12 @@ export function MarkdownRenderer({
   };
 
   return (
-    <div className="text-gray-700 leading-relaxed">
-      <div className="prose max-w-none">{renderContentWithImages()}</div>
+    <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+      <div>{renderContentWithImages()}</div>
 
-      {/* 이미지 갤러리 (추가 이미지들) */}
       {showGallery && images && images.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             이미지 갤러리
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -205,7 +200,6 @@ export function MarkdownRenderer({
         </div>
       )}
 
-      {/* 이미지 모달 */}
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
