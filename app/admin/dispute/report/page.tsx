@@ -34,9 +34,6 @@ export default function AdminReportPage() {
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
-  const [visibleStatusRowId, setVisibleStatusRowId] = useState<string | null>(
-    null
-  );
 
   useEffect(() => {
     setFilters({ category: 'REPORT', type: 'ALL', status: 'ALL' });
@@ -45,22 +42,18 @@ export default function AdminReportPage() {
   useEffect(() => {
     if (filters.category === 'REPORT') {
       fetchDisputes();
-      setVisibleStatusRowId(null);
     }
   }, [filters, fetchDisputes]);
 
   const handleTypeChange = (value: DisputeType | 'ALL') => {
     setFilters({ type: value });
-    setVisibleStatusRowId(null);
   };
 
   const handleStatusChange = (value: DisputeStatus | 'ALL') => {
     setFilters({ status: value });
-    setVisibleStatusRowId(null);
   };
 
   const handleOpenDetailModal = async (disputeId: string) => {
-    setVisibleStatusRowId(disputeId);
     const data = await fetchDisputeById(disputeId);
     if (data) {
       setSelectedDispute(data);
@@ -117,10 +110,7 @@ export default function AdminReportPage() {
             </div>
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
               <button
-                onClick={() => {
-                  setVisibleStatusRowId(d.id);
-                  openResolveModal(d.id);
-                }}
+                onClick={() => openResolveModal(d.id)}
                 className="font-medium text-teal-green hover:font-semibold"
               >
                 상세/답변
@@ -128,40 +118,37 @@ export default function AdminReportPage() {
               {d.status === 'ANSWERED' && (
                 <>
                   <button
-                    onClick={() => {
-                      setVisibleStatusRowId(d.id);
+                    onClick={() =>
                       openConfirmModal(
                         '환불 및 거래 취소 확인',
                         '해당 건에 대해 환불 및 거래 취소를 진행하시겠습니까?',
                         () => refundAndCancel(d.id)
-                      );
-                    }}
+                      )
+                    }
                     className="text-gray-400 hover:text-gray-300 font-medium"
                   >
                     환불
                   </button>
                   <button
-                    onClick={() => {
-                      setVisibleStatusRowId(d.id);
+                    onClick={() =>
                       openConfirmModal(
                         '패널티 부여 확인',
                         '판매자에게 패널티를 부여하시겠습니까?',
                         () => penalizeSeller(d.id)
-                      );
-                    }}
+                      )
+                    }
                     className="text-yellow-400 hover:text-yellow-300 font-medium"
                   >
                     패널티
                   </button>
                   <button
-                    onClick={() => {
-                      setVisibleStatusRowId(d.id);
+                    onClick={() =>
                       openConfirmModal(
                         '최종 처리 확인',
                         '해당 건을 최종 처리하고 거래를 원상 복구하시겠습니까?',
                         () => finalize(d.id)
-                      );
-                    }}
+                      )
+                    }
                     className="text-gray-400 hover:text-gray-300 font-medium"
                   >
                     최종처리
