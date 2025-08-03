@@ -142,7 +142,7 @@ export const DataItemCard = ({
 
               // 로그인 상태 확인
               if (!loggedInUser) {
-                alert('로그인 해주세요.');
+                toast.error('로그인 해주세요.');
                 router.push('/login');
                 return;
               }

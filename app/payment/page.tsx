@@ -312,16 +312,6 @@ export default function PaymentPage() {
         onClose={() => setRechargeModalOpen(false)}
         currentPoints={snackMoney}
         shortage={shortageAmount}
-        onRechargeSuccess={(rechargedAmount) => {
-          // 스낵 머니 업데이트
-          setSnackMoney((prev) => prev + rechargedAmount);
-
-          // 충전 모달 닫기
-          setRechargeModalOpen(false);
-
-          // 스낵 결제 화면 표시
-          setShowSnackPayment(true);
-        }}
       />
 
       {/* Recharge Confirm Modal */}
