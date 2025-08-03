@@ -5,7 +5,7 @@ import LightDarkModeIcon from '@/public/lightDarkMode.svg';
 
 interface ThemeSwitchProps {
   isDark: boolean | undefined;
-  onToggle: () => void | undefined;
+  onToggle: () => void;
 }
 
 export function ThemeSwitch({ isDark, onToggle }: ThemeSwitchProps) {

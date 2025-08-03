@@ -3,9 +3,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
+import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 import { MenuLink } from './MenuLink';
 import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
@@ -18,20 +20,22 @@ import Login from '@/public/login.svg';
 const ADMIN_ROLE = 'ADMIN';
 
 interface HeaderProps {
-  isDarkmode?: boolean;
-  onToggle?: () => void;
   isTrading?: boolean;
 }
 
-export const Header: FC<HeaderProps> = ({
-  isDarkmode,
-  onToggle,
-  isTrading = false,
-}) => {
+export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
+  const pathname = usePathname();
+
+  const { actualTheme, changeTheme } = useTheme();
+  const isDark = actualTheme === 'dark';
+
+  // /match 또는 /match/trading 페이지에서는 강제로 다크모드 적용
+  const isMatchPage = pathname?.startsWith('/match');
+  const isDarkmode = isMatchPage ? true : isDark;
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -44,7 +48,7 @@ export const Header: FC<HeaderProps> = ({
 
   return (
     <header
-      className={`w-full h-[57px] md:h-[67px] px-6 flex md:px-0 justify-between items-center relative transition-colors duration-300 ${
+      className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${
         isDarkmode
           ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
           : 'bg-white border-b'
@@ -109,7 +113,10 @@ export const Header: FC<HeaderProps> = ({
         )}
 
         {/* ThemeSwitch에 isDarkmode onToggle props 전달 */}
-        {onToggle && <ThemeSwitch isDark={isDarkmode} onToggle={onToggle} />}
+        <ThemeSwitch
+          isDark={isDarkmode}
+          onToggle={() => changeTheme(isDarkmode ? 'light' : 'dark')}
+        />
       </div>
     </header>
   );
