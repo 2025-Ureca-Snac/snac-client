@@ -24,6 +24,7 @@ export interface PointContentProps {
   selectedMonth?: number;
   onYearChange?: (year: number) => void;
   onMonthChange?: (month: number) => void;
+  onRefreshData?: () => void;
 }
 
 /**

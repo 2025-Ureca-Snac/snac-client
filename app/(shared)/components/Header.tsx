@@ -2,13 +2,16 @@
 
 import React, { FC, useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
+import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 import { MenuLink } from './MenuLink';
-import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch'; // 오타 수정: ThemSwitch -> ThemeSwitch
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
 
-import LogoMobile from '@/public/logo_mobile.svg';
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
@@ -16,17 +19,23 @@ import Login from '@/public/login.svg';
 
 const ADMIN_ROLE = 'ADMIN';
 
-// isDarkmode onToggle을 props로 받도록 인터페이스 정의
 interface HeaderProps {
-  isDarkmode: boolean;
-  onToggle: () => void;
+  isTrading?: boolean;
 }
 
-export const Header: FC<HeaderProps> = ({ isDarkmode, onToggle }) => {
+export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
+  const pathname = usePathname();
+
+  const { actualTheme, changeTheme } = useTheme();
+  const isDark = actualTheme === 'dark';
+
+  // /match 또는 /match/trading 페이지에서는 강제로 다크모드 적용
+  const isMatchPage = pathname?.startsWith('/match');
+  const isDarkmode = isMatchPage ? true : isDark;
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -39,33 +48,51 @@ export const Header: FC<HeaderProps> = ({ isDarkmode, onToggle }) => {
 
   return (
     <header
-      className={`w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center ${isDarkmode ? 'dark' : ''}`}
+      className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${
+        isDarkmode
+          ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
+          : 'bg-white border-b'
+      }`}
     >
-      <Link href="/" aria-label="스낵 로고">
-        <LogoMobile
-          width={100}
-          height={25}
-          className="text-black dark:text-white"
-          aria-hidden="true"
-        />
-      </Link>
+      {isDarkmode && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-transparent to-blue-300/3"></div>
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-16 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5"></div>
+        </>
+      )}
 
-      <div className="flex gap-4 items-center">
+      <div className="relative z-10">
+        <Link href="/">
+          <Image
+            src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
+            alt="스낙 로고"
+            width={100}
+            height={25}
+            priority
+          />
+        </Link>
+      </div>
+
+      <div className="relative z-10 flex gap-4 items-center">
         {isAdmin && (
           <MenuLink
             href="/admin"
             IconComponent={Admin}
             alt="관리자 페이지"
             text="관리자"
+            isDarkmode={isDarkmode}
           />
         )}
 
-        <MenuLink
-          href="/match"
-          IconComponent={Matching}
-          alt="실시간 매칭"
-          text="실시간 매칭"
-        />
+        {isTrading ? null : (
+          <MenuLink
+            href="/match"
+            IconComponent={Matching}
+            alt="실시간 매칭"
+            text="실시간 매칭"
+            isDarkmode={isDarkmode}
+          />
+        )}
 
         {isLoggedIn ? (
           <MenuLink
@@ -73,6 +100,7 @@ export const Header: FC<HeaderProps> = ({ isDarkmode, onToggle }) => {
             IconComponent={User}
             alt="마이페이지"
             text="마이페이지"
+            isDarkmode={isDarkmode}
           />
         ) : (
           <MenuLink
@@ -80,11 +108,15 @@ export const Header: FC<HeaderProps> = ({ isDarkmode, onToggle }) => {
             IconComponent={Login}
             alt="로그인"
             text="로그인"
+            isDarkmode={isDarkmode}
           />
         )}
 
-        {/* isDarkmode onToggle props를 그대로 전달 */}
-        <ThemeSwitch isDarkmode={isDarkmode} onToggle={onToggle} />
+        {/* ThemeSwitch에 isDarkmode onToggle props 전달 */}
+        <ThemeSwitch
+          isDark={isDarkmode}
+          onToggle={() => changeTheme(isDarkmode ? 'light' : 'dark')}
+        />
       </div>
     </header>
   );

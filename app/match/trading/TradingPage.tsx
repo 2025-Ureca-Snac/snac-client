@@ -16,6 +16,7 @@ import WaitingPaymentStep from './components/WaitingPaymentStep';
 import ShowPhoneStep from './components/ShowPhoneStep';
 import UploadDataStep from './components/UploadDataStep';
 import TradeCancelModal from '@/app/(shared)/components/TradeCancelModal';
+import { Header } from '@/app/(shared)/components/Header';
 
 type TradingStep =
   | 'confirmation'
@@ -45,9 +46,9 @@ const SELLER_TRADING_STEPS: TradingStep[] = [
 
 export default function TradingPage() {
   const router = useRouter();
-  const { partner, setUserRole, userRole } = useMatchStore();
+  const { partner, setUserRole, userRole, updatePartner } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
-  const [timeLeft, setTimeLeft] = useState(300); // 5분 제한
+  const [timeLeft, setTimeLeft] = useState(3000); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
 
   // 현재 사용자가 판매자인지 구매자인지 판단
@@ -55,8 +56,16 @@ export default function TradingPage() {
   const { user } = useAuthStore();
   const isSeller = partner?.seller === user;
 
+  // matchStore에서 파트너 정보 직접 사용 (null 체크 후 사용)
+  const partnerInfo = partner;
+
+  // 디버깅: 파트너 정보 변경 시 로그 출력
+  useEffect(() => {
+    console.log('🔄 TradingPage partnerInfo 업데이트:', partnerInfo);
+  }, [partnerInfo]);
   // 전역 WebSocket 연결 유지
-  const { activatePage, deactivatePage } = useGlobalWebSocket();
+  const { activatePage, deactivatePage, sendTradeCancel } =
+    useGlobalWebSocket();
 
   // TradingPage 활성화
   useEffect(() => {
@@ -99,18 +108,32 @@ export default function TradingPage() {
     return () => {
       deactivatePage('trading');
     };
-  }, [activatePage, deactivatePage, userRole, isSeller, setCurrentStep]);
+  }, [
+    activatePage,
+    deactivatePage,
+    userRole,
+    isSeller,
+    setCurrentStep,
+    router,
+  ]);
   // 사용자 역할에 따른 거래 단계 설정
   const TRADING_STEPS = isSeller ? SELLER_TRADING_STEPS : BUYER_TRADING_STEPS;
 
-  // userRole 설정
+  // userRole 설정 및 partner.type 수정
   useEffect(() => {
     if (partner) {
       const role = isSeller ? 'seller' : 'buyer';
       setUserRole(role);
+
+      // partner.type을 현재 사용자의 역할로 올바르게 설정
+      if (partner.type !== role) {
+        updatePartner({ type: role });
+        console.log('🔄 partner.type 업데이트:', role);
+      }
+
       console.log('🔄 userRole 설정:', role);
     }
-  }, [partner, isSeller, setUserRole]);
+  }, [partner, isSeller, setUserRole, updatePartner]);
 
   // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
   useEffect(() => {
@@ -161,8 +184,7 @@ export default function TradingPage() {
     );
   }
 
-  // 이제 partner는 항상 유효함 (MatchPartner 타입 그대로 사용)
-  const partnerInfo = partner!;
+  // partnerInfo는 위에서 이미 선언됨 (partner와 동일)
 
   const handleNextStep = () => {
     const currentIndex = TRADING_STEPS.indexOf(currentStep);
@@ -177,6 +199,16 @@ export default function TradingPage() {
 
   const handleCancel = () => {
     if (confirm('거래를 취소하시겠습니까? 패널티가 부과될 수 있습니다.')) {
+      // WebSocket을 통해 거래 취소 메시지 전송
+      const tradeId = partnerInfo?.tradeId;
+      if (isSeller) {
+        // 판매자인 경우
+        sendTradeCancel('seller', currentStep, tradeId);
+      } else {
+        // 구매자인 경우
+        sendTradeCancel('buyer', currentStep, tradeId);
+      }
+
       router.push('/match');
     }
   };
@@ -188,20 +220,20 @@ export default function TradingPage() {
         case 'confirmation':
           return (
             <ConfirmationStep
-              partner={partnerInfo}
+              partner={partnerInfo!}
               onNext={handleNextStep}
               onCancel={handleCancel}
             />
           );
 
         case 'waiting_payment':
-          return <WaitingPaymentStep partner={partnerInfo} />;
+          return <WaitingPaymentStep partner={partnerInfo!} />;
 
         case 'show_phone':
           return (
             <ShowPhoneStep
-              partner={partnerInfo}
-              buyerPhone={partnerInfo.phone}
+              partner={partnerInfo!}
+              buyerPhone={partnerInfo!.phone}
               onNext={handleNextStep}
             />
           );
@@ -209,8 +241,8 @@ export default function TradingPage() {
         case 'upload_data':
           return (
             <UploadDataStep
-              partner={partnerInfo}
-              tradeId={partnerInfo.tradeId}
+              partner={partnerInfo!}
+              tradeId={partnerInfo!.tradeId}
               onNext={handleNextStep}
             />
           );
@@ -218,9 +250,9 @@ export default function TradingPage() {
         case 'verification':
           return (
             <VerificationStep
-              dataAmount={partnerInfo.dataAmount}
+              dataAmount={partnerInfo!.dataAmount}
               timeLeft={timeLeft}
-              tradeId={partnerInfo.tradeId}
+              tradeId={partnerInfo!.tradeId}
               userRole={userRole || 'seller'}
               onNext={handleNextStep}
             />
@@ -237,7 +269,7 @@ export default function TradingPage() {
         case 'confirmation':
           return (
             <ConfirmationStep
-              partner={partnerInfo}
+              partner={partnerInfo!}
               onNext={handleNextStep}
               onCancel={handleCancel}
             />
@@ -246,21 +278,21 @@ export default function TradingPage() {
         case 'payment':
           return (
             <PaymentStep
-              amount={partnerInfo.priceGb}
-              tradeId={partnerInfo.tradeId}
+              amount={partnerInfo!.priceGb}
+              tradeId={partnerInfo!.tradeId}
               onNext={handleNextStep}
             />
           );
 
         case 'transfer':
-          return <TransferStep onNext={handleNextStep} />;
+          return <TransferStep />;
 
         case 'verification':
           return (
             <VerificationStep
-              dataAmount={partnerInfo.dataAmount}
+              dataAmount={partnerInfo!.dataAmount}
               timeLeft={timeLeft}
-              tradeId={partnerInfo.tradeId}
+              tradeId={partnerInfo!.tradeId}
               userRole={userRole || 'buyer'}
               onNext={handleNextStep}
             />
@@ -273,32 +305,45 @@ export default function TradingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-400/5 via-transparent to-green-300/3">
+      <Header isTrading={true} />
+
       {/* 헤더 */}
-      <TradingHeader timeLeft={timeLeft} currentStep={currentStep} />
+      <TradingHeader
+        timeLeft={timeLeft}
+        currentStep={currentStep}
+        userRole={userRole}
+      />
 
       {/* 단계 표시 */}
-      <TradingSteps currentStep={currentStep} />
+      <TradingSteps currentStep={currentStep} userRole={userRole} />
 
       {/* 메인 콘텐츠 */}
-      <main className="flex-1 px-4 py-6">
-        {renderStepContent()}
+      <main className="relative flex-1 px-4 py-8 bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
+        {/* 배경 글로우 효과 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 via-transparent to-green-300/3"></div>
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-5 animate-pulse delay-1000"></div>
 
-        {/* 취소 버튼 */}
-        <div className="max-w-2xl mx-auto mt-6">
-          <button
-            onClick={handleCancel}
-            className="w-full bg-gray-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-600 transition-colors"
-          >
-            거래 취소
-          </button>
+        <div className="relative z-10">
+          {renderStepContent()}
+
+          {/* 취소 버튼 */}
+          <div className="max-w-2xl mx-auto mt-8">
+            <button
+              onClick={handleCancel}
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/25 border border-red-500/30"
+            >
+              거래 취소
+            </button>
+          </div>
         </div>
 
         {/* 개발용 테스트 버튼들 */}
         {process.env.NODE_ENV === 'development' && (
           <div className="fixed bottom-4 right-4 z-50">
-            <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
-              <h4 className="text-white text-sm font-medium mb-3">
+            <div className="bg-gradient-to-br from-gray-900 to-black p-4 rounded-xl shadow-2xl border border-green-400/20 backdrop-blur-sm">
+              <h4 className="text-green-400 text-sm font-medium mb-3">
                 🔧 테스트 단계 ({isSeller ? '판매자' : '구매자'})
               </h4>
               <div className="space-y-2">
@@ -309,8 +354,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('confirmation')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'confirmation'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       거래 확인
@@ -319,8 +364,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('waiting_payment')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'waiting_payment'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       결제 대기
@@ -329,8 +374,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('show_phone')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'show_phone'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       핸드폰번호 표시
@@ -339,8 +384,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('upload_data')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'upload_data'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       데이터 업로드
@@ -349,8 +394,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('verification')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'verification'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       거래 완료
@@ -363,8 +408,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('confirmation')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'confirmation'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       거래 확인
@@ -373,8 +418,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('payment')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'payment'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       결제
@@ -383,8 +428,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('transfer')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'transfer'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       이체
@@ -393,8 +438,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('verification')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'verification'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          ? 'bg-green-500 text-black font-semibold'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                       }`}
                     >
                       인증

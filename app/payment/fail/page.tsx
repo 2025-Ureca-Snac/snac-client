@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, Suspense, useState } from 'react';
+import { useEffect, Suspense, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/app/(shared)/utils/api';
 
@@ -10,6 +10,8 @@ import { api } from '@/app/(shared)/utils/api';
 function PaymentFailComponent() {
   const searchParams = useSearchParams();
   const [failureReason, setFailureReason] = useState<string>('');
+  const [countdown, setCountdown] = useState(3);
+  const isMessageSentRef = useRef(false); // 중복 전송 방지 (useRef 사용)
 
   useEffect(() => {
     const orderId = searchParams.get('orderId');
@@ -33,22 +35,40 @@ function PaymentFailComponent() {
 
     sendFailureToBackend();
 
-    // 부모 창에 실패 메시지 전송
-    window.opener?.postMessage(
-      {
-        type: 'PAYMENT_RESULT',
-        success: false,
-        code: code,
-        message: message,
-      },
-      window.location.origin
-    );
+    // ✅ 3초 카운트다운 시작
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
 
-    // 3초 후 창 닫기
-    setTimeout(() => {
-      window.close();
-    }, 3000);
-  }, [searchParams]);
+          // ✅ 중복 전송 방지 (Strict Mode 대응)
+          if (!isMessageSentRef.current) {
+            window.opener?.postMessage(
+              {
+                type: 'PAYMENT_RESULT',
+                success: false,
+                code: code,
+                message: message,
+              },
+              window.location.origin
+            );
+            isMessageSentRef.current = true;
+          }
+
+          // 메시지 전송 후 창 닫기
+          setTimeout(() => {
+            window.close();
+          }, 100);
+
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // 컴포넌트 언마운트 시 인터벌 정리
+    return () => clearInterval(countdownInterval);
+  }, []); // ✅ 빈 의존성 배열로 한 번만 실행 (Strict Mode 대응)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -59,7 +79,7 @@ function PaymentFailComponent() {
         <h2 className="text-xl font-bold text-gray-900 mb-2">결제 실패</h2>
         <p className="text-gray-600">{failureReason}</p>
         <p className="text-sm text-gray-500 mt-4">
-          3초 후 자동으로 창이 닫힙니다...
+          {countdown}초 후 자동으로 창이 닫힙니다...
         </p>
       </div>
     </div>
