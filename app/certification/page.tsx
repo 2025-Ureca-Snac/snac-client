@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { toast } from 'sonner';
 
 export default function Certification() {
   const [countdown, setCountdown] = useState(5);
   const [isProcessing, setIsProcessing] = useState(true);
-  const [isMessageSent, setIsMessageSent] = useState(false); // 메시지 전송 상태 추적
+  const isMessageSentRef = useRef(false); // 메시지 전송 상태 추적 (useRef 사용)
 
   // 창이 닫히는 순간에 헤더 정보를 추출하는 함수
   const extractAuthData = async () => {
     // 이미 메시지를 전송했다면 중복 전송 방지
-    if (isMessageSent) {
+    if (isMessageSentRef.current) {
       console.log('이미 메시지를 전송했으므로 중복 전송을 방지합니다');
       return;
     }
@@ -18,15 +19,35 @@ export default function Certification() {
     try {
       // URL 파라미터에서 인증 정보 추출
       const urlParams = new URLSearchParams(window.location.search);
-      const authorization = urlParams.get('social');
+      const social = urlParams.get('social');
+      const error = urlParams.get('error');
 
       console.log('URL 파라미터에서 추출한 인증 데이터:', {
-        authorization,
+        social,
+        error,
         urlParams: Object.fromEntries(urlParams.entries()),
       });
 
-      // 인증 정보가 있는 경우에만 메시지 전달
-      if (authorization) {
+      // error 파라미터가 있으면 인증 실패, social 파라미터가 있으면 성공
+      if (error) {
+        // 인증 실패 시
+        if (window.opener) {
+          window.opener.postMessage(
+            {
+              type: 'AUTH_ERROR',
+              data: {
+                error,
+              },
+            },
+            '*' //window.location.origin
+          );
+          isMessageSentRef.current = true; // 메시지 전송 완료 표시
+        } else {
+          // 부모 창이 없는 경우 (직접 접근) 처리
+          console.log('인증 실패:', error);
+          toast.error('인증에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else if (social) {
         // 인증 성공
         // 부모 창에 성공 메시지 전달
         if (window.opener) {
@@ -34,35 +55,34 @@ export default function Certification() {
             {
               type: 'AUTH_SUCCESS',
               data: {
-                authorization,
+                authorization: social,
               },
             },
             '*' //window.location.origin
           );
-          setIsMessageSent(true); // 메시지 전송 완료 표시
-          console.log('인증 데이터 전송 완료');
+          isMessageSentRef.current = true; // 메시지 전송 완료 표시
+          console.log('인증 성공 - 데이터 전송 완료');
         } else {
           // 부모 창이 없는 경우 (직접 접근) 처리
-          console.log('인증 성공:', { authorization });
-          alert('인증이 성공적으로 완료되었습니다!');
+          console.log('인증 성공:', { social });
+          toast.success('인증이 성공적으로 완료되었습니다!');
         }
       } else {
-        // 인증 실패 시
+        // 파라미터가 없는 경우 (예상치 못한 상황)
+        console.log('예상치 못한 상황: 파라미터가 없습니다');
         if (window.opener) {
           window.opener.postMessage(
             {
               type: 'AUTH_ERROR',
               data: {
-                authorization: 'authorization 없음',
+                error: 'UNEXPECTED_ERROR',
               },
             },
             '*' //window.location.origin
           );
-          setIsMessageSent(true); // 메시지 전송 완료 표시
+          isMessageSentRef.current = true;
         } else {
-          // 부모 창이 없는 경우 (직접 접근) 처리
-          console.log('인증 실패');
-          alert('인증에 실패했습니다. 다시 시도해주세요.');
+          toast.error('예상치 못한 상황이 발생했습니다.');
         }
       }
     } catch (error) {
@@ -73,12 +93,13 @@ export default function Certification() {
             type: 'AUTH_ERROR',
             data: {
               error: 'EXTRACTION_ERROR',
-              errorDescription: '인증 데이터 추출 중 오류가 발생했습니다',
             },
           },
           window.location.origin
         );
-        setIsMessageSent(true); // 메시지 전송 완료 표시
+        isMessageSentRef.current = true; // 메시지 전송 완료 표시
+      } else {
+        toast.error('인증 데이터 추출 중 오류가 발생했습니다.');
       }
     }
   };

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import AnimatedTabContent from './AnimatedTabContent';
 import HistoryDetailModal from './HistoryDetailModal';
+import { TradingHistoryCard } from './TradingHistoryCard';
 import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
 import { ApiResponse } from '../types/api';
@@ -33,6 +33,9 @@ interface TradingHistoryItem {
   tradeType: string;
   createdAt: string;
   phone: string | null;
+  partnerId?: number;
+  partnerFavorite: boolean;
+  partnerNickname: string;
   cancelReason?: string;
   cancelRequested: boolean;
   cancelRequestReason: string | null;
@@ -194,6 +197,9 @@ export default function TradingHistoryPage({
       cancelReason: item.cancelReason || '',
       cancelRequested: item.cancelRequested || false,
       cancelRequestReason: item.cancelRequestReason || null,
+      partnerId: item.partnerId || undefined,
+      partnerFavorite: item.partnerFavorite || false,
+      partnerNickname: item.partnerNickname || '',
     };
     setSelectedItem(historyItem);
     setIsModalOpen(true);
@@ -435,72 +441,18 @@ export default function TradingHistoryPage({
                           aria-label={`${activeTab === 'all' ? '전체' : activeTab === 'active' ? (isPurchase ? '구매 중' : '판매 중') : isPurchase ? '구매 완료' : '판매 완료'} ${isPurchase ? '구매' : '판매'} 내역`}
                         >
                           {tradingHistory.map((item) => (
-                            <div
+                            <TradingHistoryCard
                               key={item.tradeId}
-                              role="listitem"
-                              tabIndex={0}
-                              className={`bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
-                              onClick={() => handleCardClick(item)}
-                              onKeyDown={(e) => handleCardKeyDown(e, item)}
-                              aria-label={`${item.carrier} ${item.dataAmount}GB ${isPurchase ? '구매' : '판매'} 내역 - ${new Date(item.createdAt).toLocaleDateString('ko-KR')} - ${item.priceGb.toLocaleString()}원 - ${getStatusText(item.status)}`}
-                            >
-                              {/* 아이콘 */}
-                              <div
-                                className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
-                                aria-hidden="true"
-                              >
-                                <Image
-                                  src={getCarrierImageUrl(item.carrier)}
-                                  alt={item.carrier}
-                                  width={48}
-                                  height={48}
-                                  className="w-[80%] h-[80%] object-contain"
-                                />
-                              </div>
-
-                              {/* 내용 */}
-                              <div className="flex-1">
-                                <div className="text-sm text-gray-500 mb-1">
-                                  {new Date(item.createdAt).toLocaleDateString(
-                                    'ko-KR'
-                                  )}
-                                </div>
-                                <div className="font-semibold text-gray-900 mb-1">
-                                  {item.carrier} {item.dataAmount}GB
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={`text-white text-xs px-2 py-1 rounded ${
-                                      item.cancelRequested
-                                        ? 'bg-red-500'
-                                        : item.status === 'BUY_REQUESTED' ||
-                                            item.status === 'ACCEPTED' ||
-                                            item.status ===
-                                              'PAYMENT_CONFIRMED' ||
-                                            item.status ===
-                                              'PAYMENT_CONFIRMED_ACCEPTED' ||
-                                            item.status === 'DATA_SENT'
-                                          ? 'bg-orange-500'
-                                          : item.status === 'COMPLETED' ||
-                                              item.status === 'AUTO_PAYOUT'
-                                            ? 'bg-green-500'
-                                            : item.status === 'CANCELED' ||
-                                                item.status === 'AUTO_REFUND'
-                                              ? 'bg-red-500'
-                                              : 'bg-black'
-                                    }`}
-                                    aria-label={`상태: ${item.cancelRequested ? '취소 접수' : getStatusText(item.status)}`}
-                                  >
-                                    {item.cancelRequested
-                                      ? '취소 접수'
-                                      : getStatusText(item.status)}
-                                  </span>
-                                  <span className="text-gray-900">
-                                    {item.priceGb.toLocaleString()}원
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
+                              item={item}
+                              isPurchase={isPurchase}
+                              theme={theme}
+                              onCardClick={handleCardClick}
+                              onCardKeyDown={handleCardKeyDown}
+                              getCarrierImageUrl={getCarrierImageUrl}
+                              getStatusText={getStatusText}
+                              partnerNickname={item.partnerNickname}
+                              partnerFavorite={item.partnerFavorite}
+                            />
                           ))}
                         </div>
                       ) : (

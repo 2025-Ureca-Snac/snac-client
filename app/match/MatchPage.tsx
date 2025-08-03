@@ -2,18 +2,21 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '../(shared)/components/Header';
-import { Footer } from '../(shared)/components/Footer';
+
 import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
 import TestPanel from './components/TestPanel';
 import TestButton from './components/TestButton';
 import { Filters } from './types';
-import { User, TradeRequest } from './types/match';
+import { TradeRequest } from './types/match';
+import { User } from '../(shared)/stores/match-store';
 import { useGlobalWebSocket } from '../(shared)/hooks/useGlobalWebSocket';
 import { useMatchStore } from '../(shared)/stores/match-store';
-//import { useAuthStore } from '../(shared)/stores/auth-store';
+import { useAuthStore } from '../(shared)/stores/auth-store';
 import TradeCancelModal from '../(shared)/components/TradeCancelModal';
+import { toast } from 'sonner';
+import { Header } from '../(shared)/components/Header';
+import { Footer } from '../(shared)/components/Footer';
 
 interface ServerTradeData {
   tradeId: number;
@@ -39,7 +42,8 @@ type MatchingStatus =
 
 export default function MatchPage() {
   const router = useRouter();
-  const { foundMatch } = useMatchStore();
+  const { foundMatch, updatePartner } = useMatchStore();
+  const { token } = useAuthStore();
   // const { user } = useAuthStore();
   // const { profile } = useUserStore();
 
@@ -53,13 +57,12 @@ export default function MatchPage() {
   const [pendingFilters, setPendingFilters] = useState<Filters>(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState<Filters>(initialFilters);
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
-  const [activeSellers, setActiveSellers] = useState<User[]>([]);
   const [hasStartedSearch, setHasStartedSearch] = useState(false); // 검색 시작 여부 추적
   const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([]);
   const [connectedUsers, setConnectedUsers] = useState<number>(0); // 접속자 수
   const [sellerInfo, setSellerInfo] = useState({
     dataAmount: 1,
-    price: 1500,
+    price: 100, // 최소 가격을 100원으로 설정
     carrier: 'SKT',
     isActive: false,
   });
@@ -71,11 +74,51 @@ export default function MatchPage() {
     null
   );
 
+  // store에서 userRole과 activeSellers, setActiveSellers 가져오기
+  const { userRole, setUserRole, activeSellers, setActiveSellers } =
+    useMatchStore();
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
 
-  // store에서 userRole 가져오기
-  const { userRole, setUserRole } = useMatchStore();
+  // 현재 토큰 상태를 즉시 확인하는 함수
+  const checkCurrentToken = () => {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // 1. Zustand persist에서 저장된 토큰 확인
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        if (parsed.state?.token) {
+          return parsed.state.token;
+        }
+      }
+
+      // 2. 다른 가능한 위치에서 토큰 확인 (fallback)
+      const fallbackToken =
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('jwt');
+
+      if (fallbackToken) {
+        return fallbackToken;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('토큰 가져오기 실패:', error);
+      return null;
+    }
+  };
+
+  // 로그인 상태 체크
+  useEffect(() => {
+    const currentToken = checkCurrentToken();
+    if (!currentToken) {
+      router.push('/login');
+      return;
+    }
+  }, [router]);
 
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
@@ -103,6 +146,23 @@ export default function MatchPage() {
       console.log('🔄 거래 상태 변경:', status, tradeData);
       setCurrentTradeStatus(status);
 
+      // tradeData로 파트너 정보 갱신
+      updatePartner({
+        tradeId: tradeData.tradeId,
+        buyer: tradeData.buyer,
+        seller: tradeData.seller,
+        cardId: tradeData.cardId,
+        carrier: tradeData.carrier,
+        dataAmount: tradeData.dataAmount,
+        phone: tradeData.phone || '010-0000-0000',
+        point: tradeData.point || 0,
+        priceGb: tradeData.priceGb || 0,
+        sellerRatingScore: 1000, // 기본값
+        status: tradeData.status,
+        cancelReason: tradeData.cancelReason || null,
+        type: 'seller' as const,
+      });
+
       if (status === 'ACCEPTED') {
         // 거래 수락 시 2초 후 모달 닫고 거래 페이지로 이동
         setTimeout(() => {
@@ -112,7 +172,7 @@ export default function MatchPage() {
         }, 2000);
       }
     },
-    []
+    [updatePartner]
   );
 
   const { setWebSocketFunctions } = useMatchStore();
@@ -123,6 +183,7 @@ export default function MatchPage() {
     registerSellerCard,
     deleteSellerCard,
     registerBuyerFilter,
+    removeBuyerFilter,
     respondToTrade,
     createTrade,
     sendPayment,
@@ -132,19 +193,31 @@ export default function MatchPage() {
   } = useGlobalWebSocket({
     appliedFilters,
     setIncomingRequests,
-    setActiveSellers,
     setMatchingStatus,
     setConnectedUsers,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
+    skipAuthCheck: true, // 인증 체크를 건너뛰어서 에러 로그 방지
   });
 
-  // MatchPage 활성화
+  // MatchPage 활성화 및 초기화
   useEffect(() => {
     activatePage('match', handleTradeStatusChange);
+
+    // 페이지 진입 시 이전 판매자 목록 초기화 및 필터 제거
+    console.log('🔄 MatchPage 진입 - 이전 데이터 초기화');
+    setActiveSellers([]);
+    removeBuyerFilter(); // 서버에 필터 제거 요청
+
     return () => {
       deactivatePage('match');
     };
-  }, [activatePage, deactivatePage, handleTradeStatusChange]);
+  }, [
+    activatePage,
+    deactivatePage,
+    handleTradeStatusChange,
+    setActiveSellers,
+    removeBuyerFilter,
+  ]);
 
   // WebSocket 함수들을 store에 저장
   useEffect(() => {
@@ -216,7 +289,7 @@ export default function MatchPage() {
       // 판매자 모드일 때도 appliedFilters 업데이트
       setAppliedFilters(pendingFilters);
     }
-  }, [pendingFilters, matchingStatus, registerBuyerFilter]);
+  }, [pendingFilters, matchingStatus, registerBuyerFilter, setActiveSellers]);
 
   const handleResetFilters = useCallback(() => {
     const emptyFilters = {
@@ -235,7 +308,10 @@ export default function MatchPage() {
     setActiveSellers([]);
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
-  }, []);
+
+    // 서버에 필터 제거 요청
+    removeBuyerFilter();
+  }, [setActiveSellers, removeBuyerFilter]);
 
   // 구매자 매칭 상태에서 뒤로가기
   const handleGoBackToSearch = useCallback(() => {
@@ -251,7 +327,10 @@ export default function MatchPage() {
     setMatchingStatus('idle');
     setHasStartedSearch(false); // 검색 시작 상태 초기화
     // pendingFilters는 유지해서 사용자가 이전 선택을 볼 수 있도록 함
-  }, []);
+
+    // 서버에 필터 제거 요청
+    removeBuyerFilter();
+  }, [setActiveSellers, removeBuyerFilter]);
 
   // 판매자 정보 관리
   const handleSellerInfoChange = useCallback(
@@ -267,6 +346,39 @@ export default function MatchPage() {
   );
 
   const handleToggleSellerStatus = useCallback(() => {
+    // 판매 활성화 시도 시 가격 유효성 검사
+    if (!sellerInfo.isActive) {
+      // 가격이 100원 미만인 경우
+      if (sellerInfo.price < 100) {
+        toast.error('가격은 최소 100원 이상이어야 합니다.', {
+          description: '가격을 100원 이상으로 설정해주세요.',
+          duration: 3000,
+        });
+        return;
+      }
+
+      // 가격이 10000원 초과인 경우
+      if (sellerInfo.price > 10000) {
+        toast.error('가격은 최대 10,000원까지 설정 가능합니다.', {
+          description: '가격을 10,000원 이하로 설정해주세요.',
+          duration: 3000,
+        });
+        return;
+      }
+
+      // 유효성 검사 통과 시 성공 메시지
+      toast.success('판매가 시작되었습니다!', {
+        description: `${sellerInfo.dataAmount}GB를 ${sellerInfo.price.toLocaleString()}원에 판매 중입니다.`,
+        duration: 3000,
+      });
+    } else {
+      // 판매 비활성화 시 안내 메시지
+      toast.info('판매가 중단되었습니다.', {
+        description: '언제든지 다시 판매를 시작할 수 있습니다.',
+        duration: 3000,
+      });
+    }
+
     const newInfo = { ...sellerInfo, isActive: !sellerInfo.isActive };
     setSellerInfo(newInfo);
 
@@ -304,28 +416,33 @@ export default function MatchPage() {
       );
 
       // 실제 서버에 응답 전송
-      respondToTrade(requestId, accept);
+      respondToTrade(requestId, accept, request.cardId);
 
       // 거래를 수락한 경우 trading 페이지로 이동
       if (accept) {
-        // 구매자 정보를 store에 저장 (판매자 입장에서 상대방은 구매자)
-        const buyerInfo = {
-          tradeId: 1,
-          buyer: 'hardcoded-buyer@email.com',
-          seller: 'hardcoded-seller@email.com',
-          cardId: 1,
-          carrier: 'SKT',
-          dataAmount: 10,
-          phone: '010-1234-5678',
-          point: 10000,
-          priceGb: 2000,
-          sellerRatingScore: 4.8,
+        // 실제 거래 요청 정보를 사용해서 파트너 정보 설정
+        const partnerInfo = {
+          tradeId: requestId,
+          buyer: request.buyerName,
+          seller: request.seller,
+          sellerId: request.sellerId,
+          sellerNickName: request.sellerNickName,
+          buyerId: request.buyerId,
+          buyerNickName: request.buyerNickName,
+          buyerRatingScore: request.buyerRatingScore,
+          cardId: request.cardId,
+          carrier: sellerInfo.carrier,
+          dataAmount: sellerInfo.dataAmount,
+          phone: '010-0000-0000', // 실제로는 서버에서 받아야 함
+          point: 0, // 실제로는 서버에서 받아야 함
+          priceGb: sellerInfo.price,
+          sellerRatingScore: request.ratingData || 1000,
           status: 'ACCEPTED',
           cancelReason: null,
-          type: 'seller' as const,
+          type: 'buyer' as const, // 판매자 입장에서 상대방은 구매자
         };
 
-        foundMatch(buyerInfo);
+        foundMatch(partnerInfo);
 
         // 1초 후 trading 페이지로 이동
         setTimeout(() => {
@@ -333,11 +450,26 @@ export default function MatchPage() {
         }, 500);
       }
     },
-    [incomingRequests, respondToTrade, sellerInfo, foundMatch, router]
+    [incomingRequests, respondToTrade, foundMatch, router, sellerInfo]
   );
+  // 토큰이 없으면 로딩 상태 표시
+  if (!token) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">로그인 상태를 확인하는 중...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
+    <div className="min-h-screen   flex flex-col bg-black">
       <main className="flex-1">
         <MatchContent
           appliedFilters={appliedFilters}
@@ -397,7 +529,6 @@ export default function MatchPage() {
         )}
       </main>
       <TradeCancelModal />
-      <Footer />
     </div>
   );
 }

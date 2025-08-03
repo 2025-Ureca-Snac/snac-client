@@ -6,8 +6,6 @@ import {
   getCarrierImageUrl,
   formatCarrierName,
 } from '../../(shared)/utils/carrier-utils';
-import { Header } from '@/app/(shared)/components/Header';
-import { Footer } from '@/app/(shared)/components/Footer';
 
 // 결제 유형 상수
 const PAYMENT_TYPES = {
@@ -88,7 +86,6 @@ function PaymentCompleteComponent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Title */}
@@ -210,7 +207,6 @@ function PaymentCompleteComponent() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
