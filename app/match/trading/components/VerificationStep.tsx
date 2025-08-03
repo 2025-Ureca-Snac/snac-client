@@ -161,10 +161,9 @@ export default function VerificationStep({
                   <Image
                     src={attachmentImageUrl}
                     alt="전송 증명 사진"
-                    className="w-full h-auto rounded-lg shadow-lg"
+                    className="w-full h-auto rounded-lg shadow-lg object-contain"
                     width={300}
                     height={300}
-                    style={{ objectFit: 'contain' }}
                   />
                   <div className="absolute top-2 right-2 bg-green-500/80 text-white px-2 py-1 rounded-full text-xs font-medium">
                     ✓ 전송 완료

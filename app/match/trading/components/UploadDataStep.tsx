@@ -247,7 +247,7 @@ export default function UploadDataStep({
                     </svg>
                   )}
                   <p
-                    className={`text-${uploadMessageType}-300 text-white text-sm`}
+                    className={`${uploadMessageType === 'error' ? 'text-red-200' : 'text-green-300'} text-sm`}
                   >
                     {uploadMessage}
                   </p>
