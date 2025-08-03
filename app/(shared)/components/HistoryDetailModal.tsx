@@ -36,6 +36,12 @@ const getCancelReasonText = (reason: string): string => {
   return REASON_MAP[reason] || reason || '없음';
 };
 
+// 메시지 타입별 CSS 클래스 매핑
+const messageTypeClasses = {
+  success: 'bg-green-50 border border-green-200 text-green-800',
+  error: 'bg-red-50 border border-red-200 text-red-800',
+} as const;
+
 /**
  * @author 이승우
  * @description 거래 내역 상세 모달 컴포넌트{@link HistoryDetailModalProps(open, onClose, item, type)}
@@ -594,17 +600,15 @@ export default function HistoryDetailModal({
                 )}
 
                 {/* 업로드 메시지 표시 */}
-                {uploadMessage && (
-                  <div
-                    className={`p-3 rounded-lg text-sm ${
-                      uploadMessageType === 'error'
-                        ? 'bg-red-50 border border-red-200 text-red-800'
-                        : 'bg-green-50 border border-green-200 text-green-800'
-                    }`}
-                  >
-                    {uploadMessage}
-                  </div>
-                )}
+                {uploadMessage &&
+                  uploadMessageType &&
+                  messageTypeClasses[uploadMessageType] && (
+                    <div
+                      className={`p-3 rounded-lg text-sm ${messageTypeClasses[uploadMessageType]}`}
+                    >
+                      {uploadMessage}
+                    </div>
+                  )}
 
                 {/* 액션 버튼 */}
                 <div className="flex gap-2">
