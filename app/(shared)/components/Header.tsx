@@ -1,56 +1,98 @@
 'use client';
 
+import React, { FC, useEffect, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
-import React, { FC } from 'react';
-import Link from 'next/link';
+import { useTheme } from '@/app/(shared)/hooks/useTheme';
+
 import { MenuLink } from './MenuLink';
-import LogoMobile from '@/public/logo_mobile.svg';
+import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
+
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
-import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
-import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
 const ADMIN_ROLE = 'ADMIN';
 
-export const Header: FC = () => {
+interface HeaderProps {
+  isTrading?: boolean;
+}
+
+export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
+  const pathname = usePathname();
 
   const { actualTheme, changeTheme } = useTheme();
   const isDark = actualTheme === 'dark';
 
-  return (
-    <header className="w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center">
-      <Link href="/" className="dark:text-white" aria-label="스낵 로고">
-        <LogoMobile
-          width={100}
-          height={25}
-          className="text-black dark:text-white"
-          aria-hidden="true"
-        />
-      </Link>
+  // /match 또는 /match/trading 페이지에서는 강제로 다크모드 적용
+  const isMatchPage = pathname?.startsWith('/match');
+  const isDarkmode = isMatchPage ? true : isDark;
 
-      <div className="flex gap-4 items-center">
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <header className="w-full h-[57px] md:h-[67px]" />;
+  }
+
+  return (
+    <header
+      className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${
+        isDarkmode
+          ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
+          : 'bg-white border-b'
+      }`}
+    >
+      {isDarkmode && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-transparent to-blue-300/3"></div>
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-16 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5"></div>
+        </>
+      )}
+
+      <div className="relative z-10">
+        <Link href="/">
+          <Image
+            src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
+            alt="스낙 로고"
+            width={100}
+            height={25}
+            priority
+          />
+        </Link>
+      </div>
+
+      <div className="relative z-10 flex gap-4 items-center">
         {isAdmin && (
           <MenuLink
             href="/admin"
             IconComponent={Admin}
             alt="관리자 페이지"
             text="관리자"
+            isDarkmode={isDarkmode}
           />
         )}
 
-        <MenuLink
-          href="/match"
-          IconComponent={Matching}
-          alt="실시간 매칭"
-          text="실시간 매칭"
-        />
+        {isTrading ? null : (
+          <MenuLink
+            href="/match"
+            IconComponent={Matching}
+            alt="실시간 매칭"
+            text="실시간 매칭"
+            isDarkmode={isDarkmode}
+          />
+        )}
 
         {isLoggedIn ? (
           <MenuLink
@@ -58,6 +100,7 @@ export const Header: FC = () => {
             IconComponent={User}
             alt="마이페이지"
             text="마이페이지"
+            isDarkmode={isDarkmode}
           />
         ) : (
           <MenuLink
@@ -65,12 +108,14 @@ export const Header: FC = () => {
             IconComponent={Login}
             alt="로그인"
             text="로그인"
+            isDarkmode={isDarkmode}
           />
         )}
 
+        {/* ThemeSwitch에 isDarkmode onToggle props 전달 */}
         <ThemeSwitch
-          isDark={isDark}
-          onToggle={() => changeTheme(isDark ? 'light' : 'dark')}
+          isDark={isDarkmode}
+          onToggle={() => changeTheme(isDarkmode ? 'light' : 'dark')}
         />
       </div>
     </header>

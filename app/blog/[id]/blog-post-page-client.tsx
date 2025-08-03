@@ -55,7 +55,5 @@ export default function BlogPostPageClient({ id }: BlogPostPageClientProps) {
       </div>
     );
   }
-
-  // 관련 포스트가 없으면 아무것도 렌더링하지 않음
   return null;
 }

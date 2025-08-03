@@ -1,14 +1,15 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
-import { Header } from './(shared)/components/Header';
+
 import Banner from './home/banner';
 import { DataAvg } from './home/data-avgs';
 import HomeLayout from './home/home-layout';
 import { ArticleSection } from './home/components/article-section';
-import { Footer } from './(shared)/components/Footer';
+
 import { generateQueryParams } from '@/app/(shared)/utils/generateQueryParams';
 import type { CardData } from '@/app/(shared)/types/card';
 
@@ -24,7 +25,67 @@ interface CardApiResponse {
   };
 }
 
+interface JwtPayload {
+  username: string;
+  [key: string]: unknown;
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+// 유틸리티 함수들
+const getCurrentUserEmail = (): string | null => {
+  try {
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      const parsed = JSON.parse(authStorage);
+      if (parsed.state?.token) {
+        const token = parsed.state.token;
+        const decoded = jwtDecode<JwtPayload>(token);
+        return decoded.username; // JWT의 username 필드 사용
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('토큰 디코딩 실패:', error);
+    return null;
+  }
+};
+
+const filterCardsByPostView = (
+  cards: CardData[],
+  postView: string
+): CardData[] => {
+  if (!postView || postView === 'ALL') return cards;
+
+  if (postView === 'MY_POSTS') {
+    const currentUserEmail = getCurrentUserEmail();
+    return currentUserEmail
+      ? cards.filter((card: CardData) => card.email === currentUserEmail)
+      : [];
+  } else if (postView === 'FAVORITE_POSTS') {
+    return cards.filter((card: CardData) => card.favorite === true);
+  }
+
+  return cards;
+};
+
+const sortCards = (cards: CardData[], sortBy: string): CardData[] => {
+  if (sortBy === 'RATING') {
+    // 인기순: 바삭스코어 높은 순, 같으면 등록순
+    return cards.sort((a, b) => {
+      if (a.ratingScore !== b.ratingScore) {
+        return b.ratingScore - a.ratingScore; // 높은 점수 먼저
+      }
+      // 점수가 같으면 등록순 (최신 등록 먼저)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  } else {
+    // 최신순: 등록순 (최신 등록 먼저)
+    return cards.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+};
 
 export default function Home() {
   // WebSocket 가드 사용
@@ -42,6 +103,7 @@ export default function Home() {
     priceRange,
     sortBy,
     carrier,
+    postView,
     actions,
     refetchTrigger,
   } = useHomeStore();
@@ -122,30 +184,16 @@ export default function Home() {
         // transactionStatus에 따라 카드 필터링
         if (transactionStatus && transactionStatus !== 'ALL') {
           filteredCards = filteredCards.filter(
-            (card) => card.sellStatus === transactionStatus
+            (card: { sellStatus: string }) =>
+              card.sellStatus === transactionStatus
           );
         }
 
+        // postView에 따른 필터링
+        filteredCards = filterCardsByPostView(filteredCards, postView);
+
         // sortBy에 따라 카드 정렬
-        if (sortBy === 'RATING') {
-          // 인기순: 바삭스코어 높은 순, 같으면 등록순
-          filteredCards.sort((a, b) => {
-            if (a.ratingScore !== b.ratingScore) {
-              return b.ratingScore - a.ratingScore; // 높은 점수 먼저
-            }
-            // 점수가 같으면 등록순 (최신 등록 먼저)
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        } else {
-          // 최신순: 등록순 (최신 등록 먼저)
-          filteredCards.sort((a, b) => {
-            return (
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-          });
-        }
+        filteredCards = sortCards(filteredCards, sortBy);
 
         // 카드 페이지 배열에 추가 (캐시)
         setCardPages((prev) => {
@@ -187,7 +235,6 @@ export default function Home() {
 
   return (
     <>
-      <Header />
       <Banner />
       <DataAvg />
 
@@ -212,8 +259,6 @@ export default function Home() {
       <div className="w-full">
         <ArticleSection />
       </div>
-
-      <Footer />
     </>
   );
 }

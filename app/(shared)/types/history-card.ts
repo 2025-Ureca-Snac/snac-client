@@ -33,6 +33,9 @@ export interface HistoryItem {
     | 'AUTO_PAYOUT';
   transactionNumber?: string;
   carrier?: string;
+  partnerId?: number;
+  partnerFavorite: boolean;
+  partnerNickname: string;
   dataAmount?: string;
   phoneNumber?: string;
   cancelReason?: string;
