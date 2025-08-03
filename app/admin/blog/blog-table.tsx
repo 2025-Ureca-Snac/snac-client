@@ -30,10 +30,10 @@ export function BlogTable({ search = '' }: { search?: string }) {
     return <p className="p-6 text-center">게시글이 없습니다.</p>;
 
   return (
-    <div className="overflow-x-auto">
-      <div className="mb-4 p-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg dark:bg-yellow-950 dark:text-yellow-100 dark:border-yellow-700">
-        <strong>안내:</strong> 제목을 클릭하면 기존 게시글 정보를 수정할 수
-        있습니다.
+    <>
+      {/* 안내창을 테이블의 overflow-x-auto 외부로 이동하여 항상 화면 너비에 맞게 표시되도록 합니다. */}
+      <div className="mb-4 p-4 text-regular-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg dark:bg-yellow-950 dark:text-yellow-100 dark:border-yellow-700 w-full">
+        <strong>안내:</strong>
         <br />
         수정 시{' '}
         <span className="font-semibold">제목, 본문 파일, 이미지 파일</span>을
@@ -41,61 +41,67 @@ export function BlogTable({ search = '' }: { search?: string }) {
         <span className="font-semibold">새 파일로 교체</span>됩니다.
       </div>
 
-      <table className="w-full text-regular-sm text-left text-gray-500 dark:text-gray-200">
-        <thead className="text-regular-xs text-gray-700 dark:text-gray-100 uppercase bg-gray-50 dark:bg-gray-800">
-          <tr>
-            <th scope="col" className="px-6 py-3">
-              ID
-            </th>
-            <th scope="col" className="px-6 py-3">
-              제목
-            </th>
-            <th scope="col" className="px-6 py-3">
-              작성자
-            </th>
-            <th scope="col" className="px-6 py-3 text-center">
-              작업
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredBlogs.map((blog) => (
-            <tr
-              key={blog.id}
-              className="bg-white border-b hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
-            >
-              <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
-                #{blog.id}
-              </td>
-
-              {/* 제목 클릭 시 모달 오픈 */}
-              <td
-                className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:underline"
-                onClick={() => {
-                  setDetailPost(blog);
-                  setDetailOpen(true);
-                }}
+      {/* 테이블만 가로 스크롤이 적용되도록 overflow-x-auto를 감싸는 div로 분리합니다. */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-regular-sm text-left text-gray-500 dark:text-gray-200">
+          <thead className="text-regular-xs text-gray-700 dark:text-gray-100 uppercase bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                ID
+              </th>
+              <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                제목
+              </th>
+              <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                작성자
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-center whitespace-nowrap"
               >
-                {blog.title || '(제목 없음)'}
-              </td>
-
-              <td className="px-6 py-4">{blog.nickname}</td>
-              <td className="px-6 py-4 flex justify-center space-x-3">
-                <Link href={`/blog/admin?edit=${blog.id}`} title="수정">
-                  <Edit className="h-6 w-6 text-midnight-black dark:text-gray-200" />
-                </Link>
-                <button
-                  onClick={() => openDeleteModal(blog.id)}
-                  className="text-red"
-                  title="삭제"
-                >
-                  <Trash className="h-6 w-6" />
-                </button>
-              </td>
+                작업
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredBlogs.map((blog) => (
+              <tr
+                key={blog.id}
+                className="bg-white border-b hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+              >
+                <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                  #{blog.id}
+                </td>
+
+                {/* 제목 클릭 시 모달 오픈 */}
+                <td
+                  className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:underline whitespace-nowrap"
+                  onClick={() => {
+                    setDetailPost(blog);
+                    setDetailOpen(true);
+                  }}
+                >
+                  {blog.title || '(제목 없음)'}
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap">{blog.nickname}</td>
+                <td className="px-6 py-4 flex justify-center space-x-3 whitespace-nowrap">
+                  <Link href={`/blog/admin?edit=${blog.id}`} title="수정">
+                    <Edit className="h-6 w-6 text-midnight-black dark:text-gray-200" />
+                  </Link>
+                  <button
+                    onClick={() => openDeleteModal(blog.id)}
+                    className="text-red"
+                    title="삭제"
+                  >
+                    <Trash className="h-6 w-6" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* 상세 모달 */}
       <BlogDetailModal
@@ -103,6 +109,6 @@ export function BlogTable({ search = '' }: { search?: string }) {
         isOpen={detailOpen}
         onClose={() => setDetailOpen(false)}
       />
-    </div>
+    </>
   );
 }
