@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
 import api from '../utils/api';
+import { API_STATUS, UPLOAD_ERROR_MESSAGE } from '../constants/api-status';
 
 // API 응답 타입 정의
 interface SendDataResponse {
@@ -166,33 +167,28 @@ export default function HistoryDetailModal({
       console.log('데이터 전송 완료 처리됨', response);
 
       // 응답 상태에 따른 처리
-      if (response.data.status === 'OK') {
+      if (response.data.status === API_STATUS.OK) {
         // 성공 시 페이지 새로고침
         window.location.reload();
-      } else if (response.data.status === 'BAD_REQUEST') {
-        // 이미지 기준 미충족 시 안내 메시지 표시
-        setUploadMessage(response.data.data || '다른 사진을 보내주세요.');
-        setUploadMessageType('error');
-      } else if (response.data.status === 'GATEWAY_TIMEOUT') {
-        // 타임아웃 시 안내 메시지 표시
-        setUploadMessage(
-          '이미지 검증 중에 문제가 발생했습니다. 잠시후 다시시도해주세요.'
-        );
-        setUploadMessageType('error');
-      } else {
-        // 기타 오류 시 기본 메시지
-        setUploadMessage(
-          '이미지 업로드 중 오류가 발생했습니다. 다시 시도해주세요.'
-        );
-        setUploadMessageType('error');
+        return;
       }
+
+      let errorMessage: string = UPLOAD_ERROR_MESSAGE.DEFAULT;
+      switch (response.data.status) {
+        case API_STATUS.BAD_REQUEST:
+          errorMessage = response.data.data || UPLOAD_ERROR_MESSAGE.BAD_IMAGE;
+          break;
+        case API_STATUS.GATEWAY_TIMEOUT:
+          errorMessage = UPLOAD_ERROR_MESSAGE.TIMEOUT;
+          break;
+      }
+      setUploadMessage(errorMessage);
+      setUploadMessageType('error');
 
       setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
     } catch (error) {
       console.error('데이터 전송 완료 처리 실패:', error);
-      setUploadMessage(
-        '이미지 업로드 중 오류가 발생했습니다. 다시 시도해주세요.'
-      );
+      setUploadMessage(UPLOAD_ERROR_MESSAGE.DEFAULT);
       setUploadMessageType('error');
     } finally {
       setIsUploading(false);
