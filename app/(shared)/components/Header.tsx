@@ -71,15 +71,6 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             priority
           />
         </Link>
-        <Link href="/">
-          <Image
-            src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
-            alt="스낙 로고"
-            width={100}
-            height={25}
-            priority
-          />
-        </Link>
       </div>
 
       <div className="relative z-10 flex gap-4 items-center">
