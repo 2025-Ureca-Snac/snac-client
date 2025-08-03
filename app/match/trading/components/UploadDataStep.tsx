@@ -129,7 +129,7 @@ export default function UploadDataStep({
                 <div>
                   <span className="text-gray-400">구매자:</span>
                   <span className="ml-2 font-medium text-white">
-                    {partner.buyer}
+                    {partner.buyerNickname}
                   </span>
                 </div>
                 <div>

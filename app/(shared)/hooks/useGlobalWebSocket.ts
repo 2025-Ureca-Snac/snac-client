@@ -11,7 +11,7 @@ import { Filters } from '../../match/types';
 import { TradeRequest } from '../../match/types/match';
 import { User } from '../stores/match-store';
 import { CancelReason } from '../constants';
-
+import { toast } from 'sonner';
 // 전역 소켓 클라이언트 (페이지 이동 시에도 유지)
 let globalStompClient: StompClient | null = null;
 let globalConnectionCount = 0;
@@ -56,6 +56,8 @@ interface ServerCardData {
   cardId: number;
   name: string;
   email: string;
+  sellerNickName: string;
+  buyerNickname: string;
   sellStatus: string;
   cardCategory: string;
   carrier: string;
@@ -75,7 +77,7 @@ interface ServerTradeData {
   sellerNickName: string;
   buyer: string;
   buyerId: number;
-  buyerNickName: string;
+  buyerNickname: string;
   buyerRatingScore: number;
   carrier: string;
   dataAmount: number;
@@ -92,6 +94,7 @@ interface UseGlobalWebSocketProps {
   setIncomingRequests?: React.Dispatch<React.SetStateAction<TradeRequest[]>>;
   setMatchingStatus?: React.Dispatch<React.SetStateAction<MatchingStatus>>;
   onTradeStatusChange?: (status: string, tradeData: ServerTradeData) => void;
+  onCardNotFound?: () => void; // 카드가 존재하지 않을 때 호출될 콜백
   skipAuthCheck?: boolean; // 인증 체크를 건너뛸지 여부
 }
 
@@ -227,6 +230,14 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
       onConnect: () => {
         console.log('✅ 전역 WebSocket 연결 성공');
         setConnectionStatus(true);
+
+        // 연결 시 판매자 목록 초기화
+        if (userRole === 'buyer') {
+          const { setActiveSellers } = useMatchStore.getState();
+          setActiveSellers([]);
+          console.log('🔄 판매자 목록 초기화 완료');
+        }
+
         setupSubscriptions();
       },
       onStompError: (frame) => {
@@ -288,16 +299,17 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         if (currentUserRole === 'buyer') {
           const { setActiveSellers } = useMatchStore.getState();
           setActiveSellers((prev: User[]) => {
+            // 더 정확한 중복 체크: 이름과 캐리어, 데이터, 가격이 모두 동일한 경우에만 중복으로 처리
             const existingIndex = prev.findIndex(
               (existing: User) =>
-                existing.tradeId === user.tradeId ||
-                (existing.name === user.name &&
-                  existing.carrier === user.carrier &&
-                  existing.data === user.data &&
-                  existing.price === user.price)
+                existing.name === user.name &&
+                existing.carrier === user.carrier &&
+                existing.data === user.data &&
+                existing.price === user.price
             );
 
             if (existingIndex !== -1) {
+              // 기존 항목이 있으면 업데이트
               const updated = [...prev];
               updated[existingIndex] = {
                 ...updated[existingIndex],
@@ -305,9 +317,18 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
                 rating: updated[existingIndex].rating,
                 transactionCount: updated[existingIndex].transactionCount,
               };
+              console.log('🔄 기존 판매자 업데이트:', user.name);
               return updated;
             } else {
+              // 새로운 판매자 추가
               const updated = [...prev, user];
+              console.log(
+                '➕ 새로운 판매자 추가:',
+                user.name,
+                '총 판매자 수:',
+                updated.length
+              );
+
               if (
                 prev.length === 0 &&
                 updated.length > 0 &&
@@ -365,7 +386,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
           sellerId: Number(tradeData.sellerId),
           sellerNickName: tradeData.sellerNickName,
           buyerId: Number(tradeData.buyerId),
-          buyerNickName: tradeData.buyerNickName,
+          buyerNickname: tradeData.buyerNickname,
           buyerRatingScore: tradeData.buyerRatingScore,
           cardId: tradeData.cardId,
           carrier: tradeData.carrier || 'unknown',
@@ -424,7 +445,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
             seller: tradeData.seller,
             buyer: tradeData.buyer,
             sellerNickName: tradeData.sellerNickName,
-            buyerNickName: tradeData.buyerNickName,
+            buyerNickname: tradeData.buyerNickname,
             sellerRatingScore: tradeData.sellerRatingScore || 1000,
             buyerRatingScore: tradeData.buyerRatingScore || 1000,
             status: 'pending',
@@ -464,7 +485,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
               seller: tradeData.seller,
               cardId: tradeData.cardId,
               buyerId: Number(tradeData.buyerId),
-              buyerNickName: tradeData.buyerNickName,
+              buyerNickname: tradeData.buyerNickname,
               buyerRatingScore: tradeData.buyerRatingScore,
               sellerId: Number(tradeData.sellerId),
               sellerNickName: tradeData.sellerNickName,
@@ -507,16 +528,21 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
     globalStompClient.subscribe('/user/queue/errors', (frame) => {
       console.error('❗에러 메시지 수신:', frame.body);
       try {
-        const error = JSON.parse(frame.body);
-        if (error.error === 'CARD_INVALID_STATUS') {
-          alert(
-            `카드 상태 오류: ${error.message}\n\n현재 상태: ${error.currentStatus}\n필요한 상태: ${error.requiredStatus}`
-          );
+        const error = frame.body;
+        console.log(error, 'error');
+        if (error === 'CARD_INVALID_STATUS') {
+          toast.error(`해당 유저는 이미 거래중입니다.`);
+        } else if (error === 'CARD_NOT_FOUND') {
+          toast.error(`카드가 서버에 존재하지 않음`);
+          // 카드가 존재하지 않을 때 콜백 함수 호출
+          if (props?.onCardNotFound) {
+            props.onCardNotFound();
+          }
         } else {
-          alert(`에러: ${error.message || frame.body}`);
+          toast.error(`에러: ${error || frame.body}`);
         }
       } catch {
-        alert(`에러: ${frame.body}`);
+        toast.error(`에러: ${frame.body}`);
       }
     });
 

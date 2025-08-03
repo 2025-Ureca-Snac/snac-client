@@ -17,7 +17,10 @@ export default function CompletePage() {
     ? {
         ...partner,
         // userRole에 따라 상대방 정보 결정
-        name: userRole === 'seller' ? partner.buyer : partner.seller, // seller면 buyer 정보, buyer면 seller 정보
+        name:
+          userRole === 'seller'
+            ? partner.buyerNickname
+            : partner.sellerNickName, // seller면 buyer 정보, buyer면 seller 정보
         data: partner.dataAmount, // dataAmount를 data로 매핑
         price: partner.priceGb, // priceGb를 price로 매핑
         rating: partner.sellerRatingScore,
@@ -29,7 +32,7 @@ export default function CompletePage() {
         sellerId: 1,
         sellerNickName: 'seller',
         buyerId: 2,
-        buyerNickName: 'buyer',
+        buyerNickname: 'buyer',
         buyerRatingScore: 4.9,
         cardId: 789,
         carrier: 'KT',

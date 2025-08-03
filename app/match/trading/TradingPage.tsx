@@ -50,13 +50,19 @@ export default function TradingPage() {
   const [timeLeft, setTimeLeft] = useState(3000); // 5분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
 
+  // TradingPage 진입 시 matchPageRefreshed 세션스토리지 아이템을 false로 설정
+  useEffect(() => {
+    console.log('🔄 TradingPage 진입 - matchPageRefreshed 플래그 초기화');
+    sessionStorage.setItem('matchPageRefreshed', 'false');
+  }, []);
+
   // 현재 사용자가 판매자인지 구매자인지 판단
   // partner.buyer가 현재 사용자라면 구매자, partner.seller가 현재 사용자라면 판매자
   const { user } = useAuthStore();
   const isSeller = partner?.seller === user;
 
   // matchStore에서 파트너 정보 직접 사용 (null 체크 후 사용)
-  const partnerInfo = partner;
+  const partnerInfo = useMatchStore.getState().partner;
 
   // 디버깅: 파트너 정보 변경 시 로그 출력
   useEffect(() => {

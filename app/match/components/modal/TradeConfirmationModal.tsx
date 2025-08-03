@@ -162,7 +162,7 @@ export default function TradeConfirmationModal({
       if (cardId) {
         sendBuyRequestCancel(cardId);
       }
-
+      window.location.reload();
       onCancel();
     }
   };
