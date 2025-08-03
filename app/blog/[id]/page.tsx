@@ -12,6 +12,28 @@ import api from '@/app/(shared)/utils/api';
 import { Header } from '@/app/(shared)/components/Header';
 import { Footer } from '@/app/(shared)/components/Footer';
 
+// 읽기 시간 계산 함수
+function calculateReadingTime(content: string): number {
+  const wordsPerMinute = 200; // 한국어 기준 분당 읽는 단어 수
+  const wordCount = content.trim().split(/\s+/).length;
+  return Math.ceil(wordCount / wordsPerMinute);
+}
+
+// 목차 생성 함수
+function generateTableOfContents(
+  content: string
+): Array<{ id: string; text: string; level: number }> {
+  const headings = content.match(/^(#{1,6})\s+(.+)$/gm);
+  if (!headings) return [];
+
+  return headings.map((heading, index) => {
+    const level = heading.match(/^(#{1,6})/)?.[0].length || 1;
+    const text = heading.replace(/^(#{1,6})\s+/, '');
+    const id = `heading-${index}`;
+    return { id, text, level };
+  });
+}
+
 // 데이터를 가져오는 함수
 async function getPost(id: string): Promise<ExtendedBlogPost | null> {
   try {
@@ -75,51 +97,41 @@ export async function generateMetadata({
 
 // 서버 컴포넌트로 블로그 포스트 내용 렌더링
 async function BlogPostContent({ post }: { post: ExtendedBlogPost }) {
-  // 디버깅을 위한 콘솔 로그
-  console.log('BlogPostContent에서 받은 post:', {
-    id: post.id,
-    title: post.title,
-    content: post.content,
-    markdownContent: post.markdownContent ? 'Promise<string>' : 'undefined',
-    contentFileUrl: post.contentFileUrl,
-    articleUrl: post.articleUrl,
-    imageUrl: post.imageUrl,
-    nickname: post.nickname,
-    publishDate: post.publishDate,
-    category: post.category,
-    readTime: post.readTime,
-    images: post.images,
-    imagePositions: post.imagePositions,
-  });
+  // 읽기 시간 계산
+  const getReadingTime = async () => {
+    if (post.markdownContent) {
+      const content = await post.markdownContent;
+      return calculateReadingTime(content);
+    }
+    return null;
+  };
+
+  const readingTime = await getReadingTime();
+
+  // 목차 생성
+  const getTableOfContents = async () => {
+    if (post.markdownContent) {
+      const content = await post.markdownContent;
+      return generateTableOfContents(content);
+    }
+    return [];
+  };
+
+  const tableOfContents = await getTableOfContents();
 
   // 콘텐츠를 단락으로 분리하고 이미지 삽입
   const renderContentWithImages = async () => {
     // 마크다운 콘텐츠가 있으면 우선 처리
     if (post.markdownContent) {
-      console.log('마크다운 콘텐츠 발견:', typeof post.markdownContent);
       const content = await post.markdownContent;
-      console.log(
-        '마크다운 원본 (처음 200자):',
-        typeof content === 'string' ? content.substring(0, 200) : 'Not a string'
-      );
       try {
         const htmlContent = marked(content, {
           breaks: true, // 줄바꿈을 <br>로 변환
           gfm: true, // GitHub Flavored Markdown 지원
         });
-        console.log(
-          'HTML 변환 결과 (처음 200자):',
-          typeof htmlContent === 'string'
-            ? htmlContent.substring(0, 200)
-            : 'Not a string'
-        );
         return (
           <div
-            className="text-gray-700 leading-relaxed"
-            style={{
-              fontSize: '16px',
-              lineHeight: '1.6',
-            }}
+            className="text-gray-700 leading-relaxed prose prose-lg max-w-none [&>h1]:text-4xl [&>h1]:font-bold [&>h1]:mb-6 [&>h1]:text-gray-900 [&>h2]:text-3xl [&>h2]:font-bold [&>h2]:mb-4 [&>h2]:text-gray-900 [&>h3]:text-2xl [&>h3]:font-bold [&>h3]:mb-3 [&>h3]:text-gray-900 [&>h4]:text-xl [&>h4]:font-semibold [&>h4]:mb-2 [&>h4]:text-gray-900 [&>p]:mb-4 [&>p]:leading-7 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-4 [&>li]:mb-2 [&>li]:leading-6 [&>strong]:font-bold [&>strong]:text-gray-900 [&>em]:italic [&>code]:bg-gray-100 [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:font-mono [&>pre]:bg-gray-100 [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:mb-4 [&>hr]:my-8 [&>hr]:border-gray-300 [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-gray-600 [&>blockquote]:bg-blue-50 [&>blockquote]:py-2 [&>blockquote]:rounded-r [&>a]:text-blue-600 [&>a]:underline [&>a]:hover:text-blue-800 [&>a]:transition-colors [&>a]:duration-200 [&>table]:w-full [&>table]:border-collapse [&>table]:mb-4 [&>th]:border [&>th]:border-gray-300 [&>th]:px-4 [&>th]:py-2 [&>th]:bg-gray-100 [&>th]:font-bold [&>td]:border [&>td]:border-gray-300 [&>td]:px-4 [&>td]:py-2 [&>img]:w-full [&>img]:h-auto [&>img]:rounded-lg [&>img]:shadow-md [&>img]:my-4 [&>img]:max-w-full [&>img]:object-contain"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         );
@@ -135,16 +147,6 @@ async function BlogPostContent({ post }: { post: ExtendedBlogPost }) {
 
     // API에서 실제로 사용하는 속성들 확인
     if (!post.content && !post.articleUrl && !post.contentFileUrl) {
-      console.log(
-        '콘텐츠가 없습니다. content:',
-        post.content,
-        'markdownContent:',
-        post.markdownContent,
-        'articleUrl:',
-        post.articleUrl,
-        'contentFileUrl:',
-        post.contentFileUrl
-      );
       return (
         <div className="text-gray-700 leading-relaxed">
           <p>콘텐츠를 불러오는 중...</p>
@@ -155,7 +157,6 @@ async function BlogPostContent({ post }: { post: ExtendedBlogPost }) {
     // 기존 content가 있으면 사용
     if (post.content) {
       const content = post.content;
-      console.log('기존 콘텐츠 렌더링:', content);
 
       if (!post.images || post.images.length === 0 || !post.imagePositions) {
         // 이미지가 없으면 일반 렌더링
@@ -232,7 +233,6 @@ async function BlogPostContent({ post }: { post: ExtendedBlogPost }) {
     // articleUrl이나 contentFileUrl이 있는 경우
     if (post.articleUrl || post.contentFileUrl) {
       const contentUrl = post.articleUrl || post.contentFileUrl;
-      console.log('콘텐츠 URL:', contentUrl);
 
       // 이미지 파일인 경우
       if (contentUrl && contentUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -357,6 +357,26 @@ async function BlogPostContent({ post }: { post: ExtendedBlogPost }) {
             </div>
           )}
 
+          {/* 읽기 시간 표시 */}
+          {post.markdownContent && (
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{readingTime}분 읽기</span>
+            </div>
+          )}
+
           {post.readTime && (
             <div className="flex items-center gap-2">
               <svg
@@ -381,6 +401,36 @@ async function BlogPostContent({ post }: { post: ExtendedBlogPost }) {
         <div className="prose prose-lg max-w-none">
           {await renderContentWithImages()}
         </div>
+
+        {/* 목차 */}
+        {tableOfContents.length > 0 && (
+          <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">목차</h3>
+            <nav className="space-y-2">
+              {tableOfContents.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={`block text-blue-600 hover:text-blue-800 transition-colors ${
+                    item.level === 1
+                      ? 'font-semibold'
+                      : item.level === 2
+                        ? 'ml-4'
+                        : item.level === 3
+                          ? 'ml-8'
+                          : item.level === 4
+                            ? 'ml-12'
+                            : item.level === 5
+                              ? 'ml-16'
+                              : 'ml-20'
+                  }`}
+                >
+                  {item.text}
+                </a>
+              ))}
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );

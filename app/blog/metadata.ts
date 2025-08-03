@@ -113,19 +113,39 @@ export const blogPageMetadata: Metadata = {
 
 // 블로그 포스트 메타데이터 생성 함수
 export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
+  // 콘텐츠에서 HTML 태그 제거하고 깨끗한 텍스트 추출
+  const cleanContent = post.content?.replace(/<[^>]*>/g, '') || '';
+  const description =
+    cleanContent.substring(0, 160) || '스낵 블로그 포스트입니다.';
+
+  // 키워드 생성 (제목, 카테고리, 태그 등)
+  const keywords = [
+    post.category || '블로그',
+    '스낵',
+    '데이터거래',
+    '데이터마켓플레이스',
+    ...(post.title.split(' ').filter((word) => word.length > 1) || []),
+  ];
+
   return {
     title: `${post.title} | 스낵 블로그`,
-    description: post.content?.substring(0, 160) || '스낵 블로그 포스트입니다.',
-    keywords: [
-      post.category || '블로그',
-      '스낵',
-      ...(post.title.split(' ') || []),
-    ],
+    description,
+    keywords,
     authors: [{ name: post.nickname || post.author || '스낵팀' }],
+    creator: '스낵',
+    publisher: '스낵',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    metadataBase: new URL('https://snac-app.com'),
+    alternates: {
+      canonical: `/blog/${post.id}`,
+    },
     openGraph: {
       title: post.title,
-      description:
-        post.content?.substring(0, 160) || '스낵 블로그 포스트입니다.',
+      description,
       url: `https://snac-app.com/blog/${post.id}`,
       siteName: '스낵',
       images: [
@@ -140,16 +160,33 @@ export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
       type: 'article',
       publishedTime: post.publishDate,
       authors: [post.nickname || post.author || '스낵팀'],
+      section: post.category || '블로그',
+      tags: keywords,
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description:
-        post.content?.substring(0, 160) || '스낵 블로그 포스트입니다.',
+      description,
       images: [post.imageUrl || post.image || '/blog-bg-pattern.png'],
+      creator: '@snac_app',
+      site: '@snac_app',
     },
-    alternates: {
-      canonical: `/blog/${post.id}`,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    other: {
+      'article:published_time': post.publishDate || '',
+      'article:author': post.nickname || post.author || '스낵팀',
+      'article:section': post.category || '블로그',
+      'article:tag': keywords.join(', '),
     },
   };
 }

@@ -34,13 +34,18 @@ export default function BlogPostPageClient({ id }: BlogPostPageClientProps) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl p-6 shadow-light">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">관련 포스트</h3>
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              관련 포스트
+            </h3>
+            <p className="text-gray-600">더 많은 유용한 정보를 확인해보세요</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedBlogs.map((post) => (
               <div
                 key={post.id}
                 onClick={() => handlePostClick(post)}
-                className="cursor-pointer hover:shadow-md transition-shadow"
+                className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
               >
                 <BlogCard post={post} />
               </div>
