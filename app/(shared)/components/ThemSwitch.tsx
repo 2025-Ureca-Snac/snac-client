@@ -6,11 +6,11 @@ import DarkIcon from '@/public/dark.svg';
 import LightDarkModeIcon from '@/public/lightDarkMode.svg';
 
 interface ThemeSwitchProps {
-  isDarkMode: boolean;
+  isDarkmode: boolean;
   onToggle: () => void;
 }
 
-export function ThemeSwitch({ isDarkMode, onToggle }: ThemeSwitchProps) {
+export function ThemeSwitch({ isDarkmode, onToggle }: ThemeSwitchProps) {
   return (
     <>
       {/* PC 이상: 스위치 */}
@@ -22,18 +22,18 @@ export function ThemeSwitch({ isDarkMode, onToggle }: ThemeSwitchProps) {
           hidden w-[75px] h-7 items-center justify-between
           rounded-full border-2 bg-white px-1 py-1
           transition-all duration-300 md:flex
-          ${isDarkMode ? '!border-white' : 'border-gray-800'}
+          ${isDarkmode ? '!border-white' : 'border-gray-800'}
         `}
-        style={isDarkMode ? { borderColor: '#fff' } : undefined}
+        style={isDarkmode ? { borderColor: '#fff' } : undefined}
       >
         <LightIcon
           className={`text-black transition-opacity duration-300 ${
-            isDarkMode ? 'opacity-40' : 'opacity-100'
+            isDarkmode ? 'opacity-40' : 'opacity-100'
           }`}
         />
         <DarkIcon
           className={`transition-opacity duration-300 ${
-            isDarkMode ? 'opacity-100 text-black' : 'opacity-40 text-gray-600'
+            isDarkmode ? 'opacity-100 text-black' : 'opacity-40 text-gray-600'
           }`}
         />
       </button>

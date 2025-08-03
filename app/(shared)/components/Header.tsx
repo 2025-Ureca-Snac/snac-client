@@ -16,13 +16,13 @@ import Login from '@/public/login.svg';
 
 const ADMIN_ROLE = 'ADMIN';
 
-// isDarkMode와 onToggle을 props로 받도록 인터페이스 정의
+// isDarkmode onToggle을 props로 받도록 인터페이스 정의
 interface HeaderProps {
-  isDarkMode: boolean;
+  isDarkmode: boolean;
   onToggle: () => void;
 }
 
-export const Header: FC<HeaderProps> = ({ isDarkMode, onToggle }) => {
+export const Header: FC<HeaderProps> = ({ isDarkmode, onToggle }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
@@ -39,7 +39,7 @@ export const Header: FC<HeaderProps> = ({ isDarkMode, onToggle }) => {
 
   return (
     <header
-      className={`w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center ${isDarkMode ? 'dark' : ''}`}
+      className={`w-full h-[57px] md:h-[67px] px-6 md:px-0 flex justify-between items-center ${isDarkmode ? 'dark' : ''}`}
     >
       <Link href="/" aria-label="스낵 로고">
         <LogoMobile
@@ -83,8 +83,8 @@ export const Header: FC<HeaderProps> = ({ isDarkMode, onToggle }) => {
           />
         )}
 
-        {/* isDarkMode와 onToggle props를 그대로 전달 */}
-        <ThemeSwitch isDarkMode={isDarkMode} onToggle={onToggle} />
+        {/* isDarkmode onToggle props를 그대로 전달 */}
+        <ThemeSwitch isDarkmode={isDarkmode} onToggle={onToggle} />
       </div>
     </header>
   );

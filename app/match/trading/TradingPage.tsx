@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '../../(shared)/components/Header';
-import { Footer } from '../../(shared)/components/Footer';
+
 import { useMatchStore } from '../../(shared)/stores/match-store';
 import { useAuthStore } from '../../(shared)/stores/auth-store';
 import { useGlobalWebSocket } from '../../(shared)/hooks/useGlobalWebSocket';
@@ -152,14 +151,12 @@ export default function TradingPage() {
   if (!isValidPartner) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">거래 정보를 확인하는 중...</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -277,8 +274,6 @@ export default function TradingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-
       {/* 헤더 */}
       <TradingHeader timeLeft={timeLeft} currentStep={currentStep} />
 
@@ -412,7 +407,6 @@ export default function TradingPage() {
         )}
       </main>
       <TradeCancelModal />
-      <Footer />
     </div>
   );
 }
