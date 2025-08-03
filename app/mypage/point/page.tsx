@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import SideMenu from '@/app/(shared)/components/SideMenu';
@@ -175,7 +175,7 @@ function PointPageContent() {
   useEffect(() => {
     loadInitialBalance(); // 잔액 한 번만 로드
     loadPointData(); // 거래 내역 로드
-  }, []);
+  }, []); // 빈 의존성 배열로 마운트 시에만 실행
 
   // 탭 변경 시 해당 탭의 내역 데이터 로드
   useEffect(() => {
@@ -189,7 +189,7 @@ function PointPageContent() {
     if (activeTab === 'POINT' && !isLoading) {
       loadPointData();
     }
-  }, [selectedYear, selectedMonth]);
+  }, [selectedYear, selectedMonth, activeTab]);
 
   // 무한 스크롤 더보기 함수
   const handleLoadMore = async () => {
@@ -288,7 +288,7 @@ function PointPageContent() {
   const currentHistory = allHistory;
 
   // 데이터 새로고침 함수
-  const handleRefreshData = async () => {
+  const handleRefreshData = useCallback(async () => {
     try {
       // 내역만 새로고침
       await loadPointData();
@@ -296,7 +296,7 @@ function PointPageContent() {
     } catch (error) {
       console.error('데이터 새로고침 실패:', error);
     }
-  };
+  }, []);
 
   // 탭 변경 핸들러
   const handleTabChange = (newTab: AssetType) => {
