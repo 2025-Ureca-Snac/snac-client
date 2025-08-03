@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
 import { Header } from './(shared)/components/Header';
@@ -24,6 +25,11 @@ interface CardApiResponse {
   };
 }
 
+interface JwtPayload {
+  username: string;
+  [key: string]: unknown;
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 // 유틸리티 함수들
@@ -34,7 +40,7 @@ const getCurrentUserEmail = (): string | null => {
       const parsed = JSON.parse(authStorage);
       if (parsed.state?.token) {
         const token = parsed.state.token;
-        const decoded = JSON.parse(atob(token.split('.')[1]));
+        const decoded = jwtDecode<JwtPayload>(token);
         return decoded.username; // JWT의 username 필드 사용
       }
     }
