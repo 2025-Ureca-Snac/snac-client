@@ -3,17 +3,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
+import type { SendDataResponse } from '../types/api';
 import api from '../utils/api';
 import { API_STATUS, UPLOAD_ERROR_MESSAGE } from '../constants/api-status';
-
-// API 응답 타입 정의
-interface SendDataResponse {
-  data: string;
-  code: string;
-  status: string;
-  message: string;
-  timestamp: string;
-}
 
 // 첨부 이미지 URL 응답 타입 정의
 interface AttachmentUrlResponse {
