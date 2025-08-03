@@ -29,9 +29,6 @@ export default function AdminQnaPage() {
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
-  const [visibleStatusRowId, setVisibleStatusRowId] = useState<string | null>(
-    null
-  );
 
   useEffect(() => {
     setFilters({ category: 'QNA', type: 'ALL', status: 'ALL' });
@@ -40,22 +37,18 @@ export default function AdminQnaPage() {
   useEffect(() => {
     if (filters.category === 'QNA') {
       fetchDisputes();
-      setVisibleStatusRowId(null);
     }
   }, [filters, fetchDisputes]);
 
   const handleTypeChange = (value: DisputeType | 'ALL') => {
     setFilters({ type: value });
-    setVisibleStatusRowId(null);
   };
 
   const handleStatusChange = (value: DisputeStatus | 'ALL') => {
     setFilters({ status: value });
-    setVisibleStatusRowId(null);
   };
 
   const handleOpenDetailModal = async (disputeId: string) => {
-    setVisibleStatusRowId(disputeId);
     const data = await fetchDisputeById(disputeId);
     if (data) {
       setSelectedDispute(data);
@@ -112,10 +105,7 @@ export default function AdminQnaPage() {
             </div>
             <div className="mt-4 text-right">
               <button
-                onClick={() => {
-                  setVisibleStatusRowId(d.id);
-                  openResolveModal(d.id);
-                }}
+                onClick={() => openResolveModal(d.id)}
                 className="text-teal-green hover:font-semibold font-medium"
               >
                 상세/답변 보기
