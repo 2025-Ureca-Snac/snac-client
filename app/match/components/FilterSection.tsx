@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import FilterGroup from './filter/FilterGroup';
 import TransactionTypeForm from './TransactionTypeForm';
 import { Filters } from '../types';
+import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
 
 interface FilterSectionProps {
   onFilterChange?: (filters: Filters) => void;
@@ -66,6 +67,15 @@ export default function FilterSection({
       price: [],
     }
   );
+
+  // 연결된 사용자 수 상태
+  const [connectedUsers, setConnectedUsers] = useState<number>(0);
+
+  // WebSocket 연결 및 연결된 사용자 수 구독
+  useGlobalWebSocket({
+    setConnectedUsers,
+    skipAuthCheck: true,
+  });
 
   // 현재 선택된 거래 방식
   const currentTransactionType = selectedFilters.transactionType[0] || '';
@@ -207,8 +217,8 @@ export default function FilterSection({
         <div className="flex items-center justify-center mb-4">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm text-green-400 font-medium">
-              실시간 매칭 활성화
+            <span className="text-green-400 font-medium text-sm text-gray-300 ">
+              현재 접속자수: {connectedUsers}명
             </span>
           </div>
         </div>
