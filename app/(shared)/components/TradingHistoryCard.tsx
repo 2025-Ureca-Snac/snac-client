@@ -82,21 +82,26 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
         <div className="flex items-center gap-2 mb-2">
           <span
             className={`text-white text-xs px-2 py-1 rounded ${
-              item.status === 'BUY_REQUESTED' ||
-              item.status === 'ACCEPTED' ||
-              item.status === 'PAYMENT_CONFIRMED' ||
-              item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
-              item.status === 'DATA_SENT'
-                ? 'bg-orange-500'
-                : item.status === 'COMPLETED' || item.status === 'AUTO_PAYOUT'
-                  ? 'bg-green-500'
-                  : item.status === 'CANCELED' || item.status === 'AUTO_REFUND'
-                    ? 'bg-red-500'
-                    : 'bg-black'
+              item.cancelRequested
+                ? 'bg-red-500'
+                : item.status === 'BUY_REQUESTED' ||
+                    item.status === 'ACCEPTED' ||
+                    item.status === 'PAYMENT_CONFIRMED' ||
+                    item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
+                    item.status === 'DATA_SENT'
+                  ? 'bg-orange-500'
+                  : item.status === 'COMPLETED' || item.status === 'AUTO_PAYOUT'
+                    ? 'bg-green-500'
+                    : item.status === 'CANCELED' ||
+                        item.status === 'AUTO_REFUND'
+                      ? 'bg-red-500'
+                      : 'bg-black'
             }`}
-            aria-label={`상태: ${getStatusText(item.status)}`}
+            aria-label={`상태: ${
+              item.cancelRequested ? '취소 접수' : getStatusText(item.status)
+            }`}
           >
-            {getStatusText(item.status)}
+            {item.cancelRequested ? '취소 접수' : getStatusText(item.status)}
           </span>
           <span className="text-gray-900">
             {item.priceGb.toLocaleString()}원
