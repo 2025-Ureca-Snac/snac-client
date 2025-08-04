@@ -39,7 +39,7 @@ export default function TransactionSummary({
           </div>
 
           <div className="flex justify-between items-center py-4 border-b border-gray-700/50">
-            <span className="text-gray-400">거래 상대방</span>
+            <span className="text-gray-400">상대방 닉네임</span>
             <span className="font-medium text-white">{partner.name}</span>
           </div>
 

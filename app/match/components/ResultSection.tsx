@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import CategoryFilter from './CategoryFilter';
+import React from 'react';
 import UserList from './user/UserList';
-import { User, CategoryOption } from '../types';
+import { User } from '../types';
 
 interface ResultSectionProps {
   users: User[];
@@ -11,28 +10,11 @@ interface ResultSectionProps {
   onUserClick?: (user: User) => void;
 }
 
-const CATEGORIES: CategoryOption[] = [
-  { id: 'all', label: '모두 보기' },
-  { id: 'seller', label: '판매자' },
-  { id: 'buyer', label: '구매자' },
-];
-
 export default function ResultSection({
   users,
   isLoading = false,
   onUserClick,
 }: ResultSectionProps) {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const filteredUsers =
-    activeCategory === 'all'
-      ? users
-      : users.filter((user) => user.type === activeCategory);
-
-  const handleCategoryChange = (categoryId: string) => {
-    setActiveCategory(categoryId);
-  };
-
   return (
     <section className="relative bg-black py-8 px-6 min-h-[30vh] overflow-hidden">
       {/* 배경 글로우 효과 */}
@@ -55,12 +37,6 @@ export default function ResultSection({
         {/* 상단 글로우 라인 */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60 mb-6"></div>
 
-        <CategoryFilter
-          categories={CATEGORIES}
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
-        />
-
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             {/* 사이버펑크 스타일 로딩 */}
@@ -77,7 +53,7 @@ export default function ResultSection({
             </div>
           </div>
         ) : (
-          <UserList users={filteredUsers} onUserClick={onUserClick} />
+          <UserList users={users} onUserClick={onUserClick} />
         )}
 
         {/* 하단 글로우 라인 */}
