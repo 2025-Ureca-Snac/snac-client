@@ -1,21 +1,24 @@
 'use client';
 
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState, Fragment } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
 import { useTheme } from '@/app/(shared)/hooks/useTheme';
 
-import { MenuLink } from './MenuLink';
 import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
 
 import Matching from '@/public/matching.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
+import Blog from '@/public/blog.svg';
+import Menu from '@/public/menu.svg';
+
+import { Dialog, Transition } from '@headlessui/react';
 
 const ADMIN_ROLE = 'ADMIN';
 
@@ -23,17 +26,42 @@ interface HeaderProps {
   isTrading?: boolean;
 }
 
+const NAV_ITEMS = [
+  {
+    key: 'admin',
+    href: '/admin',
+    icon: Admin,
+    text: '관리자',
+    show: (isAdmin: boolean) => isAdmin,
+  },
+  {
+    key: 'match',
+    href: '/match',
+    icon: Matching,
+    text: '실시간 매칭',
+    show: (_: boolean, isTrading: boolean) => !isTrading,
+  },
+  {
+    key: 'blog',
+    href: '/blog',
+    icon: Blog,
+    text: '블로그',
+    show: () => true,
+  },
+];
+
 export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
   const pathname = usePathname();
+  const router = useRouter();
 
   const { actualTheme, changeTheme } = useTheme();
   const isDark = actualTheme === 'dark';
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // /match 또는 /match/trading 페이지에서는 강제로 다크모드 적용
   const isMatchPage = pathname?.startsWith('/match');
   const isDarkmode = isMatchPage ? true : isDark;
 
@@ -42,82 +70,214 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
     setMounted(true);
   }, []);
 
+  const handleMobileNav = (path: string) => {
+    setMenuOpen(false);
+    setTimeout(() => {
+      router.push(path);
+    }, 200);
+  };
+
   if (!mounted) {
     return <header className="w-full h-[57px] md:h-[67px]" />;
   }
 
+  const headerHeight = 57;
+  const headerHeightMd = 67;
+
   return (
-    <header
-      className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${
-        isDarkmode
-          ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
-          : 'bg-white border-b'
-      }`}
-    >
-      {isDarkmode && (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-transparent to-blue-300/3"></div>
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-16 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-5"></div>
-        </>
-      )}
+    <>
+      <header
+        className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 z-50 ${
+          isDarkmode
+            ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
+            : 'bg-white border-b'
+        }`}
+      >
+        <div className="relative z-10">
+          <Link href="/">
+            <Image
+              src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
+              alt="스낙 로고"
+              width={100}
+              height={25}
+              priority
+            />
+          </Link>
+        </div>
 
-      <div className="relative z-10">
-        <Link href="/">
-          <Image
-            src={isDarkmode ? '/logo_mobile_dark.png' : '/logo_mobile.svg'}
-            alt="스낙 로고"
-            width={100}
-            height={25}
-            priority
+        {/* PC 메뉴 */}
+        <div className="relative z-10 gap-4 items-center md:flex hidden">
+          {NAV_ITEMS.map(
+            (item) =>
+              item.show(isAdmin, isTrading) && (
+                <Link
+                  href={item.href}
+                  key={item.key}
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+                >
+                  <item.icon
+                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                  />
+                  <span
+                    className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    {item.text}
+                  </span>
+                </Link>
+              )
+          )}
+          {isLoggedIn ? (
+            <Link
+              href="/mypage"
+              className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+            >
+              <User
+                className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+              />
+              <span
+                className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+              >
+                마이페이지
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+            >
+              <Login
+                className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+              />
+              <span
+                className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+              >
+                로그인
+              </span>
+            </Link>
+          )}
+          <ThemeSwitch
+            isDark={isDarkmode}
+            onToggle={() => changeTheme(isDarkmode ? 'light' : 'dark')}
           />
-        </Link>
-      </div>
+        </div>
 
-      <div className="relative z-10 flex gap-4 items-center">
-        {isAdmin && (
-          <MenuLink
-            href="/admin"
-            IconComponent={Admin}
-            alt="관리자 페이지"
-            text="관리자"
-            isDarkmode={isDarkmode}
-          />
-        )}
+        <div className="md:hidden flex items-center">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="메뉴 열기"
+            className="focus:outline-none"
+          >
+            <Menu
+              className={`w-7 h-7 ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+            />
+          </button>
+        </div>
+      </header>
 
-        {isTrading ? null : (
-          <MenuLink
-            href="/match"
-            IconComponent={Matching}
-            alt="실시간 매칭"
-            text="실시간 매칭"
-            isDarkmode={isDarkmode}
-          />
-        )}
+      {/* 모바일 드롭다운 */}
+      <Transition.Root show={menuOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-[9999] md:hidden"
+          onClose={setMenuOpen}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div
+              className="fixed bottom-0 left-0 right-0 bg-black/40 dark:bg-gray-400/20"
+              style={{ top: `${headerHeight}px` }}
+            />
+          </Transition.Child>
 
-        {isLoggedIn ? (
-          <MenuLink
-            href="/mypage"
-            IconComponent={User}
-            alt="마이페이지"
-            text="마이페이지"
-            isDarkmode={isDarkmode}
-          />
-        ) : (
-          <MenuLink
-            href="/login"
-            IconComponent={Login}
-            alt="로그인"
-            text="로그인"
-            isDarkmode={isDarkmode}
-          />
-        )}
-
-        {/* ThemeSwitch에 isDarkmode onToggle props 전달 */}
-        <ThemeSwitch
-          isDark={isDarkmode}
-          onToggle={() => changeTheme(isDarkmode ? 'light' : 'dark')}
-        />
-      </div>
-    </header>
+          <Transition.Child
+            as={Fragment}
+            enter="transition duration-200 transform"
+            enterFrom="opacity-0 -translate-y-4"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition duration-150 transform"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 -translate-y-4"
+          >
+            <Dialog.Panel
+              className="fixed left-0 w-full z-10 bg-white dark:bg-gray-900 px-4 py-4 flex flex-col gap-1 rounded-b-2xl shadow-none"
+              style={{
+                top:
+                  typeof window !== 'undefined' && window.innerWidth >= 768
+                    ? `${headerHeightMd}px`
+                    : `${headerHeight}px`,
+              }}
+            >
+              {NAV_ITEMS.map(
+                (item) =>
+                  item.show(isAdmin, isTrading) && (
+                    <button
+                      type="button"
+                      key={item.key}
+                      onClick={() => handleMobileNav(item.href)}
+                      className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
+                    >
+                      <item.icon
+                        className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                      />
+                      <span
+                        className={`text-base font-medium ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                      >
+                        {item.text}
+                      </span>
+                    </button>
+                  )
+              )}
+              {isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={() => handleMobileNav('/mypage')}
+                  className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
+                >
+                  <User
+                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                  />
+                  <span
+                    className={`text-base font-medium ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    마이페이지
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleMobileNav('/login')}
+                  className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
+                >
+                  <Login
+                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                  />
+                  <span
+                    className={`text-base font-medium ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    로그인
+                  </span>
+                </button>
+              )}
+              <div className="pt-2">
+                <ThemeSwitch
+                  isDark={isDarkmode}
+                  onToggle={() => {
+                    changeTheme(isDarkmode ? 'light' : 'dark');
+                  }}
+                />
+              </div>
+            </Dialog.Panel>
+          </Transition.Child>
+        </Dialog>
+      </Transition.Root>
+    </>
   );
 };
