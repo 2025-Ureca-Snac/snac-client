@@ -14,35 +14,36 @@ interface BuyerMatchingStatusProps {
   onGoBack?: () => void;
 }
 
+// 필터 값을 사용자 친화적인 이름으로 변환하기 위한 옵션
+const FILTER_OPTIONS: Record<keyof Filters, Record<string, string>> = {
+  transactionType: {
+    구매자: '구매자',
+    판매자: '판매자',
+  },
+  carrier: {
+    SKT: 'SKT',
+    KT: 'KT',
+    'LG U+': 'LG U+',
+  },
+  dataAmount: {
+    '1GB': '1GB',
+    '2GB': '2GB',
+  },
+  price: {
+    ALL: '전체',
+    P0_1000: '1,000원 이하',
+    P0_1500: '1,500원 이하',
+    P0_2000: '2,000원 이하',
+    P0_2500: '2,500원 이하',
+  },
+};
+
 // 필터 값을 사용자 친화적인 이름으로 변환하는 유틸리티 함수
 const getFilterDisplayName = (
   category: keyof Filters,
   value: string
 ): string => {
-  const filterOptions: Record<keyof Filters, Record<string, string>> = {
-    transactionType: {
-      구매자: '구매자',
-      판매자: '판매자',
-    },
-    carrier: {
-      SKT: 'SKT',
-      KT: 'KT',
-      'LG U+': 'LG U+',
-    },
-    dataAmount: {
-      '1GB': '1GB',
-      '2GB': '2GB',
-    },
-    price: {
-      ALL: '전체',
-      P0_1000: '1,000원 이하',
-      P0_1500: '1,500원 이하',
-      P0_2000: '2,000원 이하',
-      P0_2500: '2,500원 이하',
-    },
-  };
-
-  return filterOptions[category]?.[value] || value;
+  return FILTER_OPTIONS[category]?.[value] || value;
 };
 
 // 필터 배열을 사용자 친화적인 이름으로 변환하는 함수
