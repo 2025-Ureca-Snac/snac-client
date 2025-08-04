@@ -65,32 +65,32 @@ const config: Config = {
       typography: {
         DEFAULT: {
           css: {
-            color: '#374151', // text-gray-700
+            color: '#404040', // text-gray-700
             lineHeight: '1.75', // leading-relaxed
             maxWidth: 'none',
             h1: {
               fontSize: '2.25rem', // text-4xl
               fontWeight: '700', // font-bold
               marginBottom: '1.5rem', // mb-6
-              color: '#111827', // text-gray-900
+              color: '#1A1A1A', // text-gray-900
             },
             h2: {
               fontSize: '1.875rem', // text-3xl
               fontWeight: '700', // font-bold
               marginBottom: '1rem', // mb-4
-              color: '#111827', // text-gray-900
+              color: '#1A1A1A', // text-gray-900
             },
             h3: {
               fontSize: '1.5rem', // text-2xl
               fontWeight: '700', // font-bold
               marginBottom: '0.75rem', // mb-3
-              color: '#111827', // text-gray-900
+              color: '#1A1A1A', // text-gray-900
             },
             h4: {
               fontSize: '1.25rem', // text-xl
               fontWeight: '600', // font-semibold
               marginBottom: '0.5rem', // mb-2
-              color: '#111827', // text-gray-900
+              color: '#1A1A1A', // text-gray-900
             },
             p: {
               marginBottom: '1rem', // mb-4
@@ -112,13 +112,13 @@ const config: Config = {
             },
             strong: {
               fontWeight: '700', // font-bold
-              color: '#111827', // text-gray-900
+              color: '#1A1A1A', // text-gray-900
             },
             em: {
               fontStyle: 'italic',
             },
             code: {
-              backgroundColor: '#F3F4F6', // bg-gray-100
+              backgroundColor: '#F5F5F5', // bg-gray-100
               padding: '0.25rem 0.5rem', // px-2 py-1
               borderRadius: '0.25rem', // rounded
               fontSize: '0.875rem', // text-sm
@@ -126,7 +126,7 @@ const config: Config = {
                 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace', // font-mono
             },
             pre: {
-              backgroundColor: '#F3F4F6', // bg-gray-100
+              backgroundColor: '#F5F5F5', // bg-gray-100
               padding: '1rem', // p-4
               borderRadius: '0.5rem', // rounded-lg
               overflowX: 'auto',
@@ -142,7 +142,7 @@ const config: Config = {
               borderLeftColor: '#3B82F6', // border-blue-500
               paddingLeft: '1rem', // pl-4
               fontStyle: 'italic',
-              color: '#4B5563', // text-gray-600
+              color: '#525252', // text-gray-600
               backgroundColor: '#EFF6FF', // bg-blue-50
               paddingTop: '0.5rem', // py-2
               paddingBottom: '0.5rem',
@@ -164,21 +164,20 @@ const config: Config = {
               marginBottom: '1rem', // mb-4
             },
             th: {
-              border: '1px solid #D1D5DB', // border border-gray-300
+              border: '1px solid #D4D4D4', // border border-gray-300
               padding: '0.5rem 1rem', // px-4 py-2
-              backgroundColor: '#F3F4F6', // bg-gray-100
+              backgroundColor: '#F5F5F5', // bg-gray-100
               fontWeight: '700', // font-bold
             },
             td: {
-              border: '1px solid #D1D5DB', // border border-gray-300
+              border: '1px solid #D4D4D4', // border border-gray-300
               padding: '0.5rem 1rem', // px-4 py-2
             },
             img: {
               width: '100%', // w-full
               height: 'auto', // h-auto
               borderRadius: '0.5rem', // rounded-lg
-              boxShadow:
-                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', // shadow-md
+              boxShadow: '0 1.5px 6px rgba(0,0,0,0.06)', // shadow-md
               marginTop: '1rem', // my-4
               marginBottom: '1rem',
               maxWidth: '100%', // max-w-full
@@ -249,7 +248,7 @@ const config: Config = {
         border: 'var(--border)',
         input: 'var(--input)',
         ring: 'var(--ring)',
-        'midnight-black': '#121212',
+        'midnight-black': '#1A1A1A',
         'signal-brown': '#5C4531',
         'burst-lime': '#98FF58',
         'candy-pink': '#FF66C4',
@@ -279,13 +278,27 @@ const config: Config = {
           600: '#525252',
           700: '#404040',
           800: '#262626',
-          900: '#171717',
+          900: '#1A1A1A',
         },
-        'btn-dark': '#1F1F1F',
+        'btn-dark': '#1A1A1A',
+        black: {
+          DEFAULT: '#1A1A1A',
+          50: '#FAFAFA',
+          100: '#F5F5F5',
+          200: '#E5E5E5',
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#1A1A1A',
+        },
       },
       boxShadow: {
-        light: '0 4px 16px rgba(163, 163, 163, 0.25)', // gray-400(회색 400), 불투명도 25%
+        light: '0 1.5px 6px rgba(0,0,0,0.06)',
       },
+
       width: {
         'card-sm': '152px',
         'card-md': '238px',
