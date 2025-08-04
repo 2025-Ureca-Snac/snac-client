@@ -177,7 +177,8 @@ const config: Config = {
               width: '100%', // w-full
               height: 'auto', // h-auto
               borderRadius: '0.5rem', // rounded-lg
-              boxShadow: '0 1.5px 6px rgba(0,0,0,0.06)', // shadow-light
+              boxShadow:
+                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
               marginTop: '1rem', // my-4
               marginBottom: '1rem',
               maxWidth: '100%', // max-w-full
@@ -283,16 +284,6 @@ const config: Config = {
         'btn-dark': '#1A1A1A',
         black: {
           DEFAULT: '#1A1A1A',
-          50: '#FAFAFA',
-          100: '#F5F5F5',
-          200: '#E5E5E5',
-          300: '#D4D4D4',
-          400: '#A3A3A3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#1A1A1A',
         },
       },
       boxShadow: {
