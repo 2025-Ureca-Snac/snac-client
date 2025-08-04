@@ -2,10 +2,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-// 내부 라이브러리/유틸리티 임포트 (절대 경로)
-import { Header } from '@/app/(shared)/components/Header';
-import { Footer } from '@/app/(shared)/components/Footer';
-
 // 상대 경로 임포트
 import BlogPostPageClient from './blog-post-page-client';
 import BlogPostContent from './blog-post-content';
@@ -52,7 +48,7 @@ export default async function BlogPostPage({ params }: Props) {
       <BlogStructuredData post={post} />
 
       <div className="min-h-screen">
-        <Header />
+        {/* <Header /> */}
 
         {/* 서버 컴포넌트로 렌더링되는 블로그 포스트 내용 */}
         <BlogPostContent post={post} />
@@ -60,7 +56,7 @@ export default async function BlogPostPage({ params }: Props) {
         {/* 클라이언트 컴포넌트 - 인터랙션만 담당 */}
         <BlogPostPageClient id={id} />
 
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </>
   );

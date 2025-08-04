@@ -30,7 +30,7 @@ export default async function BlogPostRenderer({
       } catch (error) {
         console.error('마크다운 변환 실패:', error);
         return (
-          <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+          <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
             {content}
           </div>
         );
@@ -40,7 +40,7 @@ export default async function BlogPostRenderer({
     // API에서 실제로 사용하는 속성들 확인
     if (!post.content && !post.articleUrl && !post.contentFileUrl) {
       return (
-        <div className="text-gray-700 leading-relaxed">
+        <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
           <p>콘텐츠를 불러오는 중...</p>
         </div>
       );
@@ -55,7 +55,7 @@ export default async function BlogPostRenderer({
         if (post.content) {
           return (
             <div
-              className="text-gray-700 leading-relaxed"
+              className="text-gray-700 dark:text-gray-300  leading-relaxed"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           );
@@ -64,7 +64,7 @@ export default async function BlogPostRenderer({
             ? await post.markdownContent
             : '';
           return (
-            <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+            <div className="text-gray-700  dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
               {markdownContent}
             </div>
           );
@@ -82,7 +82,7 @@ export default async function BlogPostRenderer({
           elements.push(
             <div
               key={`paragraph-${i}`}
-              className="text-gray-700 leading-relaxed mb-6"
+              className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6"
               dangerouslySetInnerHTML={{ __html: paragraph }}
             />
           );
