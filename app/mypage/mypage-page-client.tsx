@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useUserStore } from '@/app/(shared)/stores/user-store';
 import { useWebSocketGuard } from '@/app/(shared)/hooks/useWebSocketGuard';
 import { toast } from 'sonner';
@@ -17,8 +17,17 @@ export default function MyPagePageClient() {
     useUserStore();
   const { favorites, handleDeleteFavorite } = useFavorites();
 
+  // 중복 호출 방지를 위한 ref
+  const isProfileLoadedRef = useRef(false);
+
   // 컴포넌트 마운트 시 사용자 정보 가져오기
   useEffect(() => {
+    // 이미 로드된 경우 중복 호출 방지
+    if (isProfileLoadedRef.current) {
+      return;
+    }
+
+    isProfileLoadedRef.current = true;
     fetchUserProfile();
   }, []); // fetchUserProfile을 의존성에서 제거
 

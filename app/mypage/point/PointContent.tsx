@@ -344,35 +344,51 @@ export default function PointContent({
   };
 
   // 월별 선택 컴포넌트
-  const MonthSelector = () => (
-    <div className="flex items-center gap-3 mb-4">
-      <span className="text-sm font-medium text-gray-700">조회 기간:</span>
-      <select
-        value={selectedYear}
-        onChange={(e) => onYearChange?.(Number(e.target.value))}
-        className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(
-          (year) => (
+  const MonthSelector = () => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    // 선택된 연도가 현재 연도인지 확인
+    const isCurrentYear = selectedYear === currentYear;
+
+    return (
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-sm font-medium text-gray-700">조회 기간:</span>
+        <select
+          value={selectedYear}
+          onChange={(e) => onYearChange?.(Number(e.target.value))}
+          className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {Array.from({ length: 5 }, (_, i) => currentYear - i).map((year) => (
             <option key={year} value={year}>
               {year}년
             </option>
-          )
-        )}
-      </select>
-      <select
-        value={selectedMonth}
-        onChange={(e) => onMonthChange?.(Number(e.target.value))}
-        className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-          <option key={month} value={month}>
-            {month}월
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+          ))}
+        </select>
+        <select
+          value={selectedMonth}
+          onChange={(e) => onMonthChange?.(Number(e.target.value))}
+          className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {Array.from({ length: 12 }, (_, i) => i + 1)
+            .filter((month) => {
+              // 현재 연도인 경우 현재 월까지만 선택 가능
+              if (isCurrentYear) {
+                return month <= currentMonth;
+              }
+              // 이전 연도인 경우 모든 월 선택 가능
+              return true;
+            })
+            .map((month) => (
+              <option key={month} value={month}>
+                {month}월
+              </option>
+            ))}
+        </select>
+      </div>
+    );
+  };
 
   // 포인트 탭 컨텐츠
   const PointsTabContent = () => (

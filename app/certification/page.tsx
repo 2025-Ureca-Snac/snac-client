@@ -197,13 +197,13 @@ export default function Certification() {
             {/* 시계가 있는 닫기 버튼 */}
             <button
               onClick={handleClose}
-              className="relative px-8 py-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-4"
+              className="relative w-full max-w-sm px-8 py-4 bg-blue-600 text-white font-semibold text-lg rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-6 mx-auto"
             >
               {/* 시계 모양 프로그레스 바 */}
-              <div className="relative w-12 h-12">
+              <div className="relative w-16 h-16 flex-shrink-0">
                 {/* 시계 외곽 원 */}
                 <svg
-                  className="w-12 h-12 transform -rotate-90"
+                  className="w-16 h-16 transform -rotate-90"
                   viewBox="0 0 100 100"
                 >
                   {/* 배경 원 */}
@@ -231,16 +231,14 @@ export default function Certification() {
 
                 {/* 중앙 숫자 */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">
+                  <span className="text-2xl font-bold text-white">
                     {countdown}
                   </span>
                 </div>
-
-                {/* 프로그레스 바 제거 - SVG stroke로 대체됨 */}
               </div>
 
               {/* 버튼 텍스트 */}
-              <span>지금 닫기</span>
+              <span className="whitespace-nowrap text-lg">지금 닫기</span>
             </button>
             <p className="text-gray-400 text-sm mt-3">
               또는 잠시 기다리시면 자동으로 닫힙니다
