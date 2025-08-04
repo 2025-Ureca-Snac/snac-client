@@ -2,6 +2,7 @@ export interface InquiryItem {
   disputeId: number;
   status: string;
   type: string;
+  category: string; // 'QNA' 또는 'REPORT'
   title: string;
   description: string;
   createdAt: string;
@@ -15,7 +16,8 @@ export enum DisputeType {
   PAYMENT = 'PAYMENT',
   ACCOUNT = 'ACCOUNT',
   TECHNICAL_PROBLEM = 'TECHNICAL_PROBLEM',
-  OTHER = 'OTHER',
+  QNA_OTHER = 'QNA_OTHER',
+  REPORT_OTHER = 'REPORT_OTHER',
 }
 
 export interface CreateInquiryRequest {
@@ -58,6 +60,7 @@ export interface InquiryDetailItem {
   id: number;
   status: string;
   type: string;
+  category: string; // 'QNA' 또는 'REPORT'
   title: string;
   description: string;
   answer: string | null;
