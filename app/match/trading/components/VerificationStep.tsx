@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
 import { api } from '@/app/(shared)/utils/api';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 // 첨부 이미지 URL 응답 타입 정의
 interface AttachmentUrlResponse {
