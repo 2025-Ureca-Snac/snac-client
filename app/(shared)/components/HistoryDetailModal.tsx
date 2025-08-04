@@ -112,6 +112,40 @@ export default function HistoryDetailModal({
     }
   };
 
+  // 신고하기 버튼 클릭
+  const handleReportClick = () => {
+    console.log('신고하기 클릭됨:', item.partnerId, item.id);
+    // TODO: 신고하기 모달 또는 페이지로 이동
+  };
+
+  // 거래 취소 버튼 표시 여부 결정
+  const shouldShowCancelButton = () => {
+    if (!item) return false;
+
+    const { status, cancelRequestStatus } = item;
+
+    if (type === 'sales') {
+      return (
+        status !== 'COMPLETED' &&
+        status !== 'DATA_SENT' &&
+        cancelRequestStatus !== 'REQUESTED'
+      );
+    }
+
+    if (type === 'purchase') {
+      const isNotCancelledByPartner =
+        cancelRequestStatus !== 'ACCEPTED' &&
+        cancelRequestStatus !== 'REJECTED';
+      const isCancellableStatus =
+        status !== 'CANCELED' &&
+        status !== 'COMPLETED' &&
+        status !== 'DATA_SENT';
+      return isNotCancelledByPartner && isCancellableStatus;
+    }
+
+    return false;
+  };
+
   // 단골 삭제
   const handleRemoveFavorite = async () => {
     if (!item?.partnerId) return;
@@ -317,19 +351,29 @@ export default function HistoryDetailModal({
               />
             </div>
             <div className="flex-1">
-              <div className="text-sm text-gray-500 mb-1">{item.date}</div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-500 mb-1">{item.date}</div>
+
+                <button
+                  onClick={handleReportClick}
+                  className="px-3 py-1 rounded-lg text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                >
+                  신고하기
+                </button>
+              </div>
               <div className="font-semibold text-gray-900 mb-1">
                 {item.title}
               </div>
+
               <div className="flex items-center gap-2">
                 <span
                   className={`text-white text-xs px-2 py-1 rounded ${
-                    item.cancelRequested
+                    item.cancelRequestStatus === 'REQUESTED'
                       ? 'bg-red-500'
                       : getHistoryStatusColor(type, item.status)
                   }`}
                 >
-                  {item.cancelRequested
+                  {item.cancelRequestStatus === 'REQUESTED'
                     ? '취소 접수'
                     : getHistoryStatusText(type, item.status)}
                 </span>
@@ -361,6 +405,7 @@ export default function HistoryDetailModal({
                     </div>
                   </div>
                 </div>
+
                 <button
                   onClick={
                     isFavorite ? handleRemoveFavorite : handleAddFavorite
@@ -406,11 +451,11 @@ export default function HistoryDetailModal({
             steps={progressSteps}
             currentStep={progressSteps.filter((step) => step.isActive).length}
             type={type}
-            cancelRequested={item.cancelRequested}
+            cancelRequestedStatus={item.cancelRequestStatus ?? undefined}
           />
 
           {/* 거래 취소 요청 상태일 때 빨간색 화면 표시 */}
-          {item.cancelRequested && (
+          {item.cancelRequestStatus === 'REQUESTED' && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
@@ -441,7 +486,8 @@ export default function HistoryDetailModal({
             )}
 
           {/* 첨부 이미지 표시 */}
-          {(item.status === 'DATA_SENT' || item.status === 'COMPLETED') &&
+          {type === 'purchase' &&
+            item.status === 'DATA_SENT' &&
             attachmentImageUrl && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
                 <div className="flex items-center gap-2 mb-3">
@@ -485,53 +531,60 @@ export default function HistoryDetailModal({
             )}
 
           {/* DATA_SENT 상태일 때 판매자/구매자별 다른 UI */}
-          {item.status === 'DATA_SENT' && !item.cancelRequested && (
-            <>
-              {/* 판매자일 때 대기 메시지 */}
-              {type === 'sales' && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
-                      <span className="text-yellow-600 text-xs">⏳</span>
+          {item.status === 'DATA_SENT' &&
+            item.cancelRequestStatus !== 'REQUESTED' && (
+              <>
+                {/* 판매자일 때 대기 메시지 */}
+                {type === 'sales' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <span className="text-yellow-600 text-xs">⏳</span>
+                      </div>
+                      <div className="text-yellow-800 text-sm">
+                        구매자 데이터 수신 확인을 기다리고 있습니다.
+                      </div>
                     </div>
-                    <div className="text-yellow-800 text-sm">
-                      구매자 데이터 수신 확인을 기다리고 있습니다.
+                    <div className="text-red text-xs mt-2">
+                      구매자 24시간 이내 수신확인 하지 않을 시, 거래 완료
+                      처리됩니다.
                     </div>
                   </div>
-                  <div className="text-red text-xs mt-2">
-                    구매자 24시간 이내 수신확인 하지 않을 시, 거래 완료
-                    처리됩니다.
-                  </div>
-                </div>
-              )}
+                )}
 
-              {/* 구매자일 때 데이터 수신 확인 버튼 */}
-              {type === 'purchase' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 text-xs">📥</span>
+                {/* 구매자일 때 데이터 수신 확인 버튼 */}
+                {type === 'purchase' && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 text-xs">📥</span>
+                      </div>
+                      <div className="text-blue-800 text-sm">
+                        판매자가 데이터를 전송했습니다. 수신 확인해주세요.
+                      </div>
                     </div>
-                    <div className="text-blue-800 text-sm">
-                      판매자가 데이터를 전송했습니다. 수신 확인해주세요.
-                    </div>
+                    <button
+                      onClick={handleDataConfirm}
+                      className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+                    >
+                      데이터 수신 완료
+                    </button>
                   </div>
-                  <button
-                    onClick={handleDataConfirm}
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
-                  >
-                    데이터 수신 완료
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-
+                )}
+              </>
+            )}
+          {item.status !== 'COMPLETED' &&
+            item.cancelRequestStatus === 'REJECTED' &&
+            type === 'purchase' && (
+              <div className="text-red-700 text-sm">
+                판매자가 거래 취소를 거절했습니다.
+              </div>
+            )}
           {type === 'sales' &&
             progressSteps.filter((step) => step.isActive).length >= 1 &&
             progressSteps.filter((step) => step.isActive).length < 5 &&
             item.status !== 'DATA_SENT' &&
-            !item.cancelRequested && (
+            item.cancelRequestStatus !== 'REQUESTED' && (
               <div className="space-y-3">
                 <div className="text-gray-700 text-sm">
                   아래 번호로{' '}
@@ -639,7 +692,7 @@ export default function HistoryDetailModal({
         {/* 하단 버튼 */}
         <div className="flex-col p-4 border-t flex gap-2">
           {/* 거래 취소 접수 상태일 때 승낙/거절 버튼 */}
-          {item.cancelRequested && type === 'sales' && (
+          {item.cancelRequestStatus === 'REQUESTED' && type === 'sales' && (
             <div className="flex gap-2 w-full">
               <button
                 onClick={handleCancelAccept}
@@ -657,18 +710,16 @@ export default function HistoryDetailModal({
           )}
 
           {/* 거래 취소 버튼 */}
-          {item.status !== 'CANCELED' &&
-            item.status !== 'COMPLETED' &&
-            !item.cancelRequested && (
-              <div className="flex w-full">
-                <button
-                  onClick={handleTradeCancelClick}
-                  className="flex-1 bg-gray-400 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-500 transition-colors"
-                >
-                  거래 취소
-                </button>
-              </div>
-            )}
+          {shouldShowCancelButton() && (
+            <div className="flex w-full">
+              <button
+                onClick={handleTradeCancelClick}
+                className="flex-1 bg-gray-400 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-500 transition-colors"
+              >
+                거래 취소
+              </button>
+            </div>
+          )}
 
           {/* 거래 취소 사유 선택 */}
           {showCancelReason && (

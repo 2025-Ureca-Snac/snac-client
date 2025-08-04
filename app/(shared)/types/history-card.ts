@@ -41,6 +41,7 @@ export interface HistoryItem {
   cancelReason?: string;
   cancelRequested: boolean;
   cancelRequestReason: string | null;
+  cancelRequestStatus: string | null;
 }
 
 /**
