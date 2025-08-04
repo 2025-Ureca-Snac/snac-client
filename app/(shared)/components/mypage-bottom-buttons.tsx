@@ -1,3 +1,4 @@
+'use client';
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';

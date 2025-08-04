@@ -16,5 +16,5 @@ export interface InquiryData {
 export interface InquiryModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (inquiry: InquiryData) => void;
+  onSubmit: (inquiry: InquiryData) => Promise<void>;
 }
