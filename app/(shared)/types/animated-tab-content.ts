@@ -4,8 +4,10 @@
  * @interface AnimatedTabContentProps
  * @property {React.ReactNode} children 자식 컴포넌트
  * @property {string} tabKey 탭 식별자
+ * @property {'left' | 'right' | null} slideDirection 슬라이드 방향
  */
 export interface AnimatedTabContentProps {
   children: React.ReactNode;
   tabKey: string;
+  slideDirection?: 'left' | 'right' | null;
 }
