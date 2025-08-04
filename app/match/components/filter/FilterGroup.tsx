@@ -34,7 +34,9 @@ export default function FilterGroup({
   return (
     <div className="space-y-3">
       <h3 className="font-medium text-lg md:text-2xl text-white">{title}</h3>
-      <div className="grid grid-cols-2 gap-2">
+      <div
+        className={`grid gap-3 ${title === '통신사' ? 'grid-cols-3' : 'grid-cols-2'}`}
+      >
         {options.map((option) => {
           const isSelected = selectedValues.includes(option.value);
           const isOptionDisabled = disabled || option.disabled;
