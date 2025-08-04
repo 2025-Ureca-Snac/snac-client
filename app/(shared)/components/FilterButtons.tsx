@@ -36,7 +36,7 @@ export default function FilterButtons({
         <button
           onClick={onApply}
           disabled={applyDisabled}
-          className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-gray-800 dark:bg-black-200 dark:text-black text-white hover:bg-gray-500"
+          className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-gray-800 dark:bg-gray-200 dark:text-black text-white hover:bg-gray-500"
         >
           {applyText}
         </button>

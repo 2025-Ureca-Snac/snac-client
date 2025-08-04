@@ -279,7 +279,7 @@ export const Modal = () => {
                           {({ checked }) => (
                             <span className="flex items-center">
                               <CheckboxIcon checked={checked} />
-                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-black-200 flex items-center justify-center ml-2">
+                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ml-2">
                                 <Image
                                   src={option.imageUrl}
                                   alt={option.name}
