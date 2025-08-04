@@ -463,7 +463,7 @@ export default function MatchPage() {
           phone: '010-0000-0000', // 실제로는 서버에서 받아야 함
           point: 0, // 실제로는 서버에서 받아야 함
           priceGb: sellerInfo.price,
-          sellerRatingScore: request.ratingData || 1000,
+          sellerRatingScore: request.sellerRatingScore || 1000,
           status: 'ACCEPTED',
           cancelReason: null,
           type: 'buyer' as const, // 판매자 입장에서 상대방은 구매자
@@ -485,7 +485,6 @@ export default function MatchPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>

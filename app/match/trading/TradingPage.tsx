@@ -312,8 +312,6 @@ export default function TradingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-400/5 via-transparent to-green-300/3">
-      <Header isTrading={true} />
-
       {/* 헤더 */}
       <TradingHeader
         timeLeft={timeLeft}
