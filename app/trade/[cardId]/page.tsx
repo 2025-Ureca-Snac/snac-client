@@ -16,7 +16,9 @@ export default async function TradePage({ params }: TradePageProps) {
   const { cardId } = await params;
 
   try {
+    console.log('카드 정보 조회 시작:', cardId);
     const response = await api.get(`/cards/${cardId}`);
+    console.log('카드 정보 조회 성공:', response.data);
     const responseData = response.data as { data: CardData };
     const cardData = responseData.data;
 
@@ -37,6 +39,11 @@ export default async function TradePage({ params }: TradePageProps) {
     );
   } catch (error) {
     console.error('카드 정보 가져오기 실패:', error);
+    console.error('에러 상세 정보:', {
+      status: (error as any)?.response?.status,
+      data: (error as any)?.response?.data,
+      message: (error as any)?.message,
+    });
     notFound();
   }
 }

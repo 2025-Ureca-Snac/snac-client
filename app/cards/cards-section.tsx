@@ -44,6 +44,7 @@ export default function CardsSection({ cards, unit }: CardsSectionProps) {
           carrier={item.carrier}
           dataAmount={item.dataAmount}
           onClickBuy={() => handleBuyClick(item)}
+          skipLoginCheck={true}
         />
       ))}
     </div>

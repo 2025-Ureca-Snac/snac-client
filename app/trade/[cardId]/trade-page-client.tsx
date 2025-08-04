@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/app/(shared)/utils/api';
 import { ApiResponse } from '@/app/(shared)/types/api';
 import { CardData } from '@/app/(shared)/types/card';
+import { toast } from 'sonner';
+import { useAuthStore } from '@/app/(shared)/stores/auth-store';
+import { AuthState } from '@/app/(shared)/types/auth-store';
+
 import ActionButtons from './components/action-buttons';
 
 interface TradePageClientProps {
@@ -15,8 +19,16 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const loggedInUser = useAuthStore((state: AuthState) => state.user);
 
   const handleConfirm = async () => {
+    // 로그인 상태 확인
+    if (!loggedInUser) {
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
+      return;
+    }
+
     if (cardData.cardCategory === 'SELL') {
       setError(null);
       setIsProcessing(true);
@@ -55,7 +67,9 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
             errorMessage = '입력값이 올바르지 않습니다.';
             break;
           case 401:
-            errorMessage = '인증되지 않은 사용자입니다.';
+            errorMessage = '로그인 후 이용이 가능합니다.';
+            toast.error('로그인 후 이용이 가능합니다.');
+            router.push('/login');
             break;
           case 403:
             errorMessage = '타인의 글만 요청 가능합니다.';
@@ -96,6 +110,15 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
           }
         } catch (error) {
           console.error('판매 확정 요청 실패:', error);
+
+          const status = (error as { response?: { status: number } })?.response
+            ?.status;
+
+          if (status === 401) {
+            toast.error('로그인 후 이용이 가능합니다.');
+            router.push('/login');
+            return;
+          }
 
           const errorMessage = (
             error as { response?: { data: { message: string } } }
