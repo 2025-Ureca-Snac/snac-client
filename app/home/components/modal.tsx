@@ -225,7 +225,7 @@ export const Modal = () => {
                   <div>
                     <Dialog.Title
                       as="h3"
-                      className="text-heading-sm font-bold leading-6 text-gray-900"
+                      className="text-heading-sm font-bold leading-6"
                     >
                       {isEditMode ? '수정하기' : '등록하기'}
                     </Dialog.Title>
@@ -235,23 +235,11 @@ export const Modal = () => {
                         : '원하는 조건을 선택해주세요'}
                     </p>
                   </div>
-                  <button
-                    onClick={handleClose}
-                    className="p-1 text-gray-400 hover:text-gray-600"
-                    aria-label="닫기"
-                  >
-                    <Image
-                      src="/close.svg"
-                      alt="닫기 아이콘"
-                      width={24}
-                      height={24}
-                    />
-                  </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-6">
                   <RadioGroup value={cardCategory} onChange={setCardCategory}>
-                    <RadioGroup.Label className="block text-regular-sm font-medium text-gray-700 mb-3">
+                    <RadioGroup.Label className="block text-regular-sm font-medium text-gray-700 dark:text-gray-100 mb-3">
                       거래
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-6">
@@ -319,7 +307,7 @@ export const Modal = () => {
                           key={preset}
                           type="button"
                           onClick={() => handleDataPresetClick(preset)}
-                          className={`w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50 ${
+                          className={`w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50 dark:hover:bg-gray-700  ${
                             isPresetSelected(preset)
                               ? 'bg-gray-100 font-medium'
                               : ''
@@ -403,7 +391,7 @@ export const Modal = () => {
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="w-full flex justify-center py-2 px-3 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      className="w-full flex justify-center py-2 px-3 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       취소하기
                     </button>
