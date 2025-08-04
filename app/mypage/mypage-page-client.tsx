@@ -4,7 +4,6 @@ import { useUserStore } from '@/app/(shared)/stores/user-store';
 import { useWebSocketGuard } from '@/app/(shared)/hooks/useWebSocketGuard';
 import { toast } from 'sonner';
 import { useFavorites } from '@/app/(shared)/hooks/use-favorites';
-import { handleSettingClick } from '@/app/(shared)/utils/setting-handlers';
 import LoadingState from '@/app/(shared)/components/loading-state';
 import MyPageContent from '@/app/mypage/components/mypage-content';
 import MyPageModals from '@/app/mypage/components/mypage-modals';
@@ -50,10 +49,7 @@ export default function MyPagePageClient() {
 
   return (
     <div className="min-h-screen bg-background w-full">
-      <MyPageContent
-        favorites={favorites}
-        onSettingClick={handleSettingClick}
-      />
+      <MyPageContent favorites={favorites} />
       <MyPageModals
         profile={profile}
         favorites={favorites}

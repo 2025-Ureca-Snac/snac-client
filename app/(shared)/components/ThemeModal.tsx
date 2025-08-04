@@ -69,13 +69,34 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
               style={{ marginTop: '-32px' }}
             >
               <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="5" fill="#DBEAFE" />
-                <path
-                  d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                <rect
+                  x="2"
+                  y="3"
+                  width="20"
+                  height="14"
+                  rx="2"
+                  ry="2"
+                  fill="#DBEAFE"
+                  stroke="#2563EB"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="8"
+                  y1="21"
+                  x2="16"
+                  y2="21"
                   stroke="#2563EB"
                   strokeWidth="2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
+                />
+                <line
+                  x1="12"
+                  y1="17"
+                  x2="12"
+                  y2="21"
+                  stroke="#2563EB"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                 />
               </svg>
             </div>

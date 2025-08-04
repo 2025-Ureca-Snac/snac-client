@@ -25,16 +25,39 @@ export default function PrivacyPolicyModal({
           className="bg-white rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* 타이틀 및 닫기 */}
-          <div className="w-full flex items-center justify-center mb-2 relative">
-            <div className="text-2xl font-bold text-black text-center w-full">
+          {/* Header and Close Button */}
+          <div className="flex flex-col items-center -mt-12 mb-2">
+            <div
+              className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-2 border-4 border-white shadow"
+              style={{ marginTop: '-32px' }}
+            >
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                  fill="#DBEAFE"
+                  stroke="#2563EB"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9 12l2 2 4-4"
+                  stroke="#2563EB"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="text-xl font-extrabold text-black text-center">
               개인정보처리 방침
             </div>
             <button
               onClick={onClose}
               type="button"
-              className="absolute right-0 top-1 text-2xl text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
               aria-label="닫기"
+              tabIndex={0}
             >
               ×
             </button>
