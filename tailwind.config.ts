@@ -177,7 +177,7 @@ const config: Config = {
               width: '100%', // w-full
               height: 'auto', // h-auto
               borderRadius: '0.5rem', // rounded-lg
-              boxShadow: '0 1.5px 6px rgba(0,0,0,0.06)', // shadow-md
+              boxShadow: '0 1.5px 6px rgba(0,0,0,0.06)', // shadow-light
               marginTop: '1rem', // my-4
               marginBottom: '1rem',
               maxWidth: '100%', // max-w-full
