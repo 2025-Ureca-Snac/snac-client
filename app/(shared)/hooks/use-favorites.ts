@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { api } from '@/app/(shared)/utils/api';
 import { ApiResponse } from '@/app/(shared)/types/api';
 import { FavoriteItem, FavoriteResponse } from '@/app/(shared)/types/mypage';
@@ -6,6 +6,9 @@ import { toast } from 'sonner';
 
 export const useFavorites = () => {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+
+  // 중복 호출 방지를 위한 ref
+  const isFavoritesLoadedRef = useRef(false);
 
   /**
    * @author 이승우
@@ -77,6 +80,12 @@ export const useFavorites = () => {
 
   // 컴포넌트 마운트 시 단골 목록 가져오기
   useEffect(() => {
+    // 이미 로드된 경우 중복 호출 방지
+    if (isFavoritesLoadedRef.current) {
+      return;
+    }
+
+    isFavoritesLoadedRef.current = true;
     loadFavorites();
   }, [loadFavorites]);
 

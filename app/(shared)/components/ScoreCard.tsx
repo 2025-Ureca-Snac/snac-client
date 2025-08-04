@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ModalPortal from './modal-portal';
 import { useUserStore } from '../stores/user-store';
 import { useModalStore } from '../stores/modal-store';
@@ -9,6 +10,9 @@ import { SNACK_GRADES } from '../constants/snack-grades';
 import { api } from '../utils/api';
 import { ApiResponse } from '../types/api';
 import { BalanceResponse } from '../types/point-history';
+
+// 전역 변수로 API 호출 상태 관리 (모든 ScoreCard 인스턴스에서 공유)
+let globalBalanceLoaded = false;
 
 /**
  * @author 이승우
@@ -19,6 +23,7 @@ interface ScoreCardProps {
 }
 
 export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
+  const router = useRouter();
   const { profile } = useUserStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -30,6 +35,9 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
   });
   const [isBalanceLoading, setIsBalanceLoading] = useState(true);
 
+  // 중복 호출 방지를 위한 ref
+  const isBalanceLoadingRef = useRef(false);
+
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
     const response =
@@ -39,19 +47,61 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
 
   // 잔액 데이터 로드
   const loadBalance = async () => {
+    console.log('💰 loadBalance 함수 시작');
+    console.log('📊 loadBalance 내부 상태:', {
+      isBalanceLoadingRef: isBalanceLoadingRef.current,
+      globalBalanceLoaded: globalBalanceLoaded,
+    });
+
+    // 이미 로딩 중인 경우 중복 호출 방지
+    if (isBalanceLoadingRef.current) {
+      console.log('🚫 이미 로딩 중이므로 중복 호출 방지');
+      return;
+    }
+
+    // 이미 한 번 로드된 경우 중복 호출 방지 (React.StrictMode 대응)
+    if (globalBalanceLoaded) {
+      console.log('🚫 이미 로드됨으로 판단하여 중복 호출 방지');
+      setIsBalanceLoading(false);
+      return;
+    }
+
     try {
+      console.log('✅ API 호출 시작');
+      isBalanceLoadingRef.current = true;
+      globalBalanceLoaded = true;
       setIsBalanceLoading(true);
       const balanceResponse = await getBalance();
+      console.log('✅ API 호출 성공:', balanceResponse);
       setBalance(balanceResponse);
     } catch (err) {
-      console.error('잔액 로드 실패:', err);
+      console.error('❌ 잔액 로드 실패:', err);
+      // 에러 발생 시 플래그 리셋
+      globalBalanceLoaded = false;
     } finally {
       setIsBalanceLoading(false);
+      isBalanceLoadingRef.current = false;
+      console.log('🏁 loadBalance 함수 완료');
     }
   };
 
   // 컴포넌트 마운트 시 잔액 로드
   useEffect(() => {
+    console.log('🔄 ScoreCard useEffect 실행됨');
+    console.log(
+      '📊 useEffect 내부 - globalBalanceLoaded:',
+      globalBalanceLoaded
+    );
+
+    // 이미 로드된 경우 즉시 리턴 (React.StrictMode 대응)
+    if (globalBalanceLoaded) {
+      console.log(
+        '🚫 useEffect에서 이미 로드됨으로 판단하여 loadBalance 호출하지 않음'
+      );
+      return;
+    }
+
+    console.log('✅ useEffect에서 loadBalance 호출');
     loadBalance();
   }, []);
 
@@ -202,18 +252,24 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
               />
             </div>
             <div className="flex gap-2">
-              <Link
-                href="/mypage/point?type=MONEY&modal=recharge"
+              <button
+                onClick={() => {
+                  router.push('/mypage/point?type=MONEY&modal=recharge');
+                }}
                 className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center hover:bg-opacity-30 transition-all"
+                type="button"
               >
                 충전
-              </Link>
-              <Link
-                href="/mypage/point?type=MONEY&modal=settlement"
+              </button>
+              <button
+                onClick={() => {
+                  router.push('/mypage/point?type=MONEY&modal=settlement');
+                }}
                 className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center hover:bg-opacity-30 transition-all"
+                type="button"
               >
                 정산
-              </Link>
+              </button>
             </div>
           </Link>
         </div>
