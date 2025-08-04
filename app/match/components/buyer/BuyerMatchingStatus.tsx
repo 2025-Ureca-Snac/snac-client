@@ -14,6 +14,48 @@ interface BuyerMatchingStatusProps {
   onGoBack?: () => void;
 }
 
+// 필터 값을 사용자 친화적인 이름으로 변환하기 위한 옵션
+const FILTER_OPTIONS: Record<keyof Filters, Record<string, string>> = {
+  transactionType: {
+    구매자: '구매자',
+    판매자: '판매자',
+  },
+  carrier: {
+    SKT: 'SKT',
+    KT: 'KT',
+    'LG U+': 'LG U+',
+  },
+  dataAmount: {
+    '1GB': '1GB',
+    '2GB': '2GB',
+  },
+  price: {
+    ALL: '전체',
+    P0_1000: '1,000원 이하',
+    P0_1500: '1,500원 이하',
+    P0_2000: '2,000원 이하',
+    P0_2500: '2,500원 이하',
+  },
+};
+
+// 필터 값을 사용자 친화적인 이름으로 변환하는 유틸리티 함수
+const getFilterDisplayName = (
+  category: keyof Filters,
+  value: string
+): string => {
+  return FILTER_OPTIONS[category]?.[value] || value;
+};
+
+// 필터 배열을 사용자 친화적인 이름으로 변환하는 함수
+const getFilterDisplayNames = (
+  category: keyof Filters,
+  values: string[]
+): string => {
+  return values
+    .map((value) => getFilterDisplayName(category, value))
+    .join(', ');
+};
+
 export default function BuyerMatchingStatus({
   appliedFilters,
   isSearching,
@@ -98,31 +140,13 @@ export default function BuyerMatchingStatus({
 
         {/* 검색 아이콘 - Lottie 애니메이션 */}
         <div className="mb-8 flex justify-center">
-          {isSearching && animationData ? (
-            <div className="w-16 h-16">
-              <Lottie
-                loop
-                animationData={animationData}
-                play
-                style={{ width: 64, height: 64 }}
-              />
-            </div>
-          ) : (
-            <div className="w-16 h-16 rounded-full border-2 border-green-400 flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+          {animationData && (
+            <Lottie
+              loop
+              animationData={animationData}
+              play={isSearching}
+              style={{ width: 120, height: 120 }}
+            />
           )}
         </div>
 
@@ -149,7 +173,7 @@ export default function BuyerMatchingStatus({
               <div className="flex items-center justify-between">
                 <span className="text-gray-300">통신사:</span>
                 <span className="text-white">
-                  {appliedFilters.carrier.join(', ')}
+                  {getFilterDisplayNames('carrier', appliedFilters.carrier)}
                 </span>
               </div>
             )}
@@ -157,7 +181,10 @@ export default function BuyerMatchingStatus({
               <div className="flex items-center justify-between">
                 <span className="text-gray-300">데이터량:</span>
                 <span className="text-white">
-                  {appliedFilters.dataAmount.join(', ')}
+                  {getFilterDisplayNames(
+                    'dataAmount',
+                    appliedFilters.dataAmount
+                  )}
                 </span>
               </div>
             )}
@@ -165,7 +192,7 @@ export default function BuyerMatchingStatus({
               <div className="flex items-center justify-between">
                 <span className="text-gray-300">가격:</span>
                 <span className="text-white">
-                  {appliedFilters.price.join(', ')}
+                  {getFilterDisplayNames('price', appliedFilters.price)}
                 </span>
               </div>
             )}

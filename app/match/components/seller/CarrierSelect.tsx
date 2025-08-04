@@ -21,7 +21,7 @@ export default function CarrierSelect({
 }: CarrierSelectProps) {
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-medium text-white">통신사</h3>
+      <h3 className="text-lg md:text-2xl font-medium text-white">통신사</h3>
       <div className="grid grid-cols-3 gap-3">
         {CARRIER_OPTIONS.map((option) => (
           <button

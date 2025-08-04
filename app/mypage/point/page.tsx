@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense, useCallback } from 'react';
+import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import SideMenu from '@/app/(shared)/components/SideMenu';
@@ -67,6 +67,11 @@ function PointPageContent() {
     new Date().getMonth() + 1
   );
 
+  // 중복 호출 방지를 위한 ref
+  const isInitialLoadRef = useRef(false);
+  // 무한 로딩 방지를 위한 ref
+  const isLoadingRef = useRef(false);
+
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
     const response =
@@ -87,7 +92,14 @@ function PointPageContent() {
 
   // 포인트/머니 데이터 로드 (거래 내역만)
   const loadPointData = async () => {
+    // 무한 로딩 방지
+    if (isLoadingRef.current) {
+      console.log('이미 로딩 중이므로 중복 호출을 방지합니다.');
+      return;
+    }
+
     try {
+      isLoadingRef.current = true;
       setIsLoading(true);
       // 포인트와 머니 모두 20개씩 불러오기
       const size = 20;
@@ -161,6 +173,7 @@ function PointPageContent() {
       console.error('포인트/머니 데이터 로드 실패:', err);
     } finally {
       setIsLoading(false);
+      isLoadingRef.current = false;
     }
   };
 
@@ -173,23 +186,36 @@ function PointPageContent() {
 
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
-    loadInitialBalance(); // 잔액 한 번만 로드
-    loadPointData(); // 거래 내역 로드
+    // 이미 초기 로드가 완료되었으면 중복 호출 방지
+    if (isInitialLoadRef.current) {
+      return;
+    }
+
+    let isMounted = true;
+    isInitialLoadRef.current = true;
+
+    const loadData = async () => {
+      if (isMounted) {
+        console.log('포인트/머니 초기 로드 시작');
+        await loadInitialBalance(); // 잔액 한 번만 로드
+        await loadPointData(); // 거래 내역 로드
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []); // 빈 의존성 배열로 마운트 시에만 실행
 
-  // 탭 변경 시 해당 탭의 내역 데이터 로드
+  // 탭 변경 또는 포인트 월별 조회 변경 시 데이터 로드
   useEffect(() => {
-    if (!isLoading) {
+    // 초기 로드가 완료된 후에만 탭/월 변경 시 데이터 로드
+    if (isInitialLoadRef.current) {
       loadPointData();
     }
-  }, [activeTab]);
-
-  // 포인트 탭에서 월별 조회 변경 시 데이터 다시 로드
-  useEffect(() => {
-    if (activeTab === 'POINT' && !isLoading) {
-      loadPointData();
-    }
-  }, [selectedYear, selectedMonth, activeTab]);
+  }, [activeTab, selectedYear, selectedMonth]);
 
   // 무한 스크롤 더보기 함수
   const handleLoadMore = async () => {
@@ -297,6 +323,20 @@ function PointPageContent() {
       console.error('데이터 새로고침 실패:', error);
     }
   }, []);
+
+  // 연도 변경 핸들러
+  const handleYearChange = (year: number) => {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    setSelectedYear(year);
+
+    // 현재 연도로 변경된 경우, 현재 월보다 큰 월이 선택되어 있다면 현재 월로 조정
+    if (year === currentYear && selectedMonth > currentMonth) {
+      setSelectedMonth(currentMonth);
+    }
+  };
 
   // 탭 변경 핸들러
   const handleTabChange = (newTab: AssetType) => {
@@ -474,7 +514,7 @@ function PointPageContent() {
                   balance={balance}
                   selectedYear={selectedYear}
                   selectedMonth={selectedMonth}
-                  onYearChange={setSelectedYear}
+                  onYearChange={handleYearChange}
                   onMonthChange={setSelectedMonth}
                   onRefreshData={handleRefreshData}
                 />

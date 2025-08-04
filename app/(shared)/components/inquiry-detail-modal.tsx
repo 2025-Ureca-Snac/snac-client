@@ -37,7 +37,8 @@ export default function InquiryDetailModal({
         return '계정 관련';
       case DisputeType.TECHNICAL_PROBLEM:
         return '기술적 문제';
-      case DisputeType.OTHER:
+      case DisputeType.QNA_OTHER:
+      case DisputeType.REPORT_OTHER:
         return '기타';
       default:
         return type;
@@ -92,7 +93,9 @@ export default function InquiryDetailModal({
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* 헤더 */}
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-900">문의 상세</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                {inquiry.category === 'REPORT' ? '신고 상세' : '문의 상세'}
+              </h2>
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
