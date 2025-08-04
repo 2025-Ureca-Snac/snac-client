@@ -117,7 +117,7 @@ export default function HomeLayout({
           ) : (
             <>
               {cards.length === 0 && (
-                <p className="text-center text-gray-500 py-10">
+                <p className="text-center text-gray-500 dark:text-gray-100 py-10">
                   표시할 데이터가 없습니다.
                 </p>
               )}
