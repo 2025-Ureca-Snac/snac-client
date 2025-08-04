@@ -212,7 +212,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         }
       } catch (error) {
         console.error('비밀번호 찾기 이메일 인증 요청 오류', error);
-        toast.error(`인증코드 전송에 실패했습니다. ${error}`);
+        toast.error('인증코드 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
       } finally {
         setIsPasswordVerifying(false); // 인증 요청 완료
       }
@@ -448,7 +448,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
               });
 
         if ((response.data as { status?: string })?.status === 'OK') {
-          toast.error('비밀번호가 성공적으로 변경되었습니다.');
+          toast.success('비밀번호가 성공적으로 변경되었습니다.');
           resetModal(); // 모달 닫기
         } else {
           toast.error('비밀번호 변경에 실패했습니다.');
