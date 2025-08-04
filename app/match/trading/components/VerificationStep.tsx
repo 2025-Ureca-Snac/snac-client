@@ -1,7 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
+import { api } from '@/app/(shared)/utils/api';
+import Image from 'next/image';
+
+// 첨부 이미지 URL 응답 타입 정의
+interface AttachmentUrlResponse {
+  data: string;
+  code: string;
+  status: string;
+  message: string;
+  timestamp: string;
+}
 
 interface VerificationStepProps {
   dataAmount: number;
@@ -20,6 +31,8 @@ export default function VerificationStep({
 }: VerificationStepProps) {
   const { sendTradeConfirm: wsSendTradeConfirm } = useGlobalWebSocket();
   const [isConfirming, setIsConfirming] = useState(false);
+  const [attachmentImageUrl, setAttachmentImageUrl] = useState<string>('');
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   // 전송 완료 시간을 컴포넌트 마운트 시점에 고정
   const [completionTime] = useState(() => new Date().toLocaleTimeString());
@@ -29,6 +42,30 @@ export default function VerificationStep({
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  // 첨부 이미지 URL 가져오기 (구매자일 때만)
+  useEffect(() => {
+    const fetchAttachmentImage = async () => {
+      if (userRole === 'buyer' && tradeId) {
+        try {
+          setIsLoadingImage(true);
+          const response = await api.get<AttachmentUrlResponse>(
+            `/trades/${tradeId}/attachment-url`
+          );
+
+          if (response.data.status === 'OK' && response.data.data) {
+            setAttachmentImageUrl(response.data.data);
+          }
+        } catch (error) {
+          console.error('첨부 이미지 URL 가져오기 실패:', error);
+        } finally {
+          setIsLoadingImage(false);
+        }
+      }
+    };
+
+    fetchAttachmentImage();
+  }, [userRole, tradeId]);
 
   // 구매자 거래 확정 처리
   const handleBuyerConfirm = async () => {
@@ -106,6 +143,46 @@ export default function VerificationStep({
                 </div>
               </div>
             </div>
+
+            {/* 판매자가 업로드한 사진 표시 */}
+            {isLoadingImage ? (
+              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                <div className="flex items-center justify-center space-x-3">
+                  <div className="w-6 h-6 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-green-300">
+                    전송 증명 사진을 불러오는 중...
+                  </span>
+                </div>
+              </div>
+            ) : attachmentImageUrl ? (
+              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                <h3 className="font-bold text-white mb-4">전송 증명 사진</h3>
+                <div className="relative">
+                  <Image
+                    src={attachmentImageUrl}
+                    alt="전송 증명 사진"
+                    className="w-full h-auto rounded-lg shadow-lg object-contain"
+                    width={300}
+                    height={300}
+                  />
+                  <div className="absolute top-2 right-2 bg-green-500/80 text-white px-2 py-1 rounded-full text-xs font-medium">
+                    ✓ 전송 완료
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm mt-3">
+                  판매자가 업로드한 데이터 전송 스크린샷입니다.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                <div className="flex items-center justify-center space-x-3">
+                  <span className="text-gray-400">📷</span>
+                  <span className="text-gray-300">
+                    전송 증명 사진을 불러올 수 없습니다.
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* 주의사항 */}
             <div className="bg-yellow-900/20 border border-yellow-400/30 rounded-xl p-6 mb-6 backdrop-blur-sm">

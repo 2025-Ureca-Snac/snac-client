@@ -2,14 +2,17 @@ import { create } from 'zustand';
 
 interface WebSocketStore {
   isConnected: boolean;
+  connectedUsers: number;
   disconnectFunction: (() => void) | null;
   disconnect: () => void;
   setConnectionStatus: (status: boolean) => void;
+  setConnectedUsers: (count: number) => void;
   setDisconnectFunction: (fn: () => void) => void;
 }
 
 export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
   isConnected: false,
+  connectedUsers: 0,
   disconnectFunction: null as (() => void) | null,
   disconnect: () => {
     console.log('🔌 WebSocket 연결 해제');
@@ -21,6 +24,9 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
   },
   setConnectionStatus: (status: boolean) => {
     set({ isConnected: status });
+  },
+  setConnectedUsers: (count: number) => {
+    set({ connectedUsers: count });
   },
   setDisconnectFunction: (fn: () => void) => {
     set({ disconnectFunction: fn });
