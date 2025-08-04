@@ -3,6 +3,8 @@
 import React from 'react';
 import { MatchPartner } from '@/app/(shared)/stores/match-store';
 import { useGlobalWebSocket } from '@/app/(shared)/hooks/useGlobalWebSocket';
+import { SNACK_GRADES } from '@/app/(shared)/constants/snack-grades';
+import Image from 'next/image';
 
 interface ConfirmationStepProps {
   partner: MatchPartner;
@@ -15,6 +17,17 @@ export default function ConfirmationStep({
   onNext,
 }: ConfirmationStepProps) {
   useGlobalWebSocket();
+
+  // 바삭스코어에 따른 등급 계산
+  const partnerRating =
+    partner.type === 'seller'
+      ? partner.buyerRatingScore
+      : partner.sellerRatingScore;
+
+  const currentGrade =
+    SNACK_GRADES.find(
+      (grade) => partnerRating >= grade.min && partnerRating <= grade.max
+    ) || SNACK_GRADES[0];
   return (
     <div className="max-w-3xl mx-auto px-4 ">
       {/* 메인 카드 */}
@@ -85,7 +98,12 @@ export default function ConfirmationStep({
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-yellow-400/20 rounded-full flex items-center justify-center">
-                  <span className="text-yellow-400 text-lg">⭐</span>
+                  <Image
+                    src={currentGrade.icon}
+                    alt={currentGrade.name}
+                    width={16}
+                    height={16}
+                  />
                 </div>
                 <div>
                   <div className="text-gray-400 text-sm">
@@ -93,7 +111,7 @@ export default function ConfirmationStep({
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-white font-semibold">
-                      {partner.sellerRatingScore}
+                      {partnerRating}
                     </span>
                   </div>
                 </div>
@@ -139,7 +157,6 @@ export default function ConfirmationStep({
                   <br />• 중간에 취소할 경우{' '}
                   <span className="text-orange-300 font-medium">패널티</span>가
                   부과될 수 있습니다
-                  <br />• 상대방과의 원활한 소통을 위해 채팅을 확인해주세요
                 </div>
               </div>
             </div>

@@ -99,7 +99,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
                       : 'bg-black'
             }`}
             aria-label={`상태: ${
-              item.cancelRequestedStatus === 'REQUESTED'
+              item.cancelRequestStatus === 'REQUESTED'
                 ? '취소 접수'
                 : getStatusText(item.status)
             }`}

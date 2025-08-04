@@ -29,6 +29,8 @@ interface ServerTradeData {
   phone?: string;
   buyerNickname?: string;
   sellerNickName?: string;
+  sellerRatingScore?: number;
+  buyerRatingScore?: number;
   cancelReason?: string;
 }
 
@@ -180,10 +182,11 @@ export default function MatchPage() {
         phone: tradeData.phone || '010-0000-0000',
         point: tradeData.point || 0,
         priceGb: tradeData.priceGb || 0,
-        sellerRatingScore: 1000, // 기본값
+        sellerRatingScore: tradeData.sellerRatingScore,
         status: tradeData.status,
         buyerNickname: tradeData.buyerNickname,
         sellerNickName: tradeData.sellerNickName,
+        buyerRatingScore: tradeData.buyerRatingScore,
         cancelReason: tradeData.cancelReason || null,
         type: 'seller' as const,
       });
@@ -461,7 +464,7 @@ export default function MatchPage() {
           phone: '010-0000-0000', // 실제로는 서버에서 받아야 함
           point: 0, // 실제로는 서버에서 받아야 함
           priceGb: sellerInfo.price,
-          sellerRatingScore: request.ratingData || 1000,
+          sellerRatingScore: request.sellerRatingScore || 1000,
           status: 'ACCEPTED',
           cancelReason: null,
           type: 'buyer' as const, // 판매자 입장에서 상대방은 구매자

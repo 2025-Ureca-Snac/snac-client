@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
 import type { SendDataResponse } from '../types/api';
 import api from '../utils/api';
@@ -48,6 +49,7 @@ export default function HistoryDetailModal({
   item,
   type,
 }: HistoryDetailModalProps) {
+  const router = useRouter();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [showCancelReason, setShowCancelReason] = useState(false);
   const [selectedCancelReason, setSelectedCancelReason] = useState<string>('');
@@ -113,10 +115,41 @@ export default function HistoryDetailModal({
   };
 
   // 신고하기 버튼 클릭
-
   const handleReportClick = () => {
     console.log('신고하기 클릭됨:', item.partnerId, item.id);
-    // TODO: 신고하기 모달 또는 페이지로 이동
+    const tradeId = item.id;
+    const tradeType = type === 'sales' ? 'SALE' : 'PURCHASE';
+    router.push(
+      `/mypage/report-history?report=true&tradeId=${tradeId}&tradeType=${tradeType}`
+    );
+  };
+
+  // 거래 취소 버튼 표시 여부 결정
+  const shouldShowCancelButton = () => {
+    if (!item) return false;
+
+    const { status, cancelRequestStatus } = item;
+
+    if (type === 'sales') {
+      return (
+        status !== 'COMPLETED' &&
+        status !== 'DATA_SENT' &&
+        cancelRequestStatus !== 'REQUESTED'
+      );
+    }
+
+    if (type === 'purchase') {
+      const isNotCancelledByPartner =
+        cancelRequestStatus !== 'ACCEPTED' &&
+        cancelRequestStatus !== 'REJECTED';
+      const isCancellableStatus =
+        status !== 'CANCELED' &&
+        status !== 'COMPLETED' &&
+        status !== 'DATA_SENT';
+      return isNotCancelledByPartner && isCancellableStatus;
+    }
+
+    return false;
   };
 
   // 단골 삭제
@@ -683,16 +716,7 @@ export default function HistoryDetailModal({
           )}
 
           {/* 거래 취소 버튼 */}
-          {((type === 'sales' &&
-            item.status !== 'COMPLETED' &&
-            item.status !== 'DATA_SENT' &&
-            item.cancelRequestStatus !== 'REQUESTED') ||
-            (type === 'purchase' &&
-              item.status !== 'CANCELED' &&
-              item.status !== 'COMPLETED' &&
-              item.status !== 'DATA_SENT' &&
-              item.cancelRequestStatus !== 'ACCEPTED' &&
-              item.cancelRequestStatus !== 'REJECTED')) && (
+          {shouldShowCancelButton() && (
             <div className="flex w-full">
               <button
                 onClick={handleTradeCancelClick}

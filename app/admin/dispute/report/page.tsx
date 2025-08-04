@@ -99,8 +99,16 @@ export default function AdminReportPage() {
               </div>
               <div className="text-regular-sm text-gray-600 dark:text-gray-400 space-y-2 border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-500">신고자 ID:</span>
+                  <span className="font-medium text-gray-500">작성자 ID:</span>
                   <span className="truncate ml-2">{d.id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-500">
+                    작성자 닉네임:
+                  </span>
+                  <span className="truncate ml-2">
+                    {d.reporterNickname ?? '-'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-500">접수일:</span>

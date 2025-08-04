@@ -23,7 +23,7 @@ export default function PriceInput({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-medium text-white">가격</h3>
+      <h3 className="text-lg md:text-2xl font-medium text-white">가격</h3>
       <div className="flex items-center space-x-2">
         <input
           type="number"
