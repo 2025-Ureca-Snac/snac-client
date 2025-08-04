@@ -8,8 +8,9 @@ import {
   useRef,
   useMemo,
 } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import { api, handleApiError } from '@/app/(shared)/utils/api';
@@ -47,6 +48,7 @@ const getHistory = async (
 };
 
 function PointPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type') as AssetType;
 
@@ -582,22 +584,24 @@ function PointPageContent() {
   );
 
   // 에러 컴포넌트
-  const ErrorState = () => (
-    <div className="bg-white rounded-lg shadow-sm border">
-      <div className="p-6">
-        <div className="text-center py-8">
-          <div className="text-red-500 mb-2">오류가 발생했습니다</div>
-          <div className="text-gray-500 mb-4">{error}</div>
-          <button
-            onClick={loadPointData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-          >
-            다시 시도
-          </button>
+  const ErrorState = () => {
+    // 에러 발생 시 바로 로그인 페이지로 이동
+    useEffect(() => {
+      console.log('포인트 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
+    }, [error, router]);
+
+    return (
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="p-6">
+          <div className="text-center py-8">
+            <div className="text-gray-500">로그인 페이지로 이동 중...</div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white w-full">

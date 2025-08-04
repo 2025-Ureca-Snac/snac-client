@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import AnimatedTabContent from './AnimatedTabContent';
@@ -70,6 +72,7 @@ export default function TradingHistoryPage({
   type,
   selectedId,
 }: TradingHistoryPageProps) {
+  const router = useRouter();
   const isPurchase = type === 'purchase';
 
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'completed'>(
@@ -483,20 +486,22 @@ export default function TradingHistoryPage({
   );
 
   // 에러 컴포넌트
-  const ErrorState = () => (
-    <div className="p-6">
-      <div className="text-center py-8">
-        <div className="text-red-500 mb-2">오류가 발생했습니다</div>
-        <div className="text-gray-500 mb-4">{error}</div>
-        <button
-          onClick={() => loadTradingHistory(activeTab)}
-          className={`px-4 py-2 ${theme.buttonColor} text-white rounded-lg focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
-        >
-          다시 시도
-        </button>
+  const ErrorState = () => {
+    // 에러 발생 시 바로 로그인 페이지로 이동
+    useEffect(() => {
+      console.log('거래 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
+    }, [error, router]);
+
+    return (
+      <div className="p-6">
+        <div className="text-center py-8">
+          <div className="text-gray-500">로그인 페이지로 이동 중...</div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // 상태 텍스트 매핑
   const getStatusText = (status: string) => {

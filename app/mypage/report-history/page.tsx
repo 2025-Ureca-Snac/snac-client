@@ -18,8 +18,8 @@ import {
   InquiryDetailItem,
   DisputeType,
 } from '@/app/(shared)/types/inquiry';
+
 import { toast } from 'sonner';
-import { handleApiError } from '@/app/(shared)/utils/api';
 import { useInquiries } from '@/app/(shared)/hooks/use-inquiries';
 import { useReports } from '@/app/(shared)/hooks/use-reports';
 import Link from 'next/link';
@@ -87,7 +87,9 @@ export default function InquiryHistoryPage() {
       setCurrentPage(response.number);
       setHasNext(!response.last);
     } catch (error) {
-      toast.error(handleApiError(error));
+      console.log('신고 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -330,7 +332,9 @@ export default function InquiryHistoryPage() {
         loadInquiries(0, false);
       }
     } catch (error) {
-      toast.error(handleApiError(error));
+      console.log('문의 작성 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     }
   };
 
@@ -351,8 +355,9 @@ export default function InquiryHistoryPage() {
       setIsDetailModalOpen(true);
       console.log('모달 상태 설정 완료');
     } catch (error) {
-      console.error('문의 상세 조회 에러:', error);
-      toast.error(handleApiError(error));
+      console.log('문의 상세 조회 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     }
   };
 
@@ -380,7 +385,9 @@ export default function InquiryHistoryPage() {
         loadInquiries(0, false);
       }
     } catch (error) {
-      toast.error(handleApiError(error));
+      console.log('신고 작성 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     }
   };
 
