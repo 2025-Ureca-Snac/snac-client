@@ -9,8 +9,6 @@ import EarningsDisplay from './components/EarningsDisplay';
 import ActionButtons from './components/ActionButtons';
 export default function CompletePage() {
   const { partner, userRole } = useMatchStore();
-  console.log('마지막보자:', partner);
-  console.log('현재 사용자 역할:', userRole);
 
   // 거래 상대방 정보 (store에서 가져오거나 기본값)
   const partnerInfo = partner
@@ -57,9 +55,9 @@ export default function CompletePage() {
   const completedAt = new Date().toLocaleString();
 
   // 보상 정보
-  const pointsEarned = 0;
-  const bonusPoints = 0; // 첫 거래 보너스
-  const experienceGained = 10;
+  const POINTS_EARNED = 0;
+  const BONUS_POINTS = 0; // 첫 거래 보너스
+  const EXPERIENCE_GAINED = 10;
 
   return (
     <div className="min-h-screen flex flex-col bg-black">
@@ -84,9 +82,9 @@ export default function CompletePage() {
               />
 
               <EarningsDisplay
-                pointsEarned={pointsEarned}
-                bonusPoints={bonusPoints}
-                experienceGained={experienceGained}
+                pointsEarned={POINTS_EARNED}
+                bonusPoints={BONUS_POINTS}
+                experienceGained={EXPERIENCE_GAINED}
               />
             </div>
 
