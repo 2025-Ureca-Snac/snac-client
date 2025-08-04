@@ -77,7 +77,7 @@ export default function DataAmountInput({
 
   return (
     <div className="space-y-3">
-      <h3 className={`text-lg font-medium text-white`}>데이터량</h3>
+      <h3 className={`text-lg md:text-2xl font-medium text-white`}>데이터량</h3>
 
       {!isCustomInput ? (
         <div className="space-y-3">
