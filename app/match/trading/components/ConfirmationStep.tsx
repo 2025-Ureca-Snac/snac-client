@@ -93,7 +93,9 @@ export default function ConfirmationStep({
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-white font-semibold">
-                      {partner.sellerRatingScore}
+                      {partner.type === 'seller'
+                        ? partner.buyerRatingScore
+                        : partner.sellerRatingScore}
                     </span>
                   </div>
                 </div>
@@ -139,7 +141,6 @@ export default function ConfirmationStep({
                   <br />• 중간에 취소할 경우{' '}
                   <span className="text-orange-300 font-medium">패널티</span>가
                   부과될 수 있습니다
-                  <br />• 상대방과의 원활한 소통을 위해 채팅을 확인해주세요
                 </div>
               </div>
             </div>
