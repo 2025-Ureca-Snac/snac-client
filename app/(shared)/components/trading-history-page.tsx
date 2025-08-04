@@ -40,6 +40,7 @@ interface TradingHistoryItem {
   cancelReason?: string;
   cancelRequested: boolean;
   cancelRequestReason: string | null;
+  cancelRequestStatus: string | null;
 }
 
 // 거래 내역 타입
@@ -215,6 +216,7 @@ export default function TradingHistoryPage({
       phoneNumber: item.phone || '',
       cancelReason: item.cancelReason || '',
       cancelRequested: item.cancelRequested || false,
+      cancelRequestStatus: item.cancelRequestStatus || null,
       cancelRequestReason: item.cancelRequestReason || null,
       partnerId: item.partnerId || undefined,
       partnerFavorite: item.partnerFavorite || false,
