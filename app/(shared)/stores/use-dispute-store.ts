@@ -15,7 +15,9 @@ export type DisputeType =
   | 'ACCOUNT'
   | 'TECHNICAL_PROBLEM'
   | 'REPORT_OTHER'
-  | 'QNA_OTHER';
+  | 'QNA_OTHER'
+  | 'QNA'
+  | 'REPORT';
 
 export interface Dispute {
   id: string;
