@@ -36,7 +36,7 @@ export default function ReportModal({
 }: ReportModalProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('PAYMENT');
+  const [category, setCategory] = useState('DATA_NONE');
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,7 +122,7 @@ export default function ReportModal({
   const resetForm = () => {
     setTitle('');
     setContent('');
-    setCategory('PAYMENT');
+    setCategory('DATA_NONE');
     setImages([]);
     setImagePreviews((prev) => {
       prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
