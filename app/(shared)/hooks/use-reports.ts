@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
 import { DisputeType } from '@/app/(shared)/types/inquiry';
+import { uploadImage } from '@/app/(shared)/utils/inquiry-api';
 
 export const useReports = () => {
   // 신고하기 제출
@@ -15,14 +16,19 @@ export const useReports = () => {
       tradeType?: string;
     }) => {
       try {
-        // 이미지 업로드 로직 (필요시 구현)
-        const attachmentKeys: string[] = [];
+        // 이미지가 있으면 먼저 업로드
+        let attachmentKeys: string[] = [];
+        if (data.images && data.images.length > 0) {
+          const uploadPromises = data.images.map((image) => uploadImage(image));
+          attachmentKeys = await Promise.all(uploadPromises);
+        }
 
         const reportData = {
           title: data.title,
           type: data.category as DisputeType,
           description: data.content,
-          attachmentKeys,
+          attachmentKeys:
+            attachmentKeys.length > 0 ? attachmentKeys : undefined,
           tradeId: data.tradeId,
           tradeType: data.tradeType,
         };

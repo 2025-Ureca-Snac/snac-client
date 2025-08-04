@@ -25,7 +25,7 @@ interface ReportModalProps {
     images: File[];
     tradeId?: string;
     tradeType?: string;
-  }) => void;
+  }) => Promise<void>;
   tradeId?: string;
   tradeType?: string; // 'SALE' 또는 'PURCHASE'
 }
@@ -118,6 +118,21 @@ export default function ReportModal({
     }
   };
 
+  /**
+   * @author 이승우
+   * @description 폼 초기화 함수
+   */
+  const resetForm = () => {
+    setTitle('');
+    setContent('');
+    setCategory('PAYMENT');
+    setImages([]);
+    setImagePreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
+      return [];
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -144,14 +159,7 @@ export default function ReportModal({
       });
 
       // 폼 초기화
-      setTitle('');
-      setContent('');
-      setCategory('PAYMENT');
-      setImages([]);
-      setImagePreviews((prev) => {
-        prev.forEach((url) => URL.revokeObjectURL(url));
-        return [];
-      });
+      resetForm();
     } catch (error) {
       console.error('신고 제출 실패:', error);
     } finally {
@@ -162,14 +170,7 @@ export default function ReportModal({
   const handleClose = () => {
     if (title.trim() || content.trim() || images.length > 0) {
       if (confirm('작성 중인 내용이 있습니다. 정말로 닫으시겠습니까?')) {
-        setTitle('');
-        setContent('');
-        setCategory('PAYMENT');
-        setImages([]);
-        setImagePreviews((prev) => {
-          prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
-          return [];
-        });
+        resetForm();
         onClose();
       }
     } else {
@@ -275,24 +276,25 @@ export default function ReportModal({
               {/* 이미지 업로드 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  증거 자료 (선택사항)
+                  이미지 첨부 (선택)
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {/* 이미지 미리보기 */}
                   {imagePreviews.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {imagePreviews.map((preview, index) => (
-                        <div key={index} className="relative">
+                        <div key={index} className="relative group">
                           <img
                             src={preview}
-                            alt={`증거 자료 ${index + 1}`}
-                            className="w-full h-20 object-cover rounded-md cursor-pointer"
+                            alt={`첨부 이미지 ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-md border cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={() => openImageModal(index)}
                           />
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                            disabled={isSubmitting}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors disabled:opacity-50"
                           >
                             ×
                           </button>
@@ -301,15 +303,15 @@ export default function ReportModal({
                     </div>
                   )}
 
-                  {/* 파일 업로드 버튼 */}
-                  {imagePreviews.length < MAX_IMAGES && (
+                  {/* 이미지 업로드 버튼 */}
+                  {images.length < MAX_IMAGES && (
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSubmitting}
-                      className="w-full p-4 border-2 border-dashed border-gray-300 rounded-md text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                      className="w-full p-4 border-2 border-dashed border-gray-300 rounded-md hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50"
                     >
-                      <div className="flex flex-col items-center">
+                      <div className="flex flex-col items-center text-gray-500">
                         <svg
                           className="w-8 h-8 mb-2"
                           fill="none"
@@ -320,11 +322,11 @@ export default function ReportModal({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                           />
                         </svg>
-                        <span>이미지 업로드</span>
-                        <span className="text-xs">
+                        <span className="text-sm">이미지 추가</span>
+                        <span className="text-xs mt-1">
                           최대 {MAX_IMAGES}개, 각 5MB 이하
                         </span>
                       </div>
@@ -338,11 +340,12 @@ export default function ReportModal({
                     multiple
                     onChange={handleImageSelect}
                     className="hidden"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
 
-              {/* 제출 버튼 */}
+              {/* 버튼 */}
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -354,10 +357,10 @@ export default function ReportModal({
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
+                  disabled={isSubmitting || !title.trim() || !content.trim()}
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? '제출 중...' : '신고하기'}
+                  {isSubmitting ? '제출 중...' : '신고 제출'}
                 </button>
               </div>
             </form>
@@ -365,77 +368,25 @@ export default function ReportModal({
         </div>
       </ModalPortal>
 
-      {/* 이미지 모달 */}
+      {/* 이미지 상세보기 모달 */}
       {imageModalOpen && (
-        <div
-          className="fixed inset-0 z-60 flex items-center justify-center bg-black/80"
-          onClick={closeImageModal}
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <img
-              src={imagePreviews[selectedImageIndex]}
-              alt={`증거 자료 ${selectedImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-
-            {/* 네비게이션 버튼 */}
-            {imagePreviews.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToPreviousImage();
-                  }}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToNextImage();
-                  }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              </>
-            )}
-
+        <ModalPortal isOpen={imageModalOpen} onClose={closeImageModal}>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[60] p-4"
+            onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()} // 클릭 이벤트 버블링 방지
+            tabIndex={0}
+          >
             {/* 닫기 버튼 */}
             <button
-              onClick={closeImageModal}
-              className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeImageModal();
+              }}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
             >
               <svg
-                className="w-6 h-6"
+                className="w-8 h-8"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -449,12 +400,91 @@ export default function ReportModal({
               </svg>
             </button>
 
-            {/* 인디케이터 */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+            {/* 이전 버튼 */}
+            {imagePreviews.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToPreviousImage();
+                }}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-10"
+              >
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+            )}
+
+            {/* 이미지 */}
+            <div className="relative max-w-full max-h-full">
+              <img
+                src={imagePreviews[selectedImageIndex]}
+                alt={`이미지 ${selectedImageIndex + 1}`}
+                className="max-w-full max-h-[80vh] object-contain"
+              />
+
+              {/* 이미지 인디케이터 */}
+              {imagePreviews.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {imagePreviews.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedImageIndex(index);
+                      }}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === selectedImageIndex
+                          ? 'bg-white'
+                          : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 다음 버튼 */}
+            {imagePreviews.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNextImage();
+                }}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-10"
+              >
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            )}
+
+            {/* 이미지 정보 */}
+            <div className="absolute bottom-4 left-4 text-white text-sm">
               {selectedImageIndex + 1} / {imagePreviews.length}
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </>
   );

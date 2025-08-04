@@ -11,8 +11,6 @@ import ReportModal from '@/app/(shared)/components/report-modal';
 import {
   getInquiryList,
   getInquiryDetail,
-  createInquiry,
-  uploadImage,
 } from '@/app/(shared)/utils/inquiry-api';
 import {
   InquiryItem,
@@ -21,6 +19,8 @@ import {
 } from '@/app/(shared)/types/inquiry';
 import { toast } from 'sonner';
 import { handleApiError } from '@/app/(shared)/utils/api';
+import { useInquiries } from '@/app/(shared)/hooks/use-inquiries';
+import { useReports } from '@/app/(shared)/hooks/use-reports';
 import Link from 'next/link';
 
 /**
@@ -49,6 +49,10 @@ export default function InquiryHistoryPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportTradeId, setReportTradeId] = useState<string>('');
   const [reportTradeType, setReportTradeType] = useState<string>('');
+
+  // 커스텀 훅 사용
+  const { createInquiry } = useInquiries();
+  const { createReport } = useReports();
 
   /**
    * @author 이승우
@@ -177,28 +181,12 @@ export default function InquiryHistoryPage() {
     images?: File[];
   }) => {
     try {
-      // 이미지가 있으면 먼저 업로드
-      let attachmentKeys: string[] = [];
-      if (inquiry.images && inquiry.images.length > 0) {
-        const uploadPromises = inquiry.images.map((image) =>
-          uploadImage(image)
-        );
-        attachmentKeys = await Promise.all(uploadPromises);
+      const success = await createInquiry(inquiry);
+      if (success) {
+        setIsInquiryModalOpen(false);
+        // 문의 목록 새로고침
+        loadInquiries(0, false);
       }
-
-      // 문의 데이터 생성
-      const inquiryData = {
-        title: inquiry.title,
-        type: inquiry.category as DisputeType,
-        description: inquiry.content,
-        attachmentKeys: attachmentKeys.length > 0 ? attachmentKeys : undefined,
-      };
-
-      await createInquiry(inquiryData);
-      toast.success('문의가 성공적으로 제출되었습니다.');
-      setIsInquiryModalOpen(false);
-      // 문의 목록 새로고침
-      loadInquiries(0, false);
     } catch (error) {
       toast.error(handleApiError(error));
     }
@@ -237,39 +225,15 @@ export default function InquiryHistoryPage() {
     tradeType?: string;
   }) => {
     try {
-      // 이미지가 있으면 먼저 업로드
-      let attachmentKeys: string[] = [];
-      if (data.images && data.images.length > 0) {
-        const uploadPromises = data.images.map((image) => uploadImage(image));
-        attachmentKeys = await Promise.all(uploadPromises);
+      const success = await createReport(data);
+      if (success) {
+        setIsReportModalOpen(false);
+        setReportTradeId('');
+        setReportTradeType('');
+
+        // 목록 새로고침
+        loadInquiries(0, false);
       }
-
-      // 신고 데이터 생성
-      const reportData = {
-        title: data.title,
-        type: data.category as DisputeType,
-        description: data.content,
-        attachmentKeys: attachmentKeys.length > 0 ? attachmentKeys : undefined,
-        tradeId: data.tradeId,
-        tradeType: data.tradeType,
-      };
-
-      // 신고하기 API 엔드포인트 사용
-      await fetch(`/trades/${data.tradeId}/disputes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reportData),
-      });
-
-      toast.success('신고가 성공적으로 접수되었습니다.');
-      setIsReportModalOpen(false);
-      setReportTradeId('');
-      setReportTradeType('');
-
-      // 목록 새로고침
-      loadInquiries(0, false);
     } catch (error) {
       toast.error(handleApiError(error));
     }

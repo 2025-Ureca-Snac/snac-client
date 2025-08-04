@@ -9,7 +9,7 @@ const INQUIRY_CATEGORIES = [
   { value: 'PAYMENT', label: '결제 관련' },
   { value: 'ACCOUNT', label: '계정 관련' },
   { value: 'TECHNICAL_PROBLEM', label: '기술적 문제' },
-  { value: 'OTHER', label: '기타' },
+  { value: 'QNA_OTHER', label: '기타' },
 ];
 
 const MAX_IMAGES = 5;
@@ -107,6 +107,21 @@ export default function InquiryModal({
     }
   };
 
+  /**
+   * @author 이승우
+   * @description 폼 초기화 함수
+   */
+  const resetForm = () => {
+    setTitle('');
+    setContent('');
+    setCategory('PAYMENT');
+    setImages([]);
+    setImagePreviews((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
+      return [];
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -126,14 +141,7 @@ export default function InquiryModal({
       });
 
       // 폼 초기화
-      setTitle('');
-      setContent('');
-      setCategory('PAYMENT');
-      setImages([]);
-      setImagePreviews((prev) => {
-        prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
-        return [];
-      });
+      resetForm();
       onClose();
     } catch (error) {
       console.error('문의 제출 실패:', error);
@@ -149,14 +157,7 @@ export default function InquiryModal({
     // 변경사항이 있으면 확인
     if (title.trim() || content.trim() || images.length > 0) {
       if (confirm('작성 중인 내용이 있습니다. 정말로 닫으시겠습니까?')) {
-        setTitle('');
-        setContent('');
-        setCategory('PAYMENT');
-        setImages([]);
-        setImagePreviews((prev) => {
-          prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
-          return [];
-        });
+        resetForm();
         onClose();
       }
     } else {
