@@ -17,8 +17,14 @@ export default function MyPagePageClient() {
   // WebSocket 가드 사용
   useWebSocketGuard();
 
-  const { profile, fetchUserProfile, updateNickname, isLoading, error, setError } =
-    useUserStore();
+  const {
+    profile,
+    fetchUserProfile,
+    updateNickname,
+    isLoading,
+    error,
+    setError,
+  } = useUserStore();
 
   const { favorites, handleDeleteFavorite } = useFavorites();
 
