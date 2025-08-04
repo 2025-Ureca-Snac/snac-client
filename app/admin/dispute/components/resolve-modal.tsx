@@ -85,7 +85,7 @@ export function ResolveModal() {
               id="modal-title"
               className="text-regular-lg md:text-regular-xl font-bold text-gray-900 dark:text-gray-100"
             >
-              문의/신고 답변 및 처리
+              답변 및 처리
             </h2>
             <button
               onClick={closeResolveModal}
