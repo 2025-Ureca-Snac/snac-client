@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, PanInfo } from 'framer-motion';
+import { motion } from 'framer-motion';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import AnimatedTabContent from './AnimatedTabContent';

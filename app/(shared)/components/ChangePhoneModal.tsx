@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ModalPortal from './modal-portal';
-import Image from 'next/image';
 import InputWithButton from './input-with-button';
 import VerificationInput from './verification-input';
 import PasswordInput from './password-input';

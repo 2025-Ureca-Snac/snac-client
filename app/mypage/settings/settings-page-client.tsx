@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUserStore } from '@/app/(shared)/stores/user-store';
 import { useModalStore } from '@/app/(shared)/stores/modal-store';
@@ -17,9 +16,7 @@ import PrivacyPolicyModal from '@/app/(shared)/components/PrivacyPolicyModal';
 import ThemeModal from '@/app/(shared)/components/ThemeModal';
 
 export default function SettingsPageClient() {
-  const router = useRouter();
-  const { profile, fetchUserProfile, updateNickname, isLoading, error } =
-    useUserStore();
+  const { profile, fetchUserProfile, updateNickname } = useUserStore();
   const { modalType, isOpen, openModal, closeModal } = useModalStore();
 
   const isProfileLoadedRef = useRef(false);
@@ -64,22 +61,17 @@ export default function SettingsPageClient() {
     closeModal();
   };
 
-  // 테마 변경 완료 핸들러
-  const handleThemeChange = async () => {
-    closeModal();
-  };
-
   // 설정 클릭 핸들러 (MyPage와 동일)
   const handleSettingItemClick = (item: string) => {
     // handleSettingClick 함수와 동일한 로직을 직접 구현
     const SETTING_MODAL_MAP = new Map([
-      ['비밀번호 변경', 'change-password'],
-      ['전화번호 변경', 'change-phone'],
-      ['닉네임 변경', 'change-nickname'],
-      ['소셜 로그인 연동', 'social-login'],
-      ['서비스 가이드', 'service-guide'],
-      ['개인정보 처리방침', 'privacy-policy'],
-      ['화면 테마', 'theme'],
+      ['비밀번호 변경', 'change-password' as const],
+      ['전화번호 변경', 'change-phone' as const],
+      ['닉네임 변경', 'change-nickname' as const],
+      ['소셜 로그인 연동', 'social-login' as const],
+      ['서비스 가이드', 'service-guide' as const],
+      ['개인정보 처리방침', 'privacy-policy' as const],
+      ['화면 테마', 'theme' as const],
     ]);
 
     const modalType = SETTING_MODAL_MAP.get(item);

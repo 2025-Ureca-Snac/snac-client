@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { settings } from '../constants/settings-data';
 import type { SettingListProps } from '../types/setting-list';
 

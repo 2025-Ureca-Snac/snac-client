@@ -188,11 +188,14 @@ export default function InquiryHistoryPage() {
     });
   }, [inquiries, activeTab]);
 
-  const tabs = [
-    { id: 'all', label: '전체' },
-    { id: 'pending', label: '답변 대기' },
-    { id: 'answered', label: '답변 완료' },
-  ];
+  const tabs = useMemo(
+    () => [
+      { id: 'all', label: '전체' },
+      { id: 'pending', label: '답변 대기' },
+      { id: 'answered', label: '답변 완료' },
+    ],
+    []
+  );
 
   // 슬라이드 핸들러
   const handleDragStart = useCallback((clientX: number) => {

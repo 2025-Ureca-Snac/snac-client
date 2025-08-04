@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  Suspense,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 
@@ -353,10 +360,13 @@ function PointPageContent() {
     window.history.pushState({}, '', url.toString());
   };
 
-  const tabs = [
-    { id: 'POINT', label: '포인트' },
-    { id: 'MONEY', label: '머니' },
-  ];
+  const tabs = useMemo(
+    () => [
+      { id: 'POINT', label: '포인트' },
+      { id: 'MONEY', label: '머니' },
+    ],
+    []
+  );
 
   // 슬라이드 핸들러
   const handleDragStart = useCallback((clientX: number) => {
@@ -392,14 +402,7 @@ function PointPageContent() {
     }
 
     setIsDragging(false);
-  }, [isDragging, currentX, startX, activeTab, tabs, handleTabChange]);
-
-  // 슬라이드 방향 감지
-  const getSlideDirection = () => {
-    const deltaX = currentX - startX;
-    if (Math.abs(deltaX) < 20) return null;
-    return deltaX > 0 ? 'right' : 'left';
-  };
+  }, [isDragging, currentX, startX, activeTab, tabs]);
 
   // 슬라이드 방향에 따른 애니메이션 설정
   const getSlideAnimation = () => {
