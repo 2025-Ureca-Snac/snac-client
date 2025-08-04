@@ -81,7 +81,7 @@ export default function TradingHistoryPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 거래 내역 데이터 로드
+  // 거래 내역 데이터 로드 (useCallback으로 안정화)
   const loadTradingHistory = useCallback(
     async (status: string) => {
       try {
@@ -153,10 +153,23 @@ export default function TradingHistoryPage({
     [type, isPurchase]
   );
 
-  // 탭 변경 시 데이터 로드
+  // 데이터 로드 (초기 로드 + 탭 변경)
   useEffect(() => {
-    loadTradingHistory(activeTab);
-  }, [activeTab, type, loadTradingHistory]);
+    let isMounted = true;
+
+    const loadData = async () => {
+      if (isMounted) {
+        console.log('거래 내역 로드 시작');
+        await loadTradingHistory(activeTab);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab, loadTradingHistory]); // loadTradingHistory 의존성 추가
 
   // selectedId가 있으면 해당 아이템의 모달을 열기
   useEffect(() => {
@@ -169,18 +182,6 @@ export default function TradingHistoryPage({
       }
     }
   }, [selectedId, tradingHistory.length]); // tradingHistory.length만 의존
-
-  // 디버깅용: 상태 변화 확인
-  useEffect(() => {
-    console.log('상태 변화:', {
-      isLoading,
-      error,
-      tradingHistoryLength: tradingHistory?.length,
-      activeTab,
-      type,
-      selectedId,
-    });
-  }, [isLoading, error, tradingHistory, activeTab, type, selectedId]);
 
   const handleCardClick = (item: TradingHistoryItem) => {
     // TradingHistoryItem을 HistoryItem으로 변환
