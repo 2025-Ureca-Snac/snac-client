@@ -12,7 +12,7 @@ export default function BlogPostHeader({ title }: BlogPostHeaderProps) {
       </h2>
       <Link
         href="/blog"
-        className="text-gray-500 dark hover:text-gray-800 dark:hover:text-gray-300 px-2 py-1 text-xs border border-gray-300 rounded transition-colors"
+        className="text-gray-500 dark hover:text-gray-800 dark:hover:text-gray-100 px-2 py-1 text-xs border border-gray-300 rounded transition-colors"
       >
         목록으로
       </Link>
