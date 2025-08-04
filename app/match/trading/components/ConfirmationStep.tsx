@@ -41,9 +41,11 @@ export default function ConfirmationStep({
                   <span className="text-green-400 text-lg">👤</span>
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm">거래 상대방</div>
+                  <div className="text-gray-400 text-sm">상대방 닉네임</div>
                   <div className="text-white font-semibold">
-                    {partner.type === 'seller' ? partner.buyer : partner.seller}
+                    {partner.type === 'seller'
+                      ? partner.buyerNickname
+                      : partner.sellerNickName}
                   </div>
                 </div>
               </div>
@@ -86,12 +88,13 @@ export default function ConfirmationStep({
                   <span className="text-yellow-400 text-lg">⭐</span>
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm">상대방 평점</div>
+                  <div className="text-gray-400 text-sm">
+                    상대방 평점(바삭스코어)
+                  </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-white font-semibold">
                       {partner.sellerRatingScore}
                     </span>
-                    <span className="text-xs text-gray-500">(거래 완료)</span>
                   </div>
                 </div>
               </div>

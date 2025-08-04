@@ -39,7 +39,6 @@ export default function Banner({
         const response = await api.get('/trade-duration-statistics');
         const data = response.data as TradeDurationResponse;
         const totalSeconds = data.data.durationSeconds;
-        console.log(data);
 
         // 초를 분과 초로 변환
         const minutes = Math.floor(totalSeconds / 60);
