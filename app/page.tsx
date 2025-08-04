@@ -1,5 +1,5 @@
 'use client';
-import Image from 'next/image';
+
 import { useEffect, useState, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
@@ -18,7 +18,7 @@ import type {
   SellStatus,
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
-
+import { CreateButton } from '@/app/(shared)/components/CreateButton';
 interface CardApiResponse {
   data: {
     hasNext: boolean;
@@ -97,6 +97,9 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [showCreateButton, setShowCreateButton] = useState(false);
+  const homeLayoutRef = useRef<HTMLDivElement>(null);
+
   const {
     cardCategory,
     category,
@@ -123,6 +126,29 @@ export default function Home() {
     setCardPages([]);
     setTotalPages(1);
   }, [refetchTrigger]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCreateButton(entry.isIntersecting);
+      },
+      {
+        rootMargin: '0px 0px -100px 0px',
+        threshold: 0.1,
+      }
+    );
+
+    const currentRef = homeLayoutRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
 
   // 현재 페이지의 데이터를 가져오는 useEffect
   useEffect(() => {
@@ -240,16 +266,8 @@ export default function Home() {
     <>
       <Banner />
       <DataAvg />
-
-      <button
-        onClick={actions.toggleCreateModal}
-        className="fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-light transition-all bg-gradient-to-br from-burst-lime to-[#38CB89] hover:brightness-90"
-        aria-label="글 등록하기"
-      >
-        <Image src="/write.svg" alt="글쓰기" width={24} height={24} />
-      </button>
-
-      <div className="flex items-center justify-center">
+      {showCreateButton && <CreateButton onClick={actions.toggleCreateModal} />}
+      <div ref={homeLayoutRef} className="flex items-center justify-center">
         <HomeLayout
           cards={cardPages[currentPage - 1] || []}
           isLoading={loading}
