@@ -20,6 +20,7 @@ interface TradingHistoryItem {
   cancelReason?: string;
   cancelRequested: boolean;
   cancelRequestReason: string | null;
+  cancelRequestStatus: string | null;
 }
 
 interface TradingHistoryCardProps {
@@ -98,10 +99,14 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
                       : 'bg-black'
             }`}
             aria-label={`상태: ${
-              item.cancelRequested ? '취소 접수' : getStatusText(item.status)
+              item.cancelRequestStatus === 'REQUESTED'
+                ? '취소 접수'
+                : getStatusText(item.status)
             }`}
           >
-            {item.cancelRequested ? '취소 접수' : getStatusText(item.status)}
+            {item.cancelRequestStatus === 'REQUESTED'
+              ? '취소 접수'
+              : getStatusText(item.status)}
           </span>
           <span className="text-gray-900">
             {item.priceGb.toLocaleString()}원
