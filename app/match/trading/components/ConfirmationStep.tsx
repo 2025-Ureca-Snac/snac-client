@@ -111,9 +111,7 @@ export default function ConfirmationStep({
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-white font-semibold">
-                      {partner.type === 'seller'
-                        ? partner.buyerRatingScore
-                        : partner.sellerRatingScore}
+                      {partnerRating}
                     </span>
                   </div>
                 </div>

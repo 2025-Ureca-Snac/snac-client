@@ -16,7 +16,6 @@ import WaitingPaymentStep from './components/WaitingPaymentStep';
 import ShowPhoneStep from './components/ShowPhoneStep';
 import UploadDataStep from './components/UploadDataStep';
 import TradeCancelModal from '@/app/(shared)/components/TradeCancelModal';
-import { Header } from '@/app/(shared)/components/Header';
 
 type TradingStep =
   | 'confirmation'
