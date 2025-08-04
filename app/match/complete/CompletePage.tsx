@@ -7,8 +7,6 @@ import CompletionHeader from './components/CompletionHeader';
 import TransactionSummary from './components/TransactionSummary';
 import EarningsDisplay from './components/EarningsDisplay';
 import ActionButtons from './components/ActionButtons';
-import { Header } from '@/app/(shared)/components/Header';
-
 export default function CompletePage() {
   const { partner, userRole } = useMatchStore();
   console.log('마지막보자:', partner);
@@ -62,8 +60,6 @@ export default function CompletePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-black">
-      <Header />
-
       {/* 완료 헤더 */}
       <CompletionHeader />
 
