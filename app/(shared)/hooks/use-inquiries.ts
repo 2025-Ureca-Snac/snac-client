@@ -30,7 +30,7 @@ export const useInquiries = () => {
         }
 
         const response = await api.get<InquiryListResponse>(
-          `/disputes?${params}`
+          `/disputes/mine?${params}`
         );
         setInquiries(response.data.content);
         setTotalPages(response.data.totalPages);
@@ -69,7 +69,7 @@ export const useInquiries = () => {
             attachmentKeys.length > 0 ? attachmentKeys : undefined,
         };
 
-        await api.post('/disputes', inquiryData);
+        await api.post('/qna', inquiryData);
         toast.success('문의가 성공적으로 등록되었습니다.');
 
         // 목록 새로고침

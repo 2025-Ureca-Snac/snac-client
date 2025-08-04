@@ -27,8 +27,7 @@ export const useReports = () => {
           title: data.title,
           type: data.category as DisputeType,
           description: data.content,
-          attachmentKeys:
-            attachmentKeys.length > 0 ? attachmentKeys : undefined,
+          attachmentKeys: attachmentKeys.length > 0 ? attachmentKeys : [],
           tradeId: data.tradeId,
           tradeType: data.tradeType,
         };
