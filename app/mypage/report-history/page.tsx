@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
 import InquiryModal from '@/app/(shared)/components/inquiry-modal';
 import InquiryDetailModal from '@/app/(shared)/components/inquiry-detail-modal';
+import ReportModal from '@/app/(shared)/components/report-modal';
 import {
   getInquiryList,
   getInquiryDetail,
@@ -27,6 +29,9 @@ import Link from 'next/link';
  * @returns 문의 목록, 작성, 상세보기 기능을 포함한 문의 내역 페이지
  */
 export default function InquiryHistoryPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'answered'>(
     'all'
   );
@@ -39,6 +44,11 @@ export default function InquiryHistoryPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // 신고하기 모달 상태
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportTradeId, setReportTradeId] = useState<string>('');
+  const [reportTradeType, setReportTradeType] = useState<string>('');
 
   /**
    * @author 이승우
@@ -79,6 +89,26 @@ export default function InquiryHistoryPage() {
     loadInquiries(0, false);
   }, [loadInquiries]);
 
+  // URL 파라미터 처리 - 신고하기 모달 자동 열기
+  useEffect(() => {
+    const shouldOpenReportModal = searchParams.get('report');
+    const tradeId = searchParams.get('tradeId');
+    const tradeType = searchParams.get('tradeType');
+
+    if (shouldOpenReportModal === 'true' && tradeId && tradeType) {
+      setReportTradeId(tradeId);
+      setReportTradeType(tradeType);
+      setIsReportModalOpen(true);
+
+      // URL에서 파라미터 제거
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('report');
+      newUrl.searchParams.delete('tradeId');
+      newUrl.searchParams.delete('tradeType');
+      router.replace(newUrl.pathname + newUrl.search);
+    }
+  }, [searchParams, router]);
+
   /**
    * @author 이승우
    * @description 더보기 로드 핸들러
@@ -107,7 +137,8 @@ export default function InquiryHistoryPage() {
         return '계정 관련';
       case DisputeType.TECHNICAL_PROBLEM:
         return '기술적 문제';
-      case DisputeType.OTHER:
+      case DisputeType.QNA_OTHER:
+      case DisputeType.REPORT_OTHER:
         return '기타';
       default:
         return type;
@@ -188,6 +219,58 @@ export default function InquiryHistoryPage() {
       console.log('모달 상태 설정 완료');
     } catch (error) {
       console.error('문의 상세 조회 에러:', error);
+      toast.error(handleApiError(error));
+    }
+  };
+
+  /**
+   * @author 이승우
+   * @description 신고하기 제출 핸들러
+   * @param data - 신고 데이터
+   */
+  const handleSubmitReport = async (data: {
+    title: string;
+    content: string;
+    category: string;
+    images: File[];
+    tradeId?: string;
+    tradeType?: string;
+  }) => {
+    try {
+      // 이미지가 있으면 먼저 업로드
+      let attachmentKeys: string[] = [];
+      if (data.images && data.images.length > 0) {
+        const uploadPromises = data.images.map((image) => uploadImage(image));
+        attachmentKeys = await Promise.all(uploadPromises);
+      }
+
+      // 신고 데이터 생성
+      const reportData = {
+        title: data.title,
+        type: data.category as DisputeType,
+        description: data.content,
+        attachmentKeys: attachmentKeys.length > 0 ? attachmentKeys : undefined,
+        tradeId: data.tradeId,
+        tradeType: data.tradeType,
+      };
+
+      // 신고하기 API 엔드포인트 사용
+      await fetch(`/trades/${data.tradeId}/disputes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportData),
+      });
+
+      toast.success('신고가 성공적으로 접수되었습니다.');
+      setIsReportModalOpen(false);
+      setReportTradeId('');
+      setReportTradeType('');
+
+      // 목록 새로고침
+      loadInquiries(0, false);
+    } catch (error) {
       toast.error(handleApiError(error));
     }
   };
@@ -320,8 +403,20 @@ export default function InquiryHistoryPage() {
                                   'ko-KR'
                                 )}
                               </div>
-                              <div className="font-semibold text-gray-900 mb-1">
-                                {item.title}
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="font-semibold text-gray-900">
+                                  {item.title}
+                                </div>
+                                {/* 신고/문의 구분 배지 */}
+                                <span
+                                  className={`px-2 py-1 text-xs rounded-full ${
+                                    item.category === 'REPORT'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-blue-100 text-blue-800'
+                                  }`}
+                                >
+                                  {item.category === 'REPORT' ? '신고' : '문의'}
+                                </span>
                               </div>
                               <div className="text-sm text-gray-600 mb-2">
                                 {getCategoryName(item.type)}
@@ -390,6 +485,19 @@ export default function InquiryHistoryPage() {
           setSelectedInquiry(null);
         }}
         inquiry={selectedInquiry}
+      />
+
+      {/* 신고하기 모달 */}
+      <ReportModal
+        open={isReportModalOpen}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          setReportTradeId('');
+          setReportTradeType('');
+        }}
+        onSubmit={handleSubmitReport}
+        tradeId={reportTradeId}
+        tradeType={reportTradeType}
       />
     </div>
   );
