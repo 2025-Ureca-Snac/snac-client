@@ -52,8 +52,6 @@ export default async function BlogPostPage({ params }: Props) {
       <BlogStructuredData post={post} />
 
       <div className="min-h-screen">
-        <Header />
-
         {/* 서버 컴포넌트로 렌더링되는 블로그 포스트 내용 */}
         <BlogPostContent post={post} />
 

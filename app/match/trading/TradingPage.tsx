@@ -15,6 +15,7 @@ import WaitingPaymentStep from './components/WaitingPaymentStep';
 import ShowPhoneStep from './components/ShowPhoneStep';
 import UploadDataStep from './components/UploadDataStep';
 import TradeCancelModal from '@/app/(shared)/components/TradeCancelModal';
+import { toast } from 'sonner';
 
 type TradingStep =
   | 'confirmation'
@@ -143,14 +144,14 @@ export default function TradingPage() {
   useEffect(() => {
     if (!partner) {
       console.warn('❌ 유효하지 않은 거래 정보: partner 정보가 없습니다.');
-      alert('유효하지 않은 거래 정보입니다. 매칭 페이지로 이동합니다.');
+      toast.error('유효하지 않은 거래 정보입니다. 매칭 페이지로 이동합니다.');
       router.push('/match');
       return;
     }
     // partner 정보 유효성 검증
     if (!partner.carrier || !partner.dataAmount || !partner.priceGb) {
       console.warn('❌ 불완전한 거래 정보:', partner);
-      alert('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
+      toast.error('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
       router.push('/match');
       return;
     }
@@ -162,7 +163,7 @@ export default function TradingPage() {
   useEffect(() => {
     if (timeLeft <= 0) {
       // 시간 초과 시 매칭 취소
-      alert('거래 시간이 초과되었습니다. 매칭 페이지로 돌아갑니다.');
+      toast.error('거래 시간이 초과되었습니다. 매칭 페이지로 돌아갑니다.');
       router.push('/match');
       return;
     }
