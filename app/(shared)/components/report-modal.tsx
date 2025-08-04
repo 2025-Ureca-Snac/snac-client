@@ -1,34 +1,42 @@
 'use client';
-
 import React, { useState, useRef } from 'react';
 import ModalPortal from './modal-portal';
-import { InquiryModalProps } from '../types/inquiry-modal';
 import { toast } from 'sonner';
 
-const INQUIRY_CATEGORIES = [
-  { value: 'PAYMENT', label: '결제 관련' },
-  { value: 'ACCOUNT', label: '계정 관련' },
-  { value: 'TECHNICAL_PROBLEM', label: '기술적 문제' },
-  { value: 'QNA_OTHER', label: '기타' },
+const REPORT_CATEGORIES = [
+  { value: 'DATA_NONE', label: '데이터 안옴' },
+  { value: 'DATA_PARTIAL', label: '일부만 수신' },
+  { value: 'REPORT_OTHER', label: '기타' },
 ];
 
 const MAX_IMAGES = 5;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
-/**
- * @author 이승우
- * @description 문의 작성 모달 컴포넌트
- * @param props - 모달 props
- * @returns 문의 작성 폼과 이미지 업로드 기능을 포함한 모달
- */
-export default function InquiryModal({
+interface ReportModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (report: {
+    title: string;
+    content: string;
+    category: string;
+    images: File[];
+    tradeId?: string;
+    tradeType?: string;
+  }) => Promise<void>;
+  tradeId?: string;
+  tradeType?: string; // 'SALE' 또는 'PURCHASE'
+}
+
+export default function ReportModal({
   open,
   onClose,
   onSubmit,
-}: InquiryModalProps) {
+  tradeId,
+  tradeType,
+}: ReportModalProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('PAYMENT');
+  const [category, setCategory] = useState('DATA_NONE');
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,7 +122,7 @@ export default function InquiryModal({
   const resetForm = () => {
     setTitle('');
     setContent('');
-    setCategory('PAYMENT');
+    setCategory('DATA_NONE');
     setImages([]);
     setImagePreviews((prev) => {
       prev.forEach((url) => URL.revokeObjectURL(url)); // 메모리 누수 방지
@@ -125,8 +133,13 @@ export default function InquiryModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !content.trim()) {
-      toast.error('제목과 내용을 모두 입력해주세요.');
+    if (!title.trim()) {
+      toast.error('제목을 입력해주세요.');
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error('내용을 입력해주세요.');
       return;
     }
 
@@ -137,24 +150,21 @@ export default function InquiryModal({
         title: title.trim(),
         content: content.trim(),
         category,
-        images: images.length > 0 ? images : undefined,
+        images,
+        tradeId,
+        tradeType,
       });
 
       // 폼 초기화
       resetForm();
-      onClose();
     } catch (error) {
-      console.error('문의 제출 실패:', error);
-      toast.error('문의 제출에 실패했습니다. 다시 시도해주세요.');
+      console.error('신고 제출 실패:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleClose = () => {
-    if (isSubmitting) return;
-
-    // 변경사항이 있으면 확인
     if (title.trim() || content.trim() || images.length > 0) {
       if (confirm('작성 중인 내용이 있습니다. 정말로 닫으시겠습니까?')) {
         resetForm();
@@ -172,7 +182,14 @@ export default function InquiryModal({
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             {/* 헤더 */}
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-900">문의 작성</h2>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">신고하기</h2>
+                {tradeId && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    거래 ID: {tradeId}
+                  </p>
+                )}
+              </div>
               <button
                 onClick={handleClose}
                 disabled={isSubmitting}
@@ -199,7 +216,7 @@ export default function InquiryModal({
               {/* 카테고리 선택 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  문의 카테고리
+                  신고 카테고리
                 </label>
                 <select
                   value={category}
@@ -207,7 +224,7 @@ export default function InquiryModal({
                   disabled={isSubmitting}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                 >
-                  {INQUIRY_CATEGORIES.map((cat) => (
+                  {REPORT_CATEGORIES.map((cat) => (
                     <option key={cat.value} value={cat.value}>
                       {cat.label}
                     </option>
@@ -225,7 +242,7 @@ export default function InquiryModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   disabled={isSubmitting}
-                  placeholder="문의 제목을 입력해주세요"
+                  placeholder="신고 제목을 입력해주세요"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                   maxLength={100}
                 />
@@ -243,7 +260,7 @@ export default function InquiryModal({
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   disabled={isSubmitting}
-                  placeholder="문의 내용을 자세히 입력해주세요"
+                  placeholder="신고 내용을 자세히 입력해주세요"
                   rows={6}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 resize-none"
                   maxLength={1000}
@@ -338,9 +355,9 @@ export default function InquiryModal({
                 <button
                   type="submit"
                   disabled={isSubmitting || !title.trim() || !content.trim()}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? '제출 중...' : '문의 제출'}
+                  {isSubmitting ? '제출 중...' : '신고 제출'}
                 </button>
               </div>
             </form>

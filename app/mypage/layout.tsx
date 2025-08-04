@@ -48,10 +48,6 @@ export default function MyPageLayout({
           {pageTitle}
         </span>
       </div>
-
-      {/* 2. 데스크톱용 Header를 감싸던 div와 Header 호출 코드를 완전히 제거합니다. */}
-      {/* app/layout.tsx가 데스크톱 헤더를 렌더링하므로 여기서는 필요 없습니다. */}
-
       {children}
     </>
   );
