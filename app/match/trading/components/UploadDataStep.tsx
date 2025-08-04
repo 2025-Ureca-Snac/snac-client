@@ -3,7 +3,11 @@
 import React, { useState } from 'react';
 import { MatchPartner } from '@/app/(shared)/stores/match-store';
 import { api } from '@/app/(shared)/utils/api';
-import { getApiErrorInfo } from '@/app/(shared)/types/api-errors';
+import {
+  API_STATUS,
+  UPLOAD_ERROR_MESSAGE,
+} from '@/app/(shared)/constants/api-status';
+import type { SendDataResponse } from '@/app/(shared)/types/api';
 
 interface UploadDataStepProps {
   partner: MatchPartner;
@@ -19,32 +23,43 @@ export default function UploadDataStep({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [uploadMessage, setUploadMessage] = useState<string>('');
+  const [uploadMessageType, setUploadMessageType] = useState<
+    'error' | 'success'
+  >('error');
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    setError(null); // 에러 초기화
+    setUploadMessage(''); // 메시지 초기화
     if (file && file.type.startsWith('image/')) {
       setSelectedFile(file);
     } else {
-      setError('이미지 파일만 선택 가능합니다.');
+      setUploadMessage('이미지 파일만 선택 가능합니다.');
+      setUploadMessageType('error');
     }
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setError('파일을 선택해주세요.');
+      setUploadMessage('파일을 선택해주세요.');
+      setUploadMessageType('error');
       return;
     }
 
-    setError(null); // 에러 초기화
-    setIsUploading(true);
-
     try {
+      setIsUploading(true);
+      setUploadMessage('');
+      setUploadMessageType('error');
+
+      console.log('데이터 전송 완료 버튼 클릭됨:', {
+        tradeId,
+        fileName: selectedFile.name,
+      });
+
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const response = await api.patch(
+      const response = await api.patch<SendDataResponse>(
         `/matching/${tradeId}/send-data`,
         formData,
         {
@@ -54,16 +69,37 @@ export default function UploadDataStep({
         }
       );
 
-      console.log(response);
+      console.log('데이터 전송 완료 처리됨', response);
 
-      setUploadSuccess(true);
-      setTimeout(() => {
-        onNext();
-      }, 1000);
+      // 응답 상태에 따른 처리
+      if (response.data.status === API_STATUS.OK) {
+        // 성공 시 다음 단계로 진행
+        setUploadSuccess(true);
+        setUploadMessage('업로드가 완료되었습니다!');
+        setUploadMessageType('success');
+        setTimeout(() => {
+          onNext();
+        }, 1000);
+        return;
+      }
+
+      let errorMessage: string = UPLOAD_ERROR_MESSAGE.DEFAULT;
+      switch (response.data.status) {
+        case API_STATUS.BAD_REQUEST:
+          errorMessage = response.data.data || UPLOAD_ERROR_MESSAGE.BAD_IMAGE;
+          break;
+        case API_STATUS.GATEWAY_TIMEOUT:
+          errorMessage = UPLOAD_ERROR_MESSAGE.TIMEOUT;
+          break;
+      }
+      setUploadMessage(errorMessage);
+      setUploadMessageType('error');
+
+      setSelectedFile(null); // 전송 완료 후 파일 정보 초기화
     } catch (error) {
-      console.error('업로드 실패:', error);
-      const errorInfo = getApiErrorInfo(error);
-      setError(errorInfo.userMessage);
+      console.error('데이터 전송 완료 처리 실패:', error);
+      setUploadMessage(UPLOAD_ERROR_MESSAGE.DEFAULT);
+      setUploadMessageType('error');
       setSelectedFile(null); // 에러 발생 시 파일 선택 초기화
     } finally {
       setIsUploading(false);
@@ -93,7 +129,7 @@ export default function UploadDataStep({
                 <div>
                   <span className="text-gray-400">구매자:</span>
                   <span className="ml-2 font-medium text-white">
-                    {partner.buyer}
+                    {partner.buyerNickname}
                   </span>
                 </div>
                 <div>
@@ -180,21 +216,41 @@ export default function UploadDataStep({
             </div>
 
             {/* 에러 메시지 */}
-            {error && (
-              <div className="mb-4 p-4 bg-red-900/20 border border-red-400/30 rounded-xl">
+            {uploadMessage && (
+              <div
+                className={`mb-4 p-4 rounded-xl ${uploadMessageType === 'error' ? 'bg-red-900/20 border border-red-400/30' : 'bg-green-900/20 border border-green-400/30'}`}
+              >
                 <div className="flex items-center">
-                  <svg
-                    className="w-5 h-5 text-red-400 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                  {uploadMessageType === 'error' ? (
+                    <svg
+                      className="w-5 h-5 text-red-400 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5 text-green-400 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L13 10.586l-1.293 1.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                  <p
+                    className={`${uploadMessageType === 'error' ? 'text-red-200' : 'text-green-300'} text-sm`}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <p className="text-red-300 text-sm">{error}</p>
+                    {uploadMessage}
+                  </p>
                 </div>
               </div>
             )}

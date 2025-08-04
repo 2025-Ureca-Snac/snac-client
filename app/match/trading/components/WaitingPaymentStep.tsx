@@ -67,7 +67,7 @@ export default function WaitingPaymentStep({
                   <div className="text-left">
                     <div className="text-gray-400 text-sm">구매자</div>
                     <div className="text-white font-semibold">
-                      {partner.buyer}
+                      {partner.buyerNickname}
                     </div>
                   </div>
                 </div>

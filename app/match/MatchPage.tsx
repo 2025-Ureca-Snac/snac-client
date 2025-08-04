@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 import MatchContent from './components/MatchContent';
 import TradeConfirmationModal from './components/modal/TradeConfirmationModal';
@@ -29,6 +29,8 @@ interface ServerTradeData {
   priceGb?: number;
   point?: number;
   phone?: string;
+  buyerNickname?: string;
+  sellerNickName?: string;
   cancelReason?: string;
 }
 
@@ -42,6 +44,7 @@ type MatchingStatus =
 
 export default function MatchPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { foundMatch, updatePartner } = useMatchStore();
   const { token } = useAuthStore();
   // const { user } = useAuthStore();
@@ -59,7 +62,6 @@ export default function MatchPage() {
   const [matchingStatus, setMatchingStatus] = useState<MatchingStatus>('idle');
   const [hasStartedSearch, setHasStartedSearch] = useState(false); // 검색 시작 여부 추적
   const [incomingRequests, setIncomingRequests] = useState<TradeRequest[]>([]);
-  const [connectedUsers, setConnectedUsers] = useState<number>(0); // 접속자 수
   const [sellerInfo, setSellerInfo] = useState({
     dataAmount: 1,
     price: 100, // 최소 가격을 100원으로 설정
@@ -79,6 +81,29 @@ export default function MatchPage() {
     useMatchStore();
   // 서버에서 실시간으로 받은 판매자 목록을 직접 사용
   const filteredUsers = activeSellers;
+
+  // 강제 새로고침 기능 - MatchPage 진입 시 한 번만 실행
+  useEffect(() => {
+    // /match 경로에 진입했을 때만 새로고침 실행
+    if (pathname === '/match') {
+      const hasRefreshed = sessionStorage.getItem('matchPageRefreshed');
+
+      if (hasRefreshed === 'false') {
+        console.log('🔄 MatchPage 진입 - 강제 새로고침 실행');
+        sessionStorage.setItem('matchPageRefreshed', 'true');
+        window.location.reload();
+        return;
+      }
+    }
+  }, [pathname]);
+
+  // 매칭 상태가 'searching'으로 변경될 때 판매자 목록 초기화
+  useEffect(() => {
+    if (matchingStatus === 'searching') {
+      console.log('🔄 매칭 검색 시작 - 판매자 목록 초기화');
+      setActiveSellers([]);
+    }
+  }, [matchingStatus, setActiveSellers]);
 
   // 현재 토큰 상태를 즉시 확인하는 함수
   const checkCurrentToken = () => {
@@ -159,6 +184,8 @@ export default function MatchPage() {
         priceGb: tradeData.priceGb || 0,
         sellerRatingScore: 1000, // 기본값
         status: tradeData.status,
+        buyerNickname: tradeData.buyerNickname,
+        sellerNickName: tradeData.sellerNickName,
         cancelReason: tradeData.cancelReason || null,
         type: 'seller' as const,
       });
@@ -194,8 +221,8 @@ export default function MatchPage() {
     appliedFilters,
     setIncomingRequests,
     setMatchingStatus,
-    setConnectedUsers,
     onTradeStatusChange: handleTradeStatusChange, // 거래 상태 변경 콜백 추가
+    onCardNotFound: () => setShowConfirmModal(false), // 카드가 존재하지 않을 때 모달 닫기
     skipAuthCheck: true, // 인증 체크를 건너뛰어서 에러 로그 방지
   });
 
@@ -428,7 +455,7 @@ export default function MatchPage() {
           sellerId: request.sellerId,
           sellerNickName: request.sellerNickName,
           buyerId: request.buyerId,
-          buyerNickName: request.buyerNickName,
+          buyerNickname: request.buyerNickname,
           buyerRatingScore: request.buyerRatingScore,
           cardId: request.cardId,
           carrier: sellerInfo.carrier,
@@ -448,6 +475,8 @@ export default function MatchPage() {
         setTimeout(() => {
           router.push('/match/trading');
         }, 500);
+      } else {
+        window.location.reload();
       }
     },
     [incomingRequests, respondToTrade, foundMatch, router, sellerInfo]
@@ -506,7 +535,6 @@ export default function MatchPage() {
         {process.env.NODE_ENV === 'development' && (
           <TestPanel
             isConnected={isConnected}
-            connectedUsers={connectedUsers}
             userRole={userRole}
             matchingStatus={matchingStatus}
             activeSellers={activeSellers}
