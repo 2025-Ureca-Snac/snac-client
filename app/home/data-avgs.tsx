@@ -71,7 +71,7 @@ export function DataAvg() {
     <div className="text-center h-[161px] md:h-[288px] py-[40px] md:py-[80px]">
       <h2 className="flex items-center justify-center gap-2">
         <div className="w-6 h-6 md:w-[44px] md:h-[44px]">
-          <TelecomIcon className="w-full h-full text-white" />
+          <TelecomIcon className="w-full h-full  dark:text-white" />
         </div>
 
         <div className="w-[60px] md:w-[105px] text-right">
