@@ -10,6 +10,7 @@ import FindPasswordSection from '../(shared)/components/find-password-section';
 import ModalPortal from '../(shared)/components/modal-portal';
 import TabNavigation from '../(shared)/components/TabNavigation';
 import { api } from '../(shared)/utils/api';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -147,7 +148,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     if (isIdVerifying) return; // 이미 인증 요청 중이면 무시
 
     if (!idFormData.phone) {
-      alert('휴대폰 번호를 입력해주세요.');
+      toast.error('휴대폰 번호를 입력해주세요.');
       return;
     }
 
@@ -170,11 +171,11 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           idVerificationRef.current?.focus();
         }, 100);
       } else {
-        alert('인증코드 전송에 실패했습니다.');
+        toast.error('인증코드 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('이메일 찾기 인증 요청 오류', error);
-      alert('인증코드 전송에 실패했습니다.');
+      toast.error('인증코드 전송에 실패했습니다.');
     } finally {
       setIsIdVerifying(false); // 인증 요청 완료
     }
@@ -189,7 +190,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
 
     if (passwordAuthType === 'email') {
       if (!email) {
-        alert('이메일을 입력해주세요.');
+        toast.error('이메일을 입력해주세요.');
         return;
       }
       try {
@@ -207,17 +208,17 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
             passwordVerificationRef.current?.focus();
           }, 100);
         } else {
-          alert('인증코드 전송에 실패했습니다.');
+          toast.error('인증코드 전송에 실패했습니다.');
         }
       } catch (error) {
         console.error('비밀번호 찾기 이메일 인증 요청 오류', error);
-        alert(`인증코드 전송에 실패했습니다. ${error}`);
+        toast.error(`인증코드 전송에 실패했습니다. ${error}`);
       } finally {
         setIsPasswordVerifying(false); // 인증 요청 완료
       }
     } else {
       if (!phone) {
-        alert('휴대폰 번호를 입력해주세요.');
+        toast.error('휴대폰 번호를 입력해주세요.');
         return;
       }
 
@@ -236,11 +237,11 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
             passwordVerificationRef.current?.focus();
           }, 100);
         } else {
-          alert('인증코드 전송에 실패했습니다.');
+          toast.error('인증코드 전송에 실패했습니다.');
         }
       } catch (error) {
         console.error('비밀번호 찾기 휴대폰 인증 요청 오류', error);
-        alert(`인증코드 전송에 실패했습니다. ${error}`);
+        toast.error(`인증코드 전송에 실패했습니다. ${error}`);
       } finally {
         setIsPasswordVerifying(false); // 인증 요청 완료
       }
@@ -275,7 +276,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           findIdButton?.focus();
         }, 100);
       } else {
-        alert('인증코드가 일치하지 않습니다.');
+        toast.error('인증코드가 일치하지 않습니다.');
       }
     } catch (error) {
       console.error('이메일 찾기 인증코드 확인 오류', error);
@@ -312,7 +313,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
             }
           }, 300);
         } else {
-          alert('인증코드가 일치하지 않습니다.');
+          toast.error('인증코드가 일치하지 않습니다.');
         }
       } else {
         const response = await api.post('/sns/verify-code', {
@@ -337,12 +338,12 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
             }
           }, 300);
         } else {
-          alert('인증코드가 일치하지 않습니다.');
+          toast.error('인증코드가 일치하지 않습니다.');
         }
       }
     } catch (error) {
       console.error('비밀번호 찾기 인증코드 확인 오류', error);
-      alert(`인증코드 확인에 실패했습니다. ${error}`);
+      toast.error(`인증코드 확인에 실패했습니다. ${error}`);
     }
   }, [
     passwordFormData.email,
@@ -377,7 +378,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         console.log(response);
         setFoundEmail(response.data.data);
       } catch (error) {
-        alert(`이메일을 찾을 수 없습니다. ${error}`);
+        toast.error(`이메일을 찾을 수 없습니다. ${error}`);
       }
     },
     [isIdVerified, idFormData.phone]
@@ -424,12 +425,12 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
 
       // 비밀번호 유효성 검사
       if (!password || !passwordConfirm) {
-        alert('비밀번호를 입력해주세요.');
+        toast.error('비밀번호를 입력해주세요.');
         return;
       }
 
       if (password !== passwordConfirm) {
-        alert('비밀번호가 일치하지 않습니다.');
+        toast.error('비밀번호가 일치하지 않습니다.');
         return;
       }
 
@@ -447,14 +448,14 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
               });
 
         if ((response.data as { status?: string })?.status === 'OK') {
-          alert('비밀번호가 성공적으로 변경되었습니다.');
+          toast.error('비밀번호가 성공적으로 변경되었습니다.');
           resetModal(); // 모달 닫기
         } else {
-          alert('비밀번호 변경에 실패했습니다.');
+          toast.error('비밀번호 변경에 실패했습니다.');
         }
       } catch (error) {
         console.error('비밀번호 변경 오류:', error);
-        alert('비밀번호 변경 중 오류가 발생했습니다.');
+        toast.error('비밀번호 변경 중 오류가 발생했습니다.');
       }
     },
     [passwordFormData, passwordAuthType, resetModal]

@@ -148,7 +148,7 @@ export default function MatchPage() {
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
     if (seller.type !== 'seller') {
-      alert('판매자에게만 거래 요청이 가능합니다.');
+      toast.error('판매자에게만 거래 요청이 가능합니다.');
       return;
     }
 
@@ -293,7 +293,7 @@ export default function MatchPage() {
         pendingFilters.price.length > 0;
 
       if (!hasRequired) {
-        alert('모든 필터 조건을 선택해주세요.');
+        toast.error('모든 필터 조건을 선택해주세요.');
         return;
       }
 

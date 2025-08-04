@@ -83,11 +83,11 @@ export default function VerificationStep({
           onNext();
         }, 1000);
       } else {
-        alert('거래 확정 요청에 실패했습니다.');
+        toast.error('거래 확정 요청에 실패했습니다.');
       }
     } catch (error) {
       console.error('거래 확정 오류:', error);
-      alert('거래 확정 중 오류가 발생했습니다.');
+      toast.error('거래 확정 중 오류가 발생했습니다.');
     } finally {
       setIsConfirming(false);
     }

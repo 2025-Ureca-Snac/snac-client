@@ -515,7 +515,7 @@ export function useGlobalWebSocket(props?: UseGlobalWebSocketProps) {
         // CARD_INVALID_STATUS 에러 처리
         if (tradeData.status === 'CARD_INVALID_STATUS') {
           console.error('❌ 카드 상태 오류:', tradeData);
-          alert(
+          toast.error(
             `카드 상태 오류: ${tradeData.cancelReason}\n\n현재 카드 상태: ${tradeData.status}`
           );
         }

@@ -122,7 +122,7 @@ export default function SignUp() {
 
       // 오늘 날짜 이상은 선택 불가
       if (selectedDate >= today) {
-        alert('오늘 날짜 이상은 선택할 수 없습니다.');
+        toast.error('오늘 날짜 이상은 선택할 수 없습니다.');
         return;
       }
 

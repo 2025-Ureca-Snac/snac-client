@@ -148,7 +148,7 @@ export default function PaymentPage() {
           `/payment/complete?pay=${pay}&tradeId=${tradeId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
-        alert(`결제가 실패했습니다. 다시 시도해주세요.`);
+        toast.error(`결제가 실패했습니다. 다시 시도해주세요.`);
         console.error('결제 실패:', responseData);
       }
     } catch (error) {
