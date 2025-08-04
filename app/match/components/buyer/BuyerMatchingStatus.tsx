@@ -143,7 +143,7 @@ export default function BuyerMatchingStatus({
             <Lottie
               loop
               animationData={animationData}
-              play
+              play={isSearching}
               style={{ width: 120, height: 120 }}
             />
           )}
