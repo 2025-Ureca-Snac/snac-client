@@ -178,7 +178,7 @@ const config: Config = {
               height: 'auto', // h-auto
               borderRadius: '0.5rem', // rounded-lg
               boxShadow:
-                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                '0 2px 12px rgba(0,0,0,0.08), 0 2px 12px rgba(255,255,255,0.18)',
               marginTop: '1rem', // my-4
               marginBottom: '1rem',
               maxWidth: '100%', // max-w-full
@@ -287,7 +287,7 @@ const config: Config = {
         },
       },
       boxShadow: {
-        light: '0 1.5px 6px rgba(0,0,0,0.06)',
+        light: '0 2px 12px rgba(0,0,0,0.08), 0 2px 12px rgba(255,255,255,0.18)',
       },
 
       width: {
