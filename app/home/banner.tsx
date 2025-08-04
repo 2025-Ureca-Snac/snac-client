@@ -99,7 +99,7 @@ export default function Banner({
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent  -translate-x-full animate-glow" />
 
                 <div className="flex flex-col items-center relative z-10">
-                  <span className="w-[70px] h-[64px] bg-white text-midnight-black text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
+                  <span className="w-[70px] h-[64px] bg-white text-midnight-black dark:text-white text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
                     {formatTime(displayMinutes)}
                   </span>
                   <span className="mt-1 text-regular-xs text-white">분</span>
@@ -108,7 +108,7 @@ export default function Banner({
                   :
                 </span>
                 <div className="flex flex-col items-center relative z-10">
-                  <span className="bg-white w-[70px] h-[64px] text-midnight-black text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
+                  <span className="bg-white w-[70px] h-[64px] text-midnight-black dark:text-white text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
                     {formatTime(displaySeconds)}
                   </span>
                   <span className="mt-1 text-regular-xs text-white">초</span>
