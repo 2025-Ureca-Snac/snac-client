@@ -113,10 +113,37 @@ export default function HistoryDetailModal({
   };
 
   // 신고하기 버튼 클릭
-
   const handleReportClick = () => {
     console.log('신고하기 클릭됨:', item.partnerId, item.id);
     // TODO: 신고하기 모달 또는 페이지로 이동
+  };
+
+  // 거래 취소 버튼 표시 여부 결정
+  const shouldShowCancelButton = () => {
+    if (!item) return false;
+
+    const { status, cancelRequestStatus } = item;
+
+    if (type === 'sales') {
+      return (
+        status !== 'COMPLETED' &&
+        status !== 'DATA_SENT' &&
+        cancelRequestStatus !== 'REQUESTED'
+      );
+    }
+
+    if (type === 'purchase') {
+      const isNotCancelledByPartner =
+        cancelRequestStatus !== 'ACCEPTED' &&
+        cancelRequestStatus !== 'REJECTED';
+      const isCancellableStatus =
+        status !== 'CANCELED' &&
+        status !== 'COMPLETED' &&
+        status !== 'DATA_SENT';
+      return isNotCancelledByPartner && isCancellableStatus;
+    }
+
+    return false;
   };
 
   // 단골 삭제
@@ -683,16 +710,7 @@ export default function HistoryDetailModal({
           )}
 
           {/* 거래 취소 버튼 */}
-          {((type === 'sales' &&
-            item.status !== 'COMPLETED' &&
-            item.status !== 'DATA_SENT' &&
-            item.cancelRequestStatus !== 'REQUESTED') ||
-            (type === 'purchase' &&
-              item.status !== 'CANCELED' &&
-              item.status !== 'COMPLETED' &&
-              item.status !== 'DATA_SENT' &&
-              item.cancelRequestStatus !== 'ACCEPTED' &&
-              item.cancelRequestStatus !== 'REJECTED')) && (
+          {shouldShowCancelButton() && (
             <div className="flex w-full">
               <button
                 onClick={handleTradeCancelClick}
