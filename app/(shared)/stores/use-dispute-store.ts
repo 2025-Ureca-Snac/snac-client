@@ -15,7 +15,9 @@ export type DisputeType =
   | 'ACCOUNT'
   | 'TECHNICAL_PROBLEM'
   | 'REPORT_OTHER'
-  | 'QNA_OTHER';
+  | 'QNA_OTHER'
+  | 'QNA'
+  | 'REPORT';
 
 export interface Dispute {
   id: string;
@@ -28,6 +30,8 @@ export interface Dispute {
   answerAt?: string;
   createdAt: string;
   attachmentUrls?: string[];
+  reporterNickname?: string;
+  opponentNickname?: string;
 }
 
 interface DisputeListResponse {
@@ -88,7 +92,6 @@ interface DisputeStore {
   finalize: (id: string) => Promise<void>;
 }
 
-// --- 주요 API 경로는 '/admin/disputes'로 통일! ---
 export const useDisputeStore = create<DisputeStore>((set, get) => ({
   disputes: [],
   pendingDisputes: [],
@@ -211,7 +214,6 @@ export const useDisputeStore = create<DisputeStore>((set, get) => ({
     }
   },
 
-  // --- 여기서부터 경로 주의! ---
   // 환불 및 거래 취소
   refundAndCancel: async (id: string) => {
     try {

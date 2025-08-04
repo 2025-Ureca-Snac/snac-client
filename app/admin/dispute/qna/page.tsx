@@ -94,9 +94,18 @@ export default function AdminQnaPage() {
               </div>
               <div className="text-regular-sm text-gray-600 dark:text-gray-400 space-y-2 border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-500">문의자 ID:</span>
+                  <span className="font-medium text-gray-500">작성자 ID:</span>
                   <span className="truncate ml-2">{d.id}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-500">
+                    작성자 닉네임:
+                  </span>
+                  <span className="truncate ml-2">
+                    {d.reporterNickname ?? '-'}
+                  </span>
+                </div>
+
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-500">접수일:</span>
                   <span>{new Date(d.createdAt).toLocaleDateString()}</span>
@@ -121,6 +130,7 @@ export default function AdminQnaPage() {
     <div className="w-full max-w-full mx-auto px-2 md:px-6 py-4 md:py-6  dark:bg-gray-900 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 md:mb-6">
         <select
+          aria-label="문의 유형 필터"
           onChange={(e) =>
             handleTypeChange(e.target.value as DisputeType | 'ALL')
           }
@@ -134,6 +144,7 @@ export default function AdminQnaPage() {
           ))}
         </select>
         <select
+          aria-label="처리 상태 필터"
           onChange={(e) =>
             handleStatusChange(e.target.value as DisputeStatus | 'ALL')
           }

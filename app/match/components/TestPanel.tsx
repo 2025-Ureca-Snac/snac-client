@@ -4,7 +4,6 @@ import { User, TradeRequest } from '../types/match';
 
 interface TestPanelProps {
   isConnected: boolean;
-  connectedUsers: number;
   userRole: 'buyer' | 'seller' | null;
   matchingStatus: string;
   activeSellers: User[];
@@ -27,7 +26,6 @@ interface TestPanelProps {
 
 export default function TestPanel({
   isConnected,
-  connectedUsers,
   userRole,
   matchingStatus,
   activeSellers,
@@ -114,14 +112,6 @@ export default function TestPanel({
               }`}
             >
               {isConnected ? '✅ 연결됨' : '❌ 연결 안됨'}
-            </span>
-          </div>
-
-          {/* 접속자 수 */}
-          <div className="text-gray-300">
-            <strong>접속자 수:</strong>
-            <span className="ml-2 text-purple-300">
-              {connectedUsers}명 온라인
             </span>
           </div>
 
