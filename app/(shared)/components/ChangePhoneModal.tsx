@@ -202,6 +202,52 @@ export default function ChangePhoneModal({
     codeTimer.stop();
   };
 
+  // 모달 닫기 핸들러
+  const handleCloseModal = () => {
+    handleReset();
+    onClose();
+  };
+
+  // 버튼 텍스트 결정 함수
+  const getButtonText = () => {
+    if (success) return '완료';
+    if (isVerified) return '완료';
+    if (!isCodeSent) return '인증';
+    if (codeTimer.time > 240) {
+      return `재전송 (${60 - (300 - codeTimer.time)}초)`;
+    }
+    return '재전송';
+  };
+
+  // 버튼 비활성화 상태 결정 함수
+  const isButtonDisabled = () => {
+    return (
+      success || isVerified || (isCodeSent && codeTimer.time > 240) || isLoading
+    );
+  };
+
+  // 인증 버튼 비활성화 상태 결정 함수
+  const isVerifyButtonDisabled = () => {
+    return !showVerification || isVerified || success || isLoading;
+  };
+
+  // 초기화 버튼 비활성화 상태 결정 함수
+  const isResetButtonDisabled = () => {
+    return (!isCodeSent && !isVerified) || success;
+  };
+
+  // 변경하기 버튼 비활성화 상태 결정 함수
+  const isChangeButtonDisabled = () => {
+    return !isVerified || isLoading || success;
+  };
+
+  // 변경하기 버튼 텍스트 결정 함수
+  const getChangeButtonText = () => {
+    if (success) return '완료';
+    if (isLoading) return '처리중...';
+    return '변경하기';
+  };
+
   // Web OTP API 지원 확인 및 자동완성
   useEffect(() => {
     if ('OTPCredential' in window) {
@@ -237,13 +283,7 @@ export default function ChangePhoneModal({
   if (!open) return null;
 
   return (
-    <ModalPortal
-      isOpen={open}
-      onClose={() => {
-        handleReset();
-        onClose();
-      }}
-    >
+    <ModalPortal isOpen={open} onClose={handleCloseModal}>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] relative">
           {/* 상단 아이콘 */}
@@ -273,12 +313,8 @@ export default function ChangePhoneModal({
               전화번호 변경
             </div>
             <button
-              onClick={() => {
-                handleReset();
-                onClose();
-              }}
-              type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+              onClick={handleCloseModal}
+              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
               aria-label="닫기"
               tabIndex={0}
             >
@@ -288,14 +324,88 @@ export default function ChangePhoneModal({
           <div className="w-full text-center text-gray-600 mb-4 text-sm">
             변경하려면 비밀번호를 입력하세요.
           </div>
+          
+          {/* 성공 메시지 */}
+          {success && (
+            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-800 text-center">
+                전화번호가 성공적으로 변경되었습니다.
+              </p>
+            </div>
+          )}
 
-          {/* 스크롤 가능한 컨테이너 */}
-          <div className="overflow-y-auto max-h-[60vh] px-2">
-            {/* 성공 메시지 */}
-            {success && (
-              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800 text-center">
-                  전화번호가 성공적으로 변경되었습니다.
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800 text-center">{error}</p>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {/* 비밀번호 입력 */}
+            <PasswordInput
+              label=""
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleFormChange('password')}
+              placeholder="현재 비밀번호"
+              disabled={isVerified || success}
+              ref={passwordRef}
+            />
+
+            {/* 전화번호 입력 */}
+            <InputWithButton
+              label=""
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleFormChange('phone')}
+              placeholder="변경하려는 전화번호"
+              disabled={isCodeSent || isVerified || success}
+              buttonText={getButtonText()}
+              onButtonClick={handleSendCode}
+              buttonDisabled={isButtonDisabled()}
+              autoComplete="tel"
+              ref={phoneRef}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                // Enter 키를 눌렀을 때만 인증코드 전송
+                if (
+                  e.key === 'Enter' &&
+                  !isLoading &&
+                  formData.password.trim() &&
+                  formData.phone.trim()
+                ) {
+                  e.preventDefault();
+                  handleSendCode();
+                }
+              }}
+            />
+
+            {/* 인증코드 입력 */}
+            <VerificationInput
+              label=""
+              id="verificationCode"
+              name="verificationCode"
+              value={formData.verificationCode}
+              onChange={handleFormChange('verificationCode')}
+              placeholder="인증번호"
+              disabled={!showVerification || isVerified || success}
+              onVerify={handleVerifyCode}
+              verifyDisabled={isVerifyButtonDisabled()}
+              helpText={`휴대폰으로 전송된 인증코드를 입력해주세요.${codeTimer.time > 0 ? ` (${Math.floor(codeTimer.time / 60)}:${(codeTimer.time % 60).toString().padStart(2, '0')})` : ''}`}
+              showHelpText={showVerification && !isVerified && !success}
+              autoComplete="one-time-code"
+              ref={verificationRef}
+            />
+
+            {/* 상태 메시지 */}
+            {isVerified && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600 text-center">
+                  {success
+                    ? '전화번호가 성공적으로 변경되었습니다.'
+                    : '인증이 완료되었습니다. 전화번호를 변경하시겠습니까?'}
                 </p>
               </div>
             )}
@@ -400,23 +510,16 @@ export default function ChangePhoneModal({
             <button
               type="button"
               onClick={handleChangePhone}
-              disabled={!isVerified || isLoading || success}
-              className="w-3/5 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={isChangeButtonDisabled()}
+              className="flex-1 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}
             >
-              {success ? '완료' : isLoading ? '처리중...' : '변경하기'}
+              {getChangeButtonText()}
             </button>
             <button
               type="button"
-              onClick={
-                isCodeSent || isVerified
-                  ? handleReset
-                  : () => {
-                      handleReset();
-                      onClose();
-                    }
-              }
-              disabled={success}
+              onClick={handleReset}
+              disabled={isResetButtonDisabled()}
               className="w-2/5 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}
             >

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+
 import { CardData } from '../types/card';
 import { getCarrierImageUrl, formatCarrierName } from '../utils/carrier-utils';
 
