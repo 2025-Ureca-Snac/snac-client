@@ -140,14 +140,18 @@ export default function BuyerMatchingStatus({
 
         {/* 검색 아이콘 - Lottie 애니메이션 */}
         <div className="mb-8 flex justify-center">
-          {animationData && (
-            <Lottie
-              loop
-              animationData={animationData}
-              play={isSearching}
-              style={{ width: 120, height: 120 }}
-            />
-          )}
+          <div className="w-32 h-32 flex items-center justify-center">
+            {animationData ? (
+              <Lottie
+                loop
+                animationData={animationData}
+                play={isSearching}
+                style={{ width: 120, height: 120 }}
+              />
+            ) : (
+              <div className="w-32 h-32  rounded-full animate-pulse flex items-center justify-center"></div>
+            )}
+          </div>
         </div>
 
         {/* 매칭 상태 메시지 */}
