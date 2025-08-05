@@ -12,11 +12,26 @@ import type { AnimatedTabContentProps } from '../types/animated-tab-content';
 export default function AnimatedTabContent({
   children,
   tabKey,
+  slideDirection,
 }: AnimatedTabContentProps) {
   const contentVariants = {
-    initial: { opacity: 0, x: 50 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -50 },
+    initial: {
+      x:
+        slideDirection === 'left'
+          ? '50%' // 오른쪽에서 시작 (더 가까이)
+          : slideDirection === 'right'
+            ? '-50%' // 왼쪽에서 시작 (더 가까이)
+            : 30,
+    },
+    animate: { x: 0 },
+    exit: {
+      x:
+        slideDirection === 'left'
+          ? '-50%' // 왼쪽으로 나감 (더 가까이)
+          : slideDirection === 'right'
+            ? '50%' // 오른쪽으로 나감 (더 가까이)
+            : -30,
+    },
   };
 
   return (
@@ -27,7 +42,7 @@ export default function AnimatedTabContent({
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        transition={{ duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }}
       >
         {children}
       </motion.div>
