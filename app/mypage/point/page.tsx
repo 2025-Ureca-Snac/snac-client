@@ -14,6 +14,7 @@ import {
 } from '@/app/(shared)/types/point-history';
 import Link from 'next/link';
 import PointContent from './PointContent';
+import { useSwipeNavigation } from '@/app/(shared)/hooks/useSwipeNavigation';
 
 // 포인트/머니 관련 타입 정의
 
@@ -71,6 +72,17 @@ function PointPageContent() {
   const isInitialLoadRef = useRef(false);
   // 무한 로딩 방지를 위한 ref
   const isLoadingRef = useRef(false);
+
+  // 스와이프 네비게이션 훅
+  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (activeTab === 'POINT') setActiveTab('MONEY');
+    },
+    onSwipeRight: () => {
+      if (activeTab === 'MONEY') setActiveTab('POINT');
+    },
+    threshold: 50,
+  });
 
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
@@ -496,6 +508,8 @@ function PointPageContent() {
             <section
               className="w-full max-w-full"
               aria-labelledby="point-history-title"
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
             >
               {isLoading ? (
                 <LoadingState />

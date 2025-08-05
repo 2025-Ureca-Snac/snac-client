@@ -11,6 +11,7 @@ import { api, handleApiError } from '../utils/api';
 import { ApiResponse } from '../types/api';
 import Link from 'next/link';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
@@ -84,6 +85,19 @@ export default function TradingHistoryPage({
 
   // 중복 호출 방지를 위한 ref
   const isInitialLoadRef = useRef(false);
+
+  // 스와이프 네비게이션 훅
+  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (activeTab === 'all') setActiveTab('active');
+      else if (activeTab === 'active') setActiveTab('completed');
+    },
+    onSwipeRight: () => {
+      if (activeTab === 'completed') setActiveTab('active');
+      else if (activeTab === 'active') setActiveTab('all');
+    },
+    threshold: 50,
+  });
 
   // 거래 내역 데이터 로드 (useCallback으로 안정화)
   const loadTradingHistory = useCallback(
@@ -424,6 +438,8 @@ export default function TradingHistoryPage({
             <section
               className="w-full max-w-full"
               aria-labelledby={`${type}-history-title`}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
             >
               <div className="bg-white rounded-lg shadow-sm border">
                 {/* 탭 네비게이션 */}

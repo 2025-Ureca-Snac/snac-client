@@ -22,6 +22,7 @@ import { handleApiError } from '@/app/(shared)/utils/api';
 import { useInquiries } from '@/app/(shared)/hooks/use-inquiries';
 import { useReports } from '@/app/(shared)/hooks/use-reports';
 import Link from 'next/link';
+import { useSwipeNavigation } from '@/app/(shared)/hooks/useSwipeNavigation';
 
 /**
  * @author 이승우
@@ -56,6 +57,19 @@ export default function InquiryHistoryPage() {
 
   // 중복 호출 방지를 위한 ref
   const isInitialLoadRef = useRef(false);
+
+  // 스와이프 네비게이션 훅
+  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (activeTab === 'all') setActiveTab('pending');
+      else if (activeTab === 'pending') setActiveTab('answered');
+    },
+    onSwipeRight: () => {
+      if (activeTab === 'answered') setActiveTab('pending');
+      else if (activeTab === 'pending') setActiveTab('all');
+    },
+    threshold: 50,
+  });
 
   /**
    * @author 이승우
@@ -342,7 +356,11 @@ export default function InquiryHistoryPage() {
             {/* 모바일 헤더 */}
             <MobileHeader />
 
-            <section className="w-full max-w-full">
+            <section
+              className="w-full max-w-full"
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
               <div className="bg-white rounded-lg shadow-sm border">
                 {/* 탭 네비게이션 */}
                 <TabNavigation
