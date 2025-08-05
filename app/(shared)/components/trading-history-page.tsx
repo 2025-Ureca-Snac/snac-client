@@ -1,19 +1,22 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
+
+import { ApiResponse } from '../types/api';
+
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import SideMenu from './SideMenu';
-import TabNavigation from './TabNavigation';
-import AnimatedTabContent from './AnimatedTabContent';
-import HistoryDetailModal from './HistoryDetailModal';
-import { TradingHistoryCard } from './TradingHistoryCard';
 import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
-import { ApiResponse } from '../types/api';
-import Link from 'next/link';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
+import AnimatedTabContent from './AnimatedTabContent';
+import HistoryDetailModal from './HistoryDetailModal';
+import SideMenu from './SideMenu';
+import TabNavigation from './TabNavigation';
+import { TradingHistoryCard } from './TradingHistoryCard';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
@@ -88,6 +91,19 @@ export default function TradingHistoryPage({
 
   // 중복 호출 방지를 위한 ref
   const isInitialLoadRef = useRef(false);
+
+  // 스와이프 네비게이션 훅
+  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (activeTab === 'all') setActiveTab('active');
+      else if (activeTab === 'active') setActiveTab('completed');
+    },
+    onSwipeRight: () => {
+      if (activeTab === 'completed') setActiveTab('active');
+      else if (activeTab === 'active') setActiveTab('all');
+    },
+    threshold: 50,
+  });
 
   // 슬라이드 관련 상태
   const [isDragging, setIsDragging] = useState(false);
@@ -562,6 +578,8 @@ export default function TradingHistoryPage({
             <section
               className="w-full max-w-full"
               aria-labelledby={`${type}-history-title`}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
             >
               <div className="bg-white rounded-lg shadow-sm border">
                 {/* 탭 네비게이션 */}
@@ -574,6 +592,7 @@ export default function TradingHistoryPage({
                   activeTextColor={`text-${theme.primaryColorClass}-600`}
                   inactiveTextColor="text-gray-500"
                   underlineColor={`bg-${theme.primaryColorClass}-600`}
+                  disableDrag={true}
                 />
 
                 {/* 거래 내역 리스트 */}
@@ -626,6 +645,7 @@ export default function TradingHistoryPage({
                                 getStatusText={getStatusText}
                                 partnerNickname={item.partnerNickname}
                                 partnerFavorite={item.partnerFavorite}
+                                isDragging={isDragging}
                               />
                             ))}
                           </div>

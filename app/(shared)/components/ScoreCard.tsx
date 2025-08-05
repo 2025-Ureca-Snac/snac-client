@@ -7,13 +7,7 @@ import ModalPortal from './modal-portal';
 import { useUserStore } from '../stores/user-store';
 import { useModalStore } from '../stores/modal-store';
 import { SNACK_GRADES } from '../constants/snack-grades';
-import { api } from '../utils/api';
-import { ApiResponse } from '../types/api';
-import { BalanceResponse } from '../types/point-history';
-
-// 전역 변수로 API 호출 상태 관리 (모든 ScoreCard 인스턴스에서 공유)
-let globalBalanceLoaded = false;
-let globalBalanceData: BalanceResponse | null = null;
+import { useBalanceStore } from '../stores/balance-store';
 
 /**
  * @author 이승우
@@ -26,73 +20,20 @@ interface ScoreCardProps {
 export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
   const router = useRouter();
   const { profile } = useUserStore();
+  const {
+    balance,
+    isLoading: isBalanceLoading,
+    fetchBalance,
+  } = useBalanceStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [balance, setBalance] = useState<BalanceResponse>({
-    point: 0,
-    money: 0,
-  });
-  const [isBalanceLoading, setIsBalanceLoading] = useState(true);
 
-  // 중복 호출 방지를 위한 ref
-  const isBalanceLoadingRef = useRef(false);
-
-  // 잔액 조회 API 함수
-  const getBalance = async (): Promise<BalanceResponse> => {
-    const response =
-      await api.get<ApiResponse<BalanceResponse>>('/wallets/summary');
-    return response.data.data;
-  };
-
-  // 잔액 데이터 로드
-  const loadBalance = async () => {
-    // 이미 로딩 중인 경우 중복 호출 방지
-    if (isBalanceLoadingRef.current) {
-      return;
-    }
-
-    // 이미 한 번 로드된 경우 중복 호출 방지 (React.StrictMode 대응)
-    if (globalBalanceLoaded) {
-      setIsBalanceLoading(false);
-      return;
-    }
-
-    try {
-      isBalanceLoadingRef.current = true;
-      globalBalanceLoaded = true;
-      setIsBalanceLoading(true);
-      const balanceResponse = await getBalance();
-      globalBalanceData = balanceResponse;
-      setBalance(balanceResponse);
-    } catch (err) {
-      console.error('잔액 로드 실패:', err);
-      // 에러 발생 시 플래그 리셋
-      globalBalanceLoaded = false;
-      globalBalanceData = null;
-    } finally {
-      setIsBalanceLoading(false);
-      isBalanceLoadingRef.current = false;
-    }
-  };
-
-  // 컴포넌트 마운트 시 잔액 로드
   useEffect(() => {
-    // 이미 로드된 경우 즉시 리턴 (React.StrictMode 대응)
-    if (globalBalanceLoaded) {
-      // 이미 로드된 경우 기존 데이터 복원
-      if (globalBalanceData) {
-        setBalance(globalBalanceData);
-      }
-      setIsBalanceLoading(false);
-      return;
-    }
+    fetchBalance();
+  }, [fetchBalance]);
 
-    loadBalance();
-  }, []);
-
-  // 실제 스코어는 API나 store에서 가져와야 함 (현재는 예시)
   const score = profile?.score || 0;
   const maxScore = 1000;
 
@@ -150,7 +91,6 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
           <button
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded px-2 py-1"
             onClick={() => {
-              // 단골 목록 모달 열기
               useModalStore.getState().openModal('favorite-list');
             }}
             aria-label="단골 목록 보기"
@@ -197,7 +137,7 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
             </div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-white font-bold text-xl">
-                {isBalanceLoading
+                {isBalanceLoading || !balance
                   ? '로딩 중...'
                   : `${balance.point.toLocaleString()}P`}
               </span>
@@ -226,7 +166,7 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
             </div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-white font-bold text-xl">
-                {isBalanceLoading
+                {isBalanceLoading || !balance
                   ? '로딩 중...'
                   : `${balance.money.toLocaleString()}S`}
               </span>

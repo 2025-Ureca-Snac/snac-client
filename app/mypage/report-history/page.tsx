@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
@@ -20,6 +19,7 @@ import {
 } from '@/app/(shared)/types/inquiry';
 
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 import { useInquiries } from '@/app/(shared)/hooks/use-inquiries';
 import { useReports } from '@/app/(shared)/hooks/use-reports';
 import Link from 'next/link';
@@ -150,55 +150,6 @@ export default function InquiryHistoryPage() {
     }
   };
 
-  /**
-   * @author 이승우
-   * @description 문의 카테고리를 한글로 변환
-   * @param type 문의 타입
-   * @returns 한글 카테고리명
-   */
-  const getCategoryName = (type: string): string => {
-    switch (type) {
-      case DisputeType.DATA_NONE:
-        return '데이터 안옴';
-      case DisputeType.DATA_PARTIAL:
-        return '일부만 수신';
-      case DisputeType.PAYMENT:
-        return '결제 관련';
-      case DisputeType.ACCOUNT:
-        return '계정 관련';
-      case DisputeType.TECHNICAL_PROBLEM:
-        return '기술적 문제';
-      case DisputeType.QNA_OTHER:
-      case DisputeType.REPORT_OTHER:
-        return '기타';
-      default:
-        return type;
-    }
-  };
-
-  /**
-   * @author 이승우
-   * @description 탭별 필터링된 문의 목록
-   */
-  const filteredInquiries = useMemo(() => {
-    if (!inquiries) return [];
-    if (activeTab === 'all') return inquiries;
-    return inquiries.filter((inquiry) => {
-      if (activeTab === 'pending') return inquiry.status === 'IN_PROGRESS';
-      if (activeTab === 'answered') return inquiry.answerAt !== null;
-      return true;
-    });
-  }, [inquiries, activeTab]);
-
-  const tabs = useMemo(
-    () => [
-      { id: 'all', label: '전체' },
-      { id: 'pending', label: '답변 대기' },
-      { id: 'answered', label: '답변 완료' },
-    ],
-    []
-  );
-
   // 슬라이드 핸들러
   const handleDragStart = useCallback((clientX: number) => {
     setIsDragging(true);
@@ -221,6 +172,12 @@ export default function InquiryHistoryPage() {
     const threshold = 100; // 슬라이드 감지 임계값
 
     if (Math.abs(deltaX) > threshold) {
+      const tabs = [
+        { id: 'all', label: '전체' },
+        { id: 'pending', label: '답변 대기' },
+        { id: 'answered', label: '답변 완료' },
+      ];
+
       const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
 
       if (deltaX > 0 && currentIndex > 0) {
@@ -233,7 +190,7 @@ export default function InquiryHistoryPage() {
     }
 
     setIsDragging(false);
-  }, [isDragging, currentX, startX, activeTab, tabs]);
+  }, [isDragging, currentX, startX, activeTab]);
 
   // 슬라이드 방향 감지
   const getSlideDirection = () => {
@@ -315,6 +272,55 @@ export default function InquiryHistoryPage() {
 
   /**
    * @author 이승우
+   * @description 문의 카테고리를 한글로 변환
+   * @param type 문의 타입
+   * @returns 한글 카테고리명
+   */
+  const getCategoryName = (type: string): string => {
+    switch (type) {
+      case DisputeType.DATA_NONE:
+        return '데이터 안옴';
+      case DisputeType.DATA_PARTIAL:
+        return '일부만 수신';
+      case DisputeType.PAYMENT:
+        return '결제 관련';
+      case DisputeType.ACCOUNT:
+        return '계정 관련';
+      case DisputeType.TECHNICAL_PROBLEM:
+        return '기술적 문제';
+      case DisputeType.QNA_OTHER:
+      case DisputeType.REPORT_OTHER:
+        return '기타';
+      default:
+        return type;
+    }
+  };
+
+  /**
+   * @author 이승우
+   * @description 탭별 필터링된 문의 목록
+   */
+  const filteredInquiries = useMemo(() => {
+    if (!inquiries) return [];
+    if (activeTab === 'all') return inquiries;
+    return inquiries.filter((inquiry) => {
+      if (activeTab === 'pending') return inquiry.status === 'IN_PROGRESS';
+      if (activeTab === 'answered') return inquiry.answerAt !== null;
+      return true;
+    });
+  }, [inquiries, activeTab]);
+
+  const tabs = useMemo(
+    () => [
+      { id: 'all', label: '전체' },
+      { id: 'pending', label: '답변 대기' },
+      { id: 'answered', label: '답변 완료' },
+    ],
+    []
+  );
+
+  /**
+   * @author 이승우
    * @description 문의 제출 핸들러
    * @param inquiry - 제출할 문의 데이터
    */
@@ -344,9 +350,6 @@ export default function InquiryHistoryPage() {
    * @param inquiry - 조회할 문의 아이템
    */
   const handleInquiryClick = async (inquiry: InquiryItem) => {
-    // 슬라이드 중에는 모달 열지 않음
-    if (isDragging) return;
-
     try {
       console.log('문의 상세 조회 시작:', inquiry.disputeId);
       const inquiryDetail = await getInquiryDetail(inquiry.disputeId);
@@ -416,8 +419,7 @@ export default function InquiryHistoryPage() {
             </p>
           </div>
           <button
-            onClick={() => !isDragging && setIsInquiryModalOpen(true)}
-            disabled={isDragging}
+            onClick={() => setIsInquiryModalOpen(true)}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             문의 작성
@@ -476,7 +478,10 @@ export default function InquiryHistoryPage() {
             {/* 모바일 헤더 */}
             <MobileHeader />
 
-            <section className="w-full max-w-full">
+            <section
+              className="w-full max-w-full"
+              aria-labelledby="inquiry-history-title"
+            >
               <div className="bg-white rounded-lg shadow-sm border">
                 {/* 탭 네비게이션 */}
                 <TabNavigation
@@ -489,6 +494,7 @@ export default function InquiryHistoryPage() {
                   activeTextColor="text-green-600"
                   inactiveTextColor="text-gray-500"
                   underlineColor="bg-green-600"
+                  disableDrag={true}
                 />
 
                 {/* 문의 내역 리스트 */}
@@ -528,7 +534,10 @@ export default function InquiryHistoryPage() {
                             <div
                               key={item.disputeId}
                               className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
-                              onClick={() => handleInquiryClick(item)}
+                              onClick={() => {
+                                if (isDragging) return;
+                                handleInquiryClick(item);
+                              }}
                             >
                               {/* 아이콘 */}
                               <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -587,8 +596,11 @@ export default function InquiryHistoryPage() {
                           {hasNext && (
                             <div className="text-center pt-4">
                               <button
-                                onClick={handleLoadMore}
-                                disabled={isLoadingMore}
+                                onClick={() => {
+                                  if (isDragging) return;
+                                  handleLoadMore();
+                                }}
+                                disabled={isLoadingMore || isDragging}
                                 className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
                               >
                                 {isLoadingMore ? '로딩 중...' : '더보기'}
