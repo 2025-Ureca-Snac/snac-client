@@ -72,27 +72,27 @@ export function MarkdownRenderer({
   // components 객체에 dark: 클래스를 추가하여 다크 모드 스타일을 직접 지정합니다.
   const components: Components = {
     h1: ({ children }) => (
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 mt-8">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 mt-8">
         {children}
       </h1>
     ),
     h2: ({ children }) => (
-      <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-6">
+      <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4 mt-6">
         {children}
       </h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 mt-5">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-5">
         {children}
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 mt-4">
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 mt-4">
         {children}
       </h4>
     ),
     p: ({ children }) => (
-      <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+      <p className="mb-4 text-gray-700 dark:text-white leading-relaxed">
         {children}
       </p>
     ),
@@ -102,7 +102,7 @@ export function MarkdownRenderer({
     ),
     li: ({ children }) => <li className="mb-1">{children}</li>,
     strong: ({ children }) => (
-      <strong className="font-semibold text-gray-900 dark:text-gray-100">
+      <strong className="font-semibold text-gray-900 dark:text-white">
         {children}
       </strong>
     ),
@@ -111,14 +111,14 @@ export function MarkdownRenderer({
       const match = /language-(\w+)/.exec(className || '');
       const isInline = !match;
       return !isInline ? (
-        <pre className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
+        <pre className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white p-4 rounded-lg overflow-x-auto my-4">
           <code className={className} {...props}>
             {children}
           </code>
         </pre>
       ) : (
         <code
-          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1 py-0.5 rounded text-sm font-mono"
+          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-1 py-0.5 rounded text-sm font-mono"
           {...props}
         >
           {children}
@@ -143,7 +143,7 @@ export function MarkdownRenderer({
       </td>
     ),
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 my-4 bg-blue-50 dark:bg-gray-800 italic text-gray-800 dark:text-gray-200">
+      <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 my-4 bg-blue-50 dark:bg-gray-800 italic text-gray-800 dark:text-white">
         {children}
       </blockquote>
     ),
@@ -173,12 +173,12 @@ export function MarkdownRenderer({
   };
 
   return (
-    <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+    <div className="text-gray-700 dark:text-white leading-relaxed">
       <div>{renderContentWithImages()}</div>
 
       {showGallery && images && images.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             이미지 갤러리
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -202,13 +202,13 @@ export function MarkdownRenderer({
 
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black dark:bg-white bg-opacity-75 flex items-center justify-center z-50"
           onClick={closeImageModal}
         >
           <div className="relative max-w-4xl max-h-full p-4">
             <button
               onClick={closeImageModal}
-              className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10"
+              className="absolute top-4 right-4 text-white dark:text-black text-2xl hover:text-gray-300 z-10"
             >
               ×
             </button>

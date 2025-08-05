@@ -28,6 +28,7 @@ interface DataItemCardProps {
   cardId?: number;
   carrier?: string;
   dataAmount?: number;
+  skipLoginCheck?: boolean; // 로그인 체크를 건너뛸지 여부
 }
 
 export const DataItemCard = ({
@@ -47,6 +48,7 @@ export const DataItemCard = ({
   cardId,
   carrier,
   dataAmount,
+  skipLoginCheck = false,
 }: DataItemCardProps) => {
   const loggedInUser = useAuthStore((state: AuthState) => state.user);
   const { actions } = useHomeStore();
@@ -140,8 +142,8 @@ export const DataItemCard = ({
                 return;
               }
 
-              // 로그인 상태 확인
-              if (!loggedInUser) {
+              // 로그인 상태 확인 (skipLoginCheck가 true면 건너뛰기)
+              if (!skipLoginCheck && !loggedInUser) {
                 toast.error('로그인 해주세요.');
                 router.push('/login');
                 return;
@@ -158,41 +160,49 @@ export const DataItemCard = ({
           <div className="flex gap-2 w-full">
             {sellStatus === 'SELLING' ? (
               <>
-                <Button
-                  onClick={() => {
-                    console.log(cardId);
-                    // 수정하기 로직
-                    if (cardId) {
-                      actions.openEditModal(cardId.toString(), {
-                        cardCategory: cardCategory as 'SELL' | 'BUY',
-                        carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
-                        dataAmount: dataAmount || 0,
-                        price: price,
-                      });
-                    }
-                  }}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
-                  style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
-                >
-                  <span className="md:hidden">수정</span>
-                  <span className="hidden md:inline">수정하기</span>
-                </Button>
+                {cardCategory === 'SELL' && (
+                  <Button
+                    onClick={() => {
+                      console.log(cardId);
+                      // 수정하기 로직
+                      if (cardId) {
+                        actions.openEditModal(cardId.toString(), {
+                          cardCategory: cardCategory as 'SELL' | 'BUY',
+                          carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
+                          dataAmount: dataAmount || 0,
+                          price: price,
+                        });
+                      }
+                    }}
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                    style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
+                  >
+                    <span className="md:hidden">수정</span>
+                    <span className="hidden md:inline">수정하기</span>
+                  </Button>
+                )}
+
                 <Button
                   onClick={() => {
                     // 삭제하기 로직
-                    if (confirm('정말 삭제하시겠습니까?')) {
-                      if (cardId) {
-                        api
-                          .delete(`/cards/${cardId}`)
-                          .then(() => {
-                            toast.success('게시글이 삭제되었습니다.');
-                            actions.triggerRefetch();
-                          })
-                          .catch((error) => {
-                            console.error('삭제 실패:', error);
-                            toast.error('삭제에 실패했습니다.');
-                          });
+                    if (cardCategory === 'SELL') {
+                      if (confirm('정말 삭제하시겠습니까?')) {
+                        if (cardId) {
+                          api
+                            .delete(`/cards/${cardId}`)
+                            .then(() => {
+                              toast.success('게시글이 삭제되었습니다.');
+                              actions.triggerRefetch();
+                            })
+                            .catch((error) => {
+                              console.error('삭제 실패:', error);
+                              toast.error('삭제에 실패했습니다.');
+                            });
+                        }
                       }
+                    } else {
+                      toast.error('구매 내역에서 삭제해주세요.');
+                      router.push('/mypage/purchase-history');
                     }
                   }}
                   className="flex-1 bg-red-500 hover:bg-red-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"

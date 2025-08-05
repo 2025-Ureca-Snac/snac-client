@@ -225,33 +225,21 @@ export const Modal = () => {
                   <div>
                     <Dialog.Title
                       as="h3"
-                      className="text-heading-sm font-bold leading-6 text-gray-900"
+                      className="text-heading-md font-bold leading-6"
                     >
                       {isEditMode ? '수정하기' : '등록하기'}
                     </Dialog.Title>
-                    <p className="mt-1 text-regular-sm text-gray-600">
+                    <p className="mt-1 text-regular-sm text-gray-600 dark:text-gray-200">
                       {isEditMode
                         ? '수정할 내용을 입력해주세요'
                         : '원하는 조건을 선택해주세요'}
                     </p>
                   </div>
-                  <button
-                    onClick={handleClose}
-                    className="p-1 text-gray-400 hover:text-gray-600"
-                    aria-label="닫기"
-                  >
-                    <Image
-                      src="/close.svg"
-                      alt="닫기 아이콘"
-                      width={24}
-                      height={24}
-                    />
-                  </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-6">
                   <RadioGroup value={cardCategory} onChange={setCardCategory}>
-                    <RadioGroup.Label className="block text-regular-sm font-medium text-gray-700 mb-3">
+                    <RadioGroup.Label className="block text-regular-sm font-medium text-gray-700 dark:text-gray-100 mb-3">
                       거래
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-6">
@@ -291,7 +279,7 @@ export const Modal = () => {
                           {({ checked }) => (
                             <span className="flex items-center">
                               <CheckboxIcon checked={checked} />
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ml-2">
+                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ml-2">
                                 <Image
                                   src={option.imageUrl}
                                   alt={option.name}
@@ -319,7 +307,7 @@ export const Modal = () => {
                           key={preset}
                           type="button"
                           onClick={() => handleDataPresetClick(preset)}
-                          className={`w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50 ${
+                          className={`w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50 dark:hover:bg-gray-700  ${
                             isPresetSelected(preset)
                               ? 'bg-gray-100 font-medium'
                               : ''
@@ -381,8 +369,8 @@ export const Modal = () => {
                       className="mt-1 w-full border border-gray-300 rounded-lg py-2 px-3 text-regular-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 "
                       required
                     />
-                    <p className="mt-1 text-xs text-gray-500">
-                      최소 가격은 100원 이상입니다.
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-300">
+                      * 최소 가격은 100원 이상입니다.
                     </p>
                   </div>
 
@@ -403,7 +391,7 @@ export const Modal = () => {
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="w-full flex justify-center py-2 px-3 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      className="w-full flex justify-center py-2 px-3 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       취소하기
                     </button>

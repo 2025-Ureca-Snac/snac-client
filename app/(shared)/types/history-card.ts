@@ -30,7 +30,8 @@ export interface HistoryItem {
     | 'COMPLETED'
     | 'CANCELED'
     | 'AUTO_REFUND'
-    | 'AUTO_PAYOUT';
+    | 'AUTO_PAYOUT'
+    | 'REPORTED';
   transactionNumber?: string;
   carrier?: string;
   partnerId?: number;

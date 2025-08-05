@@ -36,4 +36,9 @@ export const menuItems: MenuItem[] = [
     label: '포인트 • 머니',
     path: '/mypage/point?type=POINT',
   },
+  {
+    id: 'settings',
+    label: '설정',
+    path: '/mypage/settings',
+  },
 ];

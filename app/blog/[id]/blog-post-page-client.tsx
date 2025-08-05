@@ -38,10 +38,12 @@ export default function BlogPostPageClient({ id }: BlogPostPageClientProps) {
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="bg-white rounded-2xl p-6 shadow-light">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               관련 포스트
             </h3>
-            <p className="text-gray-600">더 많은 유용한 정보를 확인해보세요</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              더 많은 유용한 정보를 확인해보세요
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedBlogs.map((post) => (

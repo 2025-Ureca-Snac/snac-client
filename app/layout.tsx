@@ -4,8 +4,8 @@ import { ThemeProvider } from './theme-provider';
 import WwwRedirect from './(shared)/components/www-redirect';
 import { Toaster } from 'sonner';
 // 2. Header와 Footer, 그리고 useEffect 훅을 임포트합니다.
-import { Header } from './(shared)/components/Header';
-import { Footer } from './(shared)/components/Footer';
+import ConditionalHeader from './(shared)/components/conditional-header';
+import ConditionalFooter from './(shared)/components/conditional-footer';
 
 const notoSansKr = Noto_Sans_KR({
   weight: ['400', '500', '700'],
@@ -16,11 +16,9 @@ const notoSansKr = Noto_Sans_KR({
 function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full md:max-w-[1440px] mx-auto min-h-screen flex flex-col">
-      <Header />
-
+      <ConditionalHeader />
       <main className="flex-1 bg-white dark:bg-gray-900">{children}</main>
-
-      <Footer />
+      <ConditionalFooter />
       <Toaster richColors position="top-center" />
     </div>
   );
@@ -33,6 +31,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <meta
+          name="google-site-verification"
+          content="ZyDbxMLQ1UsdJrNj45pOk18xpt7KQNivFtcYjfW74Go"
+        />
+      </head>
       <WwwRedirect />
       <body className={`${notoSansKr.className} antialiased`}>
         <ThemeProvider>

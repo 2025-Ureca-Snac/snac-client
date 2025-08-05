@@ -65,124 +65,165 @@ const config: Config = {
       typography: {
         DEFAULT: {
           css: {
-            color: '#374151', // text-gray-700
-            lineHeight: '1.75', // leading-relaxed
+            color: '#404040',
+            lineHeight: '1.75',
             maxWidth: 'none',
             h1: {
-              fontSize: '2.25rem', // text-4xl
-              fontWeight: '700', // font-bold
-              marginBottom: '1.5rem', // mb-6
-              color: '#111827', // text-gray-900
+              fontSize: '2.25rem',
+              fontWeight: '700',
+              marginBottom: '1.5rem',
+              color: '#1A1A1A',
             },
             h2: {
-              fontSize: '1.875rem', // text-3xl
-              fontWeight: '700', // font-bold
-              marginBottom: '1rem', // mb-4
-              color: '#111827', // text-gray-900
+              fontSize: '1.875rem',
+              fontWeight: '700',
+              marginBottom: '1rem',
+              color: '#1A1A1A',
             },
             h3: {
-              fontSize: '1.5rem', // text-2xl
-              fontWeight: '700', // font-bold
-              marginBottom: '0.75rem', // mb-3
-              color: '#111827', // text-gray-900
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              marginBottom: '0.75rem',
+              color: '#1A1A1A',
             },
             h4: {
-              fontSize: '1.25rem', // text-xl
-              fontWeight: '600', // font-semibold
-              marginBottom: '0.5rem', // mb-2
-              color: '#111827', // text-gray-900
+              fontSize: '1.25rem',
+              fontWeight: '600',
+              marginBottom: '0.5rem',
+              color: '#1A1A1A',
             },
-            p: {
-              marginBottom: '1rem', // mb-4
-              lineHeight: '1.75', // leading-7
-            },
+            p: { marginBottom: '1rem', lineHeight: '1.75' },
             ul: {
               listStyleType: 'disc',
-              paddingLeft: '1.5rem', // pl-6
-              marginBottom: '1rem', // mb-4
+              paddingLeft: '1.5rem',
+              marginBottom: '1rem',
             },
             ol: {
               listStyleType: 'decimal',
-              paddingLeft: '1.5rem', // pl-6
-              marginBottom: '1rem', // mb-4
+              paddingLeft: '1.5rem',
+              marginBottom: '1rem',
             },
-            li: {
-              marginBottom: '0.5rem', // mb-2
-              lineHeight: '1.5', // leading-6
-            },
-            strong: {
-              fontWeight: '700', // font-bold
-              color: '#111827', // text-gray-900
-            },
-            em: {
-              fontStyle: 'italic',
-            },
+            li: { marginBottom: '0.5rem', lineHeight: '1.5' },
+            strong: { fontWeight: '700', color: '#1A1A1A' },
+            em: { fontStyle: 'italic' },
             code: {
-              backgroundColor: '#F3F4F6', // bg-gray-100
-              padding: '0.25rem 0.5rem', // px-2 py-1
-              borderRadius: '0.25rem', // rounded
-              fontSize: '0.875rem', // text-sm
+              backgroundColor: '#F5F5F5',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem',
+              fontSize: '0.875rem',
               fontFamily:
-                'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace', // font-mono
+                'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
             },
             pre: {
-              backgroundColor: '#F3F4F6', // bg-gray-100
-              padding: '1rem', // p-4
-              borderRadius: '0.5rem', // rounded-lg
+              backgroundColor: '#F5F5F5',
+              padding: '1rem',
+              borderRadius: '0.5rem',
               overflowX: 'auto',
-              marginBottom: '1rem', // mb-4
+              marginBottom: '1rem',
             },
             hr: {
-              marginTop: '2rem', // my-8
+              marginTop: '2rem',
               marginBottom: '2rem',
-              borderColor: '#D1D5DB', // border-gray-300
+              borderColor: '#D1D5DB',
             },
             blockquote: {
-              borderLeftWidth: '4px', // border-l-4
-              borderLeftColor: '#3B82F6', // border-blue-500
-              paddingLeft: '1rem', // pl-4
+              borderLeftWidth: '4px',
+              borderLeftColor: '#3B82F6',
+              paddingLeft: '1rem',
               fontStyle: 'italic',
-              color: '#4B5563', // text-gray-600
-              backgroundColor: '#EFF6FF', // bg-blue-50
-              paddingTop: '0.5rem', // py-2
+              color: '#525252',
+              backgroundColor: '#EFF6FF',
+              paddingTop: '0.5rem',
               paddingBottom: '0.5rem',
-              borderTopRightRadius: '0.25rem', // rounded-r
+              borderTopRightRadius: '0.25rem',
               borderBottomRightRadius: '0.25rem',
             },
             a: {
-              color: '#2563EB', // text-blue-600
+              color: '#2563EB',
               textDecoration: 'underline',
               '&:hover': {
-                color: '#1E40AF', // hover:text-blue-800
+                color: '#1E40AF',
                 transitionProperty: 'color',
                 transitionDuration: '200ms',
               },
             },
             table: {
-              width: '100%', // w-full
-              borderCollapse: 'collapse', // border-collapse
-              marginBottom: '1rem', // mb-4
+              width: '100%',
+              borderCollapse: 'collapse',
+              marginBottom: '1rem',
             },
             th: {
-              border: '1px solid #D1D5DB', // border border-gray-300
-              padding: '0.5rem 1rem', // px-4 py-2
-              backgroundColor: '#F3F4F6', // bg-gray-100
-              fontWeight: '700', // font-bold
+              border: '1px solid #D4D4D4',
+              padding: '0.5rem 1rem',
+              backgroundColor: '#F5F5F5',
+              fontWeight: '700',
+            },
+            td: { border: '1px solid #D4D4D4', padding: '0.5rem 1rem' },
+            img: {
+              width: '100%',
+              height: 'auto',
+              borderRadius: '0.5rem',
+              boxShadow:
+                '0 2px 12px rgba(0,0,0,0.08), 0 2px 12px rgba(255,255,255,0.18)',
+              marginTop: '1rem',
+              marginBottom: '1rem',
+              maxWidth: '100%',
+              objectFit: 'contain',
+            },
+          },
+        },
+        // ---  [다크 모드 설정 추가] ---
+        invert: {
+          css: {
+            color: '#E5E5E5', // text-gray-200
+            h1: { color: '#FAFAFA' }, // text-gray-50
+            h2: { color: '#FAFAFA' },
+            h3: { color: '#FAFAFA' },
+            h4: { color: '#FAFAFA' },
+            strong: { color: '#FAFAFA' },
+            code: {
+              backgroundColor: '#262626', // bg-gray-800
+              color: '#E5E5E5', // text-gray-200
+            },
+            pre: {
+              backgroundColor: '#262626', // bg-gray-800
+              color: '#E5E5E5', // text-gray-200
+            },
+            hr: { borderColor: '#525252' }, // border-gray-600
+            blockquote: {
+              borderLeftColor: '#60A5FA', // border-blue-400
+              color: '#D4D4D4', // text-gray-300
+              backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            },
+            a: {
+              color: '#60A5FA', // text-blue-400
+              '&:hover': { color: '#93C5FD' },
+            },
+            th: {
+              border: '1px solid #525252', // border-gray-600
+              backgroundColor: '#262626', // bg-gray-800
+              color: '#FAFAFA', // text-gray-50
             },
             td: {
-              border: '1px solid #D1D5DB', // border border-gray-300
-              padding: '0.5rem 1rem', // px-4 py-2
+              border: '1px solid #525252', // border-gray-600
             },
             img: {
-              width: '100%', // w-full
-              height: 'auto', // h-auto
-              borderRadius: '0.5rem', // rounded-lg
               boxShadow:
-                '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', // shadow-md
-              marginTop: '1rem', // my-4
-              marginBottom: '1rem',
-              maxWidth: '100%', // max-w-full
-              objectFit: 'contain', // object-contain
+                '0 2px 12px rgba(255,255,255,0.08), 0 2px 12px rgba(0,0,0,0.18)',
+            },
+            ul: {
+              li: {
+                '&::marker': {
+                  color: '#A3A3A3', // text-gray-400
+                },
+              },
+            },
+            ol: {
+              li: {
+                '&::marker': {
+                  color: '#A3A3A3', // text-gray-400
+                },
+              },
             },
           },
         },
@@ -193,6 +234,7 @@ const config: Config = {
         blink: 'blink 3s ease-in-out infinite',
         'blink-fast': 'blink 0.5s ease-in-out infinite',
         'blink-slow': 'blink 2s ease-in-out infinite',
+        float: 'float 4s ease-in-out infinite',
       },
       keyframes: {
         glow: {
@@ -213,6 +255,12 @@ const config: Config = {
           '0%, 50%': { opacity: '1' },
           '25%, 75%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px) translateX(0px)' },
+          '25%': { transform: 'translateY(-8px) translateX(0px)' },
+          '50%': { transform: 'translateY(-4px) translateX(0px)' },
+          '75%': { transform: 'translateY(6px) translateX(0px)' },
         },
       },
       colors: {
@@ -249,7 +297,7 @@ const config: Config = {
         border: 'var(--border)',
         input: 'var(--input)',
         ring: 'var(--ring)',
-        'midnight-black': '#121212',
+        'midnight-black': '#1A1A1A',
         'signal-brown': '#5C4531',
         'burst-lime': '#98FF58',
         'candy-pink': '#FF66C4',
@@ -279,13 +327,17 @@ const config: Config = {
           600: '#525252',
           700: '#404040',
           800: '#262626',
-          900: '#171717',
+          900: '#1A1A1A',
         },
-        'btn-dark': '#1F1F1F',
+        'btn-dark': '#1A1A1A',
+        black: {
+          DEFAULT: '#1A1A1A',
+        },
       },
       boxShadow: {
-        light: '0 4px 16px rgba(163, 163, 163, 0.25)', // gray-400(회색 400), 불투명도 25%
+        light: '0 2px 12px rgba(0,0,0,0.08), 0 2px 12px rgba(255,255,255,0.18)',
       },
+
       width: {
         'card-sm': '152px',
         'card-md': '238px',
