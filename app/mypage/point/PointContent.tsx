@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import Image from 'next/image';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
+import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
 import RechargeModal from '@/app/(shared)/components/recharge-modal';
 import SettlementModal from '@/app/(shared)/components/settlement-modal';
 import CancelModal from '@/app/(shared)/components/cancel-modal';
@@ -43,6 +44,7 @@ export default function PointContent({
   onYearChange,
   onMonthChange,
   onRefreshData,
+  isDragging = false,
 }: PointContentProps) {
   const [pointsFilter, setPointsFilter] = useState<PointFilterType>('all');
   const [moneyFilter, setMoneyFilter] = useState<MoneyFilterType>('all');
@@ -188,10 +190,12 @@ export default function PointContent({
       {/* 포인트 적립 버튼 */}
       <button
         onClick={() => {
+          if (isDragging) return;
           // TODO: 포인트 적립 기능 구현 예정
           console.log('포인트 적립 버튼 클릭');
         }}
-        className="ml-auto px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1"
+        disabled={isDragging}
+        className="ml-auto px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Image src="/snac-price.svg" alt="스낵" width={16} height={16} />
         적립
@@ -266,14 +270,16 @@ export default function PointContent({
       {/* 머니 충전 및 정산 버튼 */}
       <div className="ml-auto flex gap-2">
         <button
-          onClick={() => setIsRechargeModalOpen(true)}
-          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+          onClick={() => !isDragging && setIsRechargeModalOpen(true)}
+          disabled={isDragging}
+          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           충전
         </button>
         <button
-          onClick={() => setIsSettlementModalOpen(true)}
-          className="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors"
+          onClick={() => !isDragging && setIsSettlementModalOpen(true)}
+          disabled={isDragging}
+          className="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           정산
         </button>
@@ -327,13 +333,15 @@ export default function PointContent({
           {activeTab === 'MONEY' && isPositive && item.category === '충전' && (
             <button
               onClick={() => {
+                if (isDragging) return;
                 setSelectedCancelAmount(amount);
                 setSelectedCancelPaymentKey(
                   item.paymentKey || item.id.toString()
                 );
                 setIsCancelModalOpen(true);
               }}
-              className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors mt-1"
+              disabled={isDragging}
+              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               취소
             </button>
@@ -461,7 +469,9 @@ export default function PointContent({
       />
 
       {/* 탭별 컨텐츠 */}
-      {activeTab === 'POINT' ? <PointsTabContent /> : <MoneyTabContent />}
+      <AnimatedTabContent tabKey={activeTab}>
+        {activeTab === 'POINT' ? <PointsTabContent /> : <MoneyTabContent />}
+      </AnimatedTabContent>
 
       {/* 모달들 */}
       <RechargeModal

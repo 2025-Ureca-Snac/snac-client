@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import LightIcon from '@/public/light.svg';
-import DarkIcon from '@/public/dark.svg';
 import LightDarkModeIcon from '@/public/lightDarkMode.svg';
 
 interface ThemeSwitchProps {
@@ -13,39 +11,38 @@ interface ThemeSwitchProps {
 export function ThemeSwitch({ isDark, onToggle }: ThemeSwitchProps) {
   return (
     <>
-      {/* PC 이상: 스위치 */}
+      {/* PC  */}
       <button
         type="button"
         aria-label="테마 토글"
         onClick={onToggle}
-        className={`
-          hidden w-[75px] h-7 items-center justify-between
-          rounded-full border-2 bg-white px-1 py-1
-          transition-all duration-300 md:flex
-          ${isDark ? '!border-white' : 'border-gray-800'}
-        `}
-        style={isDark ? { borderColor: '#fff' } : undefined}
+        className="hidden md:flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none"
       >
-        <LightIcon
-          className={`text-black transition-opacity duration-300 ${
-            isDark ? 'opacity-40' : 'opacity-100'
-          }`}
-        />
-        <DarkIcon
-          className={`transition-opacity duration-300 ${
-            isDark ? 'opacity-100 text-black' : 'opacity-40 text-gray-600'
-          }`}
+        <LightDarkModeIcon
+          width={24}
+          height={24}
+          className={isDark ? 'text-white' : 'text-gray-800'}
         />
       </button>
 
-      {/* 모바일: 한 개만 */}
+      {/* 모바일 */}
       <button
         type="button"
-        aria-label="다크/라이트 토글"
+        aria-label="테마 토글"
         onClick={onToggle}
-        className="flex items-center justify-center p-2 md:hidden"
+        className="flex w-full items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none md:hidden"
       >
-        <LightDarkModeIcon width={24} height={24} className="dark:text-white" />
+        <LightDarkModeIcon
+          width={24}
+          height={24}
+          className={`w-6 h-6 ${isDark ? 'text-white' : 'text-gray-800'}`}
+        />
+
+        <span
+          className={`text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+        >
+          {isDark ? '라이트 모드' : '다크 모드'}
+        </span>
       </button>
     </>
   );

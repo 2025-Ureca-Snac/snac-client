@@ -69,7 +69,12 @@ export const useAuthStore = create<AuthState>()(
               role: decoded?.role,
               token: token,
               tokenExp: decoded?.exp, // 토큰 만료 시간 저장
+              error: null, // 로그인 성공 시 에러 상태 초기화
             });
+
+            // user-store의 에러 상태도 초기화
+            const { useUserStore } = await import('./user-store');
+            useUserStore.getState().setError(null);
           }
         } catch (error) {
           useAuthStore.getState().resetAuthState();
@@ -147,7 +152,13 @@ export const useAuthStore = create<AuthState>()(
                       role: decoded?.role,
                       token: token,
                       tokenExp: decoded?.exp, // 토큰 만료 시간 저장
+                      error: null, // 로그인 성공 시 에러 상태 초기화
                     });
+
+                    // user-store의 에러 상태도 초기화
+                    const { useUserStore } = await import('./user-store');
+                    useUserStore.getState().setError(null);
+
                     console.log('소셜 로그인 성공:', response);
                     resolve(true);
                   } else {
