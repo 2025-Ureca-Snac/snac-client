@@ -7,7 +7,6 @@ interface FilterOptionProps {
   label: string;
   checked: boolean;
   onChange: (value: string) => void;
-  multiSelect?: boolean;
   disabled?: boolean;
   name?: string;
   className?: string;
@@ -33,11 +32,11 @@ export default function FilterOption({
   if (variant === 'radio') {
     return (
       <label
-        className={`flex items-center space-x-3 cursor-pointer dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 p-1 ${className} ${
+        className={`flex w-full items-center justify-between cursor-pointer dark:text-white py-2 ${className} ${
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >
-        <span className="text-gray-500 dark:text-gray-200  mr-auto text-regular-sm  min-w-[200px] ">
+        <span className="text-gray-500 dark:text-gray-200 text-regular-sm">
           {label}
         </span>
         <input
@@ -101,15 +100,14 @@ export default function FilterOption({
     );
   }
 
-  // button variant (default)
   return (
     <button
       onClick={handleChange}
       disabled={disabled}
-      className={`px-2 py-2 text-regular-sm h-[40px] rounded-[10px] border transition-colors md:w-full  md:flex md:h-auto md:p-1 md:border-none md:bg-transparent md:rounded-none ${
+      className={`w-full flex justify-center items-center px-2 py-2 text-regular-sm h-[40px] rounded-[10px] border transition-colors md:w-full md:justify-start md:h-auto md:p-1 md:border-none md:bg-transparent md:rounded-none ${
         checked
-          ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 md:text-midnight-black md:font-bold md:underline dark:text-white'
-          : 'bg-white text-gray-700 dark:hover:bg-gray-700 hover:bg-gray-50 md:text-gray-500 '
+          ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent md:text-midnight-black md:font-bold md:underline dark:md:text-white'
+          : 'bg-white text-gray-700 hover:bg-gray-50  dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 md:text-gray-500'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
     >
       {label}
