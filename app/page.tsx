@@ -128,13 +128,16 @@ export default function Home() {
   }, [refetchTrigger]);
 
   useEffect(() => {
+    const OBSERVER_ROOT_MARGIN = '0px 0px -100px 0px';
+    const OBSERVER_THRESHOLD = 0.1;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         setShowCreateButton(entry.isIntersecting);
       },
       {
-        rootMargin: '0px 0px -100px 0px',
-        threshold: 0.1,
+        rootMargin: OBSERVER_ROOT_MARGIN,
+        threshold: OBSERVER_THRESHOLD,
       }
     );
 
