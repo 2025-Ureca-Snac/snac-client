@@ -4,13 +4,15 @@ import {
   useState,
   useEffect,
   Suspense,
-  useCallback,
   useRef,
   useMemo,
+  useCallback,
 } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import TabNavigation from '@/app/(shared)/components/TabNavigation';
+import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
 
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import { api, handleApiError } from '@/app/(shared)/utils/api';
@@ -23,7 +25,9 @@ import {
 } from '@/app/(shared)/types/point-history';
 import Link from 'next/link';
 import PointContent from './PointContent';
-import { useSwipeNavigation } from '@/app/(shared)/hooks/useSwipeNavigation';
+import RechargeModal from '@/app/(shared)/components/recharge-modal';
+import SettlementModal from '@/app/(shared)/components/settlement-modal';
+import CancelModal from '@/app/(shared)/components/cancel-modal';
 
 // 포인트/머니 관련 타입 정의
 
@@ -83,21 +87,48 @@ function PointPageContent() {
   // 무한 로딩 방지를 위한 ref
   const isLoadingRef = useRef(false);
 
-  // 스와이프 네비게이션 훅
-  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
-    onSwipeLeft: () => {
-      if (activeTab === 'POINT') setActiveTab('MONEY');
-    },
-    onSwipeRight: () => {
-      if (activeTab === 'MONEY') setActiveTab('POINT');
-    },
-    threshold: 50,
-  });
-  
-  // 슬라이드 관련 상태
+  // 드래그 상태 관리
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
+
+  // 모달 상태 관리
+  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
+  const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedCancelAmount, setSelectedCancelAmount] = useState<number>(0);
+  const [selectedCancelPaymentKey, setSelectedCancelPaymentKey] =
+    useState<string>('');
+
+  // 슬라이드 방향 계산
+  const getSlideDirection = () => {
+    const deltaX = currentX - startX;
+    if (Math.abs(deltaX) < 10) return null;
+    return deltaX > 0 ? 'right' : 'left';
+  };
+
+  // 슬라이드 방향에 따른 애니메이션 설정
+  const getSlideAnimation = () => {
+    const deltaX = currentX - startX;
+
+    if (Math.abs(deltaX) < 10) return { x: 0 };
+
+    if (deltaX > 0) {
+      // 오른쪽으로 슬라이드 - 현재 화면이 오른쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 100, 1);
+      return {
+        x: Math.min(deltaX * 0.5, 150), // 더 민감한 이동
+        opacity: 1 - progress * 0.2, // 약간 투명해짐
+      };
+    } else {
+      // 왼쪽으로 슬라이드 - 현재 화면이 왼쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 100, 1);
+      return {
+        x: Math.max(deltaX * 0.5, -150), // 더 민감한 이동
+        opacity: 1 - progress * 0.2, // 약간 투명해짐
+      };
+    }
+  };
 
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
@@ -107,7 +138,7 @@ function PointPageContent() {
   };
 
   // 초기 잔액 로드 (한 번만 호출)
-  const loadInitialBalance = async () => {
+  const loadInitialBalance = useCallback(async () => {
     try {
       const balanceResponse = await getBalance();
       setBalance(balanceResponse);
@@ -115,10 +146,10 @@ function PointPageContent() {
     } catch (err) {
       console.error('잔액 로드 실패:', err);
     }
-  };
+  }, []);
 
   // 포인트/머니 데이터 로드 (거래 내역만)
-  const loadPointData = async () => {
+  const loadPointData = useCallback(async () => {
     // 무한 로딩 방지
     if (isLoadingRef.current) {
       console.log('이미 로딩 중이므로 중복 호출을 방지합니다.');
@@ -202,7 +233,7 @@ function PointPageContent() {
       setIsLoading(false);
       isLoadingRef.current = false;
     }
-  };
+  }, [activeTab, selectedYear, selectedMonth, balance.money]);
 
   // URL 파라미터 변경 시 activeTab 업데이트
   useEffect(() => {
@@ -234,7 +265,7 @@ function PointPageContent() {
     return () => {
       isMounted = false;
     };
-  }, []); // 빈 의존성 배열로 마운트 시에만 실행
+  }, [loadInitialBalance, loadPointData]); // 의존성 배열 수정
 
   // 탭 변경 또는 포인트 월별 조회 변경 시 데이터 로드
   useEffect(() => {
@@ -242,7 +273,7 @@ function PointPageContent() {
     if (isInitialLoadRef.current) {
       loadPointData();
     }
-  }, [activeTab, selectedYear, selectedMonth]);
+  }, [loadPointData]); // loadPointData만 의존성으로 사용
 
   // 무한 스크롤 더보기 함수
   const handleLoadMore = async () => {
@@ -341,7 +372,7 @@ function PointPageContent() {
   const currentHistory = allHistory;
 
   // 데이터 새로고침 함수
-  const handleRefreshData = useCallback(async () => {
+  const handleRefreshData = async () => {
     try {
       // 내역만 새로고침
       await loadPointData();
@@ -349,7 +380,7 @@ function PointPageContent() {
     } catch (error) {
       console.error('데이터 새로고침 실패:', error);
     }
-  }, []);
+  };
 
   // 연도 변경 핸들러
   const handleYearChange = (year: number) => {
@@ -366,80 +397,52 @@ function PointPageContent() {
   };
 
   // 탭 변경 핸들러
-  const handleTabChange = (newTab: AssetType) => {
+  const handleTabChange = useCallback((newTab: AssetType) => {
     setActiveTab(newTab);
     // URL 업데이트 (브라우저 히스토리에 추가)
     const url = new URL(window.location.href);
     url.searchParams.set('type', newTab);
     window.history.pushState({}, '', url.toString());
-  };
+  }, []);
 
-  const tabs = useMemo(
-    () => [
-      { id: 'POINT', label: '포인트' },
-      { id: 'MONEY', label: '머니' },
-    ],
-    []
-  );
-
-  // 슬라이드 핸들러
+  // 드래그 시작 핸들러
   const handleDragStart = useCallback((clientX: number) => {
     setIsDragging(true);
     setStartX(clientX);
     setCurrentX(clientX);
   }, []);
 
+  // 드래그 이동 핸들러
   const handleDragMove = useCallback(
     (clientX: number) => {
-      if (!isDragging) return;
-      setCurrentX(clientX);
+      if (isDragging) {
+        setCurrentX(clientX);
+      }
     },
     [isDragging]
   );
 
+  // 드래그 종료 핸들러
   const handleDragEnd = useCallback(() => {
     if (!isDragging) return;
 
     const deltaX = currentX - startX;
-    const threshold = 100; // 슬라이드 감지 임계값
+    const threshold = 60; // 임계값을 낮춤
 
     if (Math.abs(deltaX) > threshold) {
-      const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
-
-      if (deltaX > 0 && currentIndex > 0) {
-        // 오른쪽으로 스와이프 - 이전 탭
-        handleTabChange(tabs[currentIndex - 1].id as AssetType);
-      } else if (deltaX < 0 && currentIndex < tabs.length - 1) {
-        // 왼쪽으로 스와이프 - 다음 탭
-        handleTabChange(tabs[currentIndex + 1].id as AssetType);
+      if (deltaX > 0 && activeTab === 'MONEY') {
+        // 오른쪽으로 드래그 - POINT로
+        handleTabChange('POINT');
+      } else if (deltaX < 0 && activeTab === 'POINT') {
+        // 왼쪽으로 드래그 - MONEY로
+        handleTabChange('MONEY');
       }
     }
 
     setIsDragging(false);
-  }, [isDragging, currentX, startX, activeTab, tabs]);
-
-  // 슬라이드 방향에 따른 애니메이션 설정
-  const getSlideAnimation = () => {
-    const deltaX = currentX - startX;
-
-    if (Math.abs(deltaX) < 20) return { x: 0 };
-
-    if (deltaX > 0) {
-      // 오른쪽으로 슬라이드 - 현재 화면이 오른쪽으로 나감
-      const progress = Math.min(Math.abs(deltaX) / 150, 1);
-      return {
-        x: Math.min(deltaX * 0.3, 200), // 더 부드러운 이동
-        opacity: 1 - progress * 0.3, // 약간 투명해짐
-      };
-    } else {
-      // 왼쪽으로 슬라이드 - 현재 화면이 왼쪽으로 나감
-      const progress = Math.min(Math.abs(deltaX) / 150, 1);
-      return {
-        x: Math.max(deltaX * 0.3, -200), // 더 부드러운 이동
-        opacity: 1 - progress * 0.3, // 약간 투명해짐
-      };
-    }
-  };
+    setStartX(0);
+    setCurrentX(0);
+  }, [isDragging, currentX, startX, activeTab, handleTabChange]);
 
   // 터치 이벤트 핸들러
   const handleTouchStart = useCallback(
@@ -467,6 +470,7 @@ function PointPageContent() {
   // 마우스 이벤트 핸들러
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       handleDragStart(e.clientX);
     },
     [handleDragStart]
@@ -474,9 +478,12 @@ function PointPageContent() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
       handleDragMove(e.clientX);
     },
-    [handleDragMove]
+    [handleDragMove, isDragging]
   );
 
   const handleMouseUp = useCallback(() => {
@@ -488,6 +495,14 @@ function PointPageContent() {
       handleDragEnd();
     }
   }, [isDragging, handleDragEnd]);
+
+  const tabs = useMemo(
+    () => [
+      { id: 'POINT', label: '포인트' },
+      { id: 'MONEY', label: '머니' },
+    ],
+    []
+  );
 
   // PC 헤더
   const DesktopHeader = () => (
@@ -635,58 +650,114 @@ function PointPageContent() {
             <section
               className="w-full max-w-full"
               aria-labelledby="point-history-title"
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
             >
               {isLoading ? (
                 <LoadingState />
               ) : error ? (
                 <ErrorState />
               ) : (
-                <motion.div
-                  className="select-none overflow-hidden"
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseLeave}
-                  animate={
-                    isDragging ? getSlideAnimation() : { x: 0, opacity: 1 }
-                  }
-                  transition={{
-                    type: 'spring',
-                    stiffness: 200,
-                    damping: 25,
-                  }}
-                >
-                  <PointContent
+                <div className="space-y-6">
+                  {/* 탭 네비게이션 - 고정 */}
+                  <TabNavigation
                     tabs={tabs}
                     activeTab={activeTab}
-                    setActiveTab={handleTabChange}
-                    pointsHistory={activeTab === 'POINT' ? currentHistory : []}
-                    moneyHistory={activeTab === 'MONEY' ? currentHistory : []}
-                    hasNext={hasNext}
-                    onLoadMore={handleLoadMore}
-                    isLoadingMore={isLoadingMore}
-                    balance={balance}
-                    selectedYear={selectedYear}
-                    selectedMonth={selectedMonth}
-                    onYearChange={handleYearChange}
-                    onMonthChange={setSelectedMonth}
-                    onRefreshData={handleRefreshData}
-                    isDragging={isDragging}
+                    onTabChange={(tabId: string) =>
+                      handleTabChange(tabId as AssetType)
+                    }
+                    disableDrag={true}
                   />
-                </motion.div>
+
+                  {/* 스와이프 가능한 콘텐츠 영역 */}
+                  <div className="bg-white rounded-lg shadow-sm border">
+                    <AnimatedTabContent
+                      tabKey={activeTab}
+                      slideDirection={getSlideDirection()}
+                    >
+                      <motion.div
+                        className="select-none overflow-hidden"
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseLeave}
+                        animate={
+                          isDragging
+                            ? getSlideAnimation()
+                            : { x: 0, opacity: 1 }
+                        }
+                        transition={{
+                          type: 'spring',
+                          stiffness: 200,
+                          damping: 25,
+                        }}
+                      >
+                        <PointContent
+                          activeTab={activeTab}
+                          pointsHistory={
+                            activeTab === 'POINT' ? currentHistory : []
+                          }
+                          moneyHistory={
+                            activeTab === 'MONEY' ? currentHistory : []
+                          }
+                          hasNext={hasNext}
+                          onLoadMore={handleLoadMore}
+                          isLoadingMore={isLoadingMore}
+                          balance={balance}
+                          selectedYear={selectedYear}
+                          selectedMonth={selectedMonth}
+                          onYearChange={handleYearChange}
+                          onMonthChange={setSelectedMonth}
+                          onRefreshData={handleRefreshData}
+                          onRechargeClick={() => setIsRechargeModalOpen(true)}
+                          onSettlementClick={() =>
+                            setIsSettlementModalOpen(true)
+                          }
+                          onCancelClick={(amount, paymentKey) => {
+                            setSelectedCancelAmount(amount);
+                            setSelectedCancelPaymentKey(paymentKey);
+                            setIsCancelModalOpen(true);
+                          }}
+                        />
+                      </motion.div>
+                    </AnimatedTabContent>
+                  </div>
+                </div>
               )}
             </section>
           </div>
         </main>
       </div>
+
+      {/* 모달들을 motion.div 완전히 밖으로 이동 */}
+      <RechargeModal
+        open={isRechargeModalOpen}
+        onClose={() => setIsRechargeModalOpen(false)}
+        currentPoints={balance.point}
+        onRefreshData={handleRefreshData}
+      />
+      <SettlementModal
+        open={isSettlementModalOpen}
+        onClose={() => setIsSettlementModalOpen(false)}
+        currentMoney={balance.money}
+        onSettlementSuccess={(amount, type) => {
+          console.log('정산 성공:', amount, type);
+          setIsSettlementModalOpen(false);
+          handleRefreshData?.();
+        }}
+      />
+      <CancelModal
+        open={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        amount={selectedCancelAmount}
+        paymentKey={selectedCancelPaymentKey}
+        onCancelSuccess={(amount: number) => {
+          console.log('취소 성공:', amount);
+          setIsCancelModalOpen(false);
+        }}
+        onRefreshData={handleRefreshData}
+      />
     </div>
   );
 }

@@ -23,6 +23,7 @@ export default function TabNavigation({
   activeTextColor = 'text-midnight-black dark:text-white',
   inactiveTextColor = 'text-gray-400 dark:text-gray-500',
   underlineColor = 'bg-midnight-black dark:bg-white',
+  disableDrag = false,
 }: TabNavigationProps) {
   const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
   const tabWidth = 100 / tabs.length;
@@ -34,22 +35,26 @@ export default function TabNavigation({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 터치/마우스 이벤트 핸들러
-  const handleStart = useCallback((clientX: number) => {
-    setIsDragging(true);
-    setStartX(clientX);
-    setCurrentX(clientX);
-  }, []);
+  const handleStart = useCallback(
+    (clientX: number) => {
+      if (disableDrag) return;
+      setIsDragging(true);
+      setStartX(clientX);
+      setCurrentX(clientX);
+    },
+    [disableDrag]
+  );
 
   const handleMove = useCallback(
     (clientX: number) => {
-      if (!isDragging) return;
+      if (!isDragging || disableDrag) return;
       setCurrentX(clientX);
     },
-    [isDragging]
+    [isDragging, disableDrag]
   );
 
   const handleEnd = useCallback(() => {
-    if (!isDragging) return;
+    if (!isDragging || disableDrag) return;
 
     const deltaX = currentX - startX;
     const threshold = 50; // 스와이프 감지 임계값
@@ -65,7 +70,15 @@ export default function TabNavigation({
     }
 
     setIsDragging(false);
-  }, [isDragging, currentX, startX, activeIndex, tabs, onTabChange]);
+  }, [
+    isDragging,
+    currentX,
+    startX,
+    activeIndex,
+    tabs,
+    onTabChange,
+    disableDrag,
+  ]);
 
   // 터치 이벤트 핸들러
   const handleTouchStart = useCallback(

@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 
 import { ApiResponse } from '../types/api';
-        
+
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { TradingHistoryCard } from './TradingHistoryCard';
 import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
@@ -105,7 +104,7 @@ export default function TradingHistoryPage({
     },
     threshold: 50,
   });
-  
+
   // 슬라이드 관련 상태
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -593,6 +592,7 @@ export default function TradingHistoryPage({
                   activeTextColor={`text-${theme.primaryColorClass}-600`}
                   inactiveTextColor="text-gray-500"
                   underlineColor={`bg-${theme.primaryColorClass}-600`}
+                  disableDrag={true}
                 />
 
                 {/* 거래 내역 리스트 */}
@@ -645,6 +645,7 @@ export default function TradingHistoryPage({
                                 getStatusText={getStatusText}
                                 partnerNickname={item.partnerNickname}
                                 partnerFavorite={item.partnerFavorite}
+                                isDragging={isDragging}
                               />
                             ))}
                           </div>

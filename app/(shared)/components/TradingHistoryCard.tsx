@@ -35,6 +35,7 @@ interface TradingHistoryCardProps {
   getStatusText: (status: string) => string;
   partnerNickname: string;
   partnerFavorite: boolean;
+  isDragging?: boolean;
 }
 
 export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
@@ -47,6 +48,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
   getStatusText,
   partnerNickname,
   partnerFavorite,
+  isDragging = false,
 }) => {
   return (
     <div
@@ -54,7 +56,10 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
       role="listitem"
       tabIndex={0}
       className={`bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
-      onClick={() => onCardClick(item)}
+      onClick={() => {
+        if (isDragging) return;
+        onCardClick(item);
+      }}
       onKeyDown={(e) => onCardKeyDown(e, item)}
       aria-label={`${item.carrier} ${item.dataAmount}GB ${isPurchase ? '구매' : '판매'} 내역 - ${new Date(item.createdAt).toLocaleDateString('ko-KR')} - ${item.priceGb.toLocaleString()}원 - ${getStatusText(item.status)}`}
     >
