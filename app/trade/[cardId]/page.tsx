@@ -40,9 +40,9 @@ export default async function TradePage({ params }: TradePageProps) {
   } catch (error) {
     console.error('카드 정보 가져오기 실패:', error);
     console.error('에러 상세 정보:', {
-      status: (error as any)?.response?.status,
-      data: (error as any)?.response?.data,
-      message: (error as any)?.message,
+      status: (error as { response?: { status: number } })?.response?.status,
+      data: (error as { response?: { data: unknown } })?.response?.data,
+      message: (error as { message?: string })?.message,
     });
     notFound();
   }
