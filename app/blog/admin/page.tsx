@@ -168,7 +168,7 @@ function BlogAdminFormComponent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full" />
-        <span className="ml-4 text-gray-600 text-lg">
+        <span className="ml-4 text-gray-600 dark:text-gray-100 text-lg">
           포스트를 불러오는 중...
         </span>
       </div>
