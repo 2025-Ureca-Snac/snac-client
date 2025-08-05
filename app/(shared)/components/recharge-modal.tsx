@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 export default function RechargeModal({
   open,
   onClose,
-  currentPoints,
+  currentMoney,
   shortage,
   onRefreshData,
 }: RechargeModalProps) {
@@ -22,6 +22,7 @@ export default function RechargeModal({
 
   // 디버깅용 로그
   console.log('RechargeModal shortage:', shortage);
+  console.log('RechargeModal currentMoney:', currentMoney);
 
   // 모달이 열릴 때마다 선택 상태 초기화
   useEffect(() => {
@@ -37,6 +38,23 @@ export default function RechargeModal({
       }
     }
   }, [open, shortage]);
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && open) {
+        onClose();
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open, onClose]);
 
   // 결제 결과 메시지 처리
   useEffect(() => {
@@ -204,7 +222,25 @@ export default function RechargeModal({
               value={selectedAmount || ''}
               onChange={(e) => {
                 const value = parseInt(e.target.value);
-                setSelectedAmount(value || null);
+                // 음수나 0 이하 값은 null로 설정
+                if (value && value > 0) {
+                  setSelectedAmount(value);
+                } else {
+                  setSelectedAmount(null);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  if (!selectedAmount) {
+                    toast.error('충전할 금액을 입력해주세요.');
+                    return;
+                  }
+                  if (selectedAmount < 1000) {
+                    toast.error('최소 1,000원부터 충전 가능합니다.');
+                    return;
+                  }
+                  handleRecharge();
+                }
               }}
               placeholder="충전할 금액을 입력하세요"
               className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -225,7 +261,7 @@ export default function RechargeModal({
               <span className="text-gray-700">현재 스낵머니</span>
               <div className="flex items-center">
                 <span className="font-medium text-gray-900">
-                  {formatNumber(currentPoints)}
+                  {formatNumber(currentMoney)}
                 </span>
                 <Image
                   src="/snac-price.svg"
@@ -243,7 +279,7 @@ export default function RechargeModal({
                 <span className="text-gray-700">예상 충전 후 스낵머니</span>
                 <div className="flex items-center">
                   <span className="font-bold text-gray-900">
-                    {formatNumber(currentPoints + selectedAmount)}
+                    {formatNumber(currentMoney + selectedAmount)}
                   </span>
                   <Image
                     src="/snac-price.svg"

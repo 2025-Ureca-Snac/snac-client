@@ -59,6 +59,23 @@ export default function SettlementModal({
     }
   }, [open]);
 
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && open) {
+        onClose();
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open, onClose]);
+
   // 은행 목록 조회
   const fetchBanks = async () => {
     try {
@@ -441,9 +458,15 @@ export default function SettlementModal({
                 type="number"
                 id="amount"
                 value={formData.amount || ''}
-                onChange={(e) =>
-                  handleInputChange('amount', parseInt(e.target.value) || 0)
-                }
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  // 음수나 0 이하 값은 0으로 설정
+                  if (value && value > 0) {
+                    handleInputChange('amount', value);
+                  } else {
+                    handleInputChange('amount', 0);
+                  }
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="정산할 금액을 입력하세요"
                 min="1000"

@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
+import { useSwipeNavigation } from '@/app/(shared)/hooks/useSwipeNavigation';
 
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import { api, handleApiError } from '@/app/(shared)/utils/api';
@@ -87,11 +88,6 @@ function PointPageContent() {
   // 무한 로딩 방지를 위한 ref
   const isLoadingRef = useRef(false);
 
-  // 드래그 상태 관리
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [currentX, setCurrentX] = useState(0);
-
   // 모달 상태 관리
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
   const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
@@ -99,36 +95,6 @@ function PointPageContent() {
   const [selectedCancelAmount, setSelectedCancelAmount] = useState<number>(0);
   const [selectedCancelPaymentKey, setSelectedCancelPaymentKey] =
     useState<string>('');
-
-  // 슬라이드 방향 계산
-  const getSlideDirection = () => {
-    const deltaX = currentX - startX;
-    if (Math.abs(deltaX) < 10) return null;
-    return deltaX > 0 ? 'right' : 'left';
-  };
-
-  // 슬라이드 방향에 따른 애니메이션 설정
-  const getSlideAnimation = () => {
-    const deltaX = currentX - startX;
-
-    if (Math.abs(deltaX) < 10) return { x: 0 };
-
-    if (deltaX > 0) {
-      // 오른쪽으로 슬라이드 - 현재 화면이 오른쪽으로 나감
-      const progress = Math.min(Math.abs(deltaX) / 100, 1);
-      return {
-        x: Math.min(deltaX * 0.5, 150), // 더 민감한 이동
-        opacity: 1 - progress * 0.2, // 약간 투명해짐
-      };
-    } else {
-      // 왼쪽으로 슬라이드 - 현재 화면이 왼쪽으로 나감
-      const progress = Math.min(Math.abs(deltaX) / 100, 1);
-      return {
-        x: Math.max(deltaX * 0.5, -150), // 더 민감한 이동
-        opacity: 1 - progress * 0.2, // 약간 투명해짐
-      };
-    }
-  };
 
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
@@ -405,96 +371,22 @@ function PointPageContent() {
     window.history.pushState({}, '', url.toString());
   }, []);
 
-  // 드래그 시작 핸들러
-  const handleDragStart = useCallback((clientX: number) => {
-    setIsDragging(true);
-    setStartX(clientX);
-    setCurrentX(clientX);
-  }, []);
-
-  // 드래그 이동 핸들러
-  const handleDragMove = useCallback(
-    (clientX: number) => {
-      if (isDragging) {
-        setCurrentX(clientX);
-      }
-    },
-    [isDragging]
-  );
-
-  // 드래그 종료 핸들러
-  const handleDragEnd = useCallback(() => {
-    if (!isDragging) return;
-
-    const deltaX = currentX - startX;
-    const threshold = 60; // 임계값을 낮춤
-
-    if (Math.abs(deltaX) > threshold) {
-      if (deltaX > 0 && activeTab === 'MONEY') {
-        // 오른쪽으로 드래그 - POINT로
-        handleTabChange('POINT');
-      } else if (deltaX < 0 && activeTab === 'POINT') {
-        // 왼쪽으로 드래그 - MONEY로
+  // 스와이프 네비게이션 훅
+  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (activeTab === 'POINT') {
+        console.log('Swiping left to MONEY');
         handleTabChange('MONEY');
       }
-    }
-
-    setIsDragging(false);
-    setStartX(0);
-    setCurrentX(0);
-  }, [isDragging, currentX, startX, activeTab, handleTabChange]);
-
-  // 터치 이벤트 핸들러
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      e.preventDefault();
-      handleDragStart(e.touches[0].clientX);
     },
-    [handleDragStart]
-  );
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (isDragging) {
-        e.preventDefault();
+    onSwipeRight: () => {
+      if (activeTab === 'MONEY') {
+        console.log('Swiping right to POINT');
+        handleTabChange('POINT');
       }
-      handleDragMove(e.touches[0].clientX);
     },
-    [handleDragMove, isDragging]
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    handleDragEnd();
-  }, [handleDragEnd]);
-
-  // 마우스 이벤트 핸들러
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      handleDragStart(e.clientX);
-    },
-    [handleDragStart]
-  );
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (isDragging) {
-        e.preventDefault();
-      }
-      handleDragMove(e.clientX);
-    },
-    [handleDragMove, isDragging]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    handleDragEnd();
-  }, [handleDragEnd]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (isDragging) {
-      handleDragEnd();
-    }
-  }, [isDragging, handleDragEnd]);
+    threshold: 50,
+  });
 
   const tabs = useMemo(
     () => [
@@ -512,44 +404,50 @@ function PointPageContent() {
         <div className="flex items-center gap-2 mb-4">
           <Link
             href="/mypage"
-            className="text-gray-500 hover:text-gray-700 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
             마이페이지
           </Link>
-          <span className="text-gray-400" aria-hidden="true">
+          <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">
             /
           </span>
-          <span className="text-gray-900 font-medium">포인트 • 머니</span>
+          <span className="text-gray-900 dark:text-white font-medium">
+            포인트 • 머니
+          </span>
         </div>
       </nav>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">포인트 • 머니</h1>
-        <p className="text-gray-600 text-lg">스낵 포인트와 머니를 관리하세요</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          포인트 • 머니
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 text-lg">
+          스낵 포인트와 머니를 관리하세요
+        </p>
       </div>
 
       {/* 요약 카드 */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <img src="/snac-price.svg" alt="스낵 포인트" className="w-5 h-5" />
-            <span className="text-sm font-medium text-blue-700">
+            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
               스낵 포인트
             </span>
           </div>
-          <div className="text-2xl font-bold text-blue-900">
+          <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
             {balance.point?.toLocaleString()}P
           </div>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <img src="/snac-price.svg" alt="스낵 머니" className="w-5 h-5" />
-            <span className="text-sm font-medium text-green-700">
+            <span className="text-sm font-medium text-green-700 dark:text-green-300">
               스낵 머니
             </span>
           </div>
-          <div className="text-2xl font-bold text-green-900">
+          <div className="text-2xl font-bold text-green-900 dark:text-green-100">
             {balance.money?.toLocaleString()}S
           </div>
         </div>
@@ -562,25 +460,25 @@ function PointPageContent() {
     <div className="md:hidden mb-6">
       {/* 요약 카드 */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <img src="/snac-price.svg" alt="스낵 포인트" className="w-4 h-4" />
-            <span className="text-xs font-medium text-blue-700">
+            <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
               스낵 포인트
             </span>
           </div>
-          <div className="text-lg font-bold text-blue-900">
+          <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
             {balance.point?.toLocaleString()}P
           </div>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <img src="/snac-price.svg" alt="스낵 머니" className="w-4 h-4" />
-            <span className="text-xs font-medium text-green-700">
+            <span className="text-xs font-medium text-green-700 dark:text-green-300">
               스낵 머니
             </span>
           </div>
-          <div className="text-lg font-bold text-green-900">
+          <div className="text-lg font-bold text-green-900 dark:text-green-100">
             {balance.money?.toLocaleString()}S
           </div>
         </div>
@@ -590,7 +488,7 @@ function PointPageContent() {
 
   // 로딩 컴포넌트
   const LoadingState = () => (
-    <div className="bg-white rounded-lg shadow-sm border">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <div className="p-6">
         <div className="space-y-4">
           {[...Array(3)].map((_, index) => (
@@ -598,10 +496,10 @@ function PointPageContent() {
               key={index}
               className="flex items-center gap-3 p-3 animate-pulse"
             >
-              <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-32"></div>
-                <div className="h-3 bg-gray-200 rounded w-20"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
               </div>
             </div>
           ))}
@@ -631,7 +529,7 @@ function PointPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
@@ -668,25 +566,30 @@ function PointPageContent() {
                   />
 
                   {/* 스와이프 가능한 콘텐츠 영역 */}
-                  <div className="bg-white rounded-lg shadow-sm border">
-                    <AnimatedTabContent
-                      tabKey={activeTab}
-                      slideDirection={getSlideDirection()}
-                    >
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <AnimatedTabContent tabKey={activeTab}>
                       <motion.div
                         className="select-none overflow-hidden"
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseLeave}
-                        animate={
-                          isDragging
-                            ? getSlideAnimation()
-                            : { x: 0, opacity: 1 }
-                        }
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.2}
+                        onTouchStart={onTouchStart}
+                        onTouchEnd={onTouchEnd}
+                        onDragEnd={(event, info) => {
+                          const deltaX = info.offset.x;
+                          const threshold = 100; // PC에서는 더 큰 임계값
+
+                          if (Math.abs(deltaX) > threshold) {
+                            if (deltaX > 0 && activeTab === 'MONEY') {
+                              console.log('PC drag right to POINT');
+                              handleTabChange('POINT');
+                            } else if (deltaX < 0 && activeTab === 'POINT') {
+                              console.log('PC drag left to MONEY');
+                              handleTabChange('MONEY');
+                            }
+                          }
+                        }}
+                        animate={{ x: 0, opacity: 1 }}
                         transition={{
                           type: 'spring',
                           stiffness: 200,
@@ -734,7 +637,7 @@ function PointPageContent() {
       <RechargeModal
         open={isRechargeModalOpen}
         onClose={() => setIsRechargeModalOpen(false)}
-        currentPoints={balance.point}
+        currentMoney={balance.money}
         onRefreshData={handleRefreshData}
       />
       <SettlementModal

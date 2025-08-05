@@ -31,6 +31,36 @@ export default function CancelModal({
   const [customReason, setCustomReason] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  // 모달이 열릴 때마다 초기화
+  React.useEffect(() => {
+    if (open) {
+      setReason('');
+      setCustomReason('');
+      setShowConfirmModal(false);
+    }
+  }, [open]);
+
+  // ESC 키로 모달 닫기
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && open) {
+        if (showConfirmModal) {
+          setShowConfirmModal(false);
+        } else {
+          onClose();
+        }
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [open, showConfirmModal, onClose]);
+
   const handleCancel = async () => {
     if (!reason.trim()) {
       toast.error('취소 사유를 선택해주세요.');
@@ -44,6 +74,10 @@ export default function CancelModal({
 
     // 확인 모달 표시
     setShowConfirmModal(true);
+  };
+
+  const handleBack = () => {
+    setShowConfirmModal(false);
   };
 
   const handleConfirmCancel = async () => {
@@ -154,20 +188,13 @@ export default function CancelModal({
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3">
+          <div className="flex justify-center">
             <button
               onClick={handleCancel}
               disabled={isLoading}
-              className="flex-[4] px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
             >
               {isLoading ? '처리 중...' : '취소'}
-            </button>
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="flex-[1] px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              취소
             </button>
           </div>
         </div>
@@ -192,16 +219,16 @@ export default function CancelModal({
                 <button
                   onClick={handleConfirmCancel}
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-8 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
                 >
                   {isLoading ? '처리 중...' : '확인'}
                 </button>
                 <button
-                  onClick={() => setShowConfirmModal(false)}
+                  onClick={handleBack}
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
                 >
-                  취소
+                  뒤로
                 </button>
               </div>
             </div>

@@ -55,7 +55,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
       key={item.tradeId}
       role="listitem"
       tabIndex={0}
-      className={`bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
+      className={`bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
       onClick={() => {
         if (isDragging) return;
         onCardClick(item);
@@ -65,7 +65,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
     >
       {/* 아이콘 */}
       <div
-        className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
+        className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
         aria-hidden="true"
       >
         <Image
@@ -79,10 +79,10 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
 
       {/* 내용 */}
       <div className="flex-1">
-        <div className="text-sm text-gray-500 mb-1">
+        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
           {new Date(item.createdAt).toLocaleDateString('ko-KR')}
         </div>
-        <div className="font-semibold text-gray-900 mb-1">
+        <div className="font-semibold text-gray-900 dark:text-white mb-1">
           {item.carrier} {item.dataAmount}GB
         </div>
         <div className="flex items-center gap-2 mb-2">
@@ -113,7 +113,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
               ? '취소 접수'
               : getStatusText(item.status)}
           </span>
-          <span className="text-gray-900">
+          <span className="text-gray-900 dark:text-white">
             {item.priceGb.toLocaleString()}원
           </span>
         </div>
@@ -122,13 +122,15 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
         {partnerNickname && (
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
-              <span className="text-xs text-gray-500">거래자:</span>
-              <span className="text-xs font-medium text-gray-700">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                거래자:
+              </span>
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {partnerNickname}
               </span>
             </div>
             {partnerFavorite && (
-              <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-medium">
+              <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium">
                 단골
               </span>
             )}
