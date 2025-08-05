@@ -60,7 +60,7 @@ export default function StructuredData({ cardData }: StructuredDataProps) {
           '@type': 'ListItem',
           position: 2,
           name: '카드 목록',
-          item: 'https://snac-app.com',
+          item: 'https://snac-app.com/cards',
         },
         {
           '@type': 'ListItem',

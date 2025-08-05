@@ -89,8 +89,7 @@ export async function generateMetadata({
         },
       },
       verification: {
-        google: 'your-google-verification-code',
-        // naver: 'your-naver-verification-code',
+        google: 'ZyDbxMLQ1UsdJrNj45pOk18xpt7KQNivFtcYjfW74Go',
       },
       other: {
         'article:published_time': cardData.createdAt,

@@ -13,14 +13,16 @@ import BlogStructuredData from '../components/BlogStructuredData';
 import { generateBlogPostMetadata } from '../metadata';
 import { getPost } from './utils';
 
-// Props 인터페이스
-interface Props {
+// generateMetadata용 Props 인터페이스
+interface GenerateMetadataProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // generateMetadata 함수 - SEO 최적화
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: GenerateMetadataProps): Promise<Metadata> {
   const { id } = await params;
   const post = await getPost(id);
 
@@ -39,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // 메인 페이지 컴포넌트
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({ params }: GenerateMetadataProps) {
   const { id } = await params;
   const post = await getPost(id);
 

@@ -1,21 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DataItemCard } from '../(shared)/components/DataItemCard';
-import { isToday } from '@/app/(shared)/utils/';
+
+import { CardData } from '../(shared)/types/card';
 import { PriceUnit } from '@/app/(shared)/types';
+import { DataItemCard } from '../(shared)/components/DataItemCard';
 import TradeConfirmationModal from '../(shared)/components/TradeConfirmationModal';
+import {
+  getCarrierImageUrl,
+  formatCarrierName,
+} from '../(shared)/utils/carrier-utils';
+import { isToday } from '@/app/(shared)/utils/';
 
 interface HomeSectionProps {
   cards: CardData[];
   unit: PriceUnit;
 }
-
-import {
-  getCarrierImageUrl,
-  formatCarrierName,
-} from '../(shared)/utils/carrier-utils';
-import { CardData } from '../(shared)/types/card';
 
 // const formatDataAmount = (amountInMB: number): string =>
 //   amountInMB >= 1024 && amountInMB % 1024 === 0

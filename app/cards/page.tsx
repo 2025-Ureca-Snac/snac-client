@@ -204,6 +204,7 @@ export default function CardsPage() {
         setTotalPages(json.data.hasNext ? pageIdx + 2 : pageIdx + 1);
       } catch (e) {
         console.error('카드 조회 실패:', e);
+
         setCardPages((prev) => {
           const next = [...prev];
           next[pageIdx] = [];
@@ -224,6 +225,7 @@ export default function CardsPage() {
     priceRange,
     sortBy,
     carrier,
+    postView,
   ]);
 
   const handlePageChange = (page: number) => {

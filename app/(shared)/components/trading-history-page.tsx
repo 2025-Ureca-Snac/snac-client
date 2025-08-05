@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import SideMenu from './SideMenu';
-import TabNavigation from './TabNavigation';
-import AnimatedTabContent from './AnimatedTabContent';
-import HistoryDetailModal from './HistoryDetailModal';
-import { TradingHistoryCard } from './TradingHistoryCard';
+import Link from 'next/link';
+
+import { ApiResponse } from '../types/api';
 import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
-import { ApiResponse } from '../types/api';
-import Link from 'next/link';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
+import AnimatedTabContent from './AnimatedTabContent';
+import HistoryDetailModal from './HistoryDetailModal';
+import SideMenu from './SideMenu';
+import TabNavigation from './TabNavigation';
+import { TradingHistoryCard } from './TradingHistoryCard';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {

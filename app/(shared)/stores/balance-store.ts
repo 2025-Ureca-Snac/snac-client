@@ -20,7 +20,7 @@ export const useBalanceStore = create<BalanceState>((set) => ({
       const response =
         await api.get<ApiResponse<BalanceResponse>>('/wallets/summary');
       set({ balance: response.data.data, isLoading: false });
-    } catch (e) {
+    } catch {
       set({ error: '잔액 조회 실패', isLoading: false });
     }
   },

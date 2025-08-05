@@ -10,6 +10,7 @@ import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 import { AuthState } from '@/app/(shared)/types/auth-store';
 
 import ActionButtons from './components/action-buttons';
+import { ConfirmationModal } from '@/app/(shared)/components/ConfirmationModal';
 
 interface TradePageClientProps {
   cardData: CardData;
@@ -19,6 +20,7 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const loggedInUser = useAuthStore((state: AuthState) => state.user);
 
   const handleConfirm = async () => {
@@ -86,52 +88,56 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
         setIsProcessing(false);
       }
     } else {
-      const confirmed = window.confirm('판매하시겠습니까?');
-      if (confirmed) {
-        setError(null);
-        setIsProcessing(true);
-
-        try {
-          console.log('판매 확정 요청 시작:', cardData);
-          // 판매 확정 API 요청
-          const response = await api.post(`/trades/buy/accept`, {
-            cardId: cardData.id,
-          });
-
-          console.log('판매 확정 응답:', response.data);
-
-          // 성공 시 판매 내역 페이지로 이동
-          const responseData = response.data as { data: { tradeId?: string } };
-          console.log('판매 확정 응답:', responseData);
-          if (responseData && responseData.data.tradeId) {
-            router.push(`/mypage/sales-history/${responseData.data.tradeId}`);
-          } else {
-            setError('거래 ID를 받지 못했습니다.');
-          }
-        } catch (error) {
-          console.error('판매 확정 요청 실패:', error);
-
-          const status = (error as { response?: { status: number } })?.response
-            ?.status;
-
-          if (status === 401) {
-            toast.error('로그인 후 이용이 가능합니다.');
-            router.push('/login');
-            return;
-          }
-
-          const errorMessage = (
-            error as { response?: { data: { message: string } } }
-          )?.response?.data.message;
-
-          setError(
-            errorMessage || '판매 확정에 실패했습니다. 다시 시도해주세요.'
-          );
-        } finally {
-          setIsProcessing(false);
-        }
-      }
+      setShowConfirmModal(true);
     }
+  };
+
+  const handleConfirmSale = async () => {
+    setShowConfirmModal(false);
+    setError(null);
+    setIsProcessing(true);
+
+    try {
+      console.log('판매 확정 요청 시작:', cardData);
+      // 판매 확정 API 요청
+      const response = await api.post(`/trades/buy/accept`, {
+        cardId: cardData.id,
+      });
+
+      console.log('판매 확정 응답:', response.data);
+
+      // 성공 시 판매 내역 페이지로 이동
+      const responseData = response.data as { data: { tradeId?: string } };
+      console.log('판매 확정 응답:', responseData);
+      if (responseData && responseData.data.tradeId) {
+        router.push(`/mypage/sales-history/${responseData.data.tradeId}`);
+      } else {
+        setError('거래 ID를 받지 못했습니다.');
+      }
+    } catch (error) {
+      console.error('판매 확정 요청 실패:', error);
+
+      const status = (error as { response?: { status: number } })?.response
+        ?.status;
+
+      if (status === 401) {
+        toast.error('로그인 후 이용이 가능합니다.');
+        router.push('/login');
+        return;
+      }
+
+      const errorMessage = (
+        error as { response?: { data: { message: string } } }
+      )?.response?.data.message;
+
+      setError(errorMessage || '판매 확정에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCancelSale = () => {
+    setShowConfirmModal(false);
   };
 
   const handleCancel = () => {
@@ -139,12 +145,23 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
   };
 
   return (
-    <ActionButtons
-      cardInfo={cardData}
-      isProcessing={isProcessing}
-      error={error}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
-    />
+    <>
+      <ActionButtons
+        cardInfo={cardData}
+        isProcessing={isProcessing}
+        error={error}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        title="판매 확정"
+        message="판매하시겠습니까?"
+        confirmText="판매"
+        cancelText="취소"
+        onConfirm={handleConfirmSale}
+        onCancel={handleCancelSale}
+      />
+    </>
   );
 }

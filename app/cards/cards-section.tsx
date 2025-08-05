@@ -2,20 +2,20 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { DataItemCard } from '@/app/(shared)/components/DataItemCard';
-import { isToday } from '@/app/(shared)/utils/';
+
+import { CardData } from '@/app/(shared)/types/card';
 import { PriceUnit } from '@/app/(shared)/types';
+import { DataItemCard } from '@/app/(shared)/components/DataItemCard';
+import {
+  getCarrierImageUrl,
+  formatCarrierName,
+} from '@/app/(shared)/utils/carrier-utils';
+import { isToday } from '@/app/(shared)/utils/';
 
 interface CardsSectionProps {
   cards: CardData[];
   unit: PriceUnit;
 }
-
-import {
-  getCarrierImageUrl,
-  formatCarrierName,
-} from '@/app/(shared)/utils/carrier-utils';
-import { CardData } from '@/app/(shared)/types/card';
 
 export default function CardsSection({ cards, unit }: CardsSectionProps) {
   const router = useRouter();
