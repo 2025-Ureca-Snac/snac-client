@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useMemo } from 'react'; // useMemo 추가
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
@@ -20,7 +20,6 @@ import type {
 } from '@/app/(shared)/utils/generateQueryParams';
 import { CreateButton } from '@/app/(shared)/components/CreateButton';
 
-// ... (CardApiResponse, JwtPayload 인터페이스 및 유틸리티 함수들은 기존과 동일)
 interface CardApiResponse {
   data: {
     hasNext: boolean;
@@ -32,8 +31,6 @@ interface JwtPayload {
   username: string;
   [key: string]: unknown;
 }
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const getCurrentUserEmail = (): string | null => {
   try {
@@ -72,7 +69,6 @@ const filterCardsByPostView = (
 };
 
 const sortCards = (cards: CardData[], sortBy: string): CardData[] => {
-  // 새로운 배열을 만들어 정렬 (원본 배열 보존)
   const sorted = [...cards];
   if (sortBy === 'RATING') {
     return sorted.sort((a, b) => {
@@ -91,7 +87,6 @@ const sortCards = (cards: CardData[], sortBy: string): CardData[] => {
 export default function HomePage() {
   useWebSocketGuard();
 
-  // [수정] 전체 카드 목록을 저장할 상태
   const [allCards, setAllCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,11 +106,10 @@ export default function HomePage() {
 
   const PAGE_SIZE = 20;
 
-  // [수정] 필터가 변경될 때마다 모든 데이터를 다시 불러오는 로직
   useEffect(() => {
     const fetchAllCards = async () => {
       setLoading(true);
-      setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
+      setCurrentPage(1);
       let accumulatedCards: CardData[] = [];
       let hasNext = true;
       let lastCardId: number | undefined = undefined;
@@ -133,7 +127,7 @@ export default function HomePage() {
         try {
           const queryString = generateQueryParams({
             cardCategory: cardCategory,
-            // [중요] API 파라미터에 정확한 거래 상태를 전달
+
             sellStatusFilter: transactionStatus as SellStatus,
             priceRanges: [priceRange],
             highRatingFirst,
@@ -141,7 +135,7 @@ export default function HomePage() {
             lastCardId,
             lastUpdatedAt,
             carrier: carrierForQuery,
-            favoriteOnly: postView === 'FAVORITE_POSTS', // [개선] API가 지원하면 즐겨찾기 필터링도 서버에서 처리
+            favoriteOnly: postView === 'FAVORITE_POSTS',
           });
 
           const endpoint = `/cards/scroll?${queryString}`;
@@ -164,7 +158,7 @@ export default function HomePage() {
           }
         } catch (error) {
           console.error('전체 카드 조회 중 오류 발생:', error);
-          hasNext = false; // 오류 발생 시 반복 중단
+          hasNext = false;
         }
       }
       setAllCards(accumulatedCards);
@@ -183,9 +177,8 @@ export default function HomePage() {
   ]);
 
   const filteredAndSortedCards = useMemo(() => {
-    // 'MY_POSTS'는 API에서 필터링할 수 없으므로 클라이언트에서 처리
     const cardsToProcess = filterCardsByPostView(allCards, postView);
-    // 정렬
+
     return sortCards(cardsToProcess, sortBy);
   }, [allCards, postView, sortBy]);
 
