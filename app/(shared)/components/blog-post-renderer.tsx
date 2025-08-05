@@ -23,7 +23,7 @@ export default async function BlogPostRenderer({
         });
         return (
           <div
-            className="prose prose-lg max-w-none"
+            className="prose prose-lg max-w-none dark:prose-invert"
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         );
@@ -55,7 +55,7 @@ export default async function BlogPostRenderer({
         if (post.content) {
           return (
             <div
-              className="text-gray-700 dark:text-gray-100  leading-relaxed"
+              className="prose prose-lg max-w-none dark:prose-invert leading-relaxed"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           );
@@ -64,7 +64,7 @@ export default async function BlogPostRenderer({
             ? await post.markdownContent
             : '';
           return (
-            <div className="text-gray-700  dark:text-gray-100 leading-relaxed whitespace-pre-wrap">
+            <div className="text-gray-700 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">
               {markdownContent}
             </div>
           );
@@ -158,9 +158,5 @@ export default async function BlogPostRenderer({
     );
   };
 
-  return (
-    <div className="prose prose-lg max-w-none">
-      {await renderContentWithImages()}
-    </div>
-  );
+  return <div>{await renderContentWithImages()}</div>;
 }
