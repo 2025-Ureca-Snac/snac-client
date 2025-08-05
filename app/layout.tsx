@@ -33,6 +33,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <meta
+          name="google-site-verification"
+          content="ZyDbxMLQ1UsdJrNj45pOk18xpt7KQNivFtcYjfW74Go"
+        />
+      </head>
       <WwwRedirect />
       <body className={`${notoSansKr.className} antialiased`}>
         <ThemeProvider>
