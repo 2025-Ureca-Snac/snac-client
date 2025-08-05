@@ -28,6 +28,7 @@ interface DataItemCardProps {
   cardId?: number;
   carrier?: string;
   dataAmount?: number;
+  skipLoginCheck?: boolean; // 로그인 체크를 건너뛸지 여부
 }
 
 export const DataItemCard = ({
@@ -47,6 +48,7 @@ export const DataItemCard = ({
   cardId,
   carrier,
   dataAmount,
+  skipLoginCheck = false,
 }: DataItemCardProps) => {
   const loggedInUser = useAuthStore((state: AuthState) => state.user);
   const { actions } = useHomeStore();
@@ -140,8 +142,8 @@ export const DataItemCard = ({
                 return;
               }
 
-              // 로그인 상태 확인
-              if (!loggedInUser) {
+              // 로그인 상태 확인 (skipLoginCheck가 true면 건너뛰기)
+              if (!skipLoginCheck && !loggedInUser) {
                 toast.error('로그인 해주세요.');
                 router.push('/login');
                 return;

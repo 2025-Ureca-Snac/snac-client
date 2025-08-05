@@ -3,10 +3,19 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import type { HistoryDetailModalProps } from '../types/history-detail-modal';
-import type { SendDataResponse } from '../types/api';
-import api from '../utils/api';
+
 import { API_STATUS, UPLOAD_ERROR_MESSAGE } from '../constants/api-status';
+import { REASON_MAP } from '../constants/cancel-reasons';
+import type { SendDataResponse } from '../types/api';
+import type { HistoryDetailModalProps } from '../types/history-detail-modal';
+import api from '../utils/api';
+import { getCarrierImageUrl } from '../utils/carrier-utils';
+import {
+  getHistoryStatusText,
+  getHistoryStatusColor,
+} from '../utils/history-status';
+import { getProgressSteps } from '../utils/progress-steps-utils';
+import ProgressStepsDetail from './progress-steps-detail';
 
 // 첨부 이미지 URL 응답 타입 정의
 interface AttachmentUrlResponse {
@@ -16,14 +25,6 @@ interface AttachmentUrlResponse {
   message: string;
   timestamp: string;
 }
-import {
-  getHistoryStatusText,
-  getHistoryStatusColor,
-} from '../utils/history-status';
-import { getCarrierImageUrl } from '../utils/carrier-utils';
-import ProgressStepsDetail from './progress-steps-detail';
-import { getProgressSteps } from '../utils/progress-steps-utils';
-import { REASON_MAP } from '../constants/cancel-reasons';
 import { DataUploadSection } from './DataUploadSection';
 // 취소 사유를 한글로 변환하는 함수
 const getCancelReasonText = (reason: string): string => {

@@ -7,16 +7,8 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import Image from 'next/image';
-import TabNavigation from '@/app/(shared)/components/TabNavigation';
-import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
-import RechargeModal from '@/app/(shared)/components/recharge-modal';
-import SettlementModal from '@/app/(shared)/components/settlement-modal';
-import CancelModal from '@/app/(shared)/components/cancel-modal';
-import {
-  PointHistoryItem,
-  AssetType,
-} from '@/app/(shared)/types/point-history';
+
+import { PointHistoryItem } from '@/app/(shared)/types/point-history';
 import {
   PointContentProps,
   MoneyFilterType,
@@ -30,30 +22,22 @@ import {
  * @returns 포인트와 머니 거래 내역을 표시하는 컨텐츠
  */
 export default function PointContent({
-  tabs,
   activeTab,
-  setActiveTab,
   pointsHistory,
   moneyHistory,
   hasNext,
   onLoadMore,
   isLoadingMore,
-  balance,
   selectedYear,
   selectedMonth,
   onYearChange,
   onMonthChange,
-  onRefreshData,
-  isDragging = false,
+  onRechargeClick,
+  onSettlementClick,
+  onCancelClick,
 }: PointContentProps) {
   const [pointsFilter, setPointsFilter] = useState<PointFilterType>('all');
   const [moneyFilter, setMoneyFilter] = useState<MoneyFilterType>('all');
-  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
-  const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [selectedCancelAmount, setSelectedCancelAmount] = useState<number>(0);
-  const [selectedCancelPaymentKey, setSelectedCancelPaymentKey] =
-    useState<string>('');
 
   // 무한 스크롤을 위한 ref
   const observerRef = useRef<HTMLDivElement>(null);
@@ -81,26 +65,6 @@ export default function PointContent({
 
     return () => observer.disconnect();
   }, [handleObserver]);
-
-  // URL 파라미터에서 모달 타입 확인
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const modalType = urlParams.get('modal');
-
-    if (modalType === 'settlement') {
-      setIsSettlementModalOpen(true);
-      // URL에서 모달 파라미터 제거
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete('modal');
-      window.history.replaceState({}, '', newUrl.toString());
-    } else if (modalType === 'recharge') {
-      setIsRechargeModalOpen(true);
-      // URL에서 모달 파라미터 제거
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete('modal');
-      window.history.replaceState({}, '', newUrl.toString());
-    }
-  }, []);
 
   // 탭이 바뀔 때 필터 초기화
   React.useEffect(() => {
@@ -147,59 +111,85 @@ export default function PointContent({
   const PointsFilterButtons = () => (
     <div className="flex flex-wrap gap-2 mb-4">
       <button
-        onClick={() => setPointsFilter('all')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setPointsFilter('all');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === 'all'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         전체
       </button>
       <button
-        onClick={() => setPointsFilter('적립')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setPointsFilter('적립');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === '적립'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         적립
       </button>
       <button
-        onClick={() => setPointsFilter('포인트 사용')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setPointsFilter('포인트 사용');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === '포인트 사용'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         포인트 사용
       </button>
       <button
-        onClick={() => setPointsFilter('취소')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setPointsFilter('취소');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === '취소'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         취소
       </button>
 
       {/* 포인트 적립 버튼 */}
-      <button
-        onClick={() => {
-          if (isDragging) return;
+      {/* <button
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
           // TODO: 포인트 적립 기능 구현 예정
           console.log('포인트 적립 버튼 클릭');
         }}
-        disabled={isDragging}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className="ml-auto px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Image src="/snac-price.svg" alt="스낵" width={16} height={16} />
         적립
-      </button>
+      </button> */}
     </div>
   );
 
@@ -207,47 +197,77 @@ export default function PointContent({
   const MoneyFilterButtons = () => (
     <div className="flex flex-wrap gap-2 mb-4">
       <button
-        onClick={() => setMoneyFilter('all')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setMoneyFilter('all');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === 'all'
             ? 'bg-green-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         전체
       </button>
       <button
-        onClick={() => setMoneyFilter('충전')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setMoneyFilter('충전');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '충전'
             ? 'bg-green-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         충전
       </button>
       <button
-        onClick={() => setMoneyFilter('머니 구매')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setMoneyFilter('머니 구매');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '머니 구매'
             ? 'bg-green-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         구매
       </button>
       <button
-        onClick={() => setMoneyFilter('판매')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setMoneyFilter('판매');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '판매'
             ? 'bg-green-600 text-white'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         판매
       </button>
       <button
-        onClick={() => setMoneyFilter('취소')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setMoneyFilter('취소');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '취소'
             ? 'bg-green-600 text-white'
@@ -257,7 +277,13 @@ export default function PointContent({
         취소
       </button>
       <button
-        onClick={() => setMoneyFilter('정산')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setMoneyFilter('정산');
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '정산'
             ? 'bg-green-600 text-white'
@@ -270,15 +296,25 @@ export default function PointContent({
       {/* 머니 충전 및 정산 버튼 */}
       <div className="ml-auto flex gap-2">
         <button
-          onClick={() => !isDragging && setIsRechargeModalOpen(true)}
-          disabled={isDragging}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onRechargeClick?.();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
           className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           충전
         </button>
         <button
-          onClick={() => !isDragging && setIsSettlementModalOpen(true)}
-          disabled={isDragging}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onSettlementClick?.();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
           className="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           정산
@@ -332,15 +368,13 @@ export default function PointContent({
           {/* 머니 탭에서 충전 내역인 경우 취소 버튼 표시 */}
           {activeTab === 'MONEY' && isPositive && item.category === '충전' && (
             <button
-              onClick={() => {
-                if (isDragging) return;
-                setSelectedCancelAmount(amount);
-                setSelectedCancelPaymentKey(
-                  item.paymentKey || item.id.toString()
-                );
-                setIsCancelModalOpen(true);
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onCancelClick?.(amount, item.paymentKey || item.id.toString());
               }}
-              disabled={isDragging}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               취소
@@ -365,7 +399,12 @@ export default function PointContent({
         <span className="text-sm font-medium text-gray-700">조회 기간:</span>
         <select
           value={selectedYear}
-          onChange={(e) => onYearChange?.(Number(e.target.value))}
+          onChange={(e) => {
+            e.stopPropagation();
+            onYearChange?.(Number(e.target.value));
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
           className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {Array.from({ length: 5 }, (_, i) => currentYear - i).map((year) => (
@@ -376,7 +415,12 @@ export default function PointContent({
         </select>
         <select
           value={selectedMonth}
-          onChange={(e) => onMonthChange?.(Number(e.target.value))}
+          onChange={(e) => {
+            e.stopPropagation();
+            onMonthChange?.(Number(e.target.value));
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
           className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {Array.from({ length: 12 }, (_, i) => i + 1)
@@ -407,8 +451,8 @@ export default function PointContent({
         {filteredPointsHistory.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             {pointsFilter === 'all'
-              ? '거래 내역이 없습니다.'
-              : '해당 카테고리의 거래 내역이 없습니다.'}
+              ? '포인트 내역이 없습니다.'
+              : '해당 카테고리의 포인트 내역이 없습니다.'}
           </div>
         ) : (
           <div>
@@ -437,8 +481,8 @@ export default function PointContent({
         {filteredMoneyHistory.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             {moneyFilter === 'all'
-              ? '거래 내역이 없습니다.'
-              : '해당 카테고리의 거래 내역이 없습니다.'}
+              ? '머니 내역이 없습니다.'
+              : '해당 카테고리의 머니 내역이 없습니다.'}
           </div>
         ) : (
           <div>
@@ -461,46 +505,8 @@ export default function PointContent({
 
   return (
     <div className="space-y-6">
-      {/* 탭 네비게이션 */}
-      <TabNavigation
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={(tabId: string) => setActiveTab(tabId as AssetType)}
-      />
-
       {/* 탭별 컨텐츠 */}
-      <AnimatedTabContent tabKey={activeTab}>
-        {activeTab === 'POINT' ? <PointsTabContent /> : <MoneyTabContent />}
-      </AnimatedTabContent>
-
-      {/* 모달들 */}
-      <RechargeModal
-        open={isRechargeModalOpen}
-        onClose={() => setIsRechargeModalOpen(false)}
-        currentPoints={balance.money}
-        onRefreshData={onRefreshData}
-      />
-      <SettlementModal
-        open={isSettlementModalOpen}
-        onClose={() => setIsSettlementModalOpen(false)}
-        currentMoney={balance.money}
-        onSettlementSuccess={(amount, type) => {
-          console.log('정산 성공:', amount, type);
-          setIsSettlementModalOpen(false);
-          onRefreshData?.();
-        }}
-      />
-      <CancelModal
-        open={isCancelModalOpen}
-        onClose={() => setIsCancelModalOpen(false)}
-        amount={selectedCancelAmount}
-        paymentKey={selectedCancelPaymentKey}
-        onCancelSuccess={(amount: number) => {
-          console.log('취소 성공:', amount);
-          setIsCancelModalOpen(false);
-        }}
-        onRefreshData={onRefreshData}
-      />
+      {activeTab === 'POINT' ? <PointsTabContent /> : <MoneyTabContent />}
     </div>
   );
 }
