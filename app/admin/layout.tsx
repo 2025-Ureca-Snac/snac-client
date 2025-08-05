@@ -32,7 +32,7 @@ function Sidebar() {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-[1020] w-64 bg-white dark:bg-gray-800 shadow-lg flex-shrink-0 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg flex-shrink-0 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
@@ -80,7 +80,7 @@ function AdminHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-[1000] flex items-center justify-between h-20 px-6 bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+    <header className="flex items-center justify-between h-20 px-6 bg-white dark:bg-gray-800 border-b dark:border-gray-700">
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
@@ -116,7 +116,7 @@ export default function AdminLayout({
 
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 z-[1010] bg-black bg-opacity-50 md:hidden"
+            className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden"
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
