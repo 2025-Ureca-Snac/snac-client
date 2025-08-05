@@ -29,6 +29,8 @@ export function getHistoryStatusText(
       return type === 'purchase' ? '구매요청' : '판매요청';
     case 'selling':
       return type === 'sales' ? '판매중' : '구매중';
+    case 'REPORTED':
+      return '신고 접수';
     default:
       return '거래 완료';
   }
@@ -61,6 +63,8 @@ export function getHistoryStatusColor(
       return type === 'sales'
         ? 'bg-green-500 text-white'
         : 'bg-red-500 text-white';
+    case 'REPORTED':
+      return 'bg-red-200 text-white';
     default:
       return 'bg-gray-500 text-white';
   }
