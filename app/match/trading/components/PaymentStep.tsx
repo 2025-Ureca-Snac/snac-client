@@ -5,6 +5,7 @@ import { useGlobalWebSocket } from '../../../(shared)/hooks/useGlobalWebSocket';
 import { api } from '../../../(shared)/utils/api';
 import { ApiResponse } from '../../../(shared)/types/api';
 import { getFinalAmount } from '../../../(shared)/utils/payment-calculations';
+import { toast } from 'sonner';
 
 interface PaymentStepProps {
   amount: number;
@@ -54,18 +55,20 @@ export default function PaymentStep({
 
   const handlePayment = async () => {
     if (!tradeId) {
-      alert('거래 ID가 없습니다.');
+      toast.error('거래 ID가 없습니다.');
       return;
     }
 
     if (!isConnected) {
-      alert('WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      toast.error(
+        'WebSocket이 연결되지 않았습니다. 잠시 후 다시 시도해주세요.'
+      );
       return;
     }
 
     // 포인트 부족 체크
     if (totalAvailable < amount) {
-      alert('보유 포인트가 부족합니다.');
+      toast.error('보유 포인트가 부족합니다.');
       return;
     }
 
@@ -102,11 +105,11 @@ export default function PaymentStep({
           onNext();
         }, 1500);
       } else {
-        alert('결제 메시지 전송에 실패했습니다.');
+        toast.error('결제 메시지 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('결제 처리 오류:', error);
-      alert('결제 처리 중 오류가 발생했습니다.');
+      toast.error('결제 처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
     }
