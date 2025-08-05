@@ -1,12 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 
-const pageLinks = [
+const ADMIN_ROLE = 'ADMIN';
+const PAGE_LINKS = [
   { name: '홈', href: '/' },
-  { name: '실시간 매칭', href: '#' },
-  { name: '마이페이지', href: '#' },
-  { name: '고객센터', href: '#' },
+  { name: '실시간 매칭', href: '/match' },
+  { name: '블로그', href: '/blog' },
+  { name: '마이페이지', href: '/mypage' },
+  { name: '문의하기', href: '/mypage/report-history' },
+  { name: '관리자', href: '/admin' },
 ];
 
 const socialLinks = [
@@ -28,12 +32,27 @@ const socialLinks = [
 ];
 
 export const DesktopFooter = () => {
+  const user = useAuthStore((state) => state.user);
+  const role = useAuthStore((state) => state.role);
+
+  const filteredPageLinks = PAGE_LINKS.filter((link) => {
+    switch (link.name) {
+      case '마이페이지':
+      case '문의하기':
+        return !!user;
+      case '관리자':
+        return !!user && role === ADMIN_ROLE;
+      default:
+        return true;
+    }
+  });
+
   return (
     <footer className="text-white bg-black md:px-[160px] pt-[80px] pb-8 px-8">
       <div className="flex justify-between">
         {/* 로고, 설명, 소셜 */}
         <div className="flex flex-col">
-          <span className="text-regular-2xl">Snac</span>
+          <span className="text-regular-2xl">SNAC</span>
           <p className="text-regular-xl pt-8">
             남는 데이터를 연결하는
             <br />
@@ -53,11 +72,11 @@ export const DesktopFooter = () => {
           <div className="space-y-10">
             <h3 className="text-medium-md text-white">페이지</h3>
             <ul className="flex flex-col gap-y-6">
-              {pageLinks.map((link) => (
+              {filteredPageLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-regular-sm text-white hover:text-gray-400"
+                    className="text-regular-sm  text-white hover:text-gray-400"
                   >
                     {link.name}
                   </Link>
@@ -65,17 +84,26 @@ export const DesktopFooter = () => {
               ))}
             </ul>
           </div>
-          {/* 회사 정보 */}
-          <div className="space-y-10">
-            <h3 className="text-medium-md text-white">회사</h3>
-            <div className="text-regular-sm text-white leading-relaxed">
-              <p>
-                06192 강남구 테헤란로M
-                <br /> 212,
+          {/* 팀소개 */}
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-medium-md font-semibold text-white hover:text-gray-400 mb-2">
+                팀원
+              </h3>
+              <span className="text-regular-sm hover:text-gray-400 text-white">
+                프론트엔드
+              </span>
+              <p className="text-regular-sm hover:text-gray-400 text-white">
+                김현훈, 양세현, 이승우
               </p>
-              <p>멀티캠퍼스 선릉</p>
-              <p>서울특별시</p>
-              <p className="pt-4">1544-9001</p>
+            </div>
+            <div>
+              <span className="text-regular-sm hover:text-gray-400 text-white">
+                백엔드
+              </span>
+              <p className="text-regular-sm hover:text-gray-400 text-white">
+                이재윤, 정동현, 정유민, 홍석준
+              </p>
             </div>
           </div>
         </div>
@@ -85,22 +113,9 @@ export const DesktopFooter = () => {
         {/* 저작권 및 약관 */}
         <div className="flex items-center gap-4 text-regular-xs text-gray-200">
           <span>Copyright © 2025 Snac. All rights reserved</span>
-          <span className="border-l border-gray-600 h-4"></span>
-          <Link
-            href="#"
-            className="text-regular-xs text-gray-500 hover:underline"
-          >
-            Privacy Policy
-          </Link>
-          <Link
-            href="#"
-            className="text-regular-xs text-gray-500 hover:underline"
-          >
-            Terms & Conditions
-          </Link>
         </div>
         {/* 결제 아이콘 */}
-        <div className="flex gap-1 pr-[190px]">
+        <div className="flex gap-1">
           <Image
             src="/tossPayment.svg"
             alt="토스페이먼츠"
