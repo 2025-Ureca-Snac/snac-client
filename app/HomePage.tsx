@@ -87,6 +87,7 @@ export default function HomePage() {
 
   const [allCards, setAllCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const {
     cardCategory,
@@ -107,6 +108,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchAllCards = async () => {
       setLoading(true);
+      setError(null);
       setCurrentPage(1);
       let accumulatedCards: CardData[] = [];
       let hasNext = true;
@@ -121,11 +123,10 @@ export default function HomePage() {
             ? 'LG'
             : (category ?? undefined);
 
-      while (hasNext) {
-        try {
+      try {
+        while (hasNext) {
           const queryString = generateQueryParams({
             cardCategory: cardCategory,
-
             sellStatusFilter: transactionStatus as SellStatus,
             priceRanges: [priceRange],
             highRatingFirst,
@@ -154,12 +155,13 @@ export default function HomePage() {
           } else {
             hasNext = false;
           }
-        } catch (error) {
-          console.error('전체 카드 조회 중 오류 발생:', error);
-          hasNext = false;
         }
+        setAllCards(accumulatedCards);
+      } catch (err) {
+        console.error('전체 카드 조회 중 오류 발생:', err);
+        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        setAllCards([]);
       }
-      setAllCards(accumulatedCards);
       setLoading(false);
     };
 
@@ -220,6 +222,7 @@ export default function HomePage() {
         <HomeLayout
           cards={currentCards}
           isLoading={loading}
+          error={error}
           currentPage={currentPage}
           totalPages={totalPages > 0 ? totalPages : 1}
           onPageChange={handlePageChange}
