@@ -25,7 +25,7 @@ export default function UserLogo() {
     <div
       className="flex justify-center items-center w-full h-64 md:w-1/2 md:h-screen"
       style={{
-        background: `linear-gradient(to bottom right, #000000 ${percent}, #384838 100%)`,
+        background: `linear-gradient(to bottom right, #1a1a1a ${percent}, #384838 100%)`,
       }}
     >
       <Link href="/">

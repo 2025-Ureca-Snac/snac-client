@@ -108,8 +108,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
 
   return (
     <>
-      <header
-        className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
+      <header className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
           isDarkmode
             ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
             : 'bg-white border-b'

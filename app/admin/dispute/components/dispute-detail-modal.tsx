@@ -11,6 +11,7 @@ interface DisputeDetailModalProps {
   onClose: () => void;
   dispute: Dispute;
 }
+
 const TYPE_LABELS: Record<string, string> = {
   PAYMENT: '결제 관련',
   ACCOUNT: '계정 관련',
@@ -125,6 +126,50 @@ export default function DisputeDetailModal({
                   : {new Date(dispute.createdAt).toLocaleDateString('ko-KR')}
                 </span>
               </div>
+
+              {/*  거래 정보 */}
+              {dispute.tradeSummary && (
+                <section className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-3 text-[1rem]">
+                    거래 정보
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-600 dark:text-gray-300">
+                        거래 ID
+                      </span>
+                      <span className="text-gray-800 dark:text-gray-100">
+                        {dispute.tradeSummary.tradeId}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-600 dark:text-gray-300">
+                        통신사
+                      </span>
+                      <span className="text-gray-800 dark:text-gray-100">
+                        {dispute.tradeSummary.carrier}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-600 dark:text-gray-300">
+                        데이터
+                      </span>
+                      <span className="text-gray-800 dark:text-gray-100">
+                        {dispute.tradeSummary.dataAmount}GB
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-600 dark:text-gray-300">
+                        GB당 가격
+                      </span>
+                      <span className="text-gray-800 dark:text-gray-100">
+                        {dispute.tradeSummary.priceGb.toLocaleString('ko-KR')}원
+                      </span>
+                    </div>
+                  </div>
+                </section>
+              )}
+
               {/* 내용 */}
               <section className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-[1rem]">
@@ -154,6 +199,7 @@ export default function DisputeDetailModal({
                     </div>
                   )}
               </section>
+
               {/* 답변 영역 */}
               {dispute.answer && (
                 <section>

@@ -11,8 +11,8 @@ export const QNA_TYPE_LABELS: Record<string, string> = {
 };
 
 export const REPORT_TYPE_LABELS: Record<string, string> = {
-  DATA_NONE: '데이터 없음',
-  DATA_PARTIAL: '데이터 일부',
+  DATA_NONE: '데이터 미전송',
+  DATA_PARTIAL: '데이터 일부 누락',
   REPORT_OTHER: '기타 신고',
 };
 
@@ -38,8 +38,8 @@ export const reportTypeFilterCategories: Array<{
   label: string;
 }> = [
   { value: 'ALL', label: '전체 유형' },
-  { value: 'DATA_NONE', label: '데이터 없음' },
-  { value: 'DATA_PARTIAL', label: '데이터 일부' },
+  { value: 'DATA_NONE', label: '데이터 미전송' },
+  { value: 'DATA_PARTIAL', label: '데이터 일부 누락' },
   { value: 'REPORT_OTHER', label: '기타 신고' },
 ];
 
@@ -52,4 +52,3 @@ export const statusFilterCategories: Array<{
   { value: 'ANSWERED', label: '답변완료' },
   { value: 'NEED_MORE', label: '자료요청' },
 ];
-
