@@ -75,7 +75,7 @@ export default function SellerStatusToggle({
         >
           {sellerInfo.isActive
             ? '구매자들이 실시간으로 거래를 신청할 수 있습니다'
-            : '거래 신청을 받지 않습니다'}
+            : '버튼을 눌러서 판매를 활성화하세요'}
         </div>
 
         {/* 활성화 상태일 때 추가 시각적 효과 */}
@@ -89,17 +89,6 @@ export default function SellerStatusToggle({
         )}
       </button>
 
-      {/* 비활성화 상태일 때 안내 메시지 */}
-      {!sellerInfo.isActive && (
-        <div className="text-center py-4">
-          <div className="text-slate-600 text-sm font-medium animate-pulse">
-            위 버튼을 눌러서 판매를 활성화하세요
-          </div>
-          <div className="text-xs text-slate-500 mt-1">
-            활성화하면 조건에 맞는 구매자들에게 표시됩니다
-          </div>
-        </div>
-      )}
       {sellerInfo.isActive && (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl p-4 shadow-lg">
           <div className="flex items-center space-x-3 mb-3">
