@@ -20,9 +20,9 @@ export default function TabNavigation({
   activeTab,
   onTabChange,
   className = '',
-  activeTextColor = 'text-midnight-black',
-  inactiveTextColor = 'text-gray-400',
-  underlineColor = 'bg-midnight-black',
+  activeTextColor = 'text-midnight-black dark:text-white',
+  inactiveTextColor = 'text-gray-400 dark:text-gray-500',
+  underlineColor = 'bg-midnight-black dark:bg-white',
 }: TabNavigationProps) {
   const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
   const tabWidth = 100 / tabs.length;

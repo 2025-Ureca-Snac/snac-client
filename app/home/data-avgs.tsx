@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import Image from 'next/image';
+// import Image from 'next/image';
 import axios from 'axios';
-
+import TelecomIcon from '@/public/telecom.svg';
 interface TradeStat {
   carrier: string;
   avgPricePerGb: number;
@@ -70,13 +70,8 @@ export function DataAvg() {
   return (
     <div className="text-center h-30 md:h-60 pt-8 md:pt-16">
       <h2 className="flex items-center justify-center gap-2">
-        <div className="relative w-[24px] h-[24px] md:w-[44px] md:h-[44px]">
-          <Image
-            src="/telecom.svg"
-            alt="통신사 아이콘"
-            fill
-            className="object-contain"
-          />
+        <div className="w-6 h-6 md:w-[44px] md:h-[44px]">
+          <TelecomIcon className="w-full h-full  dark:text-white" />
         </div>
 
         <div className="w-[60px] md:w-[105px] text-right">
