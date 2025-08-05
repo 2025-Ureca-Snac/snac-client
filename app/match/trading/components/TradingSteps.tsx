@@ -98,7 +98,7 @@ export default function TradingSteps({
                         : 'text-gray-600'
                     }`}
                   >
-                    {index + 1}/4
+                    {index + 1}/{STEPS.length}
                   </div>
                 </div>
 

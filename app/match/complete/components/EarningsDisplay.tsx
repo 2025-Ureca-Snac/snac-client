@@ -4,18 +4,15 @@ import Image from 'next/image';
 import React from 'react';
 
 interface EarningsDisplayProps {
-  pointsEarned: number;
+  pointsEarned?: number;
   experienceGained: number;
   bonusPoints?: number;
 }
 
 export default function EarningsDisplay({
-  pointsEarned,
   experienceGained,
   bonusPoints = 0,
 }: EarningsDisplayProps) {
-  const totalPoints = pointsEarned + bonusPoints;
-
   return (
     <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
       {/* 서브틀한 글로우 효과 */}
@@ -28,7 +25,7 @@ export default function EarningsDisplay({
 
         <div className="space-y-6">
           {/* 기본 포인트 */}
-          <div className="flex items-center justify-between p-6 bg-blue-900/20 border border-blue-400/30 rounded-xl backdrop-blur-sm">
+          {/* <div className="flex items-center justify-between p-6 bg-blue-900/20 border border-blue-400/30 rounded-xl backdrop-blur-sm">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-400/25">
                 <span className="text-black text-xl">💰</span>
@@ -41,7 +38,7 @@ export default function EarningsDisplay({
             <div className="text-3xl font-bold text-blue-400 animate-pulse">
               +{pointsEarned}
             </div>
-          </div>
+          </div> */}
 
           {/* 보너스 포인트 */}
           {bonusPoints > 0 && (
@@ -87,20 +84,6 @@ export default function EarningsDisplay({
         </div>
 
         {/* 총 합계 - 특별한 강조 */}
-        <div className="border-t border-gray-700/50 pt-8 mt-8">
-          <div className="flex items-center justify-between p-6 bg-green-900/20 border border-green-400/30 rounded-xl backdrop-blur-sm">
-            <span className="text-xl font-bold text-green-300">총 포인트</span>
-            <div className="relative">
-              <span className="text-4xl font-bold text-green-400 animate-pulse">
-                +{totalPoints}
-              </span>
-              {/* 글로우 효과 */}
-              <div className="absolute inset-0 text-4xl font-bold text-green-400 animate-ping opacity-20">
-                +{totalPoints}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
