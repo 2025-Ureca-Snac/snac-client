@@ -6,8 +6,6 @@ import { usePathname } from 'next/navigation';
 
 import { useAdminStore } from '../(shared)/stores/use-admin-store';
 
-import { ConfirmationModal } from '@/app/(shared)/components/ConfirmationModal';
-
 import ManagerIcon from '@/public/manager.svg';
 import DashboardIcon from '@/public/database.svg';
 import PostIcon from '@/public/post.svg';
@@ -124,7 +122,6 @@ export default function AdminLayout({
           />
         )}
       </div>
-      <ConfirmationModal />
     </>
   );
 }
