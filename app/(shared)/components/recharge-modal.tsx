@@ -197,13 +197,15 @@ export default function RechargeModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">충전 금액</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            충전 금액
+          </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
           >
             ✕
           </button>
@@ -211,7 +213,7 @@ export default function RechargeModal({
 
         {/* Recharge Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             충전할 금액
           </label>
           <div className="relative">
@@ -243,24 +245,26 @@ export default function RechargeModal({
                 }
               }}
               placeholder="충전할 금액을 입력하세요"
-              className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none">
               원
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             최소 1,000원부터 충전 가능합니다
           </p>
         </div>
 
         {/* Current Points Display */}
-        <div className="border-t border-gray-200 pt-4 mb-6">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-gray-700">현재 스낵머니</span>
+              <span className="text-gray-700 dark:text-gray-300">
+                현재 스낵머니
+              </span>
               <div className="flex items-center">
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-gray-900 dark:text-white">
                   {formatNumber(currentMoney)}
                 </span>
                 <Image
@@ -274,11 +278,13 @@ export default function RechargeModal({
             </div>
           </div>
           {selectedAmount && (
-            <div className="space-y-2 mt-4 pt-4 border-t border-gray-100">
+            <div className="space-y-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
               <div className="flex justify-between items-center">
-                <span className="text-gray-700">예상 충전 후 스낵머니</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  예상 충전 후 스낵머니
+                </span>
                 <div className="flex items-center">
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-900 dark:text-white">
                     {formatNumber(currentMoney + selectedAmount)}
                   </span>
                   <Image

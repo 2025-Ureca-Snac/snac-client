@@ -233,7 +233,7 @@ export default function ChangePhoneModal({
 
   // 초기화 버튼 비활성화 상태 결정 함수
   const isResetButtonDisabled = () => {
-    return (!isCodeSent && !isVerified) || success;
+    return success;
   };
 
   // 변경하기 버튼 비활성화 상태 결정 함수
@@ -324,7 +324,7 @@ export default function ChangePhoneModal({
           <div className="w-full text-center text-gray-600 mb-4 text-sm">
             변경하려면 비밀번호를 입력하세요.
           </div>
-          
+
           {/* 성공 메시지 */}
           {success && (
             <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -409,100 +409,6 @@ export default function ChangePhoneModal({
                 </p>
               </div>
             )}
-
-            {/* 에러 메시지 */}
-            {error && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-center">{error}</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {/* 비밀번호 입력 */}
-              <PasswordInput
-                label=""
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleFormChange('password')}
-                placeholder="현재 비밀번호"
-                disabled={isVerified || success}
-                ref={passwordRef}
-              />
-
-              {/* 전화번호 입력 */}
-              <InputWithButton
-                label=""
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleFormChange('phone')}
-                placeholder="변경하려는 전화번호"
-                disabled={isCodeSent || isVerified || success}
-                buttonText={
-                  success
-                    ? '완료'
-                    : isVerified
-                      ? '완료'
-                      : !isCodeSent
-                        ? '인증'
-                        : codeTimer.time > 240
-                          ? `재전송 (${60 - (300 - codeTimer.time)}초)`
-                          : '재전송'
-                }
-                onButtonClick={handleSendCode}
-                buttonDisabled={
-                  success ||
-                  isVerified ||
-                  (isCodeSent && codeTimer.time > 240) ||
-                  isLoading
-                }
-                autoComplete="tel"
-                ref={phoneRef}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                  // Enter 키를 눌렀을 때만 인증코드 전송
-                  if (
-                    e.key === 'Enter' &&
-                    !isLoading &&
-                    formData.password.trim() &&
-                    formData.phone.trim()
-                  ) {
-                    e.preventDefault();
-                    handleSendCode();
-                  }
-                }}
-              />
-
-              {/* 인증코드 입력 */}
-              <VerificationInput
-                label=""
-                id="verificationCode"
-                name="verificationCode"
-                value={formData.verificationCode}
-                onChange={handleFormChange('verificationCode')}
-                placeholder="인증번호"
-                disabled={!showVerification || isVerified || success}
-                onVerify={handleVerifyCode}
-                verifyDisabled={
-                  !showVerification || isVerified || success || isLoading
-                }
-                helpText={`휴대폰으로 전송된 인증코드를 입력해주세요.${codeTimer.time > 0 ? ` (${Math.floor(codeTimer.time / 60)}:${(codeTimer.time % 60).toString().padStart(2, '0')})` : ''}`}
-                showHelpText={showVerification && !isVerified && !success}
-                autoComplete="one-time-code"
-                ref={verificationRef}
-              />
-
-              {/* 상태 메시지 */}
-              {isVerified && (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600 text-center">
-                    {success
-                      ? '전화번호가 성공적으로 변경되었습니다.'
-                      : '인증이 완료되었습니다. 전화번호를 변경하시겠습니까?'}
-                  </p>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* 버튼들 */}
@@ -518,7 +424,9 @@ export default function ChangePhoneModal({
             </button>
             <button
               type="button"
-              onClick={handleReset}
+              onClick={
+                isCodeSent || isVerified ? handleReset : handleCloseModal
+              }
               disabled={isResetButtonDisabled()}
               className="w-2/5 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}

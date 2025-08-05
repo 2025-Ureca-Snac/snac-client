@@ -11,14 +11,23 @@ export default function BlogStructuredData({
 }: BlogStructuredDataProps) {
   if (post) {
     // 개별 포스트용 구조화된 데이터
-    const cleanContent = post.content?.replace(/<[^>]*>/g, '') || '';
-    const wordCount = cleanContent.split(/\s+/).length;
+    // content가 없으면 markdownContent를 사용
+    let contentText = '';
+    if (post.content) {
+      contentText = post.content.replace(/<[^>]*>/g, '');
+    } else if (
+      post.markdownContent &&
+      typeof post.markdownContent === 'string'
+    ) {
+      contentText = post.markdownContent;
+    }
+    const wordCount = contentText.split(/\s+/).length;
 
     const structuredData = {
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
       headline: post.title,
-      description: cleanContent.substring(0, 160) || post.title,
+      description: contentText.substring(0, 160) || post.title,
       image:
         post.imageUrl ||
         post.image ||
@@ -116,7 +125,12 @@ export default function BlogStructuredData({
         '@type': 'BlogPosting',
         headline: post.title,
         description:
-          post.content?.replace(/<[^>]*>/g, '').substring(0, 160) || post.title,
+          (
+            post.content?.replace(/<[^>]*>/g, '') ||
+            (post.markdownContent && typeof post.markdownContent === 'string'
+              ? post.markdownContent
+              : '')
+          ).substring(0, 160) || post.title,
         image:
           post.imageUrl ||
           post.image ||

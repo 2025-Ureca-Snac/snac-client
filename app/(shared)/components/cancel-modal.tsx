@@ -128,13 +128,15 @@ export default function CancelModal({
     <>
       {/* 메인 취소 모달 */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">취소 확인</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              취소 확인
+            </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             >
               ✕
             </button>
@@ -142,16 +144,18 @@ export default function CancelModal({
 
           {/* Content */}
           <div className="mb-6">
-            <p className="text-gray-700 mb-4">다음 금액을 취소하시겠습니까?</p>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              다음 금액을 취소하시겠습니까?
+            </p>
             <div className="text-center mb-6">
-              <span className="text-2xl font-bold text-red-600">
+              <span className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {amount.toLocaleString()}원
               </span>
             </div>
 
             {/* 취소 사유 입력 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 취소 사유
               </label>
 
@@ -164,7 +168,7 @@ export default function CancelModal({
                     setCustomReason('');
                   }
                 }}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-3"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-3"
               >
                 <option value="">취소 사유를 선택해주세요</option>
                 {COMMON_CANCEL_REASONS.map((commonReason) => (
@@ -181,7 +185,7 @@ export default function CancelModal({
                   onChange={(e) => setCustomReason(e.target.value)}
                   placeholder="취소 사유를 직접 입력해주세요"
                   rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
                 />
               )}
             </div>
@@ -203,14 +207,14 @@ export default function CancelModal({
       {/* 확인 모달 */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-lg p-6 w-full max-w-sm mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm mx-4">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 취소 확인
               </h3>
-              <p className="text-gray-700 mb-6">
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
                 정말{' '}
-                <span className="font-bold text-red-600">
+                <span className="font-bold text-red-600 dark:text-red-400">
                   {amount.toLocaleString()}원
                 </span>
                 을 취소하시겠습니까?
@@ -226,7 +230,7 @@ export default function CancelModal({
                 <button
                   onClick={handleBack}
                   disabled={isLoading}
-                  className="flex-1 px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
+                  className="flex-1 px-8 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
                 >
                   뒤로
                 </button>

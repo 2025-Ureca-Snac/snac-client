@@ -74,6 +74,7 @@ export default function HistoryDetailModal({
           }
         } catch (error) {
           console.error('첨부 이미지 URL 가져오기 실패:', error);
+        } finally {
         }
       }
     };
@@ -313,7 +314,7 @@ export default function HistoryDetailModal({
         <div className="p-4 space-y-4">
           {/* 기본 정보 */}
           <div className="flex items-start gap-3">
-            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
               <Image
                 src={getCarrierImageUrl(item.carrier || 'SKT')}
                 alt={item.carrier || 'SKT'}
@@ -330,7 +331,7 @@ export default function HistoryDetailModal({
 
                 <button
                   onClick={handleReportClick}
-                  className="px-3 py-1 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                  className="px-3 py-1 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors"
                 >
                   신고하기
                 </button>
@@ -363,8 +364,8 @@ export default function HistoryDetailModal({
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 dark:text-blue-300 text-sm">
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 dark:text-blue-400 text-sm">
                       👤
                     </span>
                   </div>
@@ -375,7 +376,7 @@ export default function HistoryDetailModal({
                     <div
                       className={`text-xs font-medium ${
                         isFavorite
-                          ? 'text-blue-700 dark:text-blue-300'
+                          ? 'text-blue-700 dark:text-blue-400'
                           : 'text-gray-500 dark:text-gray-400'
                       }`}
                     >
@@ -391,8 +392,8 @@ export default function HistoryDetailModal({
                   disabled={isLoadingFavorite}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                     isFavorite
-                      ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
-                      : 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
+                      ? 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/30'
+                      : 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/30'
                   } ${isLoadingFavorite ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isLoadingFavorite ? (
@@ -436,12 +437,12 @@ export default function HistoryDetailModal({
           {item.cancelRequestStatus === 'REQUESTED' && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
-                  <span className="text-red-600 dark:text-red-300 text-xs">
+                <div className="w-6 h-6 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 dark:text-red-400 text-xs">
                     ⚠️
                   </span>
                 </div>
-                <div className="text-red-800 dark:text-red-200 text-sm font-medium">
+                <div className="text-red-800 dark:text-red-300 text-sm font-medium">
                   거래 취소가 접수되었습니다.
                 </div>
               </div>
@@ -460,11 +461,11 @@ export default function HistoryDetailModal({
               <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-3">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                    <span className="text-gray-600 dark:text-gray-300 text-xs">
+                    <span className="text-gray-600 dark:text-gray-400 text-xs">
                       📷
                     </span>
                   </div>
-                  <div className="text-gray-800 dark:text-white text-sm font-medium">
+                  <div className="text-gray-800 dark:text-gray-200 text-sm font-medium">
                     전송된 데이터 확인
                   </div>
                 </div>
@@ -495,12 +496,12 @@ export default function HistoryDetailModal({
                 {type === 'sales' && (
                   <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 mb-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-yellow-100 dark:bg-yellow-800 rounded-full flex items-center justify-center">
-                        <span className="text-yellow-600 dark:text-yellow-300 text-xs">
+                      <div className="w-6 h-6 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                        <span className="text-yellow-600 dark:text-yellow-400 text-xs">
                           ⏳
                         </span>
                       </div>
-                      <div className="text-yellow-800 dark:text-yellow-200 text-sm">
+                      <div className="text-yellow-800 dark:text-yellow-300 text-sm">
                         구매자 데이터 수신 확인을 기다리고 있습니다.
                       </div>
                     </div>
@@ -515,12 +516,12 @@ export default function HistoryDetailModal({
                 {type === 'purchase' && (
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-3">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 dark:text-blue-300 text-xs">
+                      <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 dark:text-blue-400 text-xs">
                           📥
                         </span>
                       </div>
-                      <div className="text-blue-800 dark:text-blue-200 text-sm">
+                      <div className="text-blue-800 dark:text-blue-300 text-sm">
                         판매자가 데이터를 전송했습니다. 수신 확인해주세요.
                       </div>
                     </div>
@@ -537,7 +538,7 @@ export default function HistoryDetailModal({
           {item.status !== 'COMPLETED' &&
             item.cancelRequestStatus === 'REJECTED' &&
             type === 'purchase' && (
-              <div className="text-red-700 dark:text-red-300 text-sm">
+              <div className="text-red-700 dark:text-red-400 text-sm">
                 판매자가 거래 취소를 거절했습니다.
               </div>
             )}
@@ -593,7 +594,7 @@ export default function HistoryDetailModal({
                 <select
                   value={selectedCancelReason}
                   onChange={(e) => setSelectedCancelReason(e.target.value)}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
                 >
                   {type === 'sales' ? (
                     <>
@@ -625,7 +626,7 @@ export default function HistoryDetailModal({
                 </button>
                 <button
                   onClick={() => setShowCancelReason(false)}
-                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-400 transition-colors"
                 >
                   취소
                 </button>

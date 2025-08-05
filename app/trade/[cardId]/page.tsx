@@ -1,5 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
+import Head from 'next/head';
 import { api } from '@/app/(shared)/utils/api';
 import { CardData } from '@/app/(shared)/types/card';
 import TradeContent from './trade-content';
@@ -22,11 +23,29 @@ export default async function TradePage({ params }: TradePageProps) {
     const responseData = response.data as { data: CardData };
     const cardData = responseData.data;
 
+    // 메타 설명 생성
+    const carrierName = cardData.carrier === 'LG' ? 'LGU+' : cardData.carrier;
+    const dataAmount = `${cardData.dataAmount}GB`;
+    const price = cardData.price
+      ? cardData.price.toLocaleString()
+      : '가격 협의';
+    const category = cardData.cardCategory === 'SELL' ? '판매' : '구매';
+    const ratingScore = cardData.ratingScore || '평점 없음';
+
+    const description =
+      `${carrierName} ${dataAmount} 데이터를 ${price}원에 ${category}합니다. 스낵스코어: ${ratingScore}`.substring(
+        0,
+        160
+      );
+
     return (
       <>
+        <Head>
+          <meta name="description" content={description} />
+        </Head>
         <StructuredData cardData={cardData} />
 
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white dark:bg-gray-900">
           <div className="max-w-4xl mx-auto p-4">
             {/* 서버 컴포넌트로 렌더링되는 거래 내용 */}
             <TradeContent cardData={cardData}>

@@ -22,12 +22,26 @@ export async function generateMetadata({
     const cardData = responseData.data;
 
     const title = `${formatCarrierName(cardData.carrier)} 데이터 ${formatDataAmount(cardData.dataAmount)} - ${cardData.cardCategory === 'SELL' ? '판매' : '구매'} | 스낵`;
-    const description = `${formatCarrierName(cardData.carrier)} ${formatDataAmount(cardData.dataAmount)} 데이터를 ${cardData.price.toLocaleString()}원에 ${cardData.cardCategory === 'SELL' ? '판매' : '구매'}합니다. 스낵스코어: ${cardData.ratingScore}`;
+
+    // 안전한 메타 설명 생성
+    const carrierName = formatCarrierName(cardData.carrier);
+    const dataAmount = formatDataAmount(cardData.dataAmount);
+    const price = cardData.price
+      ? cardData.price.toLocaleString()
+      : '가격 협의';
+    const category = cardData.cardCategory === 'SELL' ? '판매' : '구매';
+    const ratingScore = cardData.ratingScore || '평점 없음';
+
+    const description =
+      `${carrierName} ${dataAmount} 데이터를 ${price}원에 ${category}합니다. 스낵스코어: ${ratingScore}`.substring(
+        0,
+        160
+      );
     const url = `https://snac-app.com/trade/${cardId}`;
 
     return {
       title,
-      description,
+      description: description,
       authors: [{ name: cardData.name || '스낵팀' }],
       creator: '스낵',
       publisher: '스낵',
@@ -51,7 +65,7 @@ export async function generateMetadata({
             url: getCarrierImageUrl(cardData.carrier),
             width: 1200,
             height: 630,
-            alt: `${formatCarrierName(cardData.carrier)} 로고`,
+            alt: `${carrierName} 로고`,
           },
         ],
         locale: 'ko_KR',
@@ -69,13 +83,13 @@ export async function generateMetadata({
         '모바일 데이터',
         '통신사 데이터',
         '스낵',
-        formatCarrierName(cardData.carrier),
-        `${formatDataAmount(cardData.dataAmount)} 데이터`,
+        carrierName,
+        `${dataAmount} 데이터`,
         cardData.cardCategory === 'SELL' ? '데이터 판매' : '데이터 구매',
         '데이터 마켓플레이스',
         '모바일 데이터 거래',
         '스낵스코어',
-        cardData.ratingScore.toString(),
+        ratingScore.toString(),
       ],
       robots: {
         index: true,
@@ -101,8 +115,8 @@ export async function generateMetadata({
           '모바일 데이터',
           '통신사 데이터',
           '스낵',
-          formatCarrierName(cardData.carrier),
-          `${formatDataAmount(cardData.dataAmount)} 데이터`,
+          carrierName,
+          `${dataAmount} 데이터`,
           cardData.cardCategory === 'SELL' ? '데이터 판매' : '데이터 구매',
         ].join(', '),
       },
@@ -110,7 +124,8 @@ export async function generateMetadata({
   } catch {
     return {
       title: '데이터 거래 | 스낵',
-      description: '안전하고 빠른 데이터 거래 플랫폼',
+      description:
+        '안전하고 빠른 데이터 거래 플랫폼입니다. 모바일 데이터를 쉽고 안전하게 거래하세요.',
       keywords: ['데이터 거래', '모바일 데이터', '통신사 데이터', '스낵'],
       robots: {
         index: false,

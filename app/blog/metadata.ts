@@ -114,9 +114,22 @@ export const blogPageMetadata: Metadata = {
 // 블로그 포스트 메타데이터 생성 함수
 export function generateBlogPostMetadata(post: ExtendedBlogPost): Metadata {
   // 콘텐츠에서 HTML 태그 제거하고 깨끗한 텍스트 추출
-  const cleanContent = post.content?.replace(/<[^>]*>/g, '') || '';
+  // content가 없으면 markdownContent를 사용
+  let contentText = '';
+  if (post.content) {
+    contentText = post.content.replace(/<[^>]*>/g, '');
+  } else if (post.markdownContent) {
+    // markdownContent가 Promise인 경우 처리
+    if (typeof post.markdownContent === 'string') {
+      contentText = post.markdownContent;
+    } else {
+      // Promise인 경우 기본값 사용
+      contentText = '';
+    }
+  }
+
   const description =
-    cleanContent.substring(0, 160) || '스낵 블로그 포스트입니다.';
+    contentText.substring(0, 160) || post.title || '스낵 블로그 포스트입니다.';
 
   // 키워드 생성 (제목, 카테고리, 태그 등)
   const keywords = [
