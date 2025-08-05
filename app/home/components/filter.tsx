@@ -10,7 +10,7 @@ import FilterIcon from '@/public/filter.svg';
 import CloseIcon from '@/public/close.svg';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL';
-type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT';
+type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 
 const FILTER_OPTIONS = {
@@ -23,7 +23,6 @@ const FILTER_OPTIONS = {
   transactionStatus: [
     { value: 'ALL', label: '모든 거래' },
     { value: 'SELLING', label: '거래 전' },
-    { value: 'TRADING', label: '거래 중' },
     { value: 'SOLD_OUT', label: '거래 완료' },
   ],
   priceRange: [
@@ -50,8 +49,6 @@ export const Filter = () => {
     postView,
   } = useHomeStore();
 
-  // 필터가 실제로 변경되었는지 확인
-
   const closeAndApply = () => {
     actions.triggerRefetch();
     actions.toggleFilter();
@@ -61,7 +58,7 @@ export const Filter = () => {
     <>
       {/* PC 사이드바 */}
       <div className="hidden md:block md:w-72 md:flex-shrink-0 mr-8">
-        <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[1015px] bg-white md:max-h-full md:rounded-2xl shadow-light">
+        <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[1050px] bg-white md:max-h-full md:rounded-2xl shadow-light">
           <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
             <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
               <FilterIcon className="hidden md:block dark:text-white" />
@@ -69,13 +66,14 @@ export const Filter = () => {
             </h2>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide  ">
+          <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide">
             <FilterGroup
               title="카테고리"
               options={FILTER_OPTIONS.category}
               selectedValues={category ? [category] : ['ALL']}
               onValueChange={(value) => actions.setCategory(value as Category)}
               variant="button"
+              mobileGridCols={2}
             />
 
             <FilterGroup
@@ -86,6 +84,7 @@ export const Filter = () => {
                 actions.setTransactionStatus(value as TransactionStatus)
               }
               variant="button"
+              mobileGridCols={3}
             />
 
             <FilterGroup
@@ -154,6 +153,7 @@ export const Filter = () => {
                         actions.setCategory(value as Category)
                       }
                       variant="button"
+                      mobileGridCols={2}
                     />
 
                     <FilterGroup
@@ -166,6 +166,7 @@ export const Filter = () => {
                         actions.setTransactionStatus(value as TransactionStatus)
                       }
                       variant="button"
+                      mobileGridCols={3}
                     />
 
                     <FilterGroup

@@ -14,8 +14,8 @@ export const PriceUnitToggle = ({
   setCurrentUnit,
   isMobile = false,
 }: PriceUnitToggleProps) => {
-  const containerWidth = isMobile ? 'w-32' : 'w-44';
-  const paddingY = isMobile ? 'py-1' : 'py-2';
+  const containerWidth = isMobile ? 'w-32' : 'w-36';
+  const paddingY = isMobile ? 'py-1' : 'py-1';
 
   const textSize = isMobile ? 'text-regular-sm' : 'text-regular-sm';
   const iconSize = isMobile ? 16 : 18;
@@ -24,7 +24,7 @@ export const PriceUnitToggle = ({
 
   return (
     <div
-      className={`relative flex ${containerWidth} items-center rounded-full bg-gray-200 p-1`}
+      className={`relative flex ${containerWidth} items-center rounded-full bg-gray-100 p-1`}
     >
       <div
         className={`absolute h-[calc(100%-8px)] w-[calc(50%-4px)] transform rounded-full bg-white ${shadow} transition-transform duration-300 ease-in-out ${
