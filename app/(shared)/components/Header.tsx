@@ -108,9 +108,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
 
   return (
     <>
-      <header
-        // [수정] 관리자 페이지에서는 z-index를 낮춰(z-10) 관리자 레이아웃(z-20, z-30) 뒤에 위치하도록 함
-        className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
+      <header className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
           isDarkmode
             ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
             : 'bg-white border-b'
@@ -174,7 +172,6 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
       <Transition.Root show={menuOpen} as={Fragment}>
         <Dialog
           as="div"
-          //  관리자 페이지에서는 z-index를 낮추고, 그 외 페이지에서는 기존의 높은 z-index를 유지
           className={`relative md:hidden ${isAdminPage ? 'z-10' : 'z-[9999]'}`}
           onClose={setMenuOpen}
         >
@@ -203,7 +200,8 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             leaveTo="opacity-0 -translate-y-4"
           >
             <Dialog.Panel
-              className="fixed left-0 w-full z-10 bg-white dark:bg-gray-900 px-4 py-4 flex flex-col gap-1 rounded-b-2xl shadow-none"
+              // [수정] isDarkmode 변수를 사용하여 동적으로 배경색을 지정합니다.
+              className={`fixed left-0 w-full z-10 px-4 py-4 flex flex-col gap-1 rounded-b-2xl shadow-none ${isDarkmode ? 'bg-gray-900' : 'bg-white'}`}
               style={{
                 top:
                   typeof window !== 'undefined' && window.innerWidth >= 768
