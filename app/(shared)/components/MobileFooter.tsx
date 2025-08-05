@@ -43,16 +43,15 @@ export const MobileFooter = () => {
   const [isPagesOpen, setIsPagesOpen] = useState(false);
 
   const filteredPageLinks = PAGE_LINKS.filter((link) => {
-    if (link.name === '마이페이지') {
-      return !!user;
+    switch (link.name) {
+      case '마이페이지':
+      case '문의하기':
+        return !!user;
+      case '관리자':
+        return !!user && role === ADMIN_ROLE;
+      default:
+        return true;
     }
-    if (link.name === '문의하기') {
-      return !!user;
-    }
-    if (link.name === '관리자') {
-      return !!user && role === ADMIN_ROLE;
-    }
-    return true;
   });
 
   return (
