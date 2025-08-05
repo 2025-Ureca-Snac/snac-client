@@ -68,7 +68,7 @@ export function DataAvg() {
   const current = dataList[index] || FALLBACK_MAP.SKT;
 
   return (
-    <div className="text-center h-[161px] md:h-[288px] py-[40px] md:py-[80px]">
+    <div className="text-center h-30 md:h-60 pt-8 md:pt-16">
       <h2 className="flex items-center justify-center gap-2">
         <div className="w-6 h-6 md:w-[44px] md:h-[44px]">
           <TelecomIcon className="w-full h-full  dark:text-white" />
@@ -94,7 +94,7 @@ export function DataAvg() {
         </span>
       </h2>
 
-      <p className="text-regular-lg md:text-medium-3xl font-bold pt-[28px]">
+      <p className="text-regular-lg md:text-medium-3xl font-bold pt-2.5">
         평균{' '}
         <span className="inline-block min-w-[80px] md:min-w-[100px] text-teal-green text-right">
           <AnimatePresence mode="wait">
