@@ -87,9 +87,6 @@ export default function TradingHistoryPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 중복 호출 방지를 위한 ref
-  const isInitialLoadRef = useRef(false);
-
   // 슬라이드 관련 상태
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -118,7 +115,8 @@ export default function TradingHistoryPage({
               item.status === 'ACCEPTED' ||
               item.status === 'PAYMENT_CONFIRMED' ||
               item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
-              item.status === 'DATA_SENT'
+              item.status === 'DATA_SENT' ||
+              item.status === 'REPORTED'
           );
         } else if (status === 'completed') {
           filteredData = response.trades.filter(
@@ -137,12 +135,14 @@ export default function TradingHistoryPage({
             a.status === 'BUY_REQUESTED' ||
             a.status === 'ACCEPTED' ||
             a.status === 'PAYMENT_CONFIRMED' ||
-            a.status === 'DATA_SENT';
+            a.status === 'DATA_SENT' ||
+            a.status === 'REPORTED';
           const bIsActive =
             b.status === 'BUY_REQUESTED' ||
             b.status === 'ACCEPTED' ||
             b.status === 'PAYMENT_CONFIRMED' ||
-            b.status === 'DATA_SENT';
+            b.status === 'DATA_SENT' ||
+            b.status === 'REPORTED';
 
           if (aIsActive && !bIsActive) return -1;
           if (!aIsActive && bIsActive) return 1;
@@ -169,13 +169,7 @@ export default function TradingHistoryPage({
 
   // 데이터 로드 (초기 로드 + 탭 변경)
   useEffect(() => {
-    // 이미 초기 로드가 완료되었으면 중복 호출 방지
-    if (isInitialLoadRef.current) {
-      return;
-    }
-
     let isMounted = true;
-    isInitialLoadRef.current = true;
 
     const loadData = async () => {
       if (isMounted) {
