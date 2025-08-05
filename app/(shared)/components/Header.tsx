@@ -32,14 +32,16 @@ const NAV_ITEMS = [
     href: '/admin',
     icon: Admin,
     text: '관리자',
-    show: (isAdmin: boolean) => isAdmin,
+    show: (isAdmin: boolean, _isTrading: boolean, _isLoggedIn: boolean) =>
+      isAdmin,
   },
   {
     key: 'match',
     href: '/match',
     icon: Matching,
     text: '실시간 매칭',
-    show: (_: boolean, isTrading: boolean) => !isTrading,
+    show: (_isAdmin: boolean, isTrading: boolean, _isLoggedIn: boolean) =>
+      !isTrading,
   },
   {
     key: 'blog',
@@ -47,6 +49,22 @@ const NAV_ITEMS = [
     icon: Blog,
     text: '블로그',
     show: () => true,
+  },
+  {
+    key: 'mypage',
+    href: '/mypage',
+    icon: User,
+    text: '마이페이지',
+    show: (_isAdmin: boolean, _isTrading: boolean, isLoggedIn: boolean) =>
+      isLoggedIn,
+  },
+  {
+    key: 'login',
+    href: '/login',
+    icon: Login,
+    text: '로그인',
+    show: (_isAdmin: boolean, _isTrading: boolean, isLoggedIn: boolean) =>
+      !isLoggedIn,
   },
 ];
 
@@ -109,7 +127,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
         <div className="relative z-10 gap-4 items-center md:flex hidden">
           {NAV_ITEMS.map(
             (item) =>
-              item.show(isAdmin, isTrading) && (
+              item.show(isAdmin, isTrading, isLoggedIn) && (
                 <Link
                   href={item.href}
                   key={item.key}
@@ -126,41 +144,13 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                 </Link>
               )
           )}
-          {isLoggedIn ? (
-            <Link
-              href="/mypage"
-              className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
-            >
-              <User
-                className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
-              />
-              <span
-                className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
-              >
-                마이페이지
-              </span>
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
-            >
-              <Login
-                className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
-              />
-              <span
-                className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
-              >
-                로그인
-              </span>
-            </Link>
-          )}
           <ThemeSwitch
             isDark={isDarkmode}
             onToggle={() => changeTheme(isDarkmode ? 'light' : 'dark')}
           />
         </div>
 
+        {/* 모바일 메뉴 버튼 */}
         <div className="md:hidden flex items-center">
           <button
             type="button"
@@ -217,7 +207,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             >
               {NAV_ITEMS.map(
                 (item) =>
-                  item.show(isAdmin, isTrading) && (
+                  item.show(isAdmin, isTrading, isLoggedIn) && (
                     <button
                       type="button"
                       key={item.key}
@@ -234,37 +224,6 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                       </span>
                     </button>
                   )
-              )}
-              {isLoggedIn ? (
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/mypage')}
-                  className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
-                >
-                  <User
-                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
-                  />
-                  <span
-                    className={`text-base font-medium ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
-                  >
-                    마이페이지
-                  </span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleMobileNav('/login')}
-                  className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
-                >
-                  <Login
-                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
-                  />
-                  <span
-                    className={`text-base font-medium ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
-                  >
-                    로그인
-                  </span>
-                </button>
               )}
               <div className="pt-2">
                 <ThemeSwitch
