@@ -7,7 +7,7 @@ import { ModalType } from '@/app/(shared)/types/modal-store';
  */
 const SETTING_MODAL_MAP = new Map<string, ModalType>([
   ['비밀번호 변경', 'change-password'],
-  ['번호 변경', 'change-phone'],
+  ['전화번호 변경', 'change-phone'],
   ['닉네임 변경', 'change-nickname'],
   ['소셜 로그인 연동', 'social-login'],
   ['서비스 가이드', 'service-guide'],

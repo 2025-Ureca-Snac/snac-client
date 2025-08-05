@@ -1,20 +1,16 @@
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import ScoreCard from '@/app/(shared)/components/ScoreCard';
 import ActionButtons from '@/app/(shared)/components/ActionButtons';
-import Accordion from '@/app/(shared)/components/Accordion';
-import SettingList from '@/app/(shared)/components/SettingList';
 import MyPageBottomButtons from '@/app/(shared)/components/mypage-bottom-buttons';
 import { FavoriteItem } from '@/app/(shared)/types/mypage';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface MyPageContentProps {
   favorites: FavoriteItem[];
-  onSettingClick: (item: string) => void;
 }
 
-export default function MyPageContent({
-  favorites,
-  onSettingClick,
-}: MyPageContentProps) {
+export default function MyPageContent({ favorites }: MyPageContentProps) {
   return (
     <div className="min-h-screen bg-background w-full">
       <div className="flex w-full min-h-screen">
@@ -30,10 +26,30 @@ export default function MyPageContent({
               <ScoreCard favoriteCount={favorites.length} />
               {/* ActionButtons (판매 내역, 구매 내역, 신고 내역) */}
               <ActionButtons />
-              {/* Accordion (거래 후기) */}
-              <Accordion />
-              {/* SettingList (설정 리스트) */}
-              <SettingList onItemClick={onSettingClick} />
+
+              {/* 설정 관리 버튼 */}
+              <div className="mb-6">
+                <Link
+                  href="/mypage/settings"
+                  className="block bg-card border border-border rounded-lg overflow-hidden hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  <div className="w-full flex justify-between items-center py-6 px-8 text-lg font-bold text-foreground">
+                    <span>설정 관리</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        모든 설정 보기
+                      </span>
+                      <Image
+                        src="/chevron-down.svg"
+                        alt="오른쪽 화살표"
+                        width={24}
+                        height={24}
+                        className="inline-block -rotate-90 text-muted-foreground"
+                      />
+                    </div>
+                  </div>
+                </Link>
+              </div>
 
               {/* 하단 버튼들 */}
               <MyPageBottomButtons />

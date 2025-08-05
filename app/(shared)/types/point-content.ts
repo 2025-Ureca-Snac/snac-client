@@ -25,6 +25,7 @@ export interface PointContentProps {
   onYearChange?: (year: number) => void;
   onMonthChange?: (month: number) => void;
   onRefreshData?: () => void;
+  isDragging?: boolean;
 }
 
 /**

@@ -33,7 +33,7 @@ export default function FilterOption({
   if (variant === 'radio') {
     return (
       <label
-        className={`flex items-center space-x-3 cursor-pointer dark:text-white hover:bg-gray-50 dark:hover-bg-gray-700 p-1 ${className} ${
+        className={`flex items-center space-x-3 cursor-pointer dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 p-1 ${className} ${
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >

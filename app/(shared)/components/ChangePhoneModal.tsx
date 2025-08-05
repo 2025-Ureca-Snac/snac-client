@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ModalPortal from './modal-portal';
-import Image from 'next/image';
 import InputWithButton from './input-with-button';
 import VerificationInput from './verification-input';
 import PasswordInput from './password-input';
@@ -246,125 +245,154 @@ export default function ChangePhoneModal({
       }}
     >
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-          {/* 헤더 */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] relative">
+          {/* 상단 아이콘 */}
+          <div className="flex flex-col items-center -mt-12 mb-2">
+            <div
+              className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-2 border-4 border-white shadow"
+              style={{ marginTop: '-32px' }}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 5C3 3.89543 3.89543 3 5 3H8.27924C8.70967 3 9.09181 3.27543 9.22792 3.68377L10.7257 8.17721C10.8831 8.64932 10.6694 9.16531 10.2243 9.38787L7.96701 10.5165C9.06925 12.9612 11.0388 14.9308 13.4835 16.033L14.6121 13.7757C14.8347 13.3306 15.3507 13.1169 15.8228 13.2743L20.3162 14.7721C20.7246 14.9082 21 15.2903 21 15.7208V19C21 20.1046 20.1046 21 19 21H18C9.71573 21 3 14.2843 3 6V5Z"
+                  fill="#DBEAFE"
+                  stroke="#2563EB"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="text-xl font-extrabold text-black text-center">
               전화번호 변경
-            </h2>
+            </div>
             <button
               onClick={() => {
                 handleReset();
                 onClose();
               }}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              type="button"
+              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+              aria-label="닫기"
               tabIndex={0}
             >
-              <Image src="/close.png" alt="닫기" width={24} height={24} />
+              ×
             </button>
           </div>
+          <div className="w-full text-center text-gray-600 mb-4 text-sm">
+            변경하려면 비밀번호를 입력하세요.
+          </div>
 
-          {/* 성공 메시지 */}
-          {success && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800 text-center">
-                전화번호가 성공적으로 변경되었습니다.
-              </p>
-            </div>
-          )}
-
-          {/* 에러 메시지 */}
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800 text-center">{error}</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {/* 비밀번호 입력 */}
-            <PasswordInput
-              label=""
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleFormChange('password')}
-              placeholder="현재 비밀번호"
-              disabled={isVerified || success}
-              ref={passwordRef}
-            />
-
-            {/* 전화번호 입력 */}
-            <InputWithButton
-              label=""
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleFormChange('phone')}
-              placeholder="변경하려는 전화번호"
-              disabled={isCodeSent || isVerified || success}
-              buttonText={
-                success
-                  ? '완료'
-                  : isVerified
-                    ? '완료'
-                    : !isCodeSent
-                      ? '인증'
-                      : codeTimer.time > 240
-                        ? `재전송 (${60 - (300 - codeTimer.time)}초)`
-                        : '재전송'
-              }
-              onButtonClick={handleSendCode}
-              buttonDisabled={
-                success ||
-                isVerified ||
-                (isCodeSent && codeTimer.time > 240) ||
-                isLoading
-              }
-              autoComplete="tel"
-              ref={phoneRef}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                // Enter 키를 눌렀을 때만 인증코드 전송
-                if (
-                  e.key === 'Enter' &&
-                  !isLoading &&
-                  formData.password.trim() &&
-                  formData.phone.trim()
-                ) {
-                  e.preventDefault();
-                  handleSendCode();
-                }
-              }}
-            />
-
-            {/* 인증코드 입력 */}
-            <VerificationInput
-              label=""
-              id="verificationCode"
-              name="verificationCode"
-              value={formData.verificationCode}
-              onChange={handleFormChange('verificationCode')}
-              placeholder="인증번호"
-              disabled={!showVerification || isVerified || success}
-              onVerify={handleVerifyCode}
-              verifyDisabled={
-                !showVerification || isVerified || success || isLoading
-              }
-              helpText={`휴대폰으로 전송된 인증코드를 입력해주세요.${codeTimer.time > 0 ? ` (${Math.floor(codeTimer.time / 60)}:${(codeTimer.time % 60).toString().padStart(2, '0')})` : ''}`}
-              showHelpText={showVerification && !isVerified && !success}
-              autoComplete="one-time-code"
-              ref={verificationRef}
-            />
-
-            {/* 상태 메시지 */}
-            {isVerified && (
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600 text-center">
-                  {success
-                    ? '전화번호가 성공적으로 변경되었습니다.'
-                    : '인증이 완료되었습니다. 전화번호를 변경하시겠습니까?'}
+          {/* 스크롤 가능한 컨테이너 */}
+          <div className="overflow-y-auto max-h-[60vh] px-2">
+            {/* 성공 메시지 */}
+            {success && (
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 text-center">
+                  전화번호가 성공적으로 변경되었습니다.
                 </p>
               </div>
             )}
+
+            {/* 에러 메시지 */}
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800 text-center">{error}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {/* 비밀번호 입력 */}
+              <PasswordInput
+                label=""
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleFormChange('password')}
+                placeholder="현재 비밀번호"
+                disabled={isVerified || success}
+                ref={passwordRef}
+              />
+
+              {/* 전화번호 입력 */}
+              <InputWithButton
+                label=""
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleFormChange('phone')}
+                placeholder="변경하려는 전화번호"
+                disabled={isCodeSent || isVerified || success}
+                buttonText={
+                  success
+                    ? '완료'
+                    : isVerified
+                      ? '완료'
+                      : !isCodeSent
+                        ? '인증'
+                        : codeTimer.time > 240
+                          ? `재전송 (${60 - (300 - codeTimer.time)}초)`
+                          : '재전송'
+                }
+                onButtonClick={handleSendCode}
+                buttonDisabled={
+                  success ||
+                  isVerified ||
+                  (isCodeSent && codeTimer.time > 240) ||
+                  isLoading
+                }
+                autoComplete="tel"
+                ref={phoneRef}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  // Enter 키를 눌렀을 때만 인증코드 전송
+                  if (
+                    e.key === 'Enter' &&
+                    !isLoading &&
+                    formData.password.trim() &&
+                    formData.phone.trim()
+                  ) {
+                    e.preventDefault();
+                    handleSendCode();
+                  }
+                }}
+              />
+
+              {/* 인증코드 입력 */}
+              <VerificationInput
+                label=""
+                id="verificationCode"
+                name="verificationCode"
+                value={formData.verificationCode}
+                onChange={handleFormChange('verificationCode')}
+                placeholder="인증번호"
+                disabled={!showVerification || isVerified || success}
+                onVerify={handleVerifyCode}
+                verifyDisabled={
+                  !showVerification || isVerified || success || isLoading
+                }
+                helpText={`휴대폰으로 전송된 인증코드를 입력해주세요.${codeTimer.time > 0 ? ` (${Math.floor(codeTimer.time / 60)}:${(codeTimer.time % 60).toString().padStart(2, '0')})` : ''}`}
+                showHelpText={showVerification && !isVerified && !success}
+                autoComplete="one-time-code"
+                ref={verificationRef}
+              />
+
+              {/* 상태 메시지 */}
+              {isVerified && (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600 text-center">
+                    {success
+                      ? '전화번호가 성공적으로 변경되었습니다.'
+                      : '인증이 완료되었습니다. 전화번호를 변경하시겠습니까?'}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 버튼들 */}
@@ -373,19 +401,26 @@ export default function ChangePhoneModal({
               type="button"
               onClick={handleChangePhone}
               disabled={!isVerified || isLoading || success}
-              className="flex-1 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-3/5 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}
             >
               {success ? '완료' : isLoading ? '처리중...' : '변경하기'}
             </button>
             <button
               type="button"
-              onClick={handleReset}
-              disabled={(!isCodeSent && !isVerified) || success}
-              className="px-4 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              onClick={
+                isCodeSent || isVerified
+                  ? handleReset
+                  : () => {
+                      handleReset();
+                      onClose();
+                    }
+              }
+              disabled={success}
+              className="w-2/5 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}
             >
-              초기화
+              {isCodeSent || isVerified ? '초기화' : '취소'}
             </button>
           </div>
         </div>

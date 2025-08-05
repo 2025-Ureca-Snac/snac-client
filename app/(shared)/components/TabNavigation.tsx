@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { TabNavigationProps } from '../types';
 
@@ -27,8 +27,106 @@ export default function TabNavigation({
   const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
   const tabWidth = 100 / tabs.length;
 
+  // 스와이프 관련 상태
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // 터치/마우스 이벤트 핸들러
+  const handleStart = useCallback((clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setCurrentX(clientX);
+  }, []);
+
+  const handleMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging) return;
+      setCurrentX(clientX);
+    },
+    [isDragging]
+  );
+
+  const handleEnd = useCallback(() => {
+    if (!isDragging) return;
+
+    const deltaX = currentX - startX;
+    const threshold = 50; // 스와이프 감지 임계값
+
+    if (Math.abs(deltaX) > threshold) {
+      if (deltaX > 0 && activeIndex > 0) {
+        // 오른쪽으로 스와이프 - 이전 탭
+        onTabChange(tabs[activeIndex - 1].id);
+      } else if (deltaX < 0 && activeIndex < tabs.length - 1) {
+        // 왼쪽으로 스와이프 - 다음 탭
+        onTabChange(tabs[activeIndex + 1].id);
+      }
+    }
+
+    setIsDragging(false);
+  }, [isDragging, currentX, startX, activeIndex, tabs, onTabChange]);
+
+  // 터치 이벤트 핸들러
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault(); // 스크롤 방지
+      handleStart(e.touches[0].clientX);
+    },
+    [handleStart]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault(); // 스크롤 방지
+      }
+      handleMove(e.touches[0].clientX);
+    },
+    [handleMove, isDragging]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    handleEnd();
+  }, [handleEnd]);
+
+  // 마우스 이벤트 핸들러
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      handleStart(e.clientX);
+    },
+    [handleStart]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      handleMove(e.clientX);
+    },
+    [handleMove]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    handleEnd();
+  }, [handleEnd]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging) {
+      handleEnd();
+    }
+  }, [isDragging, handleEnd]);
+
   return (
-    <div className={`flex border-b mb-6 relative ${className}`}>
+    <div
+      ref={containerRef}
+      className={`flex border-b mb-6 relative ${className} select-none`}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -46,10 +144,15 @@ export default function TabNavigation({
         className={`absolute bottom-0 h-0.5 ${underlineColor}`}
         initial={false}
         animate={{
-          left: `${activeIndex * tabWidth}%`,
+          left: isDragging
+            ? `${Math.max(0, Math.min((tabs.length - 1) * tabWidth, activeIndex * tabWidth + (currentX - startX) / 10))}%`
+            : `${activeIndex * tabWidth}%`,
           width: `${tabWidth}%`,
         }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        transition={{
+          duration: isDragging ? 0 : 0.3,
+          ease: 'easeInOut',
+        }}
       />
     </div>
   );
