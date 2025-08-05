@@ -23,8 +23,8 @@ export default function UserConnectionAnimation({ className = '' }) {
       <div
         className="flex items-center justify-center"
         style={{
-          width: 100,
-          height: 100,
+          width: 120,
+          height: 120,
           borderRadius: 26,
           fontSize: 24,
           zIndex: 3,
@@ -67,8 +67,8 @@ export default function UserConnectionAnimation({ className = '' }) {
       <div
         className="flex items-center justify-center"
         style={{
-          width: 100,
-          height: 100,
+          width: 120,
+          height: 120,
           zIndex: 2,
         }}
       >
