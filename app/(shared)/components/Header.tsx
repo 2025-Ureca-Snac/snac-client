@@ -78,6 +78,8 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   const pathname = usePathname();
   const router = useRouter();
 
+  const isAdminPage = pathname?.startsWith('/admin');
+
   const { actualTheme, changeTheme } = useTheme();
   const isDark = actualTheme === 'dark';
   const [menuOpen, setMenuOpen] = useState(false);
@@ -107,7 +109,8 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   return (
     <>
       <header
-        className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 z-50 ${
+        // [수정] 관리자 페이지에서는 z-index를 낮춰(z-10) 관리자 레이아웃(z-20, z-30) 뒤에 위치하도록 함
+        className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
           isDarkmode
             ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
             : 'bg-white border-b'
@@ -171,7 +174,8 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
       <Transition.Root show={menuOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="relative z-[9999] md:hidden"
+          //  관리자 페이지에서는 z-index를 낮추고, 그 외 페이지에서는 기존의 높은 z-index를 유지
+          className={`relative md:hidden ${isAdminPage ? 'z-10' : 'z-[9999]'}`}
           onClose={setMenuOpen}
         >
           <Transition.Child
