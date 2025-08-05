@@ -92,7 +92,7 @@ export function MarkdownRenderer({
       </h4>
     ),
     p: ({ children }) => (
-      <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+      <p className="mb-4 text-gray-700 dark:text-gray-100 leading-relaxed">
         {children}
       </p>
     ),
@@ -118,7 +118,7 @@ export function MarkdownRenderer({
         </pre>
       ) : (
         <code
-          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1 py-0.5 rounded text-sm font-mono"
+          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-1 py-0.5 rounded text-sm font-mono"
           {...props}
         >
           {children}
@@ -173,7 +173,7 @@ export function MarkdownRenderer({
   };
 
   return (
-    <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+    <div className="text-gray-700 dark:text-gray-100 leading-relaxed">
       <div>{renderContentWithImages()}</div>
 
       {showGallery && images && images.length > 0 && (
@@ -202,13 +202,13 @@ export function MarkdownRenderer({
 
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black dark:bg-white bg-opacity-75 flex items-center justify-center z-50"
           onClick={closeImageModal}
         >
           <div className="relative max-w-4xl max-h-full p-4">
             <button
               onClick={closeImageModal}
-              className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10"
+              className="absolute top-4 right-4 text-white dark:text-black text-2xl hover:text-gray-300 z-10"
             >
               ×
             </button>

@@ -33,7 +33,7 @@ export default function FilterGroup({
 
   return (
     <div className={`space-y-3 ${className}`}>
-      <h3 className="text-regular-md md:text-medium-md font-semibold text-midnight-black">
+      <h3 className="text-regular-md md:text-medium-md font-semibold ">
         {title}
       </h3>
       <div className="flex flex-wrap gap-2 md:flex-col md:items-start md:gap-3">
