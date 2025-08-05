@@ -50,7 +50,6 @@ export default function HistoryDetailModal({
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
   const [attachmentImageUrl, setAttachmentImageUrl] = useState<string>('');
-  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   // 단골 상태 초기화
   useEffect(() => {
@@ -65,7 +64,6 @@ export default function HistoryDetailModal({
       // 데이터 수신완료 상태일 때만 이미지 가져오기
       if (item?.status === 'DATA_SENT' || item?.status === 'COMPLETED') {
         try {
-          setIsLoadingImage(true);
           const response = await api.get<AttachmentUrlResponse>(
             `/trades/${item.id}/attachment-url`
           );
@@ -76,7 +74,6 @@ export default function HistoryDetailModal({
         } catch (error) {
           console.error('첨부 이미지 URL 가져오기 실패:', error);
         } finally {
-          setIsLoadingImage(false);
         }
       }
     };
