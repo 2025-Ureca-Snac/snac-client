@@ -16,7 +16,6 @@ import WaitingPaymentStep from './components/WaitingPaymentStep';
 import ShowPhoneStep from './components/ShowPhoneStep';
 import UploadDataStep from './components/UploadDataStep';
 import TradeCancelModal from '@/app/(shared)/components/TradeCancelModal';
-import { Header } from '@/app/(shared)/components/Header';
 
 type TradingStep =
   | 'confirmation'
@@ -312,8 +311,6 @@ export default function TradingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-400/5 via-transparent to-green-300/3">
-      <Header isTrading={true} />
-
       {/* 헤더 */}
       <TradingHeader
         timeLeft={timeLeft}

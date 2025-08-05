@@ -119,9 +119,7 @@ export default function TransferStep() {
                 <div className="text-blue-200/80 text-sm space-y-1">
                   <p>
                     • 평균 전송 시간:{' '}
-                    <span className="text-blue-300 font-medium">
-                      30초 ~ 1분
-                    </span>
+                    <span className="text-blue-300 font-medium">1분 ~ 3분</span>
                   </p>
                   <p>• 전송 완료 시 자동으로 다음 단계로 진행됩니다</p>
                   <p>• 네트워크 상태에 따라 시간이 다를 수 있습니다</p>
