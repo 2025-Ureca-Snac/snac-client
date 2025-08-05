@@ -7,7 +7,6 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import Image from 'next/image';
 
 import { PointHistoryItem } from '@/app/(shared)/types/point-history';
 import {
@@ -177,7 +176,7 @@ export default function PointContent({
       </button>
 
       {/* 포인트 적립 버튼 */}
-      <button
+      {/* <button
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -190,7 +189,7 @@ export default function PointContent({
       >
         <Image src="/snac-price.svg" alt="스낵" width={16} height={16} />
         적립
-      </button>
+      </button> */}
     </div>
   );
 
