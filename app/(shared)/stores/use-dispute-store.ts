@@ -19,6 +19,14 @@ export type DisputeType =
   | 'QNA'
   | 'REPORT';
 
+export interface TradeSummary {
+  tradeId: number;
+  priceGb: number;
+  dataAmount: number;
+  carrier: string;
+  myRole: string | null;
+  counterpartyId: number | null;
+}
 export interface Dispute {
   id: string;
   status: DisputeStatus;
@@ -32,6 +40,7 @@ export interface Dispute {
   attachmentUrls?: string[];
   reporterNickname?: string;
   opponentNickname?: string;
+  tradeSummary?: TradeSummary;
 }
 
 interface DisputeListResponse {
