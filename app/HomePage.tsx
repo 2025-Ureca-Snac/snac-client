@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react'; // useMemo 추가
 import { jwtDecode } from 'jwt-decode';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { useWebSocketGuard } from './(shared)/hooks/useWebSocketGuard';
@@ -19,6 +19,8 @@ import type {
   Carrier,
 } from '@/app/(shared)/utils/generateQueryParams';
 import { CreateButton } from '@/app/(shared)/components/CreateButton';
+
+// ... (CardApiResponse, JwtPayload 인터페이스 및 유틸리티 함수들은 기존과 동일)
 interface CardApiResponse {
   data: {
     hasNext: boolean;
@@ -33,7 +35,6 @@ interface JwtPayload {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-// 유틸리티 함수들
 const getCurrentUserEmail = (): string | null => {
   try {
     const authStorage = localStorage.getItem('auth-storage');
@@ -42,7 +43,7 @@ const getCurrentUserEmail = (): string | null => {
       if (parsed.state?.token) {
         const token = parsed.state.token;
         const decoded = jwtDecode<JwtPayload>(token);
-        return decoded.username; // JWT의 username 필드 사용
+        return decoded.username;
       }
     }
     return null;
@@ -71,109 +72,54 @@ const filterCardsByPostView = (
 };
 
 const sortCards = (cards: CardData[], sortBy: string): CardData[] => {
+  // 새로운 배열을 만들어 정렬 (원본 배열 보존)
+  const sorted = [...cards];
   if (sortBy === 'RATING') {
-    // 인기순: 바삭스코어 높은 순, 같으면 등록순
-    return cards.sort((a, b) => {
+    return sorted.sort((a, b) => {
       if (a.ratingScore !== b.ratingScore) {
-        return b.ratingScore - a.ratingScore; // 높은 점수 먼저
+        return b.ratingScore - a.ratingScore;
       }
-      // 점수가 같으면 등록순 (최신 등록 먼저)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   } else {
-    // 최신순: 등록순 (최신 등록 먼저)
-    return cards.sort((a, b) => {
+    return sorted.sort((a, b) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }
 };
 
 export default function HomePage() {
-  // WebSocket 가드 사용
   useWebSocketGuard();
 
-  const [cardPages, setCardPages] = useState<CardData[][]>([]);
+  // [수정] 전체 카드 목록을 저장할 상태
+  const [allCards, setAllCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
-  const [showCreateButton, setShowCreateButton] = useState(false);
-  const homeLayoutRef = useRef<HTMLDivElement>(null);
-
   const {
     cardCategory,
     category,
     transactionStatus,
     priceRange,
     sortBy,
-    carrier,
     postView,
     actions,
     refetchTrigger,
   } = useHomeStore();
 
-  const PAGE_SIZE = 54;
+  const [showCreateButton, setShowCreateButton] = useState(false);
+  const homeLayoutRef = useRef<HTMLDivElement>(null);
 
-  // refetchTrigger가 변경될 때 페이지네이션 상태를 리셋하는 useEffect
-  const isInitialMount = useRef(true);
+  const PAGE_SIZE = 20;
+
+  // [수정] 필터가 변경될 때마다 모든 데이터를 다시 불러오는 로직
   useEffect(() => {
-    // 컴포넌트 첫 마운트 시에는 실행하지 않음
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    setCurrentPage(1);
-    setCardPages([]);
-    setTotalPages(1);
-  }, [refetchTrigger]);
-
-  useEffect(() => {
-    const OBSERVER_ROOT_MARGIN = '0px 0px -100px 0px';
-    const OBSERVER_THRESHOLD = 0.1;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setShowCreateButton(entry.isIntersecting);
-      },
-      {
-        rootMargin: OBSERVER_ROOT_MARGIN,
-        threshold: OBSERVER_THRESHOLD,
-      }
-    );
-
-    const currentRef = homeLayoutRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, []);
-
-  // 현재 페이지의 데이터를 가져오는 useEffect
-  useEffect(() => {
-    const pageIdx = currentPage - 1;
-    // 페이지 인덱스가 유효하지 않거나, 해당 페이지 데이터가 이미 캐시되어 있다면 fetch를 건너뜀
-    if (pageIdx < 0 || cardPages[pageIdx]) {
-      if (cardPages[pageIdx]) setLoading(false);
-      return;
-    }
-
-    const fetchPage = async () => {
+    const fetchAllCards = async () => {
       setLoading(true);
-
+      setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
+      let accumulatedCards: CardData[] = [];
+      let hasNext = true;
       let lastCardId: number | undefined = undefined;
       let lastUpdatedAt: string | undefined = undefined;
-      // 이전 페이지의 마지막 아이템을 기준으로 커서 설정
-      if (pageIdx > 0 && cardPages[pageIdx - 1]?.length > 0) {
-        const prevPageLast =
-          cardPages[pageIdx - 1][cardPages[pageIdx - 1].length - 1];
-        lastCardId = prevPageLast.id;
-        lastUpdatedAt = prevPageLast.updatedAt;
-      }
 
       const highRatingFirst = sortBy === 'RATING';
       const carrierForQuery: Carrier | undefined =
@@ -183,87 +129,96 @@ export default function HomePage() {
             ? 'LG'
             : (category ?? undefined);
 
-      const queryString = generateQueryParams({
-        cardCategory: cardCategory,
-        sellStatusFilter: 'ALL' as SellStatus,
-        priceRanges: [priceRange],
-        highRatingFirst,
-        size: PAGE_SIZE,
-        lastCardId,
-        lastUpdatedAt,
-        carrier: carrierForQuery,
-        favoriteOnly: false,
-      });
+      while (hasNext) {
+        try {
+          const queryString = generateQueryParams({
+            cardCategory: cardCategory,
+            // [중요] API 파라미터에 정확한 거래 상태를 전달
+            sellStatusFilter: transactionStatus as SellStatus,
+            priceRanges: [priceRange],
+            highRatingFirst,
+            size: PAGE_SIZE,
+            lastCardId,
+            lastUpdatedAt,
+            carrier: carrierForQuery,
+            favoriteOnly: postView === 'FAVORITE_POSTS', // [개선] API가 지원하면 즐겨찾기 필터링도 서버에서 처리
+          });
 
-      const fullUrl = `${API_BASE}/cards/scroll?${queryString}&_v=${new Date().getTime()}`;
-      console.log('[요청 URL]', fullUrl);
+          const endpoint = `/cards/scroll?${queryString}`;
+          const res = await api.get(endpoint);
+          const json = res.data as CardApiResponse;
 
-      try {
-        const endpoint = fullUrl.replace(API_BASE || '', '');
-        const res = await api.get(endpoint);
-
-        console.log('Response 객체:', res);
-        console.log('Response status:', res.status);
-        console.log('Response headers:', res.headers);
-
-        const json = res.data as CardApiResponse;
-        console.log('Parsed JSON:', json);
-        // CANCELLED 상태의 카드 제외
-        let filteredCards = json.data.cardResponseList.filter(
-          (card) => card.sellStatus !== 'CANCELLED'
-        );
-
-        // transactionStatus에 따라 카드 필터링
-        if (transactionStatus && transactionStatus !== 'ALL') {
-          filteredCards = filteredCards.filter(
-            (card: { sellStatus: string }) =>
-              card.sellStatus === transactionStatus
+          const newCards = json.data.cardResponseList.filter(
+            (card) => card.sellStatus !== 'CANCELLED'
           );
+
+          accumulatedCards = [...accumulatedCards, ...newCards];
+
+          hasNext = json.data.hasNext;
+          if (hasNext && newCards.length > 0) {
+            const lastCard = newCards[newCards.length - 1];
+            lastCardId = lastCard.id;
+            lastUpdatedAt = lastCard.updatedAt;
+          } else {
+            hasNext = false;
+          }
+        } catch (error) {
+          console.error('전체 카드 조회 중 오류 발생:', error);
+          hasNext = false; // 오류 발생 시 반복 중단
         }
-
-        // postView에 따른 필터링
-        filteredCards = filterCardsByPostView(filteredCards, postView);
-
-        // sortBy에 따라 카드 정렬
-        filteredCards = sortCards(filteredCards, sortBy);
-
-        // 카드 페이지 배열에 추가 (캐시)
-        setCardPages((prev) => {
-          const next = [...prev];
-          next[pageIdx] = filteredCards;
-          return next;
-        });
-
-        setTotalPages(json.data.hasNext ? pageIdx + 2 : pageIdx + 1);
-      } catch (e) {
-        console.error('카드 조회 실패:', e);
-        setCardPages((prev) => {
-          const next = [...prev];
-          next[pageIdx] = [];
-          return next;
-        });
-      } finally {
-        setLoading(false);
       }
+      setAllCards(accumulatedCards);
+      setLoading(false);
     };
 
-    fetchPage();
+    fetchAllCards();
   }, [
-    currentPage,
-    cardPages,
     cardCategory,
     category,
-    transactionStatus,
     priceRange,
     sortBy,
-    carrier,
+    transactionStatus,
+    refetchTrigger,
+    postView,
   ]);
 
+  const filteredAndSortedCards = useMemo(() => {
+    // 'MY_POSTS'는 API에서 필터링할 수 없으므로 클라이언트에서 처리
+    const cardsToProcess = filterCardsByPostView(allCards, postView);
+    // 정렬
+    return sortCards(cardsToProcess, sortBy);
+  }, [allCards, postView, sortBy]);
+
+  const totalPages = Math.ceil(filteredAndSortedCards.length / PAGE_SIZE);
+
+  const currentCards = useMemo(() => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    return filteredAndSortedCards.slice(startIndex, endIndex);
+  }, [currentPage, filteredAndSortedCards]);
+
   const handlePageChange = (page: number) => {
-    if (page > 0 && page <= totalPages) {
+    if (page > 0 && (page <= totalPages || totalPages === 0)) {
       setCurrentPage(page);
     }
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowCreateButton(entry.isIntersecting);
+      },
+      {
+        rootMargin: '0px 0px -100px 0px',
+        threshold: 0.1,
+      }
+    );
+    const currentRef = homeLayoutRef.current;
+    if (currentRef) observer.observe(currentRef);
+    return () => {
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, []);
 
   return (
     <>
@@ -272,10 +227,10 @@ export default function HomePage() {
       {showCreateButton && <CreateButton onClick={actions.toggleCreateModal} />}
       <div ref={homeLayoutRef} className="flex items-center justify-center">
         <HomeLayout
-          cards={cardPages[currentPage - 1] || []}
+          cards={currentCards}
           isLoading={loading}
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={totalPages > 0 ? totalPages : 1}
           onPageChange={handlePageChange}
         />
       </div>

@@ -10,7 +10,7 @@ import FilterIcon from '@/public/filter.svg';
 import CloseIcon from '@/public/close.svg';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL';
-type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT';
+type TransactionStatus = 'ALL' | 'SELLING' | 'SOLD_OUT';
 type PriceRange = 'ALL' | 'P0_1000' | 'P0_1500' | 'P0_2000' | 'P0_2500';
 
 const FILTER_OPTIONS = {
@@ -23,7 +23,7 @@ const FILTER_OPTIONS = {
   transactionStatus: [
     { value: 'ALL', label: '모든 거래' },
     { value: 'SELLING', label: '거래 전' },
-    { value: 'TRADING', label: '거래 중' },
+
     { value: 'SOLD_OUT', label: '거래 완료' },
   ],
   priceRange: [
