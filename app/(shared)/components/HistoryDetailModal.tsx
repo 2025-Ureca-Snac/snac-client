@@ -25,16 +25,11 @@ interface AttachmentUrlResponse {
   message: string;
   timestamp: string;
 }
+import { DataUploadSection } from './DataUploadSection';
 // 취소 사유를 한글로 변환하는 함수
 const getCancelReasonText = (reason: string): string => {
   return REASON_MAP[reason] || reason || '없음';
 };
-
-// 메시지 타입별 CSS 클래스 매핑
-const messageTypeClasses = {
-  success: 'bg-green-50 border border-green-200 text-green-800',
-  error: 'bg-red-50 border border-red-200 text-red-800',
-} as const;
 
 /**
  * @author 이승우
@@ -51,18 +46,11 @@ export default function HistoryDetailModal({
   type,
 }: HistoryDetailModalProps) {
   const router = useRouter();
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [showCancelReason, setShowCancelReason] = useState(false);
   const [selectedCancelReason, setSelectedCancelReason] = useState<string>('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoadingFavorite, setIsLoadingFavorite] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState<string>('');
-  const [uploadMessageType, setUploadMessageType] = useState<
-    'success' | 'error' | ''
-  >('');
   const [attachmentImageUrl, setAttachmentImageUrl] = useState<string>('');
-  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   // 단골 상태 초기화
   useEffect(() => {
@@ -77,7 +65,6 @@ export default function HistoryDetailModal({
       // 데이터 수신완료 상태일 때만 이미지 가져오기
       if (item?.status === 'DATA_SENT' || item?.status === 'COMPLETED') {
         try {
-          setIsLoadingImage(true);
           const response = await api.get<AttachmentUrlResponse>(
             `/trades/${item.id}/attachment-url`
           );
@@ -88,7 +75,6 @@ export default function HistoryDetailModal({
         } catch (error) {
           console.error('첨부 이미지 URL 가져오기 실패:', error);
         } finally {
-          setIsLoadingImage(false);
         }
       }
     };
@@ -135,7 +121,10 @@ export default function HistoryDetailModal({
       return (
         status !== 'COMPLETED' &&
         status !== 'DATA_SENT' &&
-        cancelRequestStatus !== 'REQUESTED'
+        status !== 'REPORTED' &&
+        status !== 'CANCELED' &&
+        cancelRequestStatus !== 'REQUESTED' &&
+        cancelRequestStatus !== 'ACCEPTED'
       );
     }
 
@@ -168,30 +157,13 @@ export default function HistoryDetailModal({
     }
   };
 
-  // 파일 업로드 핸들러
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    console.log('파일 선택됨:', file.name);
-    setUploadedFile(file);
-  };
   // 전송완료 핸들러
-  const handleDataSent = async () => {
-    if (!uploadedFile) {
-      console.log('업로드된 파일이 없습니다.');
-      return;
-    }
-
+  const handleDataSent = async (file: File) => {
     try {
-      setIsUploading(true);
-      setUploadMessage('');
-      setUploadMessageType('');
-
       console.log('전송완료 버튼 클릭됨:', item);
 
       const formData = new FormData();
-      formData.append('file', uploadedFile);
+      formData.append('file', file);
 
       const response = await api.patch<SendDataResponse>(
         `/trades/${item.id}/send-data`,
@@ -221,16 +193,10 @@ export default function HistoryDetailModal({
           errorMessage = UPLOAD_ERROR_MESSAGE.TIMEOUT;
           break;
       }
-      setUploadMessage(errorMessage);
-      setUploadMessageType('error');
-
-      setUploadedFile(null); // 전송 완료 후 파일 정보 초기화
+      throw new Error(errorMessage);
     } catch (error) {
       console.error('데이터 전송 완료 처리 실패:', error);
-      setUploadMessage(UPLOAD_ERROR_MESSAGE.DEFAULT);
-      setUploadMessageType('error');
-    } finally {
-      setIsUploading(false);
+      throw error;
     }
   };
 
@@ -480,18 +446,6 @@ export default function HistoryDetailModal({
             </div>
           )}
 
-          {/* 상태에 따라 메시지 조건부 표시 */}
-          {item.status !== 'DATA_SENT' &&
-            item.status !== 'COMPLETED' &&
-            item.status !== 'CANCELED' &&
-            !item.cancelRequested && (
-              <div className="text-green-600 text-sm">
-                {type === 'sales'
-                  ? '판매요청이 접수되었습니다.'
-                  : '구매글이 등록 되었습니다.'}
-              </div>
-            )}
-
           {/* 첨부 이미지 표시 */}
           {type === 'purchase' &&
             item.status === 'DATA_SENT' &&
@@ -521,19 +475,6 @@ export default function HistoryDetailModal({
                     />
                   </div>
                 </a>
-              </div>
-            )}
-
-          {/* 이미지 로딩 중 표시 */}
-          {(item.status === 'DATA_SENT' || item.status === 'COMPLETED') &&
-            isLoadingImage && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-3">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-gray-600 text-sm">
-                    이미지 로딩 중...
-                  </span>
-                </div>
               </div>
             )}
 
@@ -591,108 +532,9 @@ export default function HistoryDetailModal({
             progressSteps.filter((step) => step.isActive).length >= 1 &&
             progressSteps.filter((step) => step.isActive).length < 5 &&
             item.status !== 'DATA_SENT' &&
-            item.cancelRequestStatus !== 'REQUESTED' && (
-              <div className="space-y-3">
-                <div className="text-gray-700 text-sm">
-                  아래 번호로{' '}
-                  <a
-                    href={
-                      item.carrier === 'SKT'
-                        ? 'https://www.tworld.co.kr/web/myt-data/giftdata?menuNm=T+끼리+데이터+선물'
-                        : item.carrier === 'KT'
-                          ? 'https://www.kt.com/mypage/benefit/data-gift'
-                          : item.carrier === 'LGU+'
-                            ? 'https://www.lguplus.co.kr/mypage/benefit/data-gift'
-                            : 'https://www.tworld.co.kr/web/myt-data/giftdata?menuNm=T+끼리+데이터+선물'
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 underline"
-                  >
-                    {item.carrier || 'SKT'}
-                  </a>
-                  통신사의 데이터{item.dataAmount || '2GB'}를 전송해주세요
-                </div>
-
-                {/* 전화번호 표시 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    전화번호
-                  </label>
-                  <div className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-base font-semibold text-gray-900">
-                    {item.phoneNumber || '010-0000-0000'}
-                  </div>
-                </div>
-
-                {/* 업로드된 파일 정보 */}
-                {uploadedFile && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 text-xs">📎</span>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-blue-900">
-                            {uploadedFile.name}
-                          </div>
-                          <div className="text-xs text-blue-600">
-                            {(uploadedFile.size / 1024).toFixed(1)} KB
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setUploadedFile(null)}
-                        className="text-blue-500 hover:text-blue-700 text-sm"
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* 업로드 메시지 표시 */}
-                {uploadMessage &&
-                  uploadMessageType &&
-                  messageTypeClasses[uploadMessageType] && (
-                    <div
-                      className={`p-3 rounded-lg text-sm ${messageTypeClasses[uploadMessageType]}`}
-                    >
-                      {uploadMessage}
-                    </div>
-                  )}
-
-                {/* 액션 버튼 */}
-                <div className="flex gap-2">
-                  <label className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer text-center">
-                    파일 업로드
-                    <input
-                      type="file"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      accept=".webp,.jpg,.jpeg,.png"
-                    />
-                  </label>
-                  <button
-                    onClick={handleDataSent}
-                    disabled={!uploadedFile || isUploading}
-                    className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
-                      uploadedFile && !isUploading
-                        ? 'bg-green-500 text-white hover:bg-green-600'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {isUploading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        업로드 중입니다
-                      </div>
-                    ) : (
-                      '전송완료'
-                    )}
-                  </button>
-                </div>
-              </div>
+            item.cancelRequestStatus !== 'REQUESTED' &&
+            item.cancelRequestStatus !== 'ACCEPTED' && (
+              <DataUploadSection item={item} onDataSent={handleDataSent} />
             )}
         </div>
 
