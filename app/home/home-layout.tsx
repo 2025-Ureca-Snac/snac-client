@@ -18,6 +18,7 @@ import type { CardData } from '@/app/(shared)/types/card';
 interface HomeLayoutProps {
   cards: CardData[];
   isLoading: boolean;
+  error: string | null;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -26,6 +27,7 @@ interface HomeLayoutProps {
 export default function HomeLayout({
   cards,
   isLoading,
+  error,
   currentPage,
   totalPages,
   onPageChange,
@@ -120,6 +122,10 @@ export default function HomeLayout({
             <div className="flex items-center justify-center py-20">
               <LoadingSpinner size="lg" />
             </div>
+          ) : error ? (
+            <p className="text-center text-red-500 dark:text-red-400 py-10">
+              {error}
+            </p>
           ) : (
             <>
               {cards.length === 0 && (
