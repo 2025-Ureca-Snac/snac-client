@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { api } from '@/app/(shared)/utils/api';
 import { getApiErrorInfo } from '@/app/(shared)/types/api-errors';
 import { MatchPartner } from '@/app/(shared)/stores/match-store';
+import { SNACK_GRADES } from '@/app/(shared)/constants/snack-grades';
+import Image from 'next/image';
 
 interface ActionButtonsProps {
   partner: MatchPartner & {
@@ -21,6 +23,12 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
   const [isToggling, setIsToggling] = useState(false);
+
+  // 바삭스코어에 따른 등급 계산
+  const currentGrade =
+    SNACK_GRADES.find(
+      (grade) => partner.rating >= grade.min && partner.rating <= grade.max
+    ) || SNACK_GRADES[0];
 
   const handleNewMatch = () => {
     router.push('/match');
@@ -130,9 +138,18 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
                 <h3 className="text-lg font-bold text-white mb-1">
                   {partner.name}
                 </h3>
-                <p className="text-gray-400 text-sm">
-                  평점: ⭐ {partner.rating}
-                </p>
+
+                <div className="flex items-center space-x-2">
+                  <Image
+                    src={currentGrade.icon}
+                    alt={currentGrade.name}
+                    width={16}
+                    height={16}
+                  />
+                  <p className="text-gray-400 text-sm">
+                    바삭스코어: {partner.rating}
+                  </p>
+                </div>
               </div>
               <div className="text-right">
                 <p className="text-green-400 font-bold">{partner.data}GB</p>

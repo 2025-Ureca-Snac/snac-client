@@ -18,14 +18,17 @@ export default function MyPageLayout({
   const getPageTitle = (pathname: string) => {
     if (pathname === '/mypage') return '마이페이지';
     if (pathname === '/mypage/point') return '포인트 • 머니';
+    if (pathname === '/mypage/settings') return '설정';
     return '마이페이지';
   };
 
   const handleBackClick = () => {
     if (pathname === '/mypage/point') {
       router.push('/mypage');
+    } else if (pathname === '/mypage/settings') {
+      router.push('/mypage');
     } else if (pathname === '/mypage') {
-      router.back();
+      router.push('/'); // 메인 페이지로 이동
     } else {
       router.push('/mypage');
     }

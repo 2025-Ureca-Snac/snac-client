@@ -1,7 +1,16 @@
 'use client';
 
-import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import {
+  useState,
+  useEffect,
+  Suspense,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import { api, handleApiError } from '@/app/(shared)/utils/api';
@@ -40,6 +49,7 @@ const getHistory = async (
 };
 
 function PointPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type') as AssetType;
 
@@ -83,6 +93,11 @@ function PointPageContent() {
     },
     threshold: 50,
   });
+  
+  // 슬라이드 관련 상태
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
 
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
@@ -359,10 +374,120 @@ function PointPageContent() {
     window.history.pushState({}, '', url.toString());
   };
 
-  const tabs = [
-    { id: 'POINT', label: '포인트' },
-    { id: 'MONEY', label: '머니' },
-  ];
+  const tabs = useMemo(
+    () => [
+      { id: 'POINT', label: '포인트' },
+      { id: 'MONEY', label: '머니' },
+    ],
+    []
+  );
+
+  // 슬라이드 핸들러
+  const handleDragStart = useCallback((clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setCurrentX(clientX);
+  }, []);
+
+  const handleDragMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging) return;
+      setCurrentX(clientX);
+    },
+    [isDragging]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return;
+
+    const deltaX = currentX - startX;
+    const threshold = 100; // 슬라이드 감지 임계값
+
+    if (Math.abs(deltaX) > threshold) {
+      const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
+
+      if (deltaX > 0 && currentIndex > 0) {
+        // 오른쪽으로 스와이프 - 이전 탭
+        handleTabChange(tabs[currentIndex - 1].id as AssetType);
+      } else if (deltaX < 0 && currentIndex < tabs.length - 1) {
+        // 왼쪽으로 스와이프 - 다음 탭
+        handleTabChange(tabs[currentIndex + 1].id as AssetType);
+      }
+    }
+
+    setIsDragging(false);
+  }, [isDragging, currentX, startX, activeTab, tabs]);
+
+  // 슬라이드 방향에 따른 애니메이션 설정
+  const getSlideAnimation = () => {
+    const deltaX = currentX - startX;
+
+    if (Math.abs(deltaX) < 20) return { x: 0 };
+
+    if (deltaX > 0) {
+      // 오른쪽으로 슬라이드 - 현재 화면이 오른쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 150, 1);
+      return {
+        x: Math.min(deltaX * 0.3, 200), // 더 부드러운 이동
+        opacity: 1 - progress * 0.3, // 약간 투명해짐
+      };
+    } else {
+      // 왼쪽으로 슬라이드 - 현재 화면이 왼쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 150, 1);
+      return {
+        x: Math.max(deltaX * 0.3, -200), // 더 부드러운 이동
+        opacity: 1 - progress * 0.3, // 약간 투명해짐
+      };
+    }
+  };
+
+  // 터치 이벤트 핸들러
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      handleDragStart(e.touches[0].clientX);
+    },
+    [handleDragStart]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
+      handleDragMove(e.touches[0].clientX);
+    },
+    [handleDragMove, isDragging]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  // 마우스 이벤트 핸들러
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      handleDragStart(e.clientX);
+    },
+    [handleDragStart]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      handleDragMove(e.clientX);
+    },
+    [handleDragMove]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging) {
+      handleDragEnd();
+    }
+  }, [isDragging, handleDragEnd]);
 
   // PC 헤더
   const DesktopHeader = () => (
@@ -471,22 +596,24 @@ function PointPageContent() {
   );
 
   // 에러 컴포넌트
-  const ErrorState = () => (
-    <div className="bg-white rounded-lg shadow-sm border">
-      <div className="p-6">
-        <div className="text-center py-8">
-          <div className="text-red-500 mb-2">오류가 발생했습니다</div>
-          <div className="text-gray-500 mb-4">{error}</div>
-          <button
-            onClick={loadPointData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-          >
-            다시 시도
-          </button>
+  const ErrorState = () => {
+    // 에러 발생 시 바로 로그인 페이지로 이동
+    useEffect(() => {
+      console.log('포인트 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
+    }, [error, router]);
+
+    return (
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="p-6">
+          <div className="text-center py-8">
+            <div className="text-gray-500">로그인 페이지로 이동 중...</div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white w-full">
@@ -516,22 +643,45 @@ function PointPageContent() {
               ) : error ? (
                 <ErrorState />
               ) : (
-                <PointContent
-                  tabs={tabs}
-                  activeTab={activeTab}
-                  setActiveTab={handleTabChange}
-                  pointsHistory={activeTab === 'POINT' ? currentHistory : []}
-                  moneyHistory={activeTab === 'MONEY' ? currentHistory : []}
-                  hasNext={hasNext}
-                  onLoadMore={handleLoadMore}
-                  isLoadingMore={isLoadingMore}
-                  balance={balance}
-                  selectedYear={selectedYear}
-                  selectedMonth={selectedMonth}
-                  onYearChange={handleYearChange}
-                  onMonthChange={setSelectedMonth}
-                  onRefreshData={handleRefreshData}
-                />
+                <motion.div
+                  className="select-none overflow-hidden"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseLeave}
+                  animate={
+                    isDragging ? getSlideAnimation() : { x: 0, opacity: 1 }
+                  }
+                  transition={{
+                    type: 'spring',
+                    stiffness: 200,
+                    damping: 25,
+                  }}
+                >
+                  <PointContent
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    setActiveTab={handleTabChange}
+                    pointsHistory={activeTab === 'POINT' ? currentHistory : []}
+                    moneyHistory={activeTab === 'MONEY' ? currentHistory : []}
+                    hasNext={hasNext}
+                    onLoadMore={handleLoadMore}
+                    isLoadingMore={isLoadingMore}
+                    balance={balance}
+                    selectedYear={selectedYear}
+                    selectedMonth={selectedMonth}
+                    onYearChange={handleYearChange}
+                    onMonthChange={setSelectedMonth}
+                    onRefreshData={handleRefreshData}
+                    isDragging={isDragging}
+                  />
+                </motion.div>
               )}
             </section>
           </div>

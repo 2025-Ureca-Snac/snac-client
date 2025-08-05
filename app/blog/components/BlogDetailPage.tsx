@@ -41,7 +41,7 @@ export default function BlogDetailPage({
 
   if (!post) {
     return (
-      <div className="p-10 text-center text-gray-500">
+      <div className="p-10 text-center text-gray-500 dark:text-gray-100">
         게시글을 찾을 수 없습니다.
         <div className="mt-8">
           <Link href="/blog" className="text-blue-600 underline">
@@ -54,7 +54,9 @@ export default function BlogDetailPage({
 
   const renderContent = () => {
     if (!post.articleUrl) {
-      return <p className="text-gray-700">콘텐츠가 없습니다.</p>;
+      return (
+        <p className="text-gray-700 dark:text-gray-100 ">콘텐츠가 없습니다.</p>
+      );
     }
 
     if (post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -77,17 +79,21 @@ export default function BlogDetailPage({
     if (markdownContent) {
       return <MarkdownRenderer content={markdownContent} />;
     }
-    return <p className="text-gray-700">콘텐츠가 없습니다.</p>;
+    return (
+      <p className="text-gray-700 dark:text-gray-100">콘텐츠가 없습니다.</p>
+    );
   };
 
   return (
     <div className="max-w-6xl mx-auto bg-white rounded-2xl my-8 shadow-light flex flex-col">
       {/* 헤더 */}
       <div className="flex-shrink-0 border-b border-gray-200 px-6 py-4 rounded-t-2xl flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">블로그 포스트</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          블로그 포스트
+        </h2>
         <Link
           href="/blog"
-          className="text-gray-500 hover:text-gray-800 px-2 py-1 text-xs border border-gray-300 rounded transition-colors"
+          className="text-gray-500 dark:text-gray-100 hover:text-gray-800 px-2 py-1 text-xs border border-gray-300 rounded transition-colors"
         >
           목록으로
         </Link>
@@ -108,10 +114,12 @@ export default function BlogDetailPage({
         )}
 
         {/* 제목 */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">{post.title}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 dark:text-gray-100">
+          {post.title}
+        </h1>
 
         {/* 메타 정보 */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-200">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-100 mb-8 pb-6 border-b border-gray-200">
           {post.nickname && (
             <div className="flex items-center gap-2">
               <svg
@@ -137,7 +145,7 @@ export default function BlogDetailPage({
 
         {/* 관련 포스트 */}
         <div className="border-t border-gray-200 pt-8 mt-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             관련 포스트
           </h3>
           {relatedPosts.length > 0 ? (
@@ -152,7 +160,9 @@ export default function BlogDetailPage({
               ))}
             </div>
           ) : (
-            <p className="text-gray-600">관련된 다른 포스트가 없습니다.</p>
+            <p className="text-gray-600 dark:text-gray-100">
+              관련된 다른 포스트가 없습니다.
+            </p>
           )}
         </div>
       </div>

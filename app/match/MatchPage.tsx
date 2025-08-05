@@ -15,7 +15,6 @@ import { useMatchStore } from '../(shared)/stores/match-store';
 import { useAuthStore } from '../(shared)/stores/auth-store';
 import TradeCancelModal from '../(shared)/components/TradeCancelModal';
 import { toast } from 'sonner';
-import { Header } from '../(shared)/components/Header';
 import { Footer } from '../(shared)/components/Footer';
 
 interface ServerTradeData {
@@ -31,6 +30,8 @@ interface ServerTradeData {
   phone?: string;
   buyerNickname?: string;
   sellerNickName?: string;
+  sellerRatingScore?: number;
+  buyerRatingScore?: number;
   cancelReason?: string;
 }
 
@@ -148,7 +149,7 @@ export default function MatchPage() {
   // 판매자 클릭 처리 (구매자용) - 먼저 정의
   const handleSellerClick = useCallback(async (seller: User) => {
     if (seller.type !== 'seller') {
-      alert('판매자에게만 거래 요청이 가능합니다.');
+      toast.error('판매자에게만 거래 요청이 가능합니다.');
       return;
     }
 
@@ -182,10 +183,11 @@ export default function MatchPage() {
         phone: tradeData.phone || '010-0000-0000',
         point: tradeData.point || 0,
         priceGb: tradeData.priceGb || 0,
-        sellerRatingScore: 1000, // 기본값
+        sellerRatingScore: tradeData.sellerRatingScore,
         status: tradeData.status,
         buyerNickname: tradeData.buyerNickname,
         sellerNickName: tradeData.sellerNickName,
+        buyerRatingScore: tradeData.buyerRatingScore,
         cancelReason: tradeData.cancelReason || null,
         type: 'seller' as const,
       });
@@ -293,7 +295,7 @@ export default function MatchPage() {
         pendingFilters.price.length > 0;
 
       if (!hasRequired) {
-        alert('모든 필터 조건을 선택해주세요.');
+        toast.error('모든 필터 조건을 선택해주세요.');
         return;
       }
 
@@ -463,7 +465,7 @@ export default function MatchPage() {
           phone: '010-0000-0000', // 실제로는 서버에서 받아야 함
           point: 0, // 실제로는 서버에서 받아야 함
           priceGb: sellerInfo.price,
-          sellerRatingScore: request.ratingData || 1000,
+          sellerRatingScore: request.sellerRatingScore || 1000,
           status: 'ACCEPTED',
           cancelReason: null,
           type: 'buyer' as const, // 판매자 입장에서 상대방은 구매자
@@ -485,7 +487,6 @@ export default function MatchPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>

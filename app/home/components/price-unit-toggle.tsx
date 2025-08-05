@@ -34,7 +34,9 @@ export const PriceUnitToggle = ({
       <button
         onClick={() => setCurrentUnit('snack')}
         className={`relative z-10 flex flex-1 items-center justify-center ${paddingY} text-center ${textSize} font-bold transition-colors duration-300 ${
-          currentUnit === 'snack' ? 'text-gray-900' : 'text-gray-500'
+          currentUnit === 'snack'
+            ? 'text-gray-900 dark:text-gray-100'
+            : 'text-gray-500 dark:text-gray-400'
         }`}
       >
         <Image
@@ -49,7 +51,9 @@ export const PriceUnitToggle = ({
       <button
         onClick={() => setCurrentUnit('won')}
         className={`relative z-10 flex flex-1 items-center justify-center ${paddingY} text-center ${textSize} font-bold transition-colors duration-300 ${
-          currentUnit === 'won' ? 'text-gray-900' : 'text-gray-500'
+          currentUnit === 'won'
+            ? 'text-gray-900 dark:text-gray-100'
+            : 'text-gray-500 dark:text-gray-400'
         }`}
       >
         ₩ 원

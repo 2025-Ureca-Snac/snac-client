@@ -21,6 +21,7 @@ import {
   getShortageAmount,
 } from '../(shared)/utils/payment-calculations';
 import { CardData } from '../(shared)/types/card';
+import { toast } from 'sonner';
 
 /**
  * @author 이승우
@@ -147,14 +148,14 @@ export default function PaymentPage() {
           `/payment/complete?pay=${pay}&tradeId=${tradeId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
-        alert(`결제가 실패했습니다. 다시 시도해주세요.`);
+        toast.error(`결제가 실패했습니다. 다시 시도해주세요.`);
         console.error('결제 실패:', responseData);
       }
     } catch (error) {
-      console.error('스낵 포인트 결제 오류:', error);
-      alert(
-        `결제 중 오류가 발생했습니다. \n${(error as { response: { data: { message: string } } }).response.data.message}`
-      );
+      toast.error('스낵 포인트 결제 오류:', {
+        description: (error as { response: { data: { message: string } } })
+          .response.data.message,
+      });
     }
   };
 

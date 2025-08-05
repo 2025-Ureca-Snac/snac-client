@@ -8,6 +8,9 @@ import { useUserStore } from '../stores/user-store';
 import { useModalStore } from '../stores/modal-store';
 import { SNACK_GRADES } from '../constants/snack-grades';
 import { useBalanceStore } from '../stores/balance-store';
+import { api } from '../utils/api';
+import { ApiResponse } from '../types/api';
+import { BalanceResponse } from '../types/point-history';
 
 /**
  * @author 이승우
@@ -33,6 +36,52 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
   useEffect(() => {
     fetchBalance();
   }, [fetchBalance]);
+  
+  // 잔액 데이터 로드
+  const loadBalance = async () => {
+    // 이미 로딩 중인 경우 중복 호출 방지
+    if (isBalanceLoadingRef.current) {
+      return;
+    }
+
+    // 이미 한 번 로드된 경우 중복 호출 방지 (React.StrictMode 대응)
+    if (globalBalanceLoaded) {
+      setIsBalanceLoading(false);
+      return;
+    }
+
+    try {
+      isBalanceLoadingRef.current = true;
+      globalBalanceLoaded = true;
+      setIsBalanceLoading(true);
+      const balanceResponse = await getBalance();
+      globalBalanceData = balanceResponse;
+      setBalance(balanceResponse);
+    } catch (err) {
+      console.error('잔액 로드 실패:', err);
+      // 에러 발생 시 플래그 리셋
+      globalBalanceLoaded = false;
+      globalBalanceData = null;
+    } finally {
+      setIsBalanceLoading(false);
+      isBalanceLoadingRef.current = false;
+    }
+  };
+
+  // 컴포넌트 마운트 시 잔액 로드
+  useEffect(() => {
+    // 이미 로드된 경우 즉시 리턴 (React.StrictMode 대응)
+    if (globalBalanceLoaded) {
+      // 이미 로드된 경우 기존 데이터 복원
+      if (globalBalanceData) {
+        setBalance(globalBalanceData);
+      }
+      setIsBalanceLoading(false);
+      return;
+    }
+
+    loadBalance();
+  }, []);
 
   const score = profile?.score || 0;
   const maxScore = 1000;
