@@ -69,19 +69,17 @@ const filterCardsByPostView = (
 };
 
 const sortCards = (cards: CardData[], sortBy: string): CardData[] => {
+  // 새로운 배열을 만들어 정렬 (원본 배열 보존)
   const sorted = [...cards];
-  if (sortBy === 'RATING') {
-    return sorted.sort((a, b) => {
-      if (a.ratingScore !== b.ratingScore) {
-        return b.ratingScore - a.ratingScore;
-      }
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  } else {
-    return sorted.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  }
+  sorted.sort((a, b) => {
+    // 인기순(RATING)일 경우 바삭스코어를 우선 비교
+    if (sortBy === 'RATING' && a.ratingScore !== b.ratingScore) {
+      return b.ratingScore - a.ratingScore;
+    }
+    // 그 외의 경우 (또는 바삭스코어가 같은 경우) 최신순으로 정렬
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+  return sorted;
 };
 
 export default function HomePage() {
