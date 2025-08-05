@@ -29,7 +29,7 @@ export default function FilterButtons({
         <button
           onClick={onReset}
           disabled={resetDisabled}
-          className="px-4 py-3 bg-gray-100 rounded-lg font-bold text-gray-800 hover:bg-gray-200 dark:hover-bg-gray-700  md:bg-transparent md:border md:border-gray-400 md:text-gray-400"
+          className="px-4 py-3 bg-gray-100 rounded-lg font-bold text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700  md:bg-transparent md:border md:border-gray-400 md:text-gray-400"
         >
           {resetText}
         </button>
