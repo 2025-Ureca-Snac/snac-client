@@ -12,6 +12,7 @@ const pageLinks = [
   { name: '실시간 매칭', href: '/match' },
   { name: '블로그', href: '/blog' },
   { name: '마이페이지', href: '/mypage' },
+  { name: '문의하기', href: '/mypage/report-history' },
   { name: '관리자', href: '/admin' },
 ];
 
@@ -45,8 +46,11 @@ export const MobileFooter = () => {
     if (link.name === '마이페이지') {
       return !!user;
     }
-    if (link.name === '관리자 페이지') {
-      return role === ADMIN_ROLE; // 관리자 권한일 때만
+    if (link.name === '문의하기') {
+      return !!user;
+    }
+    if (link.name === '관리자') {
+      return !!user && role === ADMIN_ROLE;
     }
     return true;
   });
