@@ -1,6 +1,5 @@
 'use client';
 
-// [수정] 더 이상 useState, useEffect가 필요 없으므로 React만 임포트합니다.
 import React from 'react';
 
 interface CreateButtonProps {
