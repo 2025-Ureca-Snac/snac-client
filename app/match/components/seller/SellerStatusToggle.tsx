@@ -31,8 +31,77 @@ export default function SellerStatusToggle({
   return (
     <div className="space-y-4">
       {/* 등록된 정보 표시 */}
+
+      {/* 상태 토글 버튼 - 형광블랙 컨셉 */}
+      <button
+        onClick={onToggle}
+        className={`w-full px-6 py-5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+          sellerInfo.isActive
+            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl border-2 border-green-400'
+            : 'bg-gradient-to-r from-slate-700 to-gray-800 text-white shadow-lg hover:shadow-xl border-2 border-slate-500 hover:border-slate-400 animate-pulse'
+        }`}
+      >
+        <div className="flex items-center justify-center space-x-3">
+          {/* 상태 표시 - 활성화일 때 형광 효과 */}
+          {sellerInfo.isActive ? (
+            <div className="flex items-center space-x-2">
+              {animationData ? (
+                <div className="w-5 h-5">
+                  <Lottie
+                    loop
+                    animationData={animationData}
+                    play
+                    style={{ width: 20, height: 20 }}
+                  />
+                </div>
+              ) : (
+                <div className="w-4 h-4 rounded-full bg-green-300 animate-pulse shadow-lg shadow-green-300/50"></div>
+              )}
+              <span className="text-lg">판매 활성화됨 - 매칭 중</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded-full bg-slate-400 border-2 border-slate-300 shadow-md animate-bounce"></div>
+              <span className="text-lg animate-pulse">판매 비활성화됨</span>
+            </div>
+          )}
+        </div>
+
+        {/* 서브 텍스트 */}
+        <div
+          className={`text-sm mt-2 ${
+            sellerInfo.isActive ? 'text-green-100' : 'text-slate-200'
+          }`}
+        >
+          {sellerInfo.isActive
+            ? '구매자들이 실시간으로 거래를 신청할 수 있습니다'
+            : '거래 신청을 받지 않습니다'}
+        </div>
+
+        {/* 활성화 상태일 때 추가 시각적 효과 */}
+        {sellerInfo.isActive && (
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-400/20 to-emerald-400/20 animate-pulse pointer-events-none"></div>
+        )}
+
+        {/* 비활성화 상태일 때 추가 시각적 효과 */}
+        {!sellerInfo.isActive && (
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-slate-400/10 to-gray-400/10 animate-pulse pointer-events-none"></div>
+        )}
+      </button>
+
+      {/* 비활성화 상태일 때 안내 메시지 */}
+      {!sellerInfo.isActive && (
+        <div className="text-center py-4">
+          <div className="text-slate-600 text-sm font-medium animate-pulse">
+            위 버튼을 눌러서 판매를 활성화하세요
+          </div>
+          <div className="text-xs text-slate-500 mt-1">
+            활성화하면 조건에 맞는 구매자들에게 표시됩니다
+          </div>
+        </div>
+      )}
       {sellerInfo.isActive && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl p-4 shadow-lg">
           <div className="flex items-center space-x-3 mb-3">
             {/* Lottie 애니메이션 또는 기본 아이콘 */}
             {animationData ? (
@@ -47,7 +116,7 @@ export default function SellerStatusToggle({
             ) : (
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             )}
-            <span className="text-gray-950 font-medium">
+            <span className="text-gray-950 font-semibold">
               구매자를 찾고 있습니다
             </span>
           </div>
@@ -60,61 +129,6 @@ export default function SellerStatusToggle({
                 : `${sellerInfo.dataAmount * 1000}MB`}
             </p>
             <p>💰 가격: {sellerInfo.price.toLocaleString()}원</p>
-          </div>
-        </div>
-      )}
-
-      {/* 상태 토글 버튼 */}
-      <button
-        onClick={onToggle}
-        className={`w-full px-6 py-4 rounded-lg font-medium transition-all duration-300 ${
-          sellerInfo.isActive
-            ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg'
-            : 'bg-gray-600 text-gray-200 hover:bg-gray-500'
-        }`}
-      >
-        <div className="flex items-center justify-center space-x-3">
-          {/* 상태 표시 - 활성화일 때 Lottie 애니메이션 */}
-          {sellerInfo.isActive ? (
-            <div className="flex items-center space-x-2">
-              {animationData ? (
-                <div className="w-4 h-4">
-                  <Lottie
-                    loop
-                    animationData={animationData}
-                    play
-                    style={{ width: 16, height: 16 }}
-                  />
-                </div>
-              ) : (
-                <div className="w-3 h-3 rounded-full bg-green-300 animate-pulse"></div>
-              )}
-            </div>
-          ) : (
-            <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-          )}
-
-          <span>
-            {sellerInfo.isActive
-              ? '판매 활성화됨 - 매칭 중'
-              : '판매 비활성화됨'}
-          </span>
-        </div>
-        <div className="text-sm opacity-75 mt-1">
-          {sellerInfo.isActive
-            ? '구매자들이 실시간으로 거래를 신청할 수 있습니다'
-            : '거래 신청을 받지 않습니다'}
-        </div>
-      </button>
-
-      {/* 비활성화 상태일 때 안내 메시지 */}
-      {!sellerInfo.isActive && (
-        <div className="text-center py-4">
-          <div className="text-gray-500 text-sm">
-            위 버튼을 눌러서 판매를 활성화하세요
-          </div>
-          <div className="text-xs text-gray-400 mt-1">
-            활성화하면 조건에 맞는 구매자들에게 표시됩니다
           </div>
         </div>
       )}
