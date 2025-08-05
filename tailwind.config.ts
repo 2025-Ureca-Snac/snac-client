@@ -234,6 +234,7 @@ const config: Config = {
         blink: 'blink 3s ease-in-out infinite',
         'blink-fast': 'blink 0.5s ease-in-out infinite',
         'blink-slow': 'blink 2s ease-in-out infinite',
+        float: 'float 4s ease-in-out infinite',
       },
       keyframes: {
         glow: {
@@ -254,6 +255,12 @@ const config: Config = {
           '0%, 50%': { opacity: '1' },
           '25%, 75%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px) translateX(0px)' },
+          '25%': { transform: 'translateY(-8px) translateX(0px)' },
+          '50%': { transform: 'translateY(-4px) translateX(0px)' },
+          '75%': { transform: 'translateY(6px) translateX(0px)' },
         },
       },
       colors: {

@@ -81,7 +81,9 @@ export default function FavoriteListModal({
                         {favorite.nickname.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <span className="font-medium">{favorite.nickname}</span>
+                    <span className="font-medium dark:text-gray-100">
+                      {favorite.nickname}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-gray-400 text-xs">
