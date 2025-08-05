@@ -3,9 +3,11 @@
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import Image from 'next/image';
+
 import FilterGroup from '@/app/(shared)/components/FilterGroup';
 import FilterButtons from '@/app/(shared)/components/FilterButtons';
+import FilterIcon from '@/public/filter.svg';
+import CloseIcon from '@/public/close.svg';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL';
 type TransactionStatus = 'ALL' | 'SELLING' | 'TRADING' | 'SOLD_OUT';
@@ -62,18 +64,12 @@ export const Filter = () => {
         <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[1015px] bg-white md:max-h-full md:rounded-2xl shadow-light">
           <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
             <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
-              <Image
-                src="/filter.svg"
-                alt="필터"
-                width={24}
-                height={24}
-                className="hidden md:block"
-              />
+              <FilterIcon className="hidden md:block dark:text-white" />
               필터
             </h2>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide">
+          <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide  ">
             <FilterGroup
               title="카테고리"
               options={FILTER_OPTIONS.category}
@@ -145,16 +141,11 @@ export const Filter = () => {
                       className="p-2"
                       aria-label="필터 닫기"
                     >
-                      <Image
-                        src="/close.svg"
-                        alt="필터 닫기"
-                        width={24}
-                        height={24}
-                      />
+                      <CloseIcon className=" dark:text-white" />
                     </button>
                   </div>
 
-                  <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide">
+                  <div className="flex-grow overflow-y-auto p-4 space-y-6 scrollbar-hide ">
                     <FilterGroup
                       title="카테고리"
                       options={FILTER_OPTIONS.category}
