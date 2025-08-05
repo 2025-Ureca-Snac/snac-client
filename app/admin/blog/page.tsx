@@ -31,7 +31,7 @@ export default function Page() {
               px-3 py-1.5
               border border-gray-300 dark:border-gray-600
               rounded-full bg-transparent
-              text-gray-700 dark:text-gray-200
+              text-gray-700 dark:text-white
               focus:outline-none focus:ring-2 focus:ring-white
               transition
               w-full md:w-auto
@@ -45,7 +45,7 @@ export default function Page() {
               inline-flex items-center space-x-2
               px-3 py-1.5
               bg-transparent border border-gray-300 dark:border-gray-600
-              text-gray-600 dark:text-gray-200 font-medium text-regular-md
+              text-gray-600 dark:text-white font-medium text-regular-md
               rounded-full transition-colors duration-200
               hover:bg-gray-100 dark:hover:bg-gray-800
               whitespace-nowrap
@@ -67,7 +67,7 @@ export default function Page() {
 
         <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-light">
           {loading && (
-            <div className="text-center py-10 text-gray-600 dark:text-gray-200">
+            <div className="text-center py-10 text-gray-600 dark:text-white">
               데이터를 불러오는 중...
             </div>
           )}

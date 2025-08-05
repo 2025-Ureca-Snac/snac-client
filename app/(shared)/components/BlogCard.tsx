@@ -100,7 +100,7 @@ export const BlogCard = ({
 
       {/* 상세 정보 (상세 모드) */}
       {isDetailed && (
-        <div className="p-4 bg-white dark:bg-gray-800 dark:text-gray-100">
+        <div className="p-4 dark:text-white">
           <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-regular-lg">
             {post.title}
           </h3>
