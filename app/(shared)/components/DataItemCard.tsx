@@ -72,7 +72,6 @@ export const DataItemCard = ({
 
   const isBuyView = cardCategory === 'BUY';
 
-  // sellStatus에 따른 버튼 텍스트와 클릭 가능 여부 결정
   const getButtonConfig = () => {
     switch (sellStatus) {
       case 'SELLING':
@@ -102,7 +101,6 @@ export const DataItemCard = ({
 
   return (
     <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md w-full max-h-[203px] md:max-h-[348px] flex flex-col p-3">
-      {/* 배지 영역 */}
       {isNew && (
         <span className="absolute top-3 left-3 z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] flex items-center justify-center">
           {newBadgeText}
@@ -114,7 +112,6 @@ export const DataItemCard = ({
         </span>
       )}
 
-      {/* 이미지 영역  */}
       <div className="relative h-[64px] md:h-[125px] mt-[35px] md:mt-[80px]">
         <Image
           src={imageUrl}
@@ -141,7 +138,9 @@ export const DataItemCard = ({
         {!isMyPost ? (
           <Button
             onClick={() => {
-              if (!buttonConfig.clickable) return;
+              if (!buttonConfig.clickable) {
+                return;
+              }
               if (!skipLoginCheck && !loggedInUser) {
                 toast.error('로그인 해주세요.');
                 router.push('/login');
