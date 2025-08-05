@@ -61,14 +61,6 @@ export default function Banner({
     <section className="bg-black ">
       <div className="flex flex-col md:flex-row items-start">
         <div className="mt-14 md:mt-0 flex-col w-full md:w-1/2 h-[266px] md:h-[532px] relative flex justify-center items-center">
-          <UserConnectionAnimation />
-          {/* <Image
-            src="/potato-lime.png"
-            alt="메인 배너 이미지"
-            fill
-            className="object-contain"
-            priority
-          /> */}
           <div className="pt-6 pb-2">
             <p className="text-regular-md text-center text-white pb-2">
               평균 거래 완료 시간
@@ -121,6 +113,14 @@ export default function Banner({
               </div>
             )}
           </div>
+          <UserConnectionAnimation />
+          {/* <Image
+            src="/potato-lime.png"
+            alt="메인 배너 이미지"
+            fill
+            className="object-contain"
+            priority
+          /> */}
         </div>
 
         <div className="w-full md:w-1/2 py-8 px-6 md:pl-10 md:pr-[106px] mt-6 md:mt-16">
