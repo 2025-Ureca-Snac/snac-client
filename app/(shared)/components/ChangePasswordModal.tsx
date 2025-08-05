@@ -251,24 +251,25 @@ export default function ChangePasswordModal({
           {/* 상단 아이콘 */}
           <div className="flex flex-col items-center -mt-12 mb-2">
             <div
-              className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-2 border-4 border-white shadow"
+              className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-2 border-4 border-white shadow"
               style={{ marginTop: '-32px' }}
             >
               <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="#D1FADF" />
                 <path
-                  d="M12 7v4l2 2"
-                  stroke="#16B364"
+                  d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z"
+                  fill="#DBEAFE"
+                  stroke="#2563EB"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="#16B364"
+                <path
+                  d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11"
+                  fill="#DBEAFE"
+                  stroke="#2563EB"
                   strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </div>
@@ -281,7 +282,7 @@ export default function ChangePasswordModal({
                 onClose();
               }}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded"
+              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
               aria-label="닫기"
               tabIndex={0}
             >
@@ -571,7 +572,7 @@ export default function ChangePasswordModal({
                 !passwordValidation.isValid ||
                 isLoading
               }
-              className="w-2/3 py-3 rounded-lg bg-green-200 text-black font-medium hover:bg-green-300 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="w-2/3 py-3 rounded-lg bg-blue-200 text-black font-medium hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               tabIndex={0}
             >
               {isLoading ? '변경 중...' : '변경하기'}

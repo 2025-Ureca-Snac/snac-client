@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import AnimatedTabContent from './AnimatedTabContent';
@@ -69,6 +72,7 @@ export default function TradingHistoryPage({
   type,
   selectedId,
 }: TradingHistoryPageProps) {
+  const router = useRouter();
   const isPurchase = type === 'purchase';
 
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'completed'>(
@@ -84,6 +88,11 @@ export default function TradingHistoryPage({
 
   // 중복 호출 방지를 위한 ref
   const isInitialLoadRef = useRef(false);
+
+  // 슬라이드 관련 상태
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
 
   // 거래 내역 데이터 로드 (useCallback으로 안정화)
   const loadTradingHistory = useCallback(
@@ -194,6 +203,9 @@ export default function TradingHistoryPage({
   }, [selectedId, tradingHistory.length]); // tradingHistory.length만 의존
 
   const handleCardClick = (item: TradingHistoryItem) => {
+    // 슬라이드 중에는 모달 열지 않음
+    if (isDragging) return;
+
     // TradingHistoryItem을 HistoryItem으로 변환
     const historyItem: HistoryItem = {
       id: item.tradeId,
@@ -251,6 +263,130 @@ export default function TradingHistoryPage({
       }
     }
   };
+
+  // 슬라이드 핸들러
+  const handleDragStart = useCallback((clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setCurrentX(clientX);
+  }, []);
+
+  const handleDragMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging) return;
+      setCurrentX(clientX);
+    },
+    [isDragging]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return;
+
+    const deltaX = currentX - startX;
+    const threshold = 100; // 슬라이드 감지 임계값
+
+    if (Math.abs(deltaX) > threshold) {
+      // tabs는 나중에 정의되므로 여기서 직접 정의
+      const tabs = [
+        { id: 'all', label: '전체' },
+        { id: 'active', label: isPurchase ? '구매 거래 중' : '판매 거래 중' },
+        {
+          id: 'completed',
+          label: isPurchase ? '구매 거래 완료' : '판매 거래 완료',
+        },
+      ];
+
+      const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
+
+      if (deltaX > 0 && currentIndex > 0) {
+        // 오른쪽으로 스와이프 - 이전 탭
+        setActiveTab(tabs[currentIndex - 1].id as typeof activeTab);
+      } else if (deltaX < 0 && currentIndex < tabs.length - 1) {
+        // 왼쪽으로 스와이프 - 다음 탭
+        setActiveTab(tabs[currentIndex + 1].id as typeof activeTab);
+      }
+    }
+
+    setIsDragging(false);
+  }, [isDragging, currentX, startX, activeTab, isPurchase]);
+
+  // 슬라이드 방향 감지
+  const getSlideDirection = () => {
+    const deltaX = currentX - startX;
+    if (Math.abs(deltaX) < 20) return null;
+    return deltaX > 0 ? 'right' : 'left';
+  };
+
+  // 슬라이드 방향에 따른 애니메이션 설정
+  const getSlideAnimation = () => {
+    const deltaX = currentX - startX;
+
+    if (Math.abs(deltaX) < 20) return { x: 0 };
+
+    if (deltaX > 0) {
+      // 오른쪽으로 슬라이드 - 현재 화면이 오른쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 150, 1);
+      return {
+        x: Math.min(deltaX * 0.3, 200), // 더 부드러운 이동
+        opacity: 1 - progress * 0.3, // 약간 투명해짐
+      };
+    } else {
+      // 왼쪽으로 슬라이드 - 현재 화면이 왼쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 150, 1);
+      return {
+        x: Math.max(deltaX * 0.3, -200), // 더 부드러운 이동
+        opacity: 1 - progress * 0.3, // 약간 투명해짐
+      };
+    }
+  };
+
+  // 터치 이벤트 핸들러
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      handleDragStart(e.touches[0].clientX);
+    },
+    [handleDragStart]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
+      handleDragMove(e.touches[0].clientX);
+    },
+    [handleDragMove, isDragging]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  // 마우스 이벤트 핸들러
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      handleDragStart(e.clientX);
+    },
+    [handleDragStart]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      handleDragMove(e.clientX);
+    },
+    [handleDragMove]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging) {
+      handleDragEnd();
+    }
+  }, [isDragging, handleDragEnd]);
 
   // 테마 설정
   const theme = {
@@ -350,20 +486,22 @@ export default function TradingHistoryPage({
   );
 
   // 에러 컴포넌트
-  const ErrorState = () => (
-    <div className="p-6">
-      <div className="text-center py-8">
-        <div className="text-red-500 mb-2">오류가 발생했습니다</div>
-        <div className="text-gray-500 mb-4">{error}</div>
-        <button
-          onClick={() => loadTradingHistory(activeTab)}
-          className={`px-4 py-2 ${theme.buttonColor} text-white rounded-lg focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
-        >
-          다시 시도
-        </button>
+  const ErrorState = () => {
+    // 에러 발생 시 바로 로그인 페이지로 이동
+    useEffect(() => {
+      console.log('거래 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
+    }, [error, router]);
+
+    return (
+      <div className="p-6">
+        <div className="text-center py-8">
+          <div className="text-gray-500">로그인 페이지로 이동 중...</div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // 상태 텍스트 매핑
   const getStatusText = (status: string) => {
@@ -439,46 +577,71 @@ export default function TradingHistoryPage({
                 />
 
                 {/* 거래 내역 리스트 */}
-                <AnimatedTabContent tabKey={activeTab}>
-                  {isLoading ? (
-                    <LoadingState />
-                  ) : error ? (
-                    <ErrorState />
-                  ) : (
-                    <div className="p-6">
-                      {tradingHistory?.length > 0 ? (
-                        <div
-                          className="space-y-4"
-                          role="list"
-                          aria-label={`${activeTab === 'all' ? '전체' : activeTab === 'active' ? (isPurchase ? '구매 중' : '판매 중') : isPurchase ? '구매 완료' : '판매 완료'} ${isPurchase ? '구매' : '판매'} 내역`}
-                        >
-                          {tradingHistory.map((item) => (
-                            <TradingHistoryCard
-                              key={item.tradeId}
-                              item={item}
-                              isPurchase={isPurchase}
-                              theme={theme}
-                              onCardClick={handleCardClick}
-                              onCardKeyDown={handleCardKeyDown}
-                              getCarrierImageUrl={getCarrierImageUrl}
-                              getStatusText={getStatusText}
-                              partnerNickname={item.partnerNickname}
-                              partnerFavorite={item.partnerFavorite}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div
-                          className="text-center py-8 text-gray-500"
-                          role="status"
-                          aria-live="polite"
-                        >
-                          {getEmptyMessage()}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </AnimatedTabContent>
+                <motion.div
+                  className="select-none overflow-hidden"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseLeave}
+                  animate={
+                    isDragging ? getSlideAnimation() : { x: 0, opacity: 1 }
+                  }
+                  transition={{
+                    type: 'spring',
+                    stiffness: 200,
+                    damping: 25,
+                  }}
+                >
+                  <AnimatedTabContent
+                    tabKey={activeTab}
+                    slideDirection={getSlideDirection()}
+                  >
+                    {isLoading ? (
+                      <LoadingState />
+                    ) : error ? (
+                      <ErrorState />
+                    ) : (
+                      <div className="p-6">
+                        {tradingHistory?.length > 0 ? (
+                          <div
+                            className="space-y-4"
+                            role="list"
+                            aria-label={`${activeTab === 'all' ? '전체' : activeTab === 'active' ? (isPurchase ? '구매 중' : '판매 중') : isPurchase ? '구매 완료' : '판매 완료'} ${isPurchase ? '구매' : '판매'} 내역`}
+                          >
+                            {tradingHistory.map((item) => (
+                              <TradingHistoryCard
+                                key={item.tradeId}
+                                item={item}
+                                isPurchase={isPurchase}
+                                theme={theme}
+                                onCardClick={handleCardClick}
+                                onCardKeyDown={handleCardKeyDown}
+                                getCarrierImageUrl={getCarrierImageUrl}
+                                getStatusText={getStatusText}
+                                partnerNickname={item.partnerNickname}
+                                partnerFavorite={item.partnerFavorite}
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <div
+                            className="text-center py-8 text-gray-500"
+                            role="status"
+                            aria-live="polite"
+                          >
+                            {getEmptyMessage()}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </AnimatedTabContent>
+                </motion.div>
               </div>
             </section>
           </div>
