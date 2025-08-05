@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { getHistoryStatusColor } from '../utils/history-status';
 
 interface TradingHistoryItem {
   tradeId: number;
@@ -82,21 +83,13 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
         </div>
         <div className="flex items-center gap-2 mb-2">
           <span
-            className={`text-white text-xs px-2 py-1 rounded ${
-              item.cancelRequested
-                ? 'bg-red-500'
-                : item.status === 'BUY_REQUESTED' ||
-                    item.status === 'ACCEPTED' ||
-                    item.status === 'PAYMENT_CONFIRMED' ||
-                    item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
-                    item.status === 'DATA_SENT'
-                  ? 'bg-orange-500'
-                  : item.status === 'COMPLETED' || item.status === 'AUTO_PAYOUT'
-                    ? 'bg-green-500'
-                    : item.status === 'CANCELED' ||
-                        item.status === 'AUTO_REFUND'
-                      ? 'bg-red-500'
-                      : 'bg-black'
+            className={`text-xs px-2 py-1 rounded ${
+              item.cancelRequestStatus === 'REQUESTED'
+                ? 'bg-red-500 text-white'
+                : getHistoryStatusColor(
+                    isPurchase ? 'purchase' : 'sales',
+                    item.status
+                  )
             }`}
             aria-label={`상태: ${
               item.cancelRequestStatus === 'REQUESTED'

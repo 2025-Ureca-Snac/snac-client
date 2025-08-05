@@ -14,6 +14,7 @@ import { api, handleApiError } from '../utils/api';
 import { ApiResponse } from '../types/api';
 import Link from 'next/link';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
+import { getHistoryStatusText } from '../utils/history-status';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
@@ -503,34 +504,6 @@ export default function TradingHistoryPage({
     );
   };
 
-  // 상태 텍스트 매핑
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'BUY_REQUESTED':
-        return '거래 요청';
-      case 'SELL_REQUESTED':
-        return '판매 요청';
-      case 'ACCEPTED':
-        return '거래 수락';
-      case 'PAYMENT_CONFIRMED':
-        return '결제 완료';
-      case 'PAYMENT_CONFIRMED_ACCEPTED':
-        return '구매자 매칭';
-      case 'DATA_SENT':
-        return '데이터 보냄';
-      case 'COMPLETED':
-        return '거래 완료';
-      case 'CANCELED':
-        return '거래 취소';
-      case 'AUTO_REFUND':
-        return '자동 환불';
-      case 'AUTO_PAYOUT':
-        return '자동 확정';
-      default:
-        return '거래 완료';
-    }
-  };
-
   // 빈 상태 메시지
   const getEmptyMessage = () => {
     if (activeTab === 'all') {
@@ -623,7 +596,9 @@ export default function TradingHistoryPage({
                                 onCardClick={handleCardClick}
                                 onCardKeyDown={handleCardKeyDown}
                                 getCarrierImageUrl={getCarrierImageUrl}
-                                getStatusText={getStatusText}
+                                getStatusText={(status: string) =>
+                                  getHistoryStatusText(type, status)
+                                }
                                 partnerNickname={item.partnerNickname}
                                 partnerFavorite={item.partnerFavorite}
                               />
