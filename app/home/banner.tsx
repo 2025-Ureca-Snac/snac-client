@@ -70,7 +70,7 @@ export default function Banner({
             priority
           /> */}
           <div className="pt-6 pb-2">
-            <p className="text-regular-md text-white pb-2">
+            <p className="text-regular-md text-center text-white pb-2">
               평균 거래 완료 시간
             </p>
             {displayMinutes > 0 || displaySeconds > 0 ? (
