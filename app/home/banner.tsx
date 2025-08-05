@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 // import { Button } from '@/app/(shared)/components/Button';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/app/(shared)/utils/api';
+import UserConnectionAnimation from './components/userConnectionAnimation';
 
 interface BannerProps {
   avgMinutes?: number;
@@ -60,14 +60,15 @@ export default function Banner({
   return (
     <section className="bg-black ">
       <div className="flex flex-col md:flex-row items-start">
-        <div className="w-full md:w-1/2 h-[266px] md:h-[532px] relative">
-          <Image
-            src="/banner.svg"
+        <div className="w-full md:w-1/2 h-[266px] md:h-[532px] relative flex justify-center items-center">
+          <UserConnectionAnimation />
+          {/* <Image
+            src="/potato-lime.png"
             alt="메인 배너 이미지"
             fill
             className="object-contain"
             priority
-          />
+          /> */}
         </div>
 
         <div className="w-full md:w-1/2 py-8 px-6 md:pl-10 md:pr-[106px] mt-6 md:mt-0">
