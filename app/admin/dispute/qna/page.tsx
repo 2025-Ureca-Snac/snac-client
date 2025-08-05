@@ -56,6 +56,10 @@ export default function AdminQnaPage() {
     }
   };
 
+  const qnaTypes = qnaTypeFilterCategories.map((cat) => cat.value);
+
+  const filteredDisputes = disputes.filter((d) => qnaTypes.includes(d.type));
+
   const renderDisputeList = () => {
     if (loading)
       return (
@@ -63,7 +67,7 @@ export default function AdminQnaPage() {
           데이터를 불러오는 중입니다...
         </div>
       );
-    if (disputes.length === 0)
+    if (filteredDisputes.length === 0)
       return (
         <div className="text-center py-20 text-regular-md text-gray-400">
           조건에 맞는 문의 내역이 없습니다.
@@ -72,7 +76,7 @@ export default function AdminQnaPage() {
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {disputes.map((d) => (
+        {filteredDisputes.map((d) => (
           <div
             key={d.id}
             className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-light flex flex-col justify-between"

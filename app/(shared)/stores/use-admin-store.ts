@@ -42,11 +42,13 @@ const QNA_TYPE_LABELS: { [key: string]: string } = {
   TECHNICAL_PROBLEM: '기술 문의',
   ACCOUNT: '계정 문의',
   PAYMENT: '결제 문의',
+  QNA_OTHER: '기타 문의',
 };
 
 const REPORT_TYPE_LABELS: { [key: string]: string } = {
   DATA_NONE: '데이터 미수신',
   DATA_PARTIAL: '데이터 일부 수신',
+  REPORT_OTHER: '기타 신고',
 };
 
 const transformStatsToChartData = (
