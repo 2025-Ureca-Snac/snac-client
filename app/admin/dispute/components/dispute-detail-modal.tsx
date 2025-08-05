@@ -6,22 +6,10 @@ import Image from 'next/image';
 import { Dispute } from '@/app/(shared)/stores/use-dispute-store';
 import { StatusBadge } from '@/app/admin/dispute/components/StatusBadge';
 
-interface ExtendedDispute extends Dispute {
-  tradeSummary?: {
-    tradeId: number;
-
-    priceGb: number;
-    dataAmount: number;
-    carrier: string;
-    myRole: string | null;
-    counterpartyId: number | null;
-  };
-}
-
 interface DisputeDetailModalProps {
   open: boolean;
   onClose: () => void;
-  dispute: ExtendedDispute;
+  dispute: Dispute;
 }
 
 const TYPE_LABELS: Record<string, string> = {
