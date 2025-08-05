@@ -2,22 +2,20 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-
 import { ApiResponse } from '../types/api';
-
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
+import { getHistoryStatusText } from '../utils/history-status';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import AnimatedTabContent from './AnimatedTabContent';
 import HistoryDetailModal from './HistoryDetailModal';
 import SideMenu from './SideMenu';
 import TabNavigation from './TabNavigation';
 import { TradingHistoryCard } from './TradingHistoryCard';
-import { getHistoryStatusText } from '../utils/history-status';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
@@ -89,9 +87,6 @@ export default function TradingHistoryPage({
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // 중복 호출 방지를 위한 ref
-  const isInitialLoadRef = useRef(false);
 
   // 스와이프 네비게이션 훅
   const { onTouchStart, onTouchEnd } = useSwipeNavigation({
