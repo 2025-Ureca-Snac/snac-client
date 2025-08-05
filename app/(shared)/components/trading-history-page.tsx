@@ -1,19 +1,21 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { ApiResponse } from '../types/api';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import SideMenu from './SideMenu';
-import TabNavigation from './TabNavigation';
-import AnimatedTabContent from './AnimatedTabContent';
-import HistoryDetailModal from './HistoryDetailModal';
-import { TradingHistoryCard } from './TradingHistoryCard';
 import { HistoryItem } from '../types/history-card';
 import { api, handleApiError } from '../utils/api';
-import { ApiResponse } from '../types/api';
-import Link from 'next/link';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
+import { getHistoryStatusText } from '../utils/history-status';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
+import AnimatedTabContent from './AnimatedTabContent';
+import HistoryDetailModal from './HistoryDetailModal';
+import SideMenu from './SideMenu';
+import TabNavigation from './TabNavigation';
+import { TradingHistoryCard } from './TradingHistoryCard';
 
 // 공통 타입 정의
 interface TradingHistoryResponse {
@@ -86,8 +88,18 @@ export default function TradingHistoryPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 중복 호출 방지를 위한 ref
-  const isInitialLoadRef = useRef(false);
+  // 스와이프 네비게이션 훅
+  const { onTouchStart, onTouchEnd } = useSwipeNavigation({
+    onSwipeLeft: () => {
+      if (activeTab === 'all') setActiveTab('active');
+      else if (activeTab === 'active') setActiveTab('completed');
+    },
+    onSwipeRight: () => {
+      if (activeTab === 'completed') setActiveTab('active');
+      else if (activeTab === 'active') setActiveTab('all');
+    },
+    threshold: 50,
+  });
 
   // 슬라이드 관련 상태
   const [isDragging, setIsDragging] = useState(false);
@@ -117,7 +129,8 @@ export default function TradingHistoryPage({
               item.status === 'ACCEPTED' ||
               item.status === 'PAYMENT_CONFIRMED' ||
               item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
-              item.status === 'DATA_SENT'
+              item.status === 'DATA_SENT' ||
+              item.status === 'REPORTED'
           );
         } else if (status === 'completed') {
           filteredData = response.trades.filter(
@@ -136,12 +149,14 @@ export default function TradingHistoryPage({
             a.status === 'BUY_REQUESTED' ||
             a.status === 'ACCEPTED' ||
             a.status === 'PAYMENT_CONFIRMED' ||
-            a.status === 'DATA_SENT';
+            a.status === 'DATA_SENT' ||
+            a.status === 'REPORTED';
           const bIsActive =
             b.status === 'BUY_REQUESTED' ||
             b.status === 'ACCEPTED' ||
             b.status === 'PAYMENT_CONFIRMED' ||
-            b.status === 'DATA_SENT';
+            b.status === 'DATA_SENT' ||
+            b.status === 'REPORTED';
 
           if (aIsActive && !bIsActive) return -1;
           if (!aIsActive && bIsActive) return 1;
@@ -168,13 +183,7 @@ export default function TradingHistoryPage({
 
   // 데이터 로드 (초기 로드 + 탭 변경)
   useEffect(() => {
-    // 이미 초기 로드가 완료되었으면 중복 호출 방지
-    if (isInitialLoadRef.current) {
-      return;
-    }
-
     let isMounted = true;
-    isInitialLoadRef.current = true;
 
     const loadData = async () => {
       if (isMounted) {
@@ -503,34 +512,6 @@ export default function TradingHistoryPage({
     );
   };
 
-  // 상태 텍스트 매핑
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'BUY_REQUESTED':
-        return '거래 요청';
-      case 'SELL_REQUESTED':
-        return '판매 요청';
-      case 'ACCEPTED':
-        return '거래 수락';
-      case 'PAYMENT_CONFIRMED':
-        return '결제 완료';
-      case 'PAYMENT_CONFIRMED_ACCEPTED':
-        return '구매자 매칭';
-      case 'DATA_SENT':
-        return '데이터 보냄';
-      case 'COMPLETED':
-        return '거래 완료';
-      case 'CANCELED':
-        return '거래 취소';
-      case 'AUTO_REFUND':
-        return '자동 환불';
-      case 'AUTO_PAYOUT':
-        return '자동 확정';
-      default:
-        return '거래 완료';
-    }
-  };
-
   // 빈 상태 메시지
   const getEmptyMessage = () => {
     if (activeTab === 'all') {
@@ -562,6 +543,8 @@ export default function TradingHistoryPage({
             <section
               className="w-full max-w-full"
               aria-labelledby={`${type}-history-title`}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
             >
               <div className="bg-white rounded-lg shadow-sm border">
                 {/* 탭 네비게이션 */}
@@ -574,6 +557,7 @@ export default function TradingHistoryPage({
                   activeTextColor={`text-${theme.primaryColorClass}-600`}
                   inactiveTextColor="text-gray-500"
                   underlineColor={`bg-${theme.primaryColorClass}-600`}
+                  disableDrag={true}
                 />
 
                 {/* 거래 내역 리스트 */}
@@ -623,9 +607,12 @@ export default function TradingHistoryPage({
                                 onCardClick={handleCardClick}
                                 onCardKeyDown={handleCardKeyDown}
                                 getCarrierImageUrl={getCarrierImageUrl}
-                                getStatusText={getStatusText}
+                                getStatusText={(status: string) =>
+                                  getHistoryStatusText(type, status)
+                                }
                                 partnerNickname={item.partnerNickname}
                                 partnerFavorite={item.partnerFavorite}
+                                isDragging={isDragging}
                               />
                             ))}
                           </div>

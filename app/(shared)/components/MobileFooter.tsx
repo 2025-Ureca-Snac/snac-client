@@ -3,15 +3,20 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 
-const pageLinks = [
+const ADMIN_ROLE = 'ADMIN';
+
+const PAGE_LINKS = [
   { name: '홈', href: '/' },
-  { name: '실시간 매칭', href: '#' },
-  { name: '마이페이지', href: '#' },
-  { name: '고객센터', href: '#' },
+  { name: '실시간 매칭', href: '/match' },
+  { name: '블로그', href: '/blog' },
+  { name: '마이페이지', href: '/mypage' },
+  { name: '문의하기', href: '/mypage/report-history' },
+  { name: '관리자', href: '/admin' },
 ];
 
-const socialLinks = [
+const SOCIAL_LINKS = [
   {
     src: '/youtube.svg',
     alt: '유튜브 바로가기',
@@ -32,19 +37,34 @@ const socialLinks = [
 // interface MobileFooter {}
 
 export const MobileFooter = () => {
+  const user = useAuthStore((state) => state.user);
+  const role = useAuthStore((state) => state.role);
+
   const [isPagesOpen, setIsPagesOpen] = useState(false);
+
+  const filteredPageLinks = PAGE_LINKS.filter((link) => {
+    switch (link.name) {
+      case '마이페이지':
+      case '문의하기':
+        return !!user;
+      case '관리자':
+        return !!user && role === ADMIN_ROLE;
+      default:
+        return true;
+    }
+  });
 
   return (
     <footer className=" text-white bg-black md:px-[160px] pt-[64px] px-8">
       {/* 로고, 설명, 소셜 */}
-      <span className="text-regular-2xl">Snac</span>
+      <span className="text-regular-2xl">SNAC</span>
       <p className="text-regular-sm py-8">
         남는 데이터를 연결하는
         <br /> 가장 간편한 거래 플랫폼
       </p>
       {/* 소셜 */}
       <div className="flex gap-6 pb-8 border-b border-gray-700">
-        {socialLinks.map((link) => (
+        {SOCIAL_LINKS.map((link) => (
           <Link href={link.href} key={link.alt} target="_blank">
             <Image src={link.src} alt={link.alt} width={24} height={24} />
           </Link>
@@ -56,7 +76,9 @@ export const MobileFooter = () => {
           onClick={() => setIsPagesOpen(!isPagesOpen)}
           className="w-full flex justify-between items-center py-8"
         >
-          <span className="text-medium-md hover:text-gray-300">페이지</span>
+          <span className="text-medium-md font-semibold hover:text-gray-300">
+            페이지
+          </span>
           {isPagesOpen ? (
             <Image src="/upArrow.svg" alt="메뉴 닫기" width={24} height={24} />
           ) : (
@@ -78,11 +100,11 @@ export const MobileFooter = () => {
               className="overflow-hidden "
             >
               <ul className="space-y-6 pb-6">
-                {pageLinks.map((link) => (
+                {filteredPageLinks.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-regular-sm text-white hover:text-gray-300 "
+                      className="text-regular-sm  text-white hover:text-gray-400"
                     >
                       {link.name}
                     </Link>
@@ -93,22 +115,15 @@ export const MobileFooter = () => {
           )}
         </AnimatePresence>
       </div>
-      {/* 회사 정보 */}
+      {/* 팀원 정보 */}
       <div className="py-8 border-b border-gray-700">
-        <h3 className="text-medium-md text-white">회사</h3>
-
+        <h3 className="text-medium-md font-semibold text-white">팀원</h3>
         <div className="mt-4 text-regular-sm text-white leading-relaxed">
-          <p>
-            06192 강남구 테헤란로 212,
-            <br />
-            멀티캠퍼스 선릉
-            <br />
-            서울특별시
-          </p>
-
-          <p className="mt-[18px]">1544-9001</p>
+          <div className="mb-3">프론트엔드: 김현훈, 양세현, 이승우</div>
+          <div>백엔드: 이재윤, 정동현, 정유민, 홍석준</div>
         </div>
       </div>
+
       {/* 결제 아이콘 */}
       <div className="py-6 ">
         <div className="flex justify-center gap-1">
@@ -121,16 +136,9 @@ export const MobileFooter = () => {
           />
         </div>
         {/* 저작권 및 약관 */}
-        <div className="flex flex-col items-center gap-4 pt-8">
-          <div className="flex gap-4">
-            <span className="text-regular-xs text-gray-500">
-              Privacy Policy
-            </span>
-            <span className="text-regular-xs text-gray-500">Terms of Use</span>
-          </div>
-
+        <div className="flex flex-col  pt-8">
           <p className="text-regular-xs text-gray-200">
-            Copyright © 2025 Snac. All rights reserved
+            Copyright © 2025 SNAC. All rights reservedd
           </p>
         </div>
       </div>

@@ -1,0 +1,60 @@
+'use client';
+
+import React from 'react';
+import { CardData } from '@/app/(shared)/types/card';
+
+interface ActionButtonsProps {
+  cardInfo: CardData;
+  isProcessing: boolean;
+  error: string | null;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export default function ActionButtons({
+  cardInfo,
+  isProcessing,
+  error,
+  onConfirm,
+  onCancel,
+}: ActionButtonsProps) {
+  return (
+    <div className="space-y-3">
+      {/* 에러 메시지 */}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* 액션 버튼들 */}
+      <div className="flex gap-3">
+        <button
+          onClick={onConfirm}
+          disabled={isProcessing || !!error}
+          className={`flex-[6] py-4 rounded-lg font-semibold text-white ${
+            cardInfo.cardCategory === 'SELL'
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-blue-500 hover:bg-blue-600'
+          } ${isProcessing || error ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {isProcessing
+            ? '처리중...'
+            : cardInfo.cardCategory === 'SELL'
+              ? '바로구매'
+              : '판매하기'}
+        </button>
+
+        <button
+          onClick={onCancel}
+          disabled={isProcessing}
+          className={`flex-[4] py-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 ${
+            isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          취소
+        </button>
+      </div>
+    </div>
+  );
+}

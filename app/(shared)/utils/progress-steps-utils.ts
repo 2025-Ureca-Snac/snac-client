@@ -82,6 +82,7 @@ export const getCurrentStep = (
       case 'AUTO_PAYOUT':
         return 5;
       case 'CANCELED':
+      case 'REPORTED':
         return 0;
       default:
         return 1;
@@ -102,6 +103,7 @@ export const getCurrentStep = (
       case 'AUTO_PAYOUT':
         return 5;
       case 'CANCELED':
+      case 'REPORTED':
         return 0;
       default:
         return 1;

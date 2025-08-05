@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { getHistoryStatusColor } from '../utils/history-status';
 
 interface TradingHistoryItem {
   tradeId: number;
@@ -35,6 +36,7 @@ interface TradingHistoryCardProps {
   getStatusText: (status: string) => string;
   partnerNickname: string;
   partnerFavorite: boolean;
+  isDragging?: boolean;
 }
 
 export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
@@ -47,6 +49,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
   getStatusText,
   partnerNickname,
   partnerFavorite,
+  isDragging = false,
 }) => {
   return (
     <div
@@ -54,7 +57,10 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
       role="listitem"
       tabIndex={0}
       className={`bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
-      onClick={() => onCardClick(item)}
+      onClick={() => {
+        if (isDragging) return;
+        onCardClick(item);
+      }}
       onKeyDown={(e) => onCardKeyDown(e, item)}
       aria-label={`${item.carrier} ${item.dataAmount}GB ${isPurchase ? '구매' : '판매'} 내역 - ${new Date(item.createdAt).toLocaleDateString('ko-KR')} - ${item.priceGb.toLocaleString()}원 - ${getStatusText(item.status)}`}
     >
@@ -82,21 +88,13 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
         </div>
         <div className="flex items-center gap-2 mb-2">
           <span
-            className={`text-white text-xs px-2 py-1 rounded ${
-              item.cancelRequested
-                ? 'bg-red-500'
-                : item.status === 'BUY_REQUESTED' ||
-                    item.status === 'ACCEPTED' ||
-                    item.status === 'PAYMENT_CONFIRMED' ||
-                    item.status === 'PAYMENT_CONFIRMED_ACCEPTED' ||
-                    item.status === 'DATA_SENT'
-                  ? 'bg-orange-500'
-                  : item.status === 'COMPLETED' || item.status === 'AUTO_PAYOUT'
-                    ? 'bg-green-500'
-                    : item.status === 'CANCELED' ||
-                        item.status === 'AUTO_REFUND'
-                      ? 'bg-red-500'
-                      : 'bg-black'
+            className={`text-xs px-2 py-1 rounded ${
+              item.cancelRequestStatus === 'REQUESTED'
+                ? 'bg-red-500 text-white'
+                : getHistoryStatusColor(
+                    isPurchase ? 'purchase' : 'sales',
+                    item.status
+                  )
             }`}
             aria-label={`상태: ${
               item.cancelRequestStatus === 'REQUESTED'

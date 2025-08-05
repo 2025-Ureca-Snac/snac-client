@@ -43,6 +43,7 @@ export interface TabNavigationProps {
   activeTextColor?: string;
   inactiveTextColor?: string;
   underlineColor?: string;
+  disableDrag?: boolean;
 }
 
 // Store 타입들
