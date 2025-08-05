@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
@@ -54,44 +54,63 @@ export default function InquiryHistoryPage() {
   const { createInquiry } = useInquiries();
   const { createReport } = useReports();
 
+  // 중복 호출 방지를 위한 ref
+  const isInitialLoadRef = useRef(false);
+
   /**
    * @author 이승우
    * @description 문의 목록 조회 함수
    * @param page - 페이지 번호 (기본값: 0)
    * @param loadMore - 추가 로드 여부 (기본값: false)
    */
-  const loadInquiries = useCallback(
-    async (page: number = 0, loadMore: boolean = false) => {
-      try {
-        setIsLoading(!loadMore);
-        setIsLoadingMore(loadMore);
+  const loadInquiries = async (page: number = 0, loadMore: boolean = false) => {
+    try {
+      setIsLoading(!loadMore);
+      setIsLoadingMore(loadMore);
 
-        const response = await getInquiryList(page, 20);
+      const response = await getInquiryList(page, 20);
 
-        console.log('문의 목록 API 응답:', response);
+      console.log('문의 목록 API 응답:', response);
 
-        if (loadMore) {
-          setInquiries((prev) => [...prev, ...response.content]);
-        } else {
-          setInquiries(response.content);
-        }
-
-        setCurrentPage(response.number);
-        setHasNext(!response.last);
-      } catch (error) {
-        toast.error(handleApiError(error));
-      } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+      if (loadMore) {
+        setInquiries((prev) => [...prev, ...response.content]);
+      } else {
+        setInquiries(response.content);
       }
-    },
-    []
-  );
+
+      setCurrentPage(response.number);
+      setHasNext(!response.last);
+    } catch (error) {
+      toast.error(handleApiError(error));
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
+  };
 
   // 초기 로드
   useEffect(() => {
-    loadInquiries(0, false);
-  }, [loadInquiries]);
+    // 이미 초기 로드가 완료되었으면 중복 호출 방지
+    if (isInitialLoadRef.current) {
+      return;
+    }
+
+    let isMounted = true;
+    isInitialLoadRef.current = true;
+
+    const loadData = async () => {
+      if (isMounted) {
+        console.log('문의 내역 초기 로드 시작');
+        await loadInquiries(0, false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []); // loadInquiries 의존성 제거
 
   // URL 파라미터 처리 - 신고하기 모달 자동 열기
   useEffect(() => {
@@ -111,17 +130,17 @@ export default function InquiryHistoryPage() {
       newUrl.searchParams.delete('tradeType');
       router.replace(newUrl.pathname + newUrl.search);
     }
-  }, [searchParams, router]);
+  }, [searchParams.toString(), router]); // searchParams.toString()으로 변경
 
   /**
    * @author 이승우
    * @description 더보기 로드 핸들러
    */
-  const handleLoadMore = useCallback(() => {
+  const handleLoadMore = () => {
     if (!isLoadingMore && hasNext) {
       loadInquiries(currentPage + 1, true);
     }
-  }, [isLoadingMore, hasNext, currentPage, loadInquiries]);
+  };
 
   /**
    * @author 이승우
