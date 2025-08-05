@@ -26,22 +26,26 @@ interface HeaderProps {
   isTrading?: boolean;
 }
 
+interface NavItemShowProps {
+  isAdmin: boolean;
+  isTrading: boolean;
+  isLoggedIn: boolean;
+}
+
 const NAV_ITEMS = [
   {
     key: 'admin',
     href: '/admin',
     icon: Admin,
     text: '관리자',
-    show: (isAdmin: boolean, _isTrading: boolean, _isLoggedIn: boolean) =>
-      isAdmin,
+    show: ({ isAdmin }: NavItemShowProps) => isAdmin,
   },
   {
     key: 'match',
     href: '/match',
     icon: Matching,
     text: '실시간 매칭',
-    show: (_isAdmin: boolean, isTrading: boolean, _isLoggedIn: boolean) =>
-      !isTrading,
+    show: ({ isTrading }: NavItemShowProps) => !isTrading,
   },
   {
     key: 'blog',
@@ -55,16 +59,14 @@ const NAV_ITEMS = [
     href: '/mypage',
     icon: User,
     text: '마이페이지',
-    show: (_isAdmin: boolean, _isTrading: boolean, isLoggedIn: boolean) =>
-      isLoggedIn,
+    show: ({ isLoggedIn }: NavItemShowProps) => isLoggedIn,
   },
   {
     key: 'login',
     href: '/login',
     icon: Login,
     text: '로그인',
-    show: (_isAdmin: boolean, _isTrading: boolean, isLoggedIn: boolean) =>
-      !isLoggedIn,
+    show: ({ isLoggedIn }: NavItemShowProps) => !isLoggedIn,
   },
 ];
 
@@ -127,7 +129,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
         <div className="relative z-10 gap-4 items-center md:flex hidden">
           {NAV_ITEMS.map(
             (item) =>
-              item.show(isAdmin, isTrading, isLoggedIn) && (
+              item.show({ isAdmin, isTrading, isLoggedIn }) && (
                 <Link
                   href={item.href}
                   key={item.key}
@@ -207,7 +209,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             >
               {NAV_ITEMS.map(
                 (item) =>
-                  item.show(isAdmin, isTrading, isLoggedIn) && (
+                  item.show({ isAdmin, isTrading, isLoggedIn }) && (
                     <button
                       type="button"
                       key={item.key}
