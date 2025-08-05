@@ -36,6 +36,7 @@ export default function MyPageBottomButtons() {
       >
         로그아웃
       </button>
+      {/* 탈퇴하기 버튼 (임시 주석처리)
       <button
         onClick={() => toast.info('탈퇴 기능은 아직 구현되지 않았습니다.')}
         className="w-full py-4 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
@@ -43,6 +44,7 @@ export default function MyPageBottomButtons() {
       >
         탈퇴하기
       </button>
+      */}
     </div>
   );
 }

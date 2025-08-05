@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 import SideMenu from '@/app/(shared)/components/SideMenu';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
 import AnimatedTabContent from '@/app/(shared)/components/AnimatedTabContent';
@@ -17,8 +18,8 @@ import {
   InquiryDetailItem,
   DisputeType,
 } from '@/app/(shared)/types/inquiry';
+
 import { toast } from 'sonner';
-import { handleApiError } from '@/app/(shared)/utils/api';
 import { useInquiries } from '@/app/(shared)/hooks/use-inquiries';
 import { useReports } from '@/app/(shared)/hooks/use-reports';
 import Link from 'next/link';
@@ -57,6 +58,11 @@ export default function InquiryHistoryPage() {
   // 중복 호출 방지를 위한 ref
   const isInitialLoadRef = useRef(false);
 
+  // 슬라이드 관련 상태
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+
   /**
    * @author 이승우
    * @description 문의 목록 조회 함수
@@ -81,7 +87,9 @@ export default function InquiryHistoryPage() {
       setCurrentPage(response.number);
       setHasNext(!response.last);
     } catch (error) {
-      toast.error(handleApiError(error));
+      console.log('신고 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -182,11 +190,128 @@ export default function InquiryHistoryPage() {
     });
   }, [inquiries, activeTab]);
 
-  const tabs = [
-    { id: 'all', label: '전체' },
-    { id: 'pending', label: '답변 대기' },
-    { id: 'answered', label: '답변 완료' },
-  ];
+  const tabs = useMemo(
+    () => [
+      { id: 'all', label: '전체' },
+      { id: 'pending', label: '답변 대기' },
+      { id: 'answered', label: '답변 완료' },
+    ],
+    []
+  );
+
+  // 슬라이드 핸들러
+  const handleDragStart = useCallback((clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setCurrentX(clientX);
+  }, []);
+
+  const handleDragMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging) return;
+      setCurrentX(clientX);
+    },
+    [isDragging]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return;
+
+    const deltaX = currentX - startX;
+    const threshold = 100; // 슬라이드 감지 임계값
+
+    if (Math.abs(deltaX) > threshold) {
+      const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
+
+      if (deltaX > 0 && currentIndex > 0) {
+        // 오른쪽으로 스와이프 - 이전 탭
+        setActiveTab(tabs[currentIndex - 1].id as typeof activeTab);
+      } else if (deltaX < 0 && currentIndex < tabs.length - 1) {
+        // 왼쪽으로 스와이프 - 다음 탭
+        setActiveTab(tabs[currentIndex + 1].id as typeof activeTab);
+      }
+    }
+
+    setIsDragging(false);
+  }, [isDragging, currentX, startX, activeTab, tabs]);
+
+  // 슬라이드 방향 감지
+  const getSlideDirection = () => {
+    const deltaX = currentX - startX;
+    if (Math.abs(deltaX) < 20) return null;
+    return deltaX > 0 ? 'right' : 'left';
+  };
+
+  // 슬라이드 방향에 따른 애니메이션 설정
+  const getSlideAnimation = () => {
+    const deltaX = currentX - startX;
+
+    if (Math.abs(deltaX) < 20) return { x: 0 };
+
+    if (deltaX > 0) {
+      // 오른쪽으로 슬라이드 - 현재 화면이 오른쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 150, 1);
+      return {
+        x: Math.min(deltaX * 0.3, 200), // 더 부드러운 이동
+        opacity: 1 - progress * 0.3, // 약간 투명해짐
+      };
+    } else {
+      // 왼쪽으로 슬라이드 - 현재 화면이 왼쪽으로 나감
+      const progress = Math.min(Math.abs(deltaX) / 150, 1);
+      return {
+        x: Math.max(deltaX * 0.3, -200), // 더 부드러운 이동
+        opacity: 1 - progress * 0.3, // 약간 투명해짐
+      };
+    }
+  };
+
+  // 터치 이벤트 핸들러
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      handleDragStart(e.touches[0].clientX);
+    },
+    [handleDragStart]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault();
+      }
+      handleDragMove(e.touches[0].clientX);
+    },
+    [handleDragMove, isDragging]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  // 마우스 이벤트 핸들러
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      handleDragStart(e.clientX);
+    },
+    [handleDragStart]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      handleDragMove(e.clientX);
+    },
+    [handleDragMove]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isDragging) {
+      handleDragEnd();
+    }
+  }, [isDragging, handleDragEnd]);
 
   /**
    * @author 이승우
@@ -207,7 +332,9 @@ export default function InquiryHistoryPage() {
         loadInquiries(0, false);
       }
     } catch (error) {
-      toast.error(handleApiError(error));
+      console.log('문의 작성 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     }
   };
 
@@ -217,6 +344,9 @@ export default function InquiryHistoryPage() {
    * @param inquiry - 조회할 문의 아이템
    */
   const handleInquiryClick = async (inquiry: InquiryItem) => {
+    // 슬라이드 중에는 모달 열지 않음
+    if (isDragging) return;
+
     try {
       console.log('문의 상세 조회 시작:', inquiry.disputeId);
       const inquiryDetail = await getInquiryDetail(inquiry.disputeId);
@@ -225,8 +355,9 @@ export default function InquiryHistoryPage() {
       setIsDetailModalOpen(true);
       console.log('모달 상태 설정 완료');
     } catch (error) {
-      console.error('문의 상세 조회 에러:', error);
-      toast.error(handleApiError(error));
+      console.log('문의 상세 조회 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     }
   };
 
@@ -254,7 +385,9 @@ export default function InquiryHistoryPage() {
         loadInquiries(0, false);
       }
     } catch (error) {
-      toast.error(handleApiError(error));
+      console.log('신고 작성 에러 발생, 로그인 페이지로 이동:', error);
+      toast.error('로그인 후 이용이 가능합니다.');
+      router.push('/login');
     }
   };
 
@@ -283,8 +416,9 @@ export default function InquiryHistoryPage() {
             </p>
           </div>
           <button
-            onClick={() => setIsInquiryModalOpen(true)}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            onClick={() => !isDragging && setIsInquiryModalOpen(true)}
+            disabled={isDragging}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             문의 작성
           </button>
@@ -358,95 +492,122 @@ export default function InquiryHistoryPage() {
                 />
 
                 {/* 문의 내역 리스트 */}
-                <AnimatedTabContent tabKey={activeTab}>
-                  <div className="p-6">
-                    {isLoading ? (
-                      <div className="text-center py-8 text-gray-500">
-                        로딩 중...
-                      </div>
-                    ) : (filteredInquiries?.length || 0) > 0 ? (
-                      <div className="space-y-4">
-                        {filteredInquiries?.map((item: InquiryItem) => (
-                          <div
-                            key={item.disputeId}
-                            className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
-                            onClick={() => handleInquiryClick(item)}
-                          >
-                            {/* 아이콘 */}
-                            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <span className="text-blue-600 font-bold text-lg">
-                                T
-                              </span>
-                            </div>
-
-                            {/* 내용 */}
-                            <div className="flex-1">
-                              <div className="text-sm text-gray-500 mb-1">
-                                {new Date(item.createdAt).toLocaleDateString(
-                                  'ko-KR'
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <div className="font-semibold text-gray-900">
-                                  {item.title}
-                                </div>
-                                {/* 신고/문의 구분 배지 */}
-                                <span
-                                  className={`px-2 py-1 text-xs rounded-full ${
-                                    item.category === 'REPORT'
-                                      ? 'bg-red-100 text-red-800'
-                                      : 'bg-blue-100 text-blue-800'
-                                  }`}
-                                >
-                                  {item.category === 'REPORT' ? '신고' : '문의'}
-                                </span>
-                              </div>
-                              <div className="text-sm text-gray-600 mb-2">
-                                {getCategoryName(item.type)}
-                              </div>
-
-                              {/* 상태 표시 */}
-                              <div className="mt-2">
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    item.status === 'IN_PROGRESS'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-green-100 text-green-800'
-                                  }`}
-                                >
-                                  {item.status === 'IN_PROGRESS'
-                                    ? '답변 대기'
-                                    : '답변 완료'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* 더보기 버튼 */}
-                        {hasNext && (
-                          <div className="text-center pt-4">
-                            <button
-                              onClick={handleLoadMore}
-                              disabled={isLoadingMore}
-                              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                <motion.div
+                  className="select-none overflow-hidden"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseLeave}
+                  animate={
+                    isDragging ? getSlideAnimation() : { x: 0, opacity: 1 }
+                  }
+                  transition={{
+                    type: 'spring',
+                    stiffness: 200,
+                    damping: 25,
+                  }}
+                >
+                  <AnimatedTabContent
+                    tabKey={activeTab}
+                    slideDirection={getSlideDirection()}
+                  >
+                    <div className="p-6">
+                      {isLoading ? (
+                        <div className="text-center py-8 text-gray-500">
+                          로딩 중...
+                        </div>
+                      ) : (filteredInquiries?.length || 0) > 0 ? (
+                        <div className="space-y-4">
+                          {filteredInquiries?.map((item: InquiryItem) => (
+                            <div
+                              key={item.disputeId}
+                              className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                              onClick={() => handleInquiryClick(item)}
                             >
-                              {isLoadingMore ? '로딩 중...' : '더보기'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        {activeTab === 'all'
-                          ? '문의 내역이 없습니다.'
-                          : activeTab === 'pending'
-                            ? '답변 대기 중인 문의가 없습니다.'
-                            : '답변 완료된 문의가 없습니다.'}
-                      </div>
-                    )}
-                  </div>
-                </AnimatedTabContent>
+                              {/* 아이콘 */}
+                              <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span className="text-blue-600 font-bold text-lg">
+                                  T
+                                </span>
+                              </div>
+
+                              {/* 내용 */}
+                              <div className="flex-1">
+                                <div className="text-sm text-gray-500 mb-1">
+                                  {new Date(item.createdAt).toLocaleDateString(
+                                    'ko-KR'
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="font-semibold text-gray-900">
+                                    {item.title}
+                                  </div>
+                                  {/* 신고/문의 구분 배지 */}
+                                  <span
+                                    className={`px-2 py-1 text-xs rounded-full ${
+                                      item.category === 'REPORT'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-blue-100 text-blue-800'
+                                    }`}
+                                  >
+                                    {item.category === 'REPORT'
+                                      ? '신고'
+                                      : '문의'}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-600 mb-2">
+                                  {getCategoryName(item.type)}
+                                </div>
+
+                                {/* 상태 표시 */}
+                                <div className="mt-2">
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      item.status === 'IN_PROGRESS'
+                                        ? 'bg-yellow-100 text-yellow-800'
+                                        : 'bg-green-100 text-green-800'
+                                    }`}
+                                  >
+                                    {item.status === 'IN_PROGRESS'
+                                      ? '답변 대기'
+                                      : '답변 완료'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+
+                          {/* 더보기 버튼 */}
+                          {hasNext && (
+                            <div className="text-center pt-4">
+                              <button
+                                onClick={handleLoadMore}
+                                disabled={isLoadingMore}
+                                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                              >
+                                {isLoadingMore ? '로딩 중...' : '더보기'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          {activeTab === 'all'
+                            ? '문의 내역이 없습니다.'
+                            : activeTab === 'pending'
+                              ? '답변 대기 중인 문의가 없습니다.'
+                              : '답변 완료된 문의가 없습니다.'}
+                        </div>
+                      )}
+                    </div>
+                  </AnimatedTabContent>
+                </motion.div>
               </div>
             </section>
           </div>

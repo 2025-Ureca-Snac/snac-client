@@ -5,8 +5,9 @@ import { Sort } from './components/sort';
 import { Modal } from './components/modal';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import HomeSection from './home-section';
-import Image from 'next/image';
 
+import RefreshIcon from '@/public/refresh.svg';
+import FilterIcon from '@/public/filter.svg';
 import { Pagination } from '@/app/(shared)/components/Pagination';
 import { PriceUnit } from '@/app/(shared)/types';
 import { PriceUnitToggle } from './components/price-unit-toggle';
@@ -17,6 +18,7 @@ import type { CardData } from '@/app/(shared)/types/card';
 interface HomeLayoutProps {
   cards: CardData[];
   isLoading: boolean;
+  error: string | null;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -25,6 +27,7 @@ interface HomeLayoutProps {
 export default function HomeLayout({
   cards,
   isLoading,
+  error,
   currentPage,
   totalPages,
   onPageChange,
@@ -58,12 +61,7 @@ export default function HomeLayout({
                 className="flex items-center gap-2"
                 aria-label="필터 열기"
               >
-                <Image
-                  src="/filter.svg"
-                  alt="필터 아이콘"
-                  width={20}
-                  height={20}
-                />
+                <FilterIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
                 <span className="font-semibold">필터</span>
               </button>
             </div>
@@ -78,13 +76,7 @@ export default function HomeLayout({
                   }}
                   aria-label="새로고침"
                 >
-                  <Image
-                    src="/refresh.svg"
-                    alt="새로고침"
-                    width={18}
-                    height={18}
-                    className="cursor-pointer"
-                  />
+                  <RefreshIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
                 </button>
               </div>
 
@@ -109,13 +101,7 @@ export default function HomeLayout({
                 onClick={() => actions.triggerRefetch()}
                 aria-label="새로고침"
               >
-                <Image
-                  src="/refresh.svg"
-                  alt="새로고침"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer"
-                />
+                <RefreshIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
               </button>
             </div>
 
@@ -130,10 +116,14 @@ export default function HomeLayout({
             <div className="flex items-center justify-center py-20">
               <LoadingSpinner size="lg" />
             </div>
+          ) : error ? (
+            <p className="text-center text-red-500 dark:text-red-400 py-10">
+              {error}
+            </p>
           ) : (
             <>
               {cards.length === 0 && (
-                <p className="text-center text-gray-500 py-10">
+                <p className="text-center text-gray-500 dark:text-gray-100 py-10">
                   표시할 데이터가 없습니다.
                 </p>
               )}
