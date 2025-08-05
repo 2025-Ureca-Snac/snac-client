@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 
 const ADMIN_ROLE = 'ADMIN';
-const pageLinks = [
+const PAGE_LINKS = [
   { name: '홈', href: '/' },
   { name: '실시간 매칭', href: '/match' },
   { name: '블로그', href: '/blog' },
@@ -35,7 +35,7 @@ export const DesktopFooter = () => {
   const user = useAuthStore((state) => state.user);
   const role = useAuthStore((state) => state.role);
 
-  const filteredPageLinks = pageLinks.filter((link) => {
+  const filteredPageLinks = PAGE_LINKS.filter((link) => {
     if (link.name === '마이페이지') {
       return !!user;
     }

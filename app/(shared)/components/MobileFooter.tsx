@@ -7,7 +7,7 @@ import { useAuthStore } from '@/app/(shared)/stores/auth-store';
 
 const ADMIN_ROLE = 'ADMIN';
 
-const pageLinks = [
+const PAGE_LINKS = [
   { name: '홈', href: '/' },
   { name: '실시간 매칭', href: '/match' },
   { name: '블로그', href: '/blog' },
@@ -16,7 +16,7 @@ const pageLinks = [
   { name: '관리자', href: '/admin' },
 ];
 
-const socialLinks = [
+const SOCIAL_LINKS = [
   {
     src: '/youtube.svg',
     alt: '유튜브 바로가기',
@@ -42,7 +42,7 @@ export const MobileFooter = () => {
 
   const [isPagesOpen, setIsPagesOpen] = useState(false);
 
-  const filteredPageLinks = pageLinks.filter((link) => {
+  const filteredPageLinks = PAGE_LINKS.filter((link) => {
     if (link.name === '마이페이지') {
       return !!user;
     }
@@ -65,7 +65,7 @@ export const MobileFooter = () => {
       </p>
       {/* 소셜 */}
       <div className="flex gap-6 pb-8 border-b border-gray-700">
-        {socialLinks.map((link) => (
+        {SOCIAL_LINKS.map((link) => (
           <Link href={link.href} key={link.alt} target="_blank">
             <Image src={link.src} alt={link.alt} width={24} height={24} />
           </Link>
@@ -139,7 +139,7 @@ export const MobileFooter = () => {
         {/* 저작권 및 약관 */}
         <div className="flex flex-col  pt-8">
           <p className="text-regular-xs text-gray-200">
-            Copyright © 2025 Snac. All rights reserved
+            Copyright © 2025 SNAC. All rights reservedd
           </p>
         </div>
       </div>
