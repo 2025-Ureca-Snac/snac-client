@@ -123,7 +123,7 @@ export default function Banner({
           </div>
         </div>
 
-        <div className="w-full md:w-1/2 py-8 px-6 md:pl-10 md:pr-[106px] mt-6 md:mt-7">
+        <div className="w-full md:w-1/2 py-8 px-6 md:pl-10 md:pr-[106px] mt-6 md:mt-16">
           <div className="pt-4">
             <p className="text-heading-sm text-burst-lime">
               실시간 매칭 진행중

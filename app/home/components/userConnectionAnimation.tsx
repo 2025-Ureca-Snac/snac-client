@@ -30,7 +30,13 @@ export default function UserConnectionAnimation({ className = '' }) {
           zIndex: 3,
         }}
       >
-        <Image src="/potato-look.png" alt="potato" width={100} height={100} />
+        <Image
+          src="/potato-look.png"
+          alt="potato"
+          width={100}
+          height={100}
+          className="scale-x-[-1]"
+        />
       </div>
       {/* 네온 연결선 */}
       <div
