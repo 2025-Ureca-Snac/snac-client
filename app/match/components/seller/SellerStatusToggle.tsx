@@ -35,10 +35,10 @@ export default function SellerStatusToggle({
       {/* 상태 토글 버튼 - 형광블랙 컨셉 */}
       <button
         onClick={onToggle}
-        className={`w-full px-6 py-5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+        className={`relative w-full px-6 py-5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 text-white shadow-lg hover:shadow-xl ${
           sellerInfo.isActive
-            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl border-2 border-green-400'
-            : 'bg-gradient-to-r from-slate-700 to-gray-800 text-white shadow-lg hover:shadow-xl border-2 border-slate-500 hover:border-slate-400 animate-pulse'
+            ? 'bg-gradient-to-r from-green-500 to-emerald-600 border-2 border-green-400'
+            : 'bg-gradient-to-r from-slate-700 to-gray-800 border-2 border-slate-500 hover:border-slate-400 animate-pulse'
         }`}
       >
         <div className="flex items-center justify-center space-x-3">
