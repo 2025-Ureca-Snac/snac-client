@@ -1,16 +1,9 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  MotionValue,
-  useMotionValue,
-} from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue } from 'framer-motion';
 import Image from 'next/image';
 import {
-  Lock,
   Newspaper,
   Zap,
   Clock,
@@ -18,9 +11,7 @@ import {
   ShieldCheck,
   Users,
   TrendingUp,
-  LogIn,
 } from 'lucide-react';
-import { toast } from 'sonner';
 
 // --- 파티클 배경 컴포넌트 ---
 const ParticleBackground = () => {
