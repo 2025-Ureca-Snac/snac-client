@@ -401,20 +401,24 @@ export default function InquiryHistoryPage() {
       <div className="flex items-center gap-2 mb-4">
         <Link
           href="/mypage"
-          className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
+          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
         >
           마이페이지
         </Link>
-        <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">문의 내역</span>
+        <span className="text-gray-400 dark:text-gray-500">/</span>
+        <span className="text-gray-900 dark:text-white font-medium">
+          문의 내역
+        </span>
       </div>
 
       {/* 제목과 설명 */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">문의 내역</h1>
-            <p className="text-gray-600 text-lg">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              문의 내역
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
               문의한 거래와 문의 받은 거래 내역을 확인하세요
             </p>
           </div>
@@ -436,33 +440,39 @@ export default function InquiryHistoryPage() {
       <div className="flex items-center gap-2 mb-4">
         <Link
           href="/mypage"
-          className="text-gray-500 hover:text-gray-700 text-sm transition-colors"
+          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
         >
           마이페이지
         </Link>
-        <span className="text-gray-400">/</span>
-        <span className="text-gray-900 font-medium">문의 내역</span>
+        <span className="text-gray-400 dark:text-gray-500">/</span>
+        <span className="text-gray-900 dark:text-white font-medium">
+          문의 내역
+        </span>
       </div>
 
       {/* 제목 */}
-      <h1 className="text-xl font-bold text-gray-900">문의 내역</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+        문의 내역
+      </h1>
     </div>
   );
 
   // 초기 로딩 중일 때 스피너 표시
   if (isLoading && inquiries.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">문의 내역을 불러오는 중...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            문의 내역을 불러오는 중...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
@@ -482,7 +492,7 @@ export default function InquiryHistoryPage() {
               className="w-full max-w-full"
               aria-labelledby="inquiry-history-title"
             >
-              <div className="bg-white rounded-lg shadow-sm border">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 {/* 탭 네비게이션 */}
                 <TabNavigation
                   tabs={tabs}
@@ -525,7 +535,7 @@ export default function InquiryHistoryPage() {
                   >
                     <div className="p-6">
                       {isLoading ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                           로딩 중...
                         </div>
                       ) : (filteredInquiries?.length || 0) > 0 ? (
@@ -533,14 +543,14 @@ export default function InquiryHistoryPage() {
                           {filteredInquiries?.map((item: InquiryItem) => (
                             <div
                               key={item.disputeId}
-                              className="bg-gray-50 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 transition-colors"
+                              className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                               onClick={() => {
                                 if (isDragging) return;
                                 handleInquiryClick(item);
                               }}
                             >
                               {/* 아이콘 */}
-                              <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
                                 <span className="text-blue-600 font-bold text-lg">
                                   T
                                 </span>
@@ -548,13 +558,13 @@ export default function InquiryHistoryPage() {
 
                               {/* 내용 */}
                               <div className="flex-1">
-                                <div className="text-sm text-gray-500 mb-1">
+                                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                                   {new Date(item.createdAt).toLocaleDateString(
                                     'ko-KR'
                                   )}
                                 </div>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <div className="font-semibold text-gray-900">
+                                  <div className="font-semibold text-gray-900 dark:text-white">
                                     {item.title}
                                   </div>
                                   {/* 신고/문의 구분 배지 */}
@@ -570,7 +580,7 @@ export default function InquiryHistoryPage() {
                                       : '문의'}
                                   </span>
                                 </div>
-                                <div className="text-sm text-gray-600 mb-2">
+                                <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                                   {getCategoryName(item.type)}
                                 </div>
 
@@ -601,7 +611,7 @@ export default function InquiryHistoryPage() {
                                   handleLoadMore();
                                 }}
                                 disabled={isLoadingMore || isDragging}
-                                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
                               >
                                 {isLoadingMore ? '로딩 중...' : '더보기'}
                               </button>
@@ -609,7 +619,7 @@ export default function InquiryHistoryPage() {
                           )}
                         </div>
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                           {activeTab === 'all'
                             ? '문의 내역이 없습니다.'
                             : activeTab === 'pending'

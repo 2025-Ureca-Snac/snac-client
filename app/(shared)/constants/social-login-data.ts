@@ -5,6 +5,7 @@
 export interface SocialProvider {
   name: string;
   src: string;
+  srcDark: string; // 다크 모드용 이미지 경로 추가
   providerId: string;
 }
 
@@ -16,16 +17,19 @@ export const SOCIALS: SocialProvider[] = [
   {
     name: '카카오',
     src: '/kakao.svg',
+    srcDark: '/kakao_dark.svg',
     providerId: 'kakao',
   },
   {
     name: '네이버',
     src: '/naver.svg',
+    srcDark: '/naver_dark.svg',
     providerId: 'naver',
   },
   {
     name: '구글',
     src: '/google.svg',
+    srcDark: '/google_dark.svg',
     providerId: 'google',
   },
 ];

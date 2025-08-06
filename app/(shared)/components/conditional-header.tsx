@@ -7,7 +7,12 @@ export default function ConditionalHeader() {
   const pathname = usePathname();
 
   // 헤더를 숨길 경로들
-  const hideHeaderPaths = ['/login', '/signUp', '/certification'];
+  const hideHeaderPaths = [
+    '/login',
+    '/signUp',
+    '/certification',
+    '/payment/process',
+  ];
   const shouldHideHeader = hideHeaderPaths.includes(pathname);
 
   if (shouldHideHeader) {

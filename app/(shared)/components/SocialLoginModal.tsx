@@ -22,7 +22,7 @@ export default function SocialLoginModal({
   onSubmit,
 }: SocialLoginModalProps) {
   const { linkSocialAccount, unlinkSocialAccount } = useAuthStore();
-  const { profile } = useUserStore();
+  const { profile, updateProfile } = useUserStore();
   const [linkedProviders, setLinkedProviders] = useState<{
     [key: string]: boolean;
   }>(SOCIAL_LOGIN_MODAL_INITIAL_STATE);
@@ -71,6 +71,18 @@ export default function SocialLoginModal({
             [providerId]: true,
           }));
 
+          // 프로필 상태 업데이트
+          updateProfile({
+            googleConnected:
+              providerId === 'google'
+                ? true
+                : profile?.googleConnected || false,
+            kakaoConnected:
+              providerId === 'kakao' ? true : profile?.kakaoConnected || false,
+            naverConnected:
+              providerId === 'naver' ? true : profile?.naverConnected || false,
+          });
+
           console.log('로컬 상태 업데이트 완료');
           toast.success(`${provider.name} 계정이 연동되었습니다.`);
 
@@ -90,6 +102,18 @@ export default function SocialLoginModal({
             ...prev,
             [providerId]: false,
           }));
+
+          // 프로필 상태 업데이트
+          updateProfile({
+            googleConnected:
+              providerId === 'google'
+                ? false
+                : profile?.googleConnected || false,
+            kakaoConnected:
+              providerId === 'kakao' ? false : profile?.kakaoConnected || false,
+            naverConnected:
+              providerId === 'naver' ? false : profile?.naverConnected || false,
+          });
 
           toast.success(`${provider.name} 계정 연동이 해제되었습니다.`);
 
@@ -117,14 +141,14 @@ export default function SocialLoginModal({
   return (
     <ModalPortal isOpen={open} onClose={onClose}>
       <div
-        className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black bg-opacity-30 dark:bg-opacity-50 flex items-center justify-center z-50"
         onClick={onClose}
         tabIndex={-1}
         aria-modal="true"
         role="dialog"
       >
         <div
-          className="bg-white rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 상단 아이콘 */}
@@ -140,19 +164,19 @@ export default function SocialLoginModal({
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black text-center">
+            <div className="text-xl font-extrabold text-black dark:text-white text-center">
               소셜 로그인 연동
             </div>
             <button
               onClick={onClose}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100"
               aria-label="닫기"
             >
               ×
             </button>
           </div>
-          <div className="w-full text-center text-gray-600 mb-6 text-sm">
+          <div className="w-full text-center text-gray-600 dark:text-gray-300 mb-6 text-sm">
             소셜 계정 연동 상태를 관리해주세요.
           </div>
 
@@ -161,7 +185,7 @@ export default function SocialLoginModal({
             {SOCIAL_MODAL_PROVIDERS.map((provider) => (
               <div
                 key={provider.id}
-                className="w-full flex items-center justify-between p-4 rounded-lg border-2 border-gray-200"
+                className="w-full flex items-center justify-between p-4 rounded-lg border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700"
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -169,7 +193,7 @@ export default function SocialLoginModal({
                   >
                     {provider.icon}
                   </div>
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">
                     {provider.name}
                   </span>
                 </div>
@@ -178,7 +202,9 @@ export default function SocialLoginModal({
                   onClick={() => handleToggleProvider(provider.id)}
                   disabled={isLoading === provider.id}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    linkedProviders[provider.id] ? 'bg-blue-600' : 'bg-gray-200'
+                    linkedProviders[provider.id]
+                      ? 'bg-blue-600'
+                      : 'bg-gray-200 dark:bg-gray-600'
                   } ${isLoading === provider.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isLoading === provider.id ? (
