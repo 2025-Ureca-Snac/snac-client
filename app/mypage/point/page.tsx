@@ -43,7 +43,7 @@ const getHistory = async (
   let url = `/asset-histories/me?assetType=${assetType}&size=${size}`;
 
   if (year && month) {
-    url += `&year=${year}&month=${month}`;
+    url += `&yearMonth=${year}-${month.toString().padStart(2, '0')}`;
   }
 
   const response = await api.get<ApiResponse<PointHistoryResponse>>(url);
