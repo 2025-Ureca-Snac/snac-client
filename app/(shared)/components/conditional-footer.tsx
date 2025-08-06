@@ -7,7 +7,12 @@ export default function ConditionalFooter() {
   const pathname = usePathname();
 
   // 푸터를 숨길 경로들
-  const hideFooterPaths = ['/login', '/signUp', '/certification'];
+  const hideFooterPaths = [
+    '/login',
+    '/signUp',
+    '/certification',
+    '/payment/process',
+  ];
   const shouldHideFooter = hideFooterPaths.includes(pathname);
 
   if (shouldHideFooter) {

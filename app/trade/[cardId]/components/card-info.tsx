@@ -24,9 +24,9 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
     <div className="flex flex-col md:flex-row gap-8">
       {/* 왼쪽: 상품 이미지 */}
       <div className="flex-1">
-        <div className="bg-gray-100 rounded-lg p-8 flex items-center justify-center min-h-[400px]">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="w-32 h-32 bg-white rounded-lg flex items-center justify-center mb-4 mx-auto shadow-sm">
+            <div className="w-32 h-32 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center mb-4 mx-auto shadow-sm">
               <Image
                 src={getCarrierImageUrl(cardInfo.carrier)}
                 alt={`${formatCarrierName(cardInfo.carrier)} 로고`}
@@ -35,10 +35,10 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
                 className="object-contain"
               />
             </div>
-            <h3 className="text-lg font-semibold text-gray-700">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
               {formatCarrierName(cardInfo.carrier)} 데이터
             </h3>
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               {formatDataAmount(cardInfo.dataAmount)}
             </p>
           </div>
@@ -50,18 +50,18 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
         <div className="space-y-6">
           {/* 상품 제목 */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {formatCarrierName(cardInfo.carrier)} 데이터{' '}
               {formatDataAmount(cardInfo.dataAmount)}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {cardInfo.cardCategory === 'SELL' ? '판매글' : '구매글'}
             </p>
           </div>
 
           {/* 가격 */}
           <div>
-            <div className="text-3xl font-bold text-gray-900 flex items-center">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
               {(cardInfo.price || 0).toLocaleString()}
               {unit === 'snack' ? (
                 <Image
@@ -72,7 +72,7 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
                   className="ml-2"
                 />
               ) : (
-                <span className="text-lg font-normal text-gray-600 ml-1">
+                <span className="text-lg font-normal text-gray-600 dark:text-gray-300 ml-1">
                   원
                 </span>
               )}
@@ -80,25 +80,29 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
           </div>
 
           {/* 구분선 */}
-          <hr className="border-gray-200" />
+          <hr className="border-gray-200 dark:border-gray-700" />
 
           {/* 상품 정보 */}
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">통신사</span>
-              <span className="font-medium">
+              <span className="text-gray-600 dark:text-gray-400">통신사</span>
+              <span className="font-medium dark:text-gray-200">
                 {formatCarrierName(cardInfo.carrier)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">데이터량</span>
-              <span className="font-medium">
+              <span className="text-gray-600 dark:text-gray-400">데이터량</span>
+              <span className="font-medium dark:text-gray-200">
                 {formatDataAmount(cardInfo.dataAmount)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">스낵스코어</span>
-              <span className="font-medium">{cardInfo.ratingScore}</span>
+              <span className="text-gray-600 dark:text-gray-400">
+                스낵스코어
+              </span>
+              <span className="font-medium dark:text-gray-200">
+                {cardInfo.ratingScore}
+              </span>
             </div>
           </div>
 

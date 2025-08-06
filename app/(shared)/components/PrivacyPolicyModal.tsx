@@ -15,14 +15,14 @@ export default function PrivacyPolicyModal({
   return (
     <ModalPortal isOpen={open} onClose={onClose}>
       <div
-        className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black bg-opacity-30 dark:bg-opacity-50 flex items-center justify-center z-50"
         onClick={onClose}
         tabIndex={-1}
         aria-modal="true"
         role="dialog"
       >
         <div
-          className="bg-white rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header and Close Button */}
@@ -49,20 +49,20 @@ export default function PrivacyPolicyModal({
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black text-center">
+            <div className="text-xl font-extrabold text-black dark:text-white text-center">
               개인정보처리 방침
             </div>
             <button
               onClick={onClose}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
               aria-label="닫기"
               tabIndex={0}
             >
               ×
             </button>
           </div>
-          <div className="w-full text-left text-gray-900 text-[15px] flex flex-col gap-5 max-h-[400px] overflow-y-auto pr-2">
+          <div className="w-full text-left text-gray-900 dark:text-gray-100 text-[15px] flex flex-col gap-5 max-h-[400px] overflow-y-auto pr-2">
             <ul className="list-disc pl-5 space-y-1 mb-2">
               <li>수집 항목: 이름, 연락처, 이메일, 서비스 이용 기록 등</li>
               <li>

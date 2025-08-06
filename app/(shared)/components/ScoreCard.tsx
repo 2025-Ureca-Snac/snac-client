@@ -34,7 +34,8 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
     fetchBalance();
   }, [fetchBalance]);
 
-  const score = profile?.score || 0;
+  const rawScore = profile?.score || 0;
+  const score = Math.min(rawScore, 1000); // 최대 1000점으로 제한
   const maxScore = 1000;
 
   // 현재 등급 계산
@@ -247,11 +248,11 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
           />
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>100</span>
-          <span>300</span>
-          <span>500</span>
-          <span>700</span>
-          <span>900</span>
+          <span>200</span>
+          <span>400</span>
+          <span>600</span>
+          <span>800</span>
+          <span>1000</span>
         </div>
       </div>
 

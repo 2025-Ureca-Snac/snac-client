@@ -109,7 +109,7 @@ export default function PointContent({
 
   // 포인트 필터 버튼 컴포넌트
   const PointsFilterButtons = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <div className="flex flex-wrap gap-2 py-1">
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -117,11 +117,10 @@ export default function PointContent({
           setPointsFilter('all');
         }}
         onMouseDown={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === 'all'
             ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         전체
@@ -137,7 +136,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === '적립'
             ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         적립
@@ -153,7 +152,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === '포인트 사용'
             ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         포인트 사용
@@ -169,7 +168,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           pointsFilter === '취소'
             ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         취소
@@ -195,7 +194,7 @@ export default function PointContent({
 
   // 머니 필터 버튼 컴포넌트
   const MoneyFilterButtons = () => (
-    <div className="flex flex-wrap gap-2 mb-4">
+    <div className="flex flex-wrap gap-2 py-1">
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -203,11 +202,10 @@ export default function PointContent({
           setMoneyFilter('all');
         }}
         onMouseDown={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === 'all'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         전체
@@ -223,7 +221,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '충전'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         충전
@@ -239,7 +237,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '머니 구매'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         구매
@@ -255,7 +253,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '판매'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         판매
@@ -271,7 +269,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '취소'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         }`}
       >
         취소
@@ -287,7 +285,7 @@ export default function PointContent({
         className={`px-3 py-1 text-sm rounded-full transition-colors ${
           moneyFilter === '정산'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
         }`}
       >
         정산
@@ -302,7 +300,6 @@ export default function PointContent({
             onRechargeClick?.();
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
           className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           충전
@@ -314,7 +311,6 @@ export default function PointContent({
             onSettlementClick?.();
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
           className="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           정산
@@ -330,17 +326,17 @@ export default function PointContent({
     const balanceAfter = getBalanceAfterValue(item.balanceAfter);
 
     return (
-      <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0">
+      <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
               {item.title}
             </span>
-            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+            <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
               {item.category}
             </span>
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             {new Date(item.createdAt).toLocaleDateString('ko-KR', {
               year: 'numeric',
               month: 'long',
@@ -361,7 +357,7 @@ export default function PointContent({
             {activeTab === 'POINT' ? 'P' : 'S'}
           </div>
           {activeTab === 'MONEY' && (
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               {balanceAfter.toLocaleString()}S
             </div>
           )}
@@ -374,8 +370,7 @@ export default function PointContent({
                 onCancelClick?.(amount, item.paymentKey || item.id.toString());
               }}
               onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+              className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               취소
             </button>
@@ -395,8 +390,10 @@ export default function PointContent({
     const isCurrentYear = selectedYear === currentYear;
 
     return (
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-sm font-medium text-gray-700">조회 기간:</span>
+      <div className="flex items-center gap-3 py-1">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          조회 기간:
+        </span>
         <select
           value={selectedYear}
           onChange={(e) => {
@@ -404,8 +401,7 @@ export default function PointContent({
             onYearChange?.(Number(e.target.value));
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         >
           {Array.from({ length: 5 }, (_, i) => currentYear - i).map((year) => (
             <option key={year} value={year}>
@@ -420,8 +416,7 @@ export default function PointContent({
             onMonthChange?.(Number(e.target.value));
           }}
           onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
         >
           {Array.from({ length: 12 }, (_, i) => i + 1)
             .filter((month) => {
@@ -444,12 +439,16 @@ export default function PointContent({
 
   // 포인트 탭 컨텐츠
   const PointsTabContent = () => (
-    <div>
-      <MonthSelector />
-      <PointsFilterButtons />
-      <div className="bg-white rounded-lg shadow-sm border">
+    <div className="space-y-4">
+      <div className="px-4">
+        <MonthSelector />
+      </div>
+      <div className="px-4">
+        <PointsFilterButtons />
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         {filteredPointsHistory.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center text-gray-500 dark:text-gray-400">
             {pointsFilter === 'all'
               ? '포인트 내역이 없습니다.'
               : '해당 카테고리의 포인트 내역이 없습니다.'}
@@ -463,7 +462,9 @@ export default function PointContent({
             {hasNext && (
               <div ref={observerRef} className="p-4 text-center">
                 {isLoadingMore && (
-                  <div className="text-gray-500">로딩 중...</div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    로딩 중...
+                  </div>
                 )}
               </div>
             )}
@@ -475,11 +476,13 @@ export default function PointContent({
 
   // 머니 탭 컨텐츠
   const MoneyTabContent = () => (
-    <div>
-      <MoneyFilterButtons />
-      <div className="bg-white rounded-lg shadow-sm border">
+    <div className="space-y-4">
+      <div className="px-4">
+        <MoneyFilterButtons />
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         {filteredMoneyHistory.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center text-gray-500 dark:text-gray-400">
             {moneyFilter === 'all'
               ? '머니 내역이 없습니다.'
               : '해당 카테고리의 머니 내역이 없습니다.'}
@@ -493,7 +496,9 @@ export default function PointContent({
             {hasNext && (
               <div ref={observerRef} className="p-4 text-center">
                 {isLoadingMore && (
-                  <div className="text-gray-500">로딩 중...</div>
+                  <div className="text-gray-500 dark:text-gray-400">
+                    로딩 중...
+                  </div>
                 )}
               </div>
             )}
@@ -504,7 +509,7 @@ export default function PointContent({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       {/* 탭별 컨텐츠 */}
       {activeTab === 'POINT' ? <PointsTabContent /> : <MoneyTabContent />}
     </div>

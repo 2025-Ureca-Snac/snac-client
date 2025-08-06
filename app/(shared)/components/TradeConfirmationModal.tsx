@@ -148,20 +148,20 @@ export default function TradeConfirmationModal({
       className="bg-black bg-opacity-50 flex items-center justify-center"
     >
       {modalItem && (
-        <div className="bg-white rounded-lg p-6 w-10/12 max-w-sm max-h-[60vh] overflow-y-auto">
-          <h3 className="text-regular-md font-bold text-left mb-1">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-10/12 max-w-sm max-h-[60vh] overflow-y-auto">
+          <h3 className="text-regular-md font-bold text-left mb-1 text-gray-900 dark:text-white">
             {modalItem.cardCategory === 'BUY' ? '판매하기' : '구매하기'}
           </h3>
 
-          <p className="text-left text-regular-sm text-gray-600 mb-4">
+          <p className="text-left text-regular-sm text-gray-600 dark:text-gray-300 mb-4">
             아래 정보를 확인해주세요
           </p>
-          <h2 className="text-heading-2xl font-bold text-center mb-2">
+          <h2 className="text-heading-2xl font-bold text-center mb-2 text-gray-900 dark:text-white">
             {formatCarrierName(modalItem.carrier)} 데이터{' '}
             {formatDataAmount(modalItem.dataAmount)}{' '}
           </h2>
 
-          <p className="text-center mb-6">
+          <p className="text-center mb-6 text-gray-900 dark:text-white">
             {modalItem.price.toLocaleString()}
             {unit === 'snack' ? '스낵' : '₩'}에{' '}
             {modalItem.cardCategory === 'BUY' ? '판매합니다' : '구매합니다'}.
@@ -169,8 +169,8 @@ export default function TradeConfirmationModal({
 
           {/* 에러 메시지 표시 */}
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red rounded-lg">
-              <p className="text-red text-sm">{error}</p>
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red dark:border-red-700 rounded-lg">
+              <p className="text-red dark:text-red-300 text-sm">{error}</p>
             </div>
           )}
 
@@ -194,7 +194,7 @@ export default function TradeConfirmationModal({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className={`w-full py-2 rounded border ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               취소하기
             </button>
