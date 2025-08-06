@@ -1,7 +1,13 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { motion, useScroll, useTransform, useMotionValue } from 'framer-motion';
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValue,
+  MotionValue,
+} from 'framer-motion';
 import Image from 'next/image';
 import {
   Newspaper,
@@ -12,6 +18,49 @@ import {
   Users,
   TrendingUp,
 } from 'lucide-react';
+
+// --- 파티클 컴포넌트 ---
+interface ParticleProps {
+  mouseX: MotionValue<number>;
+  mouseY: MotionValue<number>;
+  i: number;
+}
+
+const Particle = ({ mouseX, mouseY, i }: ParticleProps) => {
+  const size = Math.random() * 3 + 1;
+  const x = useTransform(
+    mouseX,
+    [0, typeof window !== 'undefined' ? window.innerWidth : 0],
+    [
+      Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 0),
+      Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 0) -
+        50 * (i % 5),
+    ]
+  );
+  const y = useTransform(
+    mouseY,
+    [0, typeof window !== 'undefined' ? window.innerHeight : 0],
+    [
+      Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 0),
+      Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 0) -
+        50 * (i % 5),
+    ]
+  );
+  return (
+    <motion.div
+      className="absolute rounded-full bg-lime-400/50"
+      style={{
+        width: size,
+        height: size,
+        left: Math.random() * 100 + '%',
+        top: Math.random() * 100 + '%',
+        x,
+        y,
+      }}
+      transition={{ type: 'spring', stiffness: 50, damping: 20 }}
+    />
+  );
+};
 
 // --- 파티클 배경 컴포넌트 ---
 const ParticleBackground = () => {
@@ -33,52 +82,27 @@ const ParticleBackground = () => {
 
   return (
     <div className="absolute inset-0 z-0">
-      {[...Array(30)].map((_, i) => {
-        const size = Math.random() * 3 + 1;
-        const x = useTransform(
-          mouseX,
-          [0, typeof window !== 'undefined' ? window.innerWidth : 0],
-          [
-            Math.random() *
-              (typeof window !== 'undefined' ? window.innerWidth : 0),
-            Math.random() *
-              (typeof window !== 'undefined' ? window.innerWidth : 0) -
-              50 * (i % 5),
-          ]
-        );
-        const y = useTransform(
-          mouseY,
-          [0, typeof window !== 'undefined' ? window.innerHeight : 0],
-          [
-            Math.random() *
-              (typeof window !== 'undefined' ? window.innerHeight : 0),
-            Math.random() *
-              (typeof window !== 'undefined' ? window.innerHeight : 0) -
-              50 * (i % 5),
-          ]
-        );
-        return (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-lime-400/50"
-            style={{
-              width: size,
-              height: size,
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              x,
-              y,
-            }}
-            transition={{ type: 'spring', stiffness: 50, damping: 20 }}
-          />
-        );
-      })}
+      {[...Array(30)].map((_, i) => (
+        <Particle key={i} mouseX={mouseX} mouseY={mouseY} i={i} />
+      ))}
     </div>
   );
 };
 
-// --- 주요 기능 카드 컴포넌트 (Bento Grid 용) ---
-const FeatureCard = ({ icon, title, description, className = '' }) => {
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  className?: string;
+}
+
+// --- 주요 기능 카드 컴포넌트 (Bento 그리드 용) ---
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+  className = '',
+}: FeatureCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -159,7 +183,20 @@ const RealtimeTradeVisual = () => {
 };
 
 // --- DataItemCard 컴포넌트 ---
-const DataItemCard = ({ imageUrl, title, price, ratingScore, delay = 0 }) => {
+interface DataItemCardProps {
+  imageUrl: string;
+  title: string;
+  price: number;
+  ratingScore: number;
+  delay?: number;
+}
+const DataItemCard = ({
+  imageUrl,
+  title,
+  price,
+  ratingScore,
+  delay = 0,
+}: DataItemCardProps) => {
   const displayPrice = (
     <span className="inline-flex items-center font-bold">
       <Image
