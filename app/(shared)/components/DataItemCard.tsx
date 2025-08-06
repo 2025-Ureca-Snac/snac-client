@@ -72,7 +72,6 @@ export const DataItemCard = ({
 
   const isBuyView = cardCategory === 'BUY';
 
-  // sellStatus에 따른 버튼 텍스트와 클릭 가능 여부 결정
   const getButtonConfig = () => {
     switch (sellStatus) {
       case 'SELLING':
@@ -101,28 +100,30 @@ export const DataItemCard = ({
   const buttonConfig = getButtonConfig();
 
   return (
-    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md max-w-[150px] max-h-[203px] md:w-[238px] md:max-w-none md:max-h-[348px] flex flex-col p-3">
+    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md w-full max-h-[203px] md:max-h-[348px] flex flex-col p-3">
       {isNew && (
-        <span className="absolute z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px]  md:w-[57px] h-[20px] md:h-[24px]  rounded-[16px] flex items-center justify-center ">
+        <span className="absolute top-3 left-3 z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] flex items-center justify-center">
           {newBadgeText}
         </span>
       )}
       {isMyPost && (
-        <span className="absolute top-3 right-3 z-10 bg-green-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center ">
+        <span className="absolute top-3 right-3 z-10 bg-green-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center">
           MY
         </span>
       )}
+
       <div className="relative h-[64px] md:h-[125px] mt-[35px] md:mt-[80px]">
         <Image
           src={imageUrl}
           alt={title}
           fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           style={{ objectFit: 'contain' }}
         />
       </div>
 
       <div className="flex-grow flex flex-col items-center md:items-start md:py-[18px] mt-2">
-        <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718]">
+        <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718] truncate w-full text-center md:text-left">
           {title}
         </h3>
         <p className="text-medium-sm md:text-medium-sm text-gray-900 h-6 flex items-center">
@@ -137,12 +138,9 @@ export const DataItemCard = ({
         {!isMyPost ? (
           <Button
             onClick={() => {
-              // 클릭 불가능한 상태면 클릭 이벤트 무시
               if (!buttonConfig.clickable) {
                 return;
               }
-
-              // 로그인 상태 확인 (skipLoginCheck가 true면 건너뛰기)
               if (!skipLoginCheck && !loggedInUser) {
                 toast.error('로그인 해주세요.');
                 router.push('/login');
@@ -150,51 +148,56 @@ export const DataItemCard = ({
               }
               onClickBuy({ email, createdAt });
             }}
-            className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
+            className={`w-full h-full ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
             style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
             disabled={!buttonConfig.clickable}
           >
             {buttonConfig.text}
           </Button>
         ) : (
-          <div className="flex gap-2 w-full">
+          <div className="flex gap-2 w-full h-full">
             {sellStatus === 'SELLING' ? (
               <>
-                <Button
-                  onClick={() => {
-                    console.log(cardId);
-                    // 수정하기 로직
-                    if (cardId) {
-                      actions.openEditModal(cardId.toString(), {
-                        cardCategory: cardCategory as 'SELL' | 'BUY',
-                        carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
-                        dataAmount: dataAmount || 0,
-                        price: price,
-                      });
-                    }
-                  }}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
-                  style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
-                >
-                  <span className="md:hidden">수정</span>
-                  <span className="hidden md:inline">수정하기</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    // 삭제하기 로직
-                    if (confirm('정말 삭제하시겠습니까?')) {
+                {cardCategory === 'SELL' && (
+                  <Button
+                    onClick={() => {
                       if (cardId) {
-                        api
-                          .delete(`/cards/${cardId}`)
-                          .then(() => {
-                            toast.success('게시글이 삭제되었습니다.');
-                            actions.triggerRefetch();
-                          })
-                          .catch((error) => {
-                            console.error('삭제 실패:', error);
-                            toast.error('삭제에 실패했습니다.');
-                          });
+                        actions.openEditModal(cardId.toString(), {
+                          cardCategory: cardCategory as 'SELL' | 'BUY',
+                          carrier: (carrier as 'SKT' | 'KT' | 'LGU+') || 'SKT',
+                          dataAmount: dataAmount || 0,
+                          price: price,
+                        });
                       }
+                    }}
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                    style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
+                  >
+                    <span className="md:hidden">수정</span>
+                    <span className="hidden md:inline">수정하기</span>
+                  </Button>
+                )}
+
+                <Button
+                  onClick={() => {
+                    if (cardCategory === 'SELL') {
+                      if (confirm('정말 삭제하시겠습니까?')) {
+                        if (cardId) {
+                          api
+                            .delete(`/cards/${cardId}`)
+                            .then(() => {
+                              toast.success('게시글이 삭제되었습니다.');
+                              actions.triggerRefetch();
+                            })
+                            .catch((error) => {
+                              console.error('삭제 실패:', error);
+                              toast.error('삭제에 실패했습니다.');
+                            });
+                        }
+                      }
+                    } else {
+                      toast.error('구매 내역에서 삭제해주세요.');
+                      router.push('/mypage/purchase-history');
                     }
                   }}
                   className="flex-1 bg-red-500 hover:bg-red-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"

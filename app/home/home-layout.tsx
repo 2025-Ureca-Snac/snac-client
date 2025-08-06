@@ -5,7 +5,7 @@ import { Sort } from './components/sort';
 import { Modal } from './components/modal';
 import { useHomeStore } from '@/app/(shared)/stores/home-store';
 import HomeSection from './home-section';
-
+import PlusIcon from '@/public/plus.svg';
 import RefreshIcon from '@/public/refresh.svg';
 import FilterIcon from '@/public/filter.svg';
 import { Pagination } from '@/app/(shared)/components/Pagination';
@@ -18,6 +18,7 @@ import type { CardData } from '@/app/(shared)/types/card';
 interface HomeLayoutProps {
   cards: CardData[];
   isLoading: boolean;
+  error: string | null;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -26,6 +27,7 @@ interface HomeLayoutProps {
 export default function HomeLayout({
   cards,
   isLoading,
+  error,
   currentPage,
   totalPages,
   onPageChange,
@@ -95,6 +97,10 @@ export default function HomeLayout({
           <div className="hidden md:flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
               <Sort />
+              <PriceUnitToggle
+                currentUnit={currentUnit}
+                setCurrentUnit={setCurrentUnit}
+              />
               <button
                 onClick={() => actions.triggerRefetch()}
                 aria-label="새로고침"
@@ -102,11 +108,13 @@ export default function HomeLayout({
                 <RefreshIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
               </button>
             </div>
-
-            <PriceUnitToggle
-              currentUnit={currentUnit}
-              setCurrentUnit={setCurrentUnit}
-            />
+            <button
+              onClick={actions.toggleCreateModal}
+              className="ml-1 px-3 rounded-lg  flex w-auto h-auto justify-center items-center gap-2 border border-gray-300 "
+            >
+              <PlusIcon className="w-8 h-8 cursor-pointer text-gray-500" />
+              <span className="text-gray-500 hidden lg:block">글 등록하기</span>
+            </button>
           </div>
         </div>
         <div className="flex-grow">
@@ -114,6 +122,10 @@ export default function HomeLayout({
             <div className="flex items-center justify-center py-20">
               <LoadingSpinner size="lg" />
             </div>
+          ) : error ? (
+            <p className="text-center text-red-500 dark:text-red-400 py-10">
+              {error}
+            </p>
           ) : (
             <>
               {cards.length === 0 && (
