@@ -12,6 +12,7 @@ import { useTheme } from '@/app/(shared)/hooks/useTheme';
 import { ThemeSwitch } from '@/app/(shared)/components/ThemSwitch';
 
 import Matching from '@/public/matching.svg';
+import Cards from '@/public/grid.svg';
 import User from '@/public/user.svg';
 import Admin from '@/public/admin.svg';
 import Login from '@/public/login.svg';
@@ -39,6 +40,13 @@ const NAV_ITEMS = [
     icon: Admin,
     text: '관리자',
     show: ({ isAdmin }: NavItemShowProps) => isAdmin,
+  },
+  {
+    key: 'cards',
+    href: '/cards',
+    icon: Cards,
+    text: '일반 거래',
+    show: () => true,
   },
   {
     key: 'match',
@@ -108,7 +116,8 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
 
   return (
     <>
-      <header className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
+      <header
+        className={`w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center relative transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
           isDarkmode
             ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
             : 'bg-white border-b'
