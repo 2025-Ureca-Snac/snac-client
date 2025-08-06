@@ -141,13 +141,6 @@ export const DataItemCard = ({
               if (!buttonConfig.clickable) {
                 return;
               }
-
-              // 로그인 상태 확인 (skipLoginCheck가 true면 건너뛰기)
-              if (!skipLoginCheck && !loggedInUser) {
-                toast.error('로그인 해주세요.');
-                router.push('/login');
-                return;
-              }
               onClickBuy({ email, createdAt });
             }}
             className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
