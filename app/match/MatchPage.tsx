@@ -253,9 +253,6 @@ export default function MatchPage() {
     setWebSocketFunctions({ sendPayment, sendTradeConfirm });
   }, [sendPayment, sendTradeConfirm, setWebSocketFunctions]);
 
-  // userRole이 변경될 때마다 로그 출력
-  useEffect(() => {}, [userRole]);
-
   // 필터 핸들러
   const handleFilterChange = useCallback(
     (filters: Filters) => {
