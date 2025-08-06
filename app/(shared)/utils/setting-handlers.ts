@@ -26,6 +26,6 @@ export const handleSettingClick = (item: string) => {
   if (modalType) {
     useModalStore.getState().openModal(modalType);
   } else {
-    console.warn(`알 수 없는 설정 항목: ${item}`);
+    //.warn(`알 수 없는 설정 항목: ${item}`);
   }
 };

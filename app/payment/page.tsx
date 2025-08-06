@@ -49,13 +49,6 @@ export default function PaymentPage() {
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const cardId = searchParams.get('id') || searchParams.get('cardId');
-    const pay = searchParams.get('pay');
-
-    console.log('Payment Page Search Params:', {
-      cardId,
-      pay,
-      fullUrl: window.location.href,
-    });
 
     // cardId가 있을 때 카드 상태 조회
     if (cardId) {
@@ -64,14 +57,12 @@ export default function PaymentPage() {
           const response = await api.get<ApiResponse<CardData>>(
             `/cards/${cardId}`
           );
-          console.log('Card Status Response:', response.data);
-
           // 응답 데이터를 cardData 상태에 저장
           if (response.data.data) {
             setCardData(response.data.data);
           }
-        } catch (error) {
-          console.error('카드 상태 조회 실패:', error);
+        } catch {
+          // 카드 상태 조회 실패 처리
         }
       };
 
@@ -85,15 +76,27 @@ export default function PaymentPage() {
           await api.get<ApiResponse<{ money: number; point: number }>>(
             '/wallets/summary'
           );
-        console.log('Wallet Summary Response:', response.data);
         setWalletData(response.data.data);
-      } catch (error) {
-        console.error('지갑 정보 조회 실패:', error);
+      } catch {
+        // 지갑 정보 조회 실패 처리
       }
     };
 
     fetchWalletData();
   }, []);
+
+  // 지갑 정보 새로고침 함수
+  const refreshWalletData = async () => {
+    try {
+      const response =
+        await api.get<ApiResponse<{ money: number; point: number }>>(
+          '/wallets/summary'
+        );
+      setWalletData(response.data.data);
+    } catch {
+      // 지갑 정보 새로고침 실패 처리
+    }
+  };
 
   // walletData가 업데이트될 때 snackMoney와 snackPoints 업데이트
   useEffect(() => {
@@ -105,14 +108,6 @@ export default function PaymentPage() {
 
   const productPrice = cardData?.price || 0;
   const finalAmount = getFinalAmount(productPrice, snackPointsToUse);
-
-  // 디버깅용 로그
-  console.log('현재 상태:', {
-    paymentMethod,
-    snackPointsToUse,
-    finalAmount,
-    showSnackPayment,
-  });
 
   const handleSnackPayment = async () => {
     try {
@@ -134,7 +129,7 @@ export default function PaymentPage() {
       if (!apiEndpoint) {
         throw new Error('잘못된 요청 파라미터입니다.');
       }
-      console.log('apiEndpoint', Number(cardId), amount, snackPointsToUse);
+
       const response = await api.post(apiEndpoint, {
         cardId: Number(cardId),
         money: amount,
@@ -144,12 +139,18 @@ export default function PaymentPage() {
       const responseData = response.data as Record<string, unknown>;
       const tradeId = (responseData.data as { tradeId: number }).tradeId;
       if (responseData.status === 'CREATED') {
+        // 지갑 정보 새로고침
+        try {
+          await api.get('/wallets/summary');
+        } catch {
+          // 지갑 정보 새로고침 실패 처리
+        }
+
         router.push(
           `/payment/complete?pay=${pay}&tradeId=${tradeId}&dataAmount=${cardData?.dataAmount}&amount=${amount}&snackMoneyUsed=${amount}&snackPointsUsed=${snackPointsToUse}&carrier=${cardData?.carrier}`
         );
       } else {
         toast.error(`결제가 실패했습니다. 다시 시도해주세요.`);
-        console.error('결제 실패:', responseData);
       }
     } catch (error) {
       toast.error('스낵 포인트 결제 오류:', {
@@ -160,27 +161,17 @@ export default function PaymentPage() {
   };
 
   const handlePaymentClick = () => {
-    console.log('결제 버튼 클릭:', {
-      paymentMethod,
-      finalAmount,
-      snackPoints,
-      showSnackPayment,
-    });
-
     if (showSnackPayment) {
       // 스낵 결제 화면에서 실제 결제 처리
       const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
 
       if (finalAmount === 0) {
         // 스낵 포인트로 전액 결제
-        console.log('스낵 포인트 전액 결제');
         handleSnackPayment();
       } else if (totalAvailable >= finalAmount) {
         // 스낵 머니 + 스낵 포인트로 충분한 경우
-        console.log('스낵 머니 + 스낵 포인트 결제');
         handleSnackPayment();
       } else {
-        console.log('포인트 부족');
         // 스낵 머니 + 스낵 포인트가 부족한 경우 충전 확인
         const shortage = getShortageAmount(finalAmount, totalAvailable);
         setShortageAmount(shortage);
@@ -190,7 +181,6 @@ export default function PaymentPage() {
       // 초기 결제 방법 선택
       if (paymentMethod === 'toss') {
         // 토스페이먼츠로 결제 - 충전 모달 열기
-        console.log('토스페이먼츠 결제 선택');
 
         // 충분한 금액이 있는지 확인
         const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
@@ -206,17 +196,11 @@ export default function PaymentPage() {
         setRechargeModalOpen(true);
       } else if (paymentMethod === PAYMENT_METHODS.SNACK) {
         // 스낵 포인트로 결제 화면 표시
-        console.log('스낵 포인트 결제 화면 표시');
 
         // 스낵 머니 + 스낵 포인트가 주문 금액보다 작으면 바로 충전 확인 모달 열기
         const totalAvailable = getTotalAvailable(snackMoney, snackPoints);
         if (totalAvailable < productPrice) {
           const shortage = getShortageAmount(productPrice, totalAvailable);
-          console.log('스낵 선택 시 shortage 계산:', {
-            totalAvailable,
-            productPrice,
-            shortage,
-          });
           setShortageAmount(shortage);
           setRechargeConfirmModalOpen(true);
           return;
@@ -224,7 +208,7 @@ export default function PaymentPage() {
 
         setShowSnackPayment(true);
       } else {
-        console.log('알 수 없는 결제 방법:', paymentMethod);
+        // 알 수 없는 결제 방법
       }
     }
   };
@@ -239,7 +223,6 @@ export default function PaymentPage() {
   };
 
   const handleRechargeConfirm = () => {
-    console.log('handleRechargeConfirm - shortageAmount:', shortageAmount);
     setRechargeConfirmModalOpen(false);
     setRechargeModalOpen(true);
   };
@@ -315,6 +298,7 @@ export default function PaymentPage() {
         onClose={() => setRechargeModalOpen(false)}
         currentMoney={snackMoney}
         shortage={shortageAmount}
+        onRefreshData={refreshWalletData}
       />
 
       {/* Recharge Confirm Modal */}

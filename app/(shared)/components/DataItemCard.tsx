@@ -163,7 +163,6 @@ export const DataItemCard = ({
                 {cardCategory === 'SELL' && (
                   <Button
                     onClick={() => {
-                      console.log(cardId);
                       // 수정하기 로직
                       if (cardId) {
                         actions.openEditModal(cardId.toString(), {
@@ -194,8 +193,7 @@ export const DataItemCard = ({
                               toast.success('게시글이 삭제되었습니다.');
                               actions.triggerRefetch();
                             })
-                            .catch((error) => {
-                              console.error('삭제 실패:', error);
+                            .catch(() => {
                               toast.error('삭제에 실패했습니다.');
                             });
                         }

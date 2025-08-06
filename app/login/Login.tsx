@@ -82,9 +82,8 @@ export default function Login() {
 
       try {
         await login(id.trim(), password);
-      } catch (error) {
+      } catch {
         // 에러는 스토어에서 처리됨
-        console.error('로그인 실패:', error);
       }
     },
     [id, password, login]

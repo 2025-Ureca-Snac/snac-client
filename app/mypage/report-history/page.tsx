@@ -69,32 +69,32 @@ export default function InquiryHistoryPage() {
    * @param page - 페이지 번호 (기본값: 0)
    * @param loadMore - 추가 로드 여부 (기본값: false)
    */
-  const loadInquiries = async (page: number = 0, loadMore: boolean = false) => {
-    try {
-      setIsLoading(!loadMore);
-      setIsLoadingMore(loadMore);
+  const loadInquiries = useCallback(
+    async (page: number = 0, loadMore: boolean = false) => {
+      try {
+        setIsLoading(!loadMore);
+        setIsLoadingMore(loadMore);
 
-      const response = await getInquiryList(page, 20);
+        const response = await getInquiryList(page, 20);
 
-      console.log('문의 목록 API 응답:', response);
+        if (loadMore) {
+          setInquiries((prev) => [...prev, ...response.content]);
+        } else {
+          setInquiries(response.content);
+        }
 
-      if (loadMore) {
-        setInquiries((prev) => [...prev, ...response.content]);
-      } else {
-        setInquiries(response.content);
+        setCurrentPage(response.number);
+        setHasNext(!response.last);
+      } catch {
+        toast.error('로그인 후 이용이 가능합니다.');
+        router.push('/login');
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
       }
-
-      setCurrentPage(response.number);
-      setHasNext(!response.last);
-    } catch (error) {
-      console.log('신고 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
-      toast.error('로그인 후 이용이 가능합니다.');
-      router.push('/login');
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  };
+    },
+    [router]
+  );
 
   // 초기 로드
   useEffect(() => {
@@ -108,7 +108,6 @@ export default function InquiryHistoryPage() {
 
     const loadData = async () => {
       if (isMounted) {
-        console.log('문의 내역 초기 로드 시작');
         await loadInquiries(0, false);
       }
     };
@@ -118,7 +117,7 @@ export default function InquiryHistoryPage() {
     return () => {
       isMounted = false;
     };
-  }, []); // loadInquiries 의존성 제거
+  }, [loadInquiries]); // loadInquiries 의존성 추가
 
   // URL 파라미터 처리 - 신고하기 모달 자동 열기
   useEffect(() => {
@@ -138,7 +137,7 @@ export default function InquiryHistoryPage() {
       newUrl.searchParams.delete('tradeType');
       router.replace(newUrl.pathname + newUrl.search);
     }
-  }, [searchParams.toString(), router]); // searchParams.toString()으로 변경
+  }, [searchParams, router]); // searchParams 의존성 추가
 
   /**
    * @author 이승우
@@ -337,8 +336,7 @@ export default function InquiryHistoryPage() {
         // 문의 목록 새로고침
         loadInquiries(0, false);
       }
-    } catch (error) {
-      console.log('문의 작성 에러 발생, 로그인 페이지로 이동:', error);
+    } catch {
       toast.error('로그인 후 이용이 가능합니다.');
       router.push('/login');
     }
@@ -351,14 +349,10 @@ export default function InquiryHistoryPage() {
    */
   const handleInquiryClick = async (inquiry: InquiryItem) => {
     try {
-      console.log('문의 상세 조회 시작:', inquiry.disputeId);
       const inquiryDetail = await getInquiryDetail(inquiry.disputeId);
-      console.log('문의 상세 조회 결과:', inquiryDetail);
       setSelectedInquiry(inquiryDetail);
       setIsDetailModalOpen(true);
-      console.log('모달 상태 설정 완료');
-    } catch (error) {
-      console.log('문의 상세 조회 에러 발생, 로그인 페이지로 이동:', error);
+    } catch {
       toast.error('로그인 후 이용이 가능합니다.');
       router.push('/login');
     }
@@ -387,8 +381,7 @@ export default function InquiryHistoryPage() {
         // 목록 새로고침
         loadInquiries(0, false);
       }
-    } catch (error) {
-      console.log('신고 작성 에러 발생, 로그인 페이지로 이동:', error);
+    } catch {
       toast.error('로그인 후 이용이 가능합니다.');
       router.push('/login');
     }

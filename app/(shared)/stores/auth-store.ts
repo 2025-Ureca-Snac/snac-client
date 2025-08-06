@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api, handleApiError } from '../utils/api';
+import { api } from '../utils/api';
 import { jwtDecode } from 'jwt-decode';
 import { AuthState, JwtPayload } from '../types/auth-store';
 
@@ -58,7 +58,7 @@ export const useAuthStore = create<AuthState>()(
             password,
           });
 
-          console.log(response);
+          //.log(response);
 
           const token = response.headers.get('Authorization')?.split(' ')[1];
           if (token) {
@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           useAuthStore.getState().resetAuthState();
-          console.log(handleApiError(error));
+          //.log(handleApiError(error));
 
           // 오류 메시지 설정
           let errorMessage = '로그인에 실패했습니다.';
@@ -128,7 +128,7 @@ export const useAuthStore = create<AuthState>()(
               window.removeEventListener('message', handleAuthMessage);
 
               if (event.data.type === 'AUTH_SUCCESS') {
-                console.log('소셜 로그인 인증 성공:', event.data.data);
+                //.log('소셜 로그인 인증 성공:', event.data.data);
 
                 try {
                   // 백엔드로 소셜 로그인 연동 요청
@@ -159,18 +159,18 @@ export const useAuthStore = create<AuthState>()(
                     const { useUserStore } = await import('./user-store');
                     useUserStore.getState().setError(null);
 
-                    console.log('소셜 로그인 성공:', response);
+                    //.log('소셜 로그인 성공:', response);
                     resolve(true);
                   } else {
                     useAuthStore.getState().resetAuthState();
                     reject(new Error('소셜 로그인에 실패했습니다.'));
                   }
-                } catch (error) {
-                  console.error('소셜 로그인 실패:', error);
+                } catch {
+                  //.error('소셜 로그인 실패:', error);
                   reject(new Error('소셜 로그인에 실패했습니다.'));
                 }
               } else if (event.data.type === 'AUTH_ERROR') {
-                console.log('소셜 로그인 인증 실패:', event.data.data);
+                //.log('소셜 로그인 인증 실패:', event.data.data);
 
                 // 헬퍼 함수를 사용하여 에러 메시지 생성
                 const errorCode = event.data.data?.error;
@@ -185,7 +185,7 @@ export const useAuthStore = create<AuthState>()(
             window.addEventListener('message', handleAuthMessage);
           });
         } catch (error) {
-          console.error('소셜 인증 중 오류:', error);
+          //.error('소셜 인증 중 오류:', error);
           throw error;
         } finally {
           set({ isLoading: false });
@@ -233,8 +233,8 @@ export const useAuthStore = create<AuthState>()(
                   }
 
                   resolve(true);
-                } catch (error) {
-                  console.error('소셜 로그인 해제 실패:', error);
+                } catch {
+                  //.error('소셜 로그인 해제 실패:', error);
 
                   // 팝업 창 닫기
                   if (authWindow && !authWindow.closed) {
@@ -259,7 +259,7 @@ export const useAuthStore = create<AuthState>()(
             window.addEventListener('message', handleAuthMessage);
           });
         } catch (error) {
-          console.error('소셜 해제 중 오류:', error);
+          //.error('소셜 해제 중 오류:', error);
           throw error;
         } finally {
           set({ isLoading: false });
@@ -269,10 +269,10 @@ export const useAuthStore = create<AuthState>()(
       // 로그아웃 액션
       logout: async () => {
         try {
-          const response = await api.post<unknown>('/logout');
-          console.log(response);
-        } catch (error) {
-          console.error('로그아웃 중 오류:', error);
+          await api.post<unknown>('/logout');
+          //.log(response);
+        } catch {
+          //.error('로그아웃 중 오류:', error);
         } finally {
           // 로그아웃을 실패했어도 리프래쉬가 없는 것이기 때문에 무조건 상태 초기화
           useAuthStore.getState().resetAuthState();

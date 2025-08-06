@@ -98,20 +98,12 @@ const NicknameInputField = forwardRef<
           });
 
           if (response.status === 200) {
-            console.log('닉네임 중복 체크 결과:', {
-              nickname: nicknameToCheck,
-              isDuplicate: false,
-              message: response.data.message,
-              fullResponse: response.data,
-            });
             setDuplicateCheckResult({
               isDuplicate: false,
               message: response.data.message || '사용 가능한 닉네임입니다.',
             });
           }
         } catch (error: unknown) {
-          console.error('닉네임 중복 체크 오류:', error);
-
           let isDuplicate = false;
           let errorMessage = '중복 체크 중 오류가 발생했습니다.';
 
@@ -196,12 +188,6 @@ const NicknameInputField = forwardRef<
     }, [value, nicknameValidation.isValid, checkNicknameDuplicate]);
 
     // 디버깅용 로그
-    console.log('닉네임 렌더링 상태:', {
-      value,
-      nicknameValidation,
-      duplicateCheckResult,
-      isCheckingDuplicate,
-    });
 
     return (
       <div>

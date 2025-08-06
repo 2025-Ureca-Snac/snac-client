@@ -21,18 +21,14 @@ export default function RechargeModal({
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
 
   // 디버깅용 로그
-  console.log('RechargeModal shortage:', shortage);
-  console.log('RechargeModal currentMoney:', currentMoney);
 
   // 모달이 열릴 때마다 선택 상태 초기화
   useEffect(() => {
     if (open) {
       if (shortage && shortage > 0) {
-        console.log('shortage', shortage);
         // 부족한 금액이 있으면 해당 금액으로 자동 설정
         setSelectedAmount(shortage);
       } else {
-        console.log('shortage 비어있음');
         // 부족한 금액이 없으면 10,000원으로 자동 설정
         setSelectedAmount(10000);
       }
@@ -67,11 +63,25 @@ export default function RechargeModal({
               `/money/recharge/success?paymentKey=${event.data.paymentKey}&orderId=${event.data.orderId}&amount=${event.data.amount}`
             );
 
-            console.log('충전 성공 처리 완료:', response.data);
-
             const responseData = response.data as ApiResponse<unknown>;
             if (responseData.status === 'OK') {
-              console.log('결제가 성공적으로 완료되었습니다!');
+              // 결제 성공 - 사용자 정보 및 지갑 정보 새로고침
+              try {
+                const { useUserStore } = await import('../stores/user-store');
+                await useUserStore.getState().fetchUserProfile();
+
+                // 지갑 정보도 새로고침
+                const { api } = await import('../utils/api');
+                await api.get('/wallets/summary');
+
+                // 성공 메시지 표시
+                toast.success('스낵머니가 성공적으로 충전되었습니다!');
+
+                // 부모 컴포넌트의 데이터 새로고침 함수도 호출
+                onRefreshData?.();
+              } catch {
+                // 사용자 정보 새로고침 실패 처리
+              }
             } else {
               // 백엔드에서 실패 응답을 보낸 경우
               try {
@@ -80,13 +90,11 @@ export default function RechargeModal({
                   errorMessage: `백엔드 처리 실패: ${responseData.message || '알 수 없는 오류'}`,
                   orderId: event.data.orderId,
                 });
-                console.log('백엔드 처리 실패 정보가 전송되었습니다.');
-              } catch (apiError) {
-                console.error('백엔드 처리 실패 정보 전송 실패:', apiError);
+              } catch {
+                // 백엔드 처리 실패 정보 전송 실패
               }
             }
           } catch (error) {
-            console.error('충전 성공 처리 오류:', error);
             const errorMessage = handleApiError(error);
 
             // 백엔드에 충전 처리 실패 정보 전송
@@ -96,17 +104,15 @@ export default function RechargeModal({
                 errorMessage: `충전 처리 중 오류: ${errorMessage}`,
                 orderId: event.data.orderId,
               });
-              console.log('충전 처리 실패 정보가 백엔드에 전송되었습니다.');
-            } catch (apiError) {
-              console.error('충전 처리 실패 정보 전송 실패:', apiError);
+            } catch {
+              // 충전 처리 실패 정보 전송 실패
             }
           }
         } else {
           // 결제 실패 처리
-          console.log('결제가 실패했습니다:', event.data);
         }
       } else if (event.data.type === 'PAYMENT_ERROR') {
-        console.log('결제 오류가 발생했습니다:', event.data);
+        // 결제 오류 처리
       }
 
       // ✅ 모든 경우에 대해 모달 닫고 데이터 새로고침
@@ -117,7 +123,7 @@ export default function RechargeModal({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [selectedAmount]);
+  }, [selectedAmount, onClose, onRefreshData]);
 
   const handleRecharge = async () => {
     if (!selectedAmount) {
@@ -154,7 +160,6 @@ export default function RechargeModal({
 
         // 필수 값들이 있는지 확인
         if (!amount || !serverOrderId) {
-          console.error('필수 정보 누락:', { amount, serverOrderId });
           throw new Error('서버 응답에 필수 정보가 누락되었습니다.');
         }
 
@@ -166,7 +171,6 @@ export default function RechargeModal({
           'width=800,height=700,scrollbars=yes,resizable=yes'
         );
       } catch (error) {
-        console.error('충전 준비 오류:', error);
         const errorMessage = handleApiError(error);
 
         // 백엔드에 충전 준비 실패 정보 전송
@@ -176,9 +180,8 @@ export default function RechargeModal({
             errorMessage: `충전 준비 중 오류: ${errorMessage}`,
             orderId: 'PREPARE_STAGE', // 준비 단계에서는 orderId가 없음
           });
-          console.log('충전 준비 실패 정보가 백엔드에 전송되었습니다.');
-        } catch (apiError) {
-          console.error('충전 준비 실패 정보 전송 실패:', apiError);
+        } catch {
+          // 충전 준비 실패 정보 전송 실패
         }
 
         // ✅ alert 대신 모달 닫고 데이터 새로고침

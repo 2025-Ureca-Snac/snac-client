@@ -23,30 +23,23 @@ function PaymentProcessComponent() {
     if (amount && orderId) {
       const processPayment = async () => {
         try {
-          console.log('=== Toss 결제위젯 시작 (샌드박스 방식) ===');
-          console.log('amount:', amount);
-          console.log('orderId:', orderId);
-
           // ✅ 샌드박스와 동일한 결제위젯 로드
           const widget = await loadPaymentWidget(
             'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm',
             '3gWoIDbGVHgNoUDS1DWDx'
           );
-          console.log('결제위젯 로드 완료');
+
           setPaymentWidget(widget);
 
           // ✅ 샌드박스와 동일한 결제수단 렌더링
           widget.renderPaymentMethods('#payment-widget', {
             value: parseInt(amount),
           });
-          console.log('결제수단 위젯 렌더링 완료');
 
           // ✅ 샌드박스와 동일한 약관 동의 렌더링
           widget.renderAgreement('#agreement', {
             variantKey: 'AGREEMENT',
           });
-          console.log('약관 동의 위젯 렌더링 완료');
-          console.log('=== Toss 결제위젯 완료 (샌드박스 방식) ===');
 
           // 로딩 메시지 숨기기
           setTimeout(() => {
@@ -59,9 +52,7 @@ function PaymentProcessComponent() {
               (spinnerElement as HTMLElement).style.display = 'none';
             }
           }, 1000);
-        } catch (error) {
-          console.error('토스페이먼츠 결제위젯 오류:', error);
-
+        } catch {
           // 부모 창에 에러 메시지 전송
           window.opener?.postMessage(
             {
@@ -90,7 +81,6 @@ function PaymentProcessComponent() {
 
     // ✅ 필수 정보 검증
     if (!amount || !orderId) {
-      console.error('필수 결제 정보 누락:', { amount, orderId });
       toast.error('결제 정보가 올바르지 않습니다. 다시 시도해주세요.');
       window.close();
       return;
@@ -105,23 +95,12 @@ function PaymentProcessComponent() {
     }
 
     try {
-      console.log('결제 요청 시작...');
-      console.log('결제 정보:', {
-        orderId,
-        orderName,
-        customerName,
-        customerEmail,
-        amount,
-        successUrl: `${window.location.origin}/payment/success?orderId=${orderId}&amount=${amount}`,
-        failUrl: `${window.location.origin}/payment/fail`,
-      });
-
       /**
        * 결제 요청
        * 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
        * 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
        */
-      const result = await paymentWidget.requestPayment({
+      await paymentWidget.requestPayment({
         orderId: orderId,
         orderName: orderName || '스낵머니 충전',
         customerName: customerName || '스낵 사용자',
@@ -130,20 +109,10 @@ function PaymentProcessComponent() {
         failUrl: `${window.location.origin}/payment/fail`,
       });
 
-      console.log('결제 요청 완료');
-
       // ✅ 결제위젯 방식에서는 Promise 결과를 직접 받음
-      console.log('결제 성공!', result);
-
       // ✅ Toss Payments가 자동으로 successUrl로 리다이렉트
-      console.log(
-        'Toss Payments가 자동으로 success 페이지로 리다이렉트합니다.'
-      );
-    } catch (error) {
-      console.error('결제 요청 오류:', error);
-
+    } catch {
       // ✅ Toss Payments가 자동으로 failUrl로 리다이렉트
-      console.log('Toss Payments가 자동으로 fail 페이지로 리다이렉트합니다.');
     }
   };
 

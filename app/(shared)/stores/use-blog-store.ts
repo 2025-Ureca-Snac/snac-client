@@ -66,8 +66,8 @@ export const useBlogStore = create<BlogState>((set, get) => ({
         .slice(0, 3);
 
       set({ relatedBlogs: related });
-    } catch (err) {
-      console.error('관련 포스트 로드 실패:', err);
+    } catch {
+      //.error('관련 포스트 로드 실패:', err);
       set({ relatedBlogs: [] });
     }
   },
@@ -138,7 +138,7 @@ export const useBlogStore = create<BlogState>((set, get) => ({
           title: string | null;
         };
       }>(`/articles/${articleId}`);
-      console.log(res);
+      //.log(res);
       const raw = res.data.data;
 
       const mappedBlog: Blog = {

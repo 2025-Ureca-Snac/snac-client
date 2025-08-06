@@ -25,7 +25,7 @@ interface SortDropdownProps {
  *     { value: 'popular', label: '인기순' }
  *   ]}
  *   defaultValue="latest"
- *   onChange={(value) => console.log('정렬:', value)}
+ *   onChange={(value) => {}}
  * />
  */ export const SortDropdown = ({
   options,

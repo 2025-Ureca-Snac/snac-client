@@ -90,7 +90,7 @@ export default function MatchPage() {
       const hasRefreshed = sessionStorage.getItem('matchPageRefreshed');
 
       if (hasRefreshed === 'false') {
-        console.log('🔄 MatchPage 진입 - 강제 새로고침 실행');
+        //.log('🔄 MatchPage 진입 - 강제 새로고침 실행');
         sessionStorage.setItem('matchPageRefreshed', 'true');
         window.location.reload();
         return;
@@ -101,7 +101,7 @@ export default function MatchPage() {
   // 매칭 상태가 'searching'으로 변경될 때 판매자 목록 초기화
   useEffect(() => {
     if (matchingStatus === 'searching') {
-      console.log('🔄 매칭 검색 시작 - 판매자 목록 초기화');
+      //.log('🔄 매칭 검색 시작 - 판매자 목록 초기화');
       setActiveSellers([]);
     }
   }, [matchingStatus, setActiveSellers]);
@@ -131,8 +131,8 @@ export default function MatchPage() {
       }
 
       return null;
-    } catch (error) {
-      console.error('토큰 가져오기 실패:', error);
+    } catch {
+      //.error('토큰 가져오기 실패:', error);
       return null;
     }
   };
@@ -169,7 +169,7 @@ export default function MatchPage() {
   // 거래 상태 변경 핸들러
   const handleTradeStatusChange = useCallback(
     (status: string, tradeData: ServerTradeData) => {
-      console.log('🔄 거래 상태 변경:', status, tradeData);
+      //.log('🔄 거래 상태 변경:', status, tradeData);
       setCurrentTradeStatus(status);
 
       // tradeData로 파트너 정보 갱신
@@ -233,7 +233,7 @@ export default function MatchPage() {
     activatePage('match', handleTradeStatusChange);
 
     // 페이지 진입 시 이전 판매자 목록 초기화 및 필터 제거
-    console.log('🔄 MatchPage 진입 - 이전 데이터 초기화');
+    //.log('🔄 MatchPage 진입 - 이전 데이터 초기화');
     setActiveSellers([]);
     removeBuyerFilter(); // 서버에 필터 제거 요청
 
@@ -253,16 +253,6 @@ export default function MatchPage() {
     setWebSocketFunctions({ sendPayment, sendTradeConfirm });
   }, [sendPayment, sendTradeConfirm, setWebSocketFunctions]);
 
-  // userRole이 변경될 때마다 로그 출력
-  useEffect(() => {
-    console.log(
-      '🔄 MatchPage userRole 변경:',
-      userRole,
-      '타입:',
-      typeof userRole
-    );
-  }, [userRole]);
-
   // 필터 핸들러
   const handleFilterChange = useCallback(
     (filters: Filters) => {
@@ -279,7 +269,7 @@ export default function MatchPage() {
             : filters.transactionType[0] === '판매자'
               ? 'seller'
               : null;
-        console.log('🎯 필터 변경 시 userRole 업데이트:', newUserRole);
+        //.log('🎯 필터 변경 시 userRole 업데이트:', newUserRole);
         setUserRole(newUserRole);
       }
     },
@@ -415,20 +405,15 @@ export default function MatchPage() {
       setActiveSellers([]);
 
       // 실제 서버에 판매자 카드 등록
-      console.log('💰 판매자 카드 서버 등록 중...');
-      console.log('🏪 판매자 원본 데이터:', newInfo);
-      console.log('🔧 변환된 서버 데이터:', {
-        carrier: newInfo.carrier === 'LGU+' ? 'LG' : newInfo.carrier,
-        dataAmount: newInfo.dataAmount,
-        price: newInfo.price,
-      });
+      //.log('💰 판매자 카드 서버 등록 중...');
+      //.log('🏪 판매자 원본 데이터:', newInfo);
+
       registerSellerCard({
         carrier: newInfo.carrier,
         dataAmount: newInfo.dataAmount,
         price: newInfo.price,
       });
     } else {
-      console.log('판매 상태가 비활성화되었습니다.');
       // 판매자 카드 삭제 (store에서 currentCardId 사용)
       deleteSellerCard();
     }

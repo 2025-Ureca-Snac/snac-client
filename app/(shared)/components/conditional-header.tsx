@@ -12,6 +12,8 @@ export default function ConditionalHeader() {
     '/signUp',
     '/certification',
     '/payment/process',
+    '/payment/success',
+    '/payment/fail',
   ];
   const shouldHideHeader = hideHeaderPaths.includes(pathname);
 

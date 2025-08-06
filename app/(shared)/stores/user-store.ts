@@ -17,9 +17,6 @@ export const useUserStore = create<UserState>()((set, get) => {
     fetchUserProfile: async () => {
       // 이미 요청 중인 경우 중복 호출 방지
       if (isFetching) {
-        console.log(
-          '이미 사용자 정보를 가져오는 중이므로 중복 호출을 방지합니다.'
-        );
         return;
       }
 
@@ -29,11 +26,8 @@ export const useUserStore = create<UserState>()((set, get) => {
 
         const response = await api.get<ApiResponse<ApiUserResponse>>('/mypage');
 
-        console.log('사용자 정보 API 응답 데이터:', response);
-
         if (response.status === 200) {
           const userData = response.data.data;
-          console.log('API 응답 데이터:', userData);
 
           const profile: UserProfile = {
             name: userData.name,
@@ -50,13 +44,11 @@ export const useUserStore = create<UserState>()((set, get) => {
             naverConnected: userData.naverConnected,
           };
 
-          console.log('변환된 UserProfile:', profile);
           set({ profile, error: null });
         } else {
           set({ error: '사용자 정보를 가져오는데 실패했습니다.' });
         }
-      } catch (error) {
-        console.error('사용자 정보 가져오기 오류:', error);
+      } catch {
         set({ error: '사용자 정보를 가져오는데 실패했습니다.' });
       } finally {
         set({ isLoading: false });

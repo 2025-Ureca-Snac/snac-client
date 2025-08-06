@@ -61,9 +61,8 @@ export default function SocialLoginModal({
     try {
       if (!isCurrentlyLinked) {
         // 소셜 로그인 연동
-        console.log('소셜 로그인 연동 시작:', providerId);
+
         const success = await linkSocialAccount(providerId);
-        console.log('소셜 로그인 연동 결과:', success);
 
         if (success) {
           setLinkedProviders((prev) => ({
@@ -83,7 +82,6 @@ export default function SocialLoginModal({
               providerId === 'naver' ? true : profile?.naverConnected || false,
           });
 
-          console.log('로컬 상태 업데이트 완료');
           toast.success(`${provider.name} 계정이 연동되었습니다.`);
 
           if (onSubmit) {
@@ -125,8 +123,6 @@ export default function SocialLoginModal({
         }
       }
     } catch (error) {
-      console.error('소셜 로그인 연동 처리 중 오류:', error);
-
       // 실제 에러 메시지 사용
       const errorMessage =
         error instanceof Error

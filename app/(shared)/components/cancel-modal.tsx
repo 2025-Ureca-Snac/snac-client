@@ -95,8 +95,6 @@ export default function CancelModal({
         cancelRequest
       );
 
-      console.log('취소 성공:', response.data);
-
       const responseData = response.data as ApiResponse<unknown>;
       if (responseData.status === 'OK') {
         toast.success('취소가 성공적으로 처리되었습니다.');
@@ -109,8 +107,7 @@ export default function CancelModal({
           '취소 처리 중 문제가 발생했습니다. 고객센터로 문의해주세요.'
         );
       }
-    } catch (error) {
-      console.error('취소 실패:', error);
+    } catch {
       toast.error('취소 처리 중 오류가 발생했습니다. 고객센터로 문의해주세요.');
     } finally {
       setIsLoading(false);

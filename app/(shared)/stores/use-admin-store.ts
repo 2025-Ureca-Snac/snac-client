@@ -128,8 +128,8 @@ export const useAdminStore = create<AdminState>((set) => ({
       } else {
         throw new Error('API 응답 데이터 형식이 올바르지 않습니다.');
       }
-    } catch (err) {
-      console.error('[useAdminStore] fetchDashboardMetrics 실패:', err);
+    } catch {
+      //.error('[useAdminStore] fetchDashboardMetrics 실패:', err);
       set({
         error: '대시보드 정보를 불러오는데 실패했습니다.',
         loading: false,
@@ -150,8 +150,8 @@ export const useAdminStore = create<AdminState>((set) => ({
       const transformedData = transformStatsToChartData(stats, QNA_TYPE_LABELS);
 
       set({ qnaChartData: transformedData, qnaChartLoading: false });
-    } catch (err) {
-      console.error('[useAdminStore] fetchQnaChartData 실패:', err);
+    } catch {
+      //.error('[useAdminStore] fetchQnaChartData 실패:', err);
       set({
         qnaChartError: '통계 데이터를 불러오는 데 실패했습니다.',
         qnaChartLoading: false,
@@ -175,8 +175,8 @@ export const useAdminStore = create<AdminState>((set) => ({
       );
 
       set({ reportChartData: transformedData, reportChartLoading: false });
-    } catch (err) {
-      console.error('[useAdminStore] fetchReportChartData 실패:', err);
+    } catch {
+      //.error('[useAdminStore] fetchReportChartData 실패:', err);
       set({
         reportChartError: '통계 데이터를 불러오는 데 실패했습니다.',
         reportChartLoading: false,

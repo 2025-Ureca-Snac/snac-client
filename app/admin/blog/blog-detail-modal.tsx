@@ -70,7 +70,13 @@ export const BlogDetailModal = ({
 
     if (post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
       return (
-        <img src={post.articleUrl} alt="업로드 이미지" className="rounded-lg" />
+        <Image
+          src={post.articleUrl}
+          alt="업로드 이미지"
+          width={400}
+          height={300}
+          className="rounded-lg"
+        />
       );
     }
 

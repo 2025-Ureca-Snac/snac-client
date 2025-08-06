@@ -69,8 +69,8 @@ export default function BuyerMatchingStatus({
     fetch('/searching-lotties.json')
       .then((response) => response.json())
       .then((data) => setAnimationData(data))
-      .catch((error) => {
-        console.error('Lottie 애니메이션 로드 실패:', error);
+      .catch(() => {
+        //.error('Lottie 애니메이션 로드 실패:', error);
       });
   }, []);
 

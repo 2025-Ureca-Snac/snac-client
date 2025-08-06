@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { useAuthStore } from './auth-store';
+import { toast } from 'sonner';
 
 type Category = 'SKT' | 'KT' | 'LGU+' | 'ALL' | null;
 export type Carrier = 'SKT' | 'KT' | 'LGU+' | '--';
@@ -81,8 +83,14 @@ export const useHomeStore = create<HomeState>((set) => ({
         refetchTrigger: state.refetchTrigger + 1,
       })),
     toggleFilter: () => set((state) => ({ isFilterOpen: !state.isFilterOpen })),
-    toggleCreateModal: () =>
-      set((state) => ({ isCreateModalOpen: !state.isCreateModalOpen })),
+    toggleCreateModal: () => {
+      const { user } = useAuthStore.getState();
+      if (!user) {
+        toast.error('로그인 후 이용이 가능합니다.');
+        return;
+      }
+      set((state) => ({ isCreateModalOpen: !state.isCreateModalOpen }));
+    },
     openEditModal: (cardId, cardData) =>
       set(() => ({
         isEditMode: true,

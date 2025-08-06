@@ -21,8 +21,7 @@ export default function MyPageBottomButtons() {
       await logout();
       toast.success('로그아웃되었습니다.');
       router.push('/');
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
+    } catch {
       toast.error('로그아웃 중 오류가 발생했습니다.');
     }
   }, [logout, router]);

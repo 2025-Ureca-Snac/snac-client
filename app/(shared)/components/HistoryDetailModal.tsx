@@ -72,8 +72,8 @@ export default function HistoryDetailModal({
           if (response.data.status === 'OK' && response.data.data) {
             setAttachmentImageUrl(response.data.data);
           }
-        } catch (error) {
-          console.error('첨부 이미지 URL 가져오기 실패:', error);
+        } catch {
+          // 첨부 이미지 URL 가져오기 실패 처리
         } finally {
         }
       }
@@ -94,8 +94,8 @@ export default function HistoryDetailModal({
       setIsLoadingFavorite(true);
       await api.post('/favorites', { toMemberId: item.partnerId });
       setIsFavorite(true);
-    } catch (error) {
-      console.error('단골 등록 실패:', error);
+    } catch {
+      // 단골 등록 실패 처리
     } finally {
       setIsLoadingFavorite(false);
     }
@@ -103,7 +103,6 @@ export default function HistoryDetailModal({
 
   // 신고하기 버튼 클릭
   const handleReportClick = () => {
-    console.log('신고하기 클릭됨:', item.partnerId, item.id);
     const tradeId = item.id;
     const tradeType = type === 'sales' ? 'SALE' : 'PURCHASE';
     router.push(
@@ -150,8 +149,8 @@ export default function HistoryDetailModal({
       setIsLoadingFavorite(true);
       await api.delete(`/favorites/${item.partnerId}`);
       setIsFavorite(false);
-    } catch (error) {
-      console.error('단골 삭제 실패:', error);
+    } catch {
+      // 단골 삭제 실패 처리
     } finally {
       setIsLoadingFavorite(false);
     }
@@ -160,8 +159,6 @@ export default function HistoryDetailModal({
   // 전송완료 핸들러
   const handleDataSent = async (file: File) => {
     try {
-      console.log('전송완료 버튼 클릭됨:', item);
-
       const formData = new FormData();
       formData.append('file', file);
 
@@ -174,8 +171,6 @@ export default function HistoryDetailModal({
           },
         }
       );
-
-      console.log('데이터 전송 완료 처리됨', response);
 
       // 응답 상태에 따른 처리
       if (response.data.status === API_STATUS.OK) {
@@ -195,7 +190,6 @@ export default function HistoryDetailModal({
       }
       throw new Error(errorMessage);
     } catch (error) {
-      console.error('데이터 전송 완료 처리 실패:', error);
       throw error;
     }
   };
@@ -203,16 +197,12 @@ export default function HistoryDetailModal({
   // 데이터 수신 확인 핸들러
   const handleDataConfirm = async () => {
     try {
-      console.log('데이터 수신 확인 버튼 클릭됨:', item);
-
-      const response = await api.patch(`/trades/${item.id}/confirm`);
-
-      console.log('데이터 수신 확인 완료:', response);
+      await api.patch(`/trades/${item.id}/confirm`);
 
       // 성공 시 페이지 새로고침
       window.location.reload();
-    } catch (error) {
-      console.error('데이터 수신 확인 실패:', error);
+    } catch {
+      // 데이터 수신 확인 실패 처리
     }
   };
 
@@ -232,56 +222,43 @@ export default function HistoryDetailModal({
   // 거래 취소 실행 핸들러
   const handleTradeCancelConfirm = async () => {
     try {
-      console.log('거래 취소 확인 버튼 클릭됨:', item);
-
-      const response = await api.patch(`/trades/${item.id}/cancel/request`, {
+      await api.patch(`/trades/${item.id}/cancel/request`, {
         reason: selectedCancelReason,
       });
 
-      console.log('거래 취소 처리 완료:', response);
-
       // 성공 시 페이지 새로고침
       window.location.reload();
-    } catch (error) {
-      console.error('거래 취소 처리 실패:', error);
+    } catch {
+      // 거래 취소 처리 실패 처리
     }
   };
 
   // 거래 취소 거절 핸들러
   const handleCancelReject = async () => {
     try {
-      console.log('거래 취소 거절 버튼 클릭됨:', item);
-
-      const response = await api.patch(`/trades/${item.id}/cancel/reject`);
-
-      console.log('거래 취소 거절 처리 완료:', response);
+      await api.patch(`/trades/${item.id}/cancel/reject`);
 
       // 성공 시 페이지 새로고침
       window.location.reload();
-    } catch (error) {
-      console.error('거래 취소 거절 처리 실패:', error);
+    } catch {
+      // 거래 취소 거절 처리 실패 처리
     }
   };
 
   // 거래 취소 승낙 핸들러
   const handleCancelAccept = async () => {
     try {
-      console.log('거래 취소 승낙 버튼 클릭됨:', item);
-
-      const response = await api.patch(`/trades/${item.id}/cancel/accept`);
-
-      console.log('거래 취소 승낙 처리 완료:', response);
+      await api.patch(`/trades/${item.id}/cancel/accept`);
 
       // 성공 시 페이지 새로고침
       window.location.reload();
-    } catch (error) {
-      console.error('거래 취소 승낙 처리 실패:', error);
+    } catch {
+      // 거래 취소 승낙 처리 실패 처리
     }
   };
 
   // 진행 단계 생성
   const progressSteps = getProgressSteps(type, item.status);
-  console.log('test:', item);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-300">
