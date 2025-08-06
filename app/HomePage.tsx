@@ -6,6 +6,7 @@ import Banner from './home/banner';
 
 import { ArticleSection } from './home/components/article-section';
 import TradingInformationSection from './home/components/TradingInformationSection';
+import BlogIntroBanner from './(shared)/components/blog-intro-banner';
 
 export default function HomePage() {
   useWebSocketGuard();
@@ -13,9 +14,10 @@ export default function HomePage() {
   return (
     <>
       <TradingInformationSection />
+      <BlogIntroBanner />
       <Banner />
 
-      <div className="w-full">
+      <div className="w-full article-section" id="articles">
         <ArticleSection />
       </div>
     </>
