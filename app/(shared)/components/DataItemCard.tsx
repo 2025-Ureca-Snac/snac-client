@@ -48,7 +48,6 @@ export const DataItemCard = ({
   cardId,
   carrier,
   dataAmount,
-  skipLoginCheck = false,
 }: DataItemCardProps) => {
   const loggedInUser = useAuthStore((state: AuthState) => state.user);
   const { actions } = useHomeStore();
@@ -101,14 +100,14 @@ export const DataItemCard = ({
   const buttonConfig = getButtonConfig();
 
   return (
-    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md max-w-[150px] max-h-[203px] md:w-[238px] md:max-w-none md:max-h-[348px] flex flex-col p-3">
+    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md w-full max-h-[203px] md:max-h-[348px] flex flex-col p-3">
       {isNew && (
-        <span className="absolute z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px]  md:w-[57px] h-[20px] md:h-[24px]  rounded-[16px] flex items-center justify-center ">
+        <span className="absolute top-3 left-3 z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] flex items-center justify-center">
           {newBadgeText}
         </span>
       )}
       {isMyPost && (
-        <span className="absolute top-3 right-3 z-10 bg-green-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center ">
+        <span className="absolute top-3 right-3 z-10 bg-green-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center">
           MY
         </span>
       )}
@@ -117,12 +116,13 @@ export const DataItemCard = ({
           src={imageUrl}
           alt={title}
           fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           style={{ objectFit: 'contain' }}
         />
       </div>
 
       <div className="flex-grow flex flex-col items-center md:items-start md:py-[18px] mt-2">
-        <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718]">
+        <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718] truncate w-full text-center md:text-left">
           {title}
         </h3>
         <p className="text-medium-sm md:text-medium-sm text-gray-900 h-6 flex items-center">
@@ -141,16 +141,17 @@ export const DataItemCard = ({
               if (!buttonConfig.clickable) {
                 return;
               }
+              
               onClickBuy({ email, createdAt });
             }}
-            className={`w-btn-sm h-btn-sm md:w-btn-md md:h-btn-md ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
+            className={`w-full h-full ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
             style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
             disabled={!buttonConfig.clickable}
           >
             {buttonConfig.text}
           </Button>
         ) : (
-          <div className="flex gap-2 w-full">
+          <div className="flex gap-2 w-full h-full">
             {sellStatus === 'SELLING' ? (
               <>
                 {cardCategory === 'SELL' && (

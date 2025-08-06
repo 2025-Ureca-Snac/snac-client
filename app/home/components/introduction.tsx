@@ -216,22 +216,24 @@ const DataItemCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount: 0.5 }}
       transition={{ duration: 0.5, delay }}
-      className="transition-transform duration-300 hover:scale-[1.05] relative bg-white dark:bg-gray-800 rounded-2xl shadow-light flex flex-col p-4 h-full"
+
+      className="transition-transform duration-300 hover:scale-[1.05] relative bg-white dark:bg-white  rounded-2xl shadow-light flex flex-col p-4 h-full"
+
     >
       <div className="relative h-20 w-full my-2">
         <Image src={imageUrl} alt={title} layout="fill" objectFit="contain" />
       </div>
 
       <div className="flex-grow flex flex-col items-start mt-2">
-        <h3 className="font-bold text-gray-900 dark:text-white text-left text-sm md:text-base">
+
+        <h3 className="font-bold text-gray-900  text-left text-sm md:text-base">
           {title}
         </h3>
-        <p className="text-sm text-gray-800 dark:text-gray-200 h-6 flex items-center">
+        <p className="text-sm text-gray-800  h-6 flex items-center">
           {displayPrice}
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          바삭스코어 {ratingScore}
-        </p>
+        <p className="text-xs text-gray-500 ">바삭스코어 {ratingScore}</p>
+
       </div>
 
       <div className="flex justify-center mt-4">
@@ -325,7 +327,7 @@ export default function Introduction() {
             className="absolute flex flex-col items-center"
           >
             <h2 className="text-8xl md:text-9xl font-extrabold text-teal-green bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent">
-              Snac
+              SNAC
             </h2>
           </motion.div>
         </div>
@@ -348,7 +350,7 @@ export default function Introduction() {
                 }}
                 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
               >
-                Snac의 약속
+                SNAC의 약속
               </motion.h2>
               <motion.p
                 variants={{
@@ -371,7 +373,7 @@ export default function Introduction() {
                 {
                   icon: <Users className="w-12 h-12 text-teal-green" />,
                   title: '신속한 실시간 매칭',
-                  desc: 'AI 기반 매칭 시스템이 최적의 거래 상대를 즉시 찾아 연결합니다.',
+                  desc: '시스템이 최적의 거래 상대를 즉시 찾아 연결합니다.',
                 },
               ].map((item, i) => (
                 <motion.div
@@ -423,7 +425,7 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                Snac은 데이터 거래에 필요한 모든 기능을 갖추고 있습니다.
+                SNAC은 데이터 거래에 필요한 모든 기능을 갖추고 있습니다.
               </motion.p>
             </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -533,7 +535,7 @@ export default function Introduction() {
                 }}
                 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
               >
-                Snac 포인트만의 특별한 혜택
+                SNAC 포인트만의 특별한 혜택
               </motion.h2>
               <motion.p
                 variants={{
@@ -542,7 +544,7 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                포인트는 현금으로 환전할 수 없지만, Snac 생태계 안에서 더 큰
+                포인트는 현금으로 환전할 수 없지만, SNAC 생태계 안에서 더 큰
                 가치를 가집니다.
               </motion.p>
             </motion.div>
