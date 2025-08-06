@@ -1,30 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 import { CardData } from '../(shared)/types/card';
 import { PriceUnit } from '@/app/(shared)/types';
 import { DataItemCard } from '../(shared)/components/DataItemCard';
-import TradeConfirmationModal from '../(shared)/components/TradeConfirmationModal';
 import {
   getCarrierImageUrl,
   formatCarrierName,
 } from '../(shared)/utils/carrier-utils';
 import { isToday } from '@/app/(shared)/utils/';
+import { useRouter } from 'next/navigation';
 
 interface HomeSectionProps {
   cards: CardData[];
   unit: PriceUnit;
 }
-
-// const formatDataAmount = (amountInMB: number): string =>
-//   amountInMB >= 1024 && amountInMB % 1024 === 0
-//     ? `${amountInMB / 1024}GB`
-//     : `${amountInMB}MB`;
-
 export default function HomeSection({ cards, unit }: HomeSectionProps) {
-  const [modalItem, setModalItem] = useState<CardData | null>(null);
+  const router = useRouter();
 
+  const handleBuyClick = (item: CardData) => {
+    // 거래 페이지로 이동
+    router.push(`/trade/${item.id}`);
+  };
   return (
     <>
       {/* 카드 그리드 */}
@@ -45,16 +43,10 @@ export default function HomeSection({ cards, unit }: HomeSectionProps) {
             cardId={item.id}
             carrier={item.carrier}
             dataAmount={item.dataAmount}
-            onClickBuy={() => setModalItem(item)}
+            onClickBuy={() => handleBuyClick(item)}
           />
         ))}
       </div>
-
-      <TradeConfirmationModal
-        modalItem={modalItem}
-        onClose={() => setModalItem(null)}
-        unit={unit}
-      />
     </>
   );
 }
