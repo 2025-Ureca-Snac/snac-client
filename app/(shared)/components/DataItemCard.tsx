@@ -141,7 +141,7 @@ export const DataItemCard = ({
               if (!buttonConfig.clickable) {
                 return;
               }
-
+              
               onClickBuy({ email, createdAt });
             }}
             className={`w-full h-full ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
