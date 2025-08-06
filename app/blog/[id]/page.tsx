@@ -1,6 +1,5 @@
 // React 관련 임포트
 import { notFound } from 'next/navigation';
-import Head from 'next/head';
 import type { Metadata } from 'next';
 
 // 내부 라이브러리/유틸리티 임포트 (절대 경로);
@@ -48,14 +47,8 @@ export default async function BlogPostPage({ params }: GenerateMetadataProps) {
     notFound();
   }
 
-  // 메타 설명 생성 - 제목 사용
-  const description = post.title || '스낵 블로그 포스트입니다.';
-
   return (
     <>
-      <Head>
-        <meta name="description" content={description} />
-      </Head>
       <BlogStructuredData post={post} />
 
       <div className="min-h-screen">

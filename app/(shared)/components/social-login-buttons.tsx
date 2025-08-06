@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/auth-store';
 import { SOCIALS } from '../constants/social-login-data';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTheme } from '../hooks/useTheme';
 
 interface SocialLoginButtonsProps {
   onError?: (message: string) => void;
@@ -17,6 +18,7 @@ export default function SocialLoginButtons({
 }: SocialLoginButtonsProps) {
   const { linkSocialAccount } = useAuthStore();
   const router = useRouter();
+  const { isDarkmode } = useTheme();
 
   const handleSocialLogin = async (providerId: string) => {
     try {
@@ -48,7 +50,7 @@ export default function SocialLoginButtons({
 
   return (
     <div className="flex justify-center">
-      {SOCIALS.map(({ name, src, providerId }, index) => (
+      {SOCIALS.map(({ name, src, srcDark, providerId }, index) => (
         <div key={name} className="flex items-center">
           <div className="w-22 h-22 md:w-34 md:h-34 rounded-full flex items-center justify-center">
             <button
@@ -61,7 +63,7 @@ export default function SocialLoginButtons({
               tabIndex={0}
             >
               <Image
-                src={src}
+                src={isDarkmode ? srcDark : src}
                 alt={name}
                 width={90}
                 height={90}

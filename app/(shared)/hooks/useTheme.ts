@@ -59,5 +59,6 @@ export function useTheme() {
     actualTheme,
     systemTheme,
     changeTheme,
+    isDarkmode: actualTheme === 'dark', // 다크 모드 상태 추가
   };
 }

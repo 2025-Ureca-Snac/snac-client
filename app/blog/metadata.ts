@@ -8,14 +8,19 @@ export const blogLayoutMetadata: Metadata = {
     template: '%s | 스낵 블로그',
   },
   description:
-    '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
+    'SKT, KT, LGU+ 데이터 거래 노하우와 팁을 공유하는 스낵 블로그입니다. 데이터 부족 시 해결 방법, 남은 데이터 활용법, 실시간 매칭 시스템 활용 가이드를 확인하세요.',
   keywords: [
     '데이터거래',
     '데이터마켓플레이스',
     '데이터판매',
     '데이터구매',
-    '비즈니스',
-    '아웃렛',
+    'SKT',
+    'KT',
+    'LGU+',
+    '모바일데이터',
+    '데이터부족',
+    '데이터활용',
+    '실시간매칭',
     '스낵',
   ],
   authors: [{ name: '스낵팀' }],
@@ -33,7 +38,7 @@ export const blogLayoutMetadata: Metadata = {
   openGraph: {
     title: '블로그 | 스낵',
     description:
-      '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
+      'SKT, KT, LGU+ 데이터 거래 노하우와 팁을 공유하는 스낵 블로그입니다. 데이터 부족 시 해결 방법, 남은 데이터 활용법, 실시간 매칭 시스템 활용 가이드를 확인하세요.',
     url: 'https://snac-app.com/blog',
     siteName: '스낵',
     images: [
@@ -51,7 +56,7 @@ export const blogLayoutMetadata: Metadata = {
     card: 'summary_large_image',
     title: '블로그 | 스낵',
     description:
-      '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
+      'SKT, KT, LGU+ 데이터 거래 노하우와 팁을 공유하는 스낵 블로그입니다. 데이터 부족 시 해결 방법, 남은 데이터 활용법, 실시간 매칭 시스템 활용 가이드를 확인하세요.',
     images: ['/blog-bg-pattern.png'],
   },
   robots: {
@@ -71,21 +76,26 @@ export const blogLayoutMetadata: Metadata = {
 export const blogPageMetadata: Metadata = {
   title: '블로그 | 스낵',
   description:
-    '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다. 최신 트렌드와 실무 노하우를 확인하세요.',
+    'SKT, KT, LGU+ 데이터 거래 노하우와 팁을 공유하는 스낵 블로그입니다. 데이터 부족 시 해결 방법, 남은 데이터 활용법, 실시간 매칭 시스템 활용 가이드, 최신 트렌드와 실무 노하우를 확인하세요.',
   keywords: [
     '데이터거래',
     '데이터마켓플레이스',
     '데이터판매',
     '데이터구매',
-    '비즈니스',
-    '아웃렛',
+    'SKT',
+    'KT',
+    'LGU+',
+    '모바일데이터',
+    '데이터부족',
+    '데이터활용',
+    '실시간매칭',
     '스낵',
     '블로그',
   ],
   openGraph: {
     title: '블로그 | 스낵',
     description:
-      '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
+      'SKT, KT, LGU+ 데이터 거래 노하우와 팁을 공유하는 스낵 블로그입니다. 데이터 부족 시 해결 방법, 남은 데이터 활용법, 실시간 매칭 시스템 활용 가이드를 확인하세요.',
     url: 'https://snac-app.com/blog',
     siteName: '스낵',
     images: [
@@ -103,7 +113,7 @@ export const blogPageMetadata: Metadata = {
     card: 'summary_large_image',
     title: '블로그 | 스낵',
     description:
-      '데이터 거래, 데이터 마켓플레이스, 데이터 판매와 구매를 다루는 스낵 블로그입니다.',
+      'SKT, KT, LGU+ 데이터 거래 노하우와 팁을 공유하는 스낵 블로그입니다. 데이터 부족 시 해결 방법, 남은 데이터 활용법, 실시간 매칭 시스템 활용 가이드를 확인하세요.',
     images: ['/blog-bg-pattern.png'],
   },
   alternates: {
