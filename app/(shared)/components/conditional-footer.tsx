@@ -12,6 +12,8 @@ export default function ConditionalFooter() {
     '/signUp',
     '/certification',
     '/payment/process',
+    '/payment/success',
+    '/payment/fail',
   ];
   const shouldHideFooter = hideFooterPaths.includes(pathname);
 

@@ -51,11 +51,6 @@ export default function UploadDataStep({
       setUploadMessage('');
       setUploadMessageType('error');
 
-      console.log('데이터 전송 완료 버튼 클릭됨:', {
-        tradeId,
-        fileName: selectedFile.name,
-      });
-
       const formData = new FormData();
       formData.append('file', selectedFile);
 
@@ -68,8 +63,6 @@ export default function UploadDataStep({
           },
         }
       );
-
-      console.log('데이터 전송 완료 처리됨', response);
 
       // 응답 상태에 따른 처리
       if (response.data.status === API_STATUS.OK) {
@@ -96,8 +89,7 @@ export default function UploadDataStep({
       setUploadMessageType('error');
 
       setSelectedFile(null); // 전송 완료 후 파일 정보 초기화
-    } catch (error) {
-      console.error('데이터 전송 완료 처리 실패:', error);
+    } catch {
       setUploadMessage(UPLOAD_ERROR_MESSAGE.DEFAULT);
       setUploadMessageType('error');
       setSelectedFile(null); // 에러 발생 시 파일 선택 초기화

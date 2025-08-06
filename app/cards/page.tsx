@@ -42,8 +42,7 @@ const getCurrentUserEmail = (): string | null => {
       }
     }
     return null;
-  } catch (error) {
-    console.error('토큰 디코딩 실패:', error);
+  } catch {
     return null;
   }
 };
@@ -155,8 +154,7 @@ export default function HomePage() {
           }
         }
         setAllCards(accumulatedCards);
-      } catch (err) {
-        console.error('전체 카드 조회 중 오류 발생:', err);
+      } catch {
         setError('데이터를 불러오는 중 오류가 발생했습니다.');
         setAllCards([]);
       }

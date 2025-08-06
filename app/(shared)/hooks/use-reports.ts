@@ -36,8 +36,7 @@ export const useReports = () => {
         await api.post(`/trades/${data.tradeId}/disputes`, reportData);
         toast.success('신고가 성공적으로 접수되었습니다.');
         return true;
-      } catch (error) {
-        console.error('신고 제출 실패:', error);
+      } catch {
         toast.error('신고 제출에 실패했습니다.');
         return false;
       }

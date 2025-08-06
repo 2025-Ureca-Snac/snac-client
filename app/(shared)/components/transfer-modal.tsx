@@ -72,8 +72,8 @@ export default function SettlementModal({
       } else if (accountList.length > 0) {
         setSelectedAccountId(accountList[0].id);
       }
-    } catch (err) {
-      console.error('계좌 목록 조회 실패:', err);
+    } catch {
+      // 계좌 목록 조회 실패 처리
     }
   };
 
@@ -122,8 +122,7 @@ export default function SettlementModal({
     setError(null);
 
     try {
-      const response = await api.post('/accounts', accountForm);
-      console.log('계좌 등록 성공:', response.data);
+      await api.post('/accounts', accountForm);
 
       // 계좌 목록 새로고침
       await fetchAccounts();
@@ -138,7 +137,6 @@ export default function SettlementModal({
 
       toast.success('계좌가 성공적으로 등록되었습니다!');
     } catch (err) {
-      console.error('계좌 등록 실패:', err);
       const errorMessage = handleApiError(err);
       setError(errorMessage);
     } finally {
@@ -181,13 +179,11 @@ export default function SettlementModal({
 
     try {
       // 정산 API 호출
-      const response = await api.post('/money/settle', {
+      await api.post('/money/settle', {
         amount: formData.amount,
         accountId: selectedAccountId,
         message: formData.message || '',
       });
-
-      console.log('정산 성공:', response.data);
 
       // 성공 콜백 호출
       if (onSettlementSuccess) {
@@ -197,7 +193,6 @@ export default function SettlementModal({
       toast.success('정산이 성공적으로 완료되었습니다!');
       onClose();
     } catch (err) {
-      console.error('정산 실패:', err);
       const errorMessage = handleApiError(err);
       setError(errorMessage);
     } finally {

@@ -138,7 +138,7 @@ export default function ChangeNicknameModal({
           nickname: nicknameToCheck.trim(),
         });
 
-        console.log(response);
+        //.log(response);
 
         if (response.status === 200) {
           const isDuplicate = response.data.data?.isDuplicate || false;
@@ -150,7 +150,7 @@ export default function ChangeNicknameModal({
           });
         }
       } catch (error: unknown) {
-        console.error('닉네임 중복 체크 오류:', error);
+        //.error('닉네임 중복 체크 오류:', error);
 
         // API 엔드포인트가 없는 경우를 대비한 fallback
         if (error && typeof error === 'object' && 'response' in error) {
@@ -270,7 +270,7 @@ export default function ChangeNicknameModal({
         toast.error('닉네임 변경에 실패했습니다.');
       }
     } catch (error: unknown) {
-      console.error('닉네임 변경 오류:', error);
+      //.error('닉네임 변경 오류:', error);
 
       // 에러 메시지 처리
       if (error && typeof error === 'object' && 'response' in error) {

@@ -80,13 +80,10 @@ export default function SettlementModal({
   const fetchBanks = async () => {
     try {
       setIsLoadingBanks(true);
-      console.log('은행 목록 조회 시작...');
       const response = await api.get<ApiResponse<Bank[]>>('/banks');
       const bankList = response.data.data;
-      console.log('은행 목록 조회 성공:', bankList);
       setBanks(bankList);
-    } catch (err) {
-      console.error('은행 목록 조회 실패:', err);
+    } catch {
       // 에러가 발생하면 기본 은행 목록으로 설정
       setBanks(DEFAULT_BANKS);
     } finally {
@@ -97,15 +94,12 @@ export default function SettlementModal({
   // 계좌 목록 조회
   const fetchAccounts = async () => {
     try {
-      console.log('계좌 목록 조회 시작...');
       const response = await api.get<ApiResponse<BankAccount[]>>('/accounts');
       const accountList = response.data.data;
-      console.log('계좌 목록 조회 성공:', accountList);
       setAccounts(accountList);
 
       // 계좌가 없으면 바로 계좌 등록 화면으로
       if (accountList.length === 0) {
-        console.log('계좌가 없음 - 계좌 등록 화면으로 자동 이동');
         setIsAddingAccount(true);
         return;
       }
@@ -119,8 +113,7 @@ export default function SettlementModal({
       } else if (accountList.length > 0) {
         setSelectedAccountId(accountList[0].id);
       }
-    } catch (err) {
-      console.error('계좌 목록 조회 실패:', err);
+    } catch {
       // 에러가 발생해도 빈 배열로 설정하여 계좌가 없다고 인식하도록 함
       setAccounts([]);
       setSelectedAccountId('');
@@ -174,8 +167,7 @@ export default function SettlementModal({
     setError(null);
 
     try {
-      const response = await api.post('/accounts', accountForm);
-      console.log('계좌 등록 성공:', response.data);
+      await api.post('/accounts', accountForm);
 
       // 계좌 목록 새로고침
       await fetchAccounts();
@@ -190,7 +182,6 @@ export default function SettlementModal({
 
       toast.success('계좌가 성공적으로 등록되었습니다!');
     } catch (err) {
-      console.error('계좌 등록 실패:', err);
       const errorMessage = handleApiError(err);
       setError(errorMessage);
     } finally {
@@ -200,9 +191,6 @@ export default function SettlementModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log('정산 버튼 클릭 - 현재 계좌 목록:', accounts);
-    console.log('계좌 개수:', accounts.length);
 
     // 계좌가 선택되지 않았으면
     if (!selectedAccountId) {
@@ -241,12 +229,10 @@ export default function SettlementModal({
       }
 
       // 정산 API 호출
-      const response = await api.post('/settlements', {
+      await api.post('/settlements', {
         amount: formData.amount,
         accountNumber: selectedAccount.accountNumber,
       });
-
-      console.log('정산 성공:', response.data);
 
       // 성공 콜백 호출
       if (onSettlementSuccess) {
@@ -257,14 +243,13 @@ export default function SettlementModal({
       try {
         const { useUserStore } = await import('../stores/user-store');
         await useUserStore.getState().fetchUserProfile();
-      } catch (error) {
-        console.error('사용자 정보 새로고침 실패:', error);
+      } catch {
+        // 사용자 정보 새로고침 실패 처리
       }
 
       toast.success('정산이 성공적으로 완료되었습니다!');
       onClose();
     } catch (err) {
-      console.error('정산 실패:', err);
       const errorMessage = handleApiError(err);
       setError(errorMessage);
     } finally {

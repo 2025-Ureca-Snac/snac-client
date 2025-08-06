@@ -27,9 +27,7 @@ export function generateTableOfContents(
 export async function getPost(id: string): Promise<ExtendedBlogPost | null> {
   try {
     const response = await api.get(`/articles/${id}`);
-    console.log('API 응답:', response.data);
     const post = (response.data as { data: ExtendedBlogPost }).data;
-    console.log('블로그 포스트 데이터:', post);
 
     // articleUrl에서 콘텐츠 가져오기
     if (post.articleUrl && !post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -38,19 +36,12 @@ export async function getPost(id: string): Promise<ExtendedBlogPost | null> {
         if (contentResponse.ok) {
           const content = await contentResponse.text();
           post.markdownContent = content;
-          console.log(
-            '마크다운 콘텐츠 로드 완료:',
-            content.substring(0, 100) + '...'
-          );
         }
-      } catch (error) {
-        console.error('콘텐츠 로드 실패:', error);
-      }
+      } catch {}
     }
 
     return post;
-  } catch (error) {
-    console.error('Failed to fetch post:', error);
+  } catch {
     return null;
   }
 }

@@ -25,8 +25,7 @@ export default function BlogPageClient() {
     }
   };
 
-  const handleSortChange = (sortBy: string) => {
-    console.log('Sort changed to:', sortBy);
+  const handleSortChange = () => {
     // 추후 정렬 로직 구현
   };
 

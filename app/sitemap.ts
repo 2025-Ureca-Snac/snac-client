@@ -47,8 +47,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }));
-  } catch (error) {
-    console.error('Failed to fetch blog posts for sitemap:', error);
+  } catch {
+    // 블로그 포스트 가져오기 실패 처리
   }
 
   return [...staticPages, ...blogPosts];

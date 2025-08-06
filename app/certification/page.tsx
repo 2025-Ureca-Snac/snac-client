@@ -12,7 +12,6 @@ export default function Certification() {
   const extractAuthData = async () => {
     // 이미 메시지를 전송했다면 중복 전송 방지
     if (isMessageSentRef.current) {
-      console.log('이미 메시지를 전송했으므로 중복 전송을 방지합니다');
       return;
     }
 
@@ -21,12 +20,6 @@ export default function Certification() {
       const urlParams = new URLSearchParams(window.location.search);
       const social = urlParams.get('social');
       const error = urlParams.get('error');
-
-      console.log('URL 파라미터에서 추출한 인증 데이터:', {
-        social,
-        error,
-        urlParams: Object.fromEntries(urlParams.entries()),
-      });
 
       // error 파라미터가 있으면 인증 실패, social 파라미터가 있으면 성공
       if (error) {
@@ -44,7 +37,6 @@ export default function Certification() {
           isMessageSentRef.current = true; // 메시지 전송 완료 표시
         } else {
           // 부모 창이 없는 경우 (직접 접근) 처리
-          console.log('인증 실패:', error);
           toast.error('인증에 실패했습니다. 다시 시도해주세요.');
         }
       } else if (social) {
@@ -61,15 +53,12 @@ export default function Certification() {
             '*' //window.location.origin
           );
           isMessageSentRef.current = true; // 메시지 전송 완료 표시
-          console.log('인증 성공 - 데이터 전송 완료');
         } else {
           // 부모 창이 없는 경우 (직접 접근) 처리
-          console.log('인증 성공:', { social });
           toast.success('인증이 성공적으로 완료되었습니다!');
         }
       } else {
         // 파라미터가 없는 경우 (예상치 못한 상황)
-        console.log('예상치 못한 상황: 파라미터가 없습니다');
         if (window.opener) {
           window.opener.postMessage(
             {
@@ -85,8 +74,7 @@ export default function Certification() {
           toast.error('예상치 못한 상황이 발생했습니다.');
         }
       }
-    } catch (error) {
-      console.error('인증 데이터 추출 중 오류:', error);
+    } catch {
       if (window.opener) {
         window.opener.postMessage(
           {
@@ -107,7 +95,6 @@ export default function Certification() {
   useEffect(() => {
     // 창이 닫히는 순간에 실행되는 이벤트 리스너
     const handleBeforeUnload = () => {
-      console.log('창이 닫히기 직전 - 인증 데이터 추출 시작');
       extractAuthData();
     };
 
@@ -124,12 +111,10 @@ export default function Certification() {
           clearInterval(countdownTimer);
           if (window.opener) {
             // 창을 닫기 전에 인증 데이터 추출
-            console.log('카운트다운 완료 - 인증 데이터 추출');
             extractAuthData();
 
             // 잠시 후 창 닫기
             setTimeout(() => {
-              console.log('인증 창을 닫습니다');
               window.close();
             }, 200);
           } else {
@@ -151,7 +136,6 @@ export default function Certification() {
   // 수동 닫기 함수
   const handleClose = () => {
     if (window.opener) {
-      console.log('수동으로 인증 창을 닫습니다');
       // 창을 닫기 전에 인증 데이터 추출
       extractAuthData();
       setTimeout(() => {

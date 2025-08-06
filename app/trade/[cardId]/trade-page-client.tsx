@@ -36,13 +36,13 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
       setIsProcessing(true);
 
       try {
-        console.log('구매 거래 요청 시작:', cardData);
+        //.log('구매 거래 요청 시작:', cardData);
         // 구매 거래 요청 생성
         const response = await api.get<ApiResponse<{ sellStatus: string }>>(
           `/cards/${cardData.id}`
         );
 
-        console.log('구매 거래 요청 성공:', response.data);
+        //.log('구매 거래 요청 성공:', response.data);
 
         // sellStatus 확인
         if (response.data.data.sellStatus === 'SELLING') {
@@ -57,7 +57,7 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
           setError('이미 다른 사용자가 구매한 카드입니다.');
         }
       } catch (error) {
-        console.error('구매 거래 요청 실패:', error);
+        //.error('구매 거래 요청 실패:', error);
 
         // 에러 코드에 따른 메시지 설정
         const status = (error as { response?: { status: number } })?.response
@@ -98,24 +98,24 @@ export default function TradePageClient({ cardData }: TradePageClientProps) {
     setIsProcessing(true);
 
     try {
-      console.log('판매 확정 요청 시작:', cardData);
+      //.log('판매 확정 요청 시작:', cardData);
       // 판매 확정 API 요청
       const response = await api.post(`/trades/buy/accept`, {
         cardId: cardData.id,
       });
 
-      console.log('판매 확정 응답:', response.data);
+      //.log('판매 확정 응답:', response.data);
 
       // 성공 시 판매 내역 페이지로 이동
       const responseData = response.data as { data: { tradeId?: string } };
-      console.log('판매 확정 응답:', responseData);
+      //.log('판매 확정 응답:', responseData);
       if (responseData && responseData.data.tradeId) {
         router.push(`/mypage/sales-history/${responseData.data.tradeId}`);
       } else {
         setError('거래 ID를 받지 못했습니다.');
       }
     } catch (error) {
-      console.error('판매 확정 요청 실패:', error);
+      //.error('판매 확정 요청 실패:', error);
 
       const status = (error as { response?: { status: number } })?.response
         ?.status;

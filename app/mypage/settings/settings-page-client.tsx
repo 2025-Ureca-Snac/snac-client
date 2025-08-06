@@ -29,7 +29,7 @@ export default function SettingsPageClient() {
     }
     isProfileLoadedRef.current = true;
     fetchUserProfile();
-  }, []);
+  }, [fetchUserProfile]);
 
   // 모달 닫기 핸들러
   const handleCloseModal = () => {
@@ -41,8 +41,8 @@ export default function SettingsPageClient() {
     try {
       await updateNickname(newNickname);
       closeModal();
-    } catch (error) {
-      console.error('닉네임 변경 실패:', error);
+    } catch {
+      // 닉네임 변경 실패 처리
     }
   };
 
@@ -78,7 +78,7 @@ export default function SettingsPageClient() {
     if (modalType) {
       openModal(modalType);
     } else {
-      console.warn(`알 수 없는 설정 항목: ${item}`);
+      // 알 수 없는 설정 항목 처리
     }
   };
 

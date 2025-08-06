@@ -53,8 +53,8 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
         data: { isFavorite: boolean };
       };
       setIsFavorite(responseData.data.isFavorite);
-    } catch (error) {
-      console.error('단골 여부 확인 실패:', error);
+    } catch {
+      //.error('단골 여부 확인 실패:', error);
       setIsFavorite(false);
     } finally {
       setIsCheckingFavorite(false);
@@ -105,7 +105,7 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
         }
       }
     } catch (error) {
-      console.error('단골 등록/해제 실패:', error);
+      //.error('단골 등록/해제 실패:', error);
       const errorInfo = getApiErrorInfo(error);
       toast.error(
         isFavorite ? '단골 해제에 실패했습니다.' : '단골 등록에 실패했습니다.',

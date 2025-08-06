@@ -35,8 +35,7 @@ export const useInquiries = () => {
         setInquiries(response.data.content);
         setTotalPages(response.data.totalPages);
         setCurrentPage(page);
-      } catch (error) {
-        console.error('문의 목록 조회 실패:', error);
+      } catch {
         toast.error('문의 목록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
@@ -75,8 +74,7 @@ export const useInquiries = () => {
         // 목록 새로고침
         await fetchInquiries(currentPage, selectedCategory);
         return true;
-      } catch (error) {
-        console.error('문의 등록 실패:', error);
+      } catch {
         toast.error('문의 등록에 실패했습니다.');
         return false;
       }

@@ -53,7 +53,7 @@ export default function TradingPage() {
 
   // TradingPage 진입 시 matchPageRefreshed 세션스토리지 아이템을 false로 설정
   useEffect(() => {
-    console.log('🔄 TradingPage 진입 - matchPageRefreshed 플래그 초기화');
+    //.log('🔄 TradingPage 진입 - matchPageRefreshed 플래그 초기화');
     sessionStorage.setItem('matchPageRefreshed', 'false');
   }, []);
 
@@ -67,7 +67,7 @@ export default function TradingPage() {
 
   // 디버깅: 파트너 정보 변경 시 로그 출력
   useEffect(() => {
-    console.log('🔄 TradingPage partnerInfo 업데이트:', partnerInfo);
+    //.log('🔄 TradingPage partnerInfo 업데이트:', partnerInfo);
   }, [partnerInfo]);
   // 전역 WebSocket 연결 유지
   const { activatePage, deactivatePage, sendTradeCancel } =
@@ -75,40 +75,18 @@ export default function TradingPage() {
 
   // TradingPage 활성화
   useEffect(() => {
-    activatePage('trading', (status, tradeData) => {
-      console.log('🔔 거래 상태 변경 오는거맞냐:', {
-        status,
-        tradeData,
-        userRole,
-        isSeller,
-      });
-      console.log('userRole확인!!!:', userRole);
-
+    activatePage('trading', (status) => {
       // PAYMENT_CONFIRMED 상태일 때 show_phone 단계로 이동 (판매자용)
       if (status === 'PAYMENT_CONFIRMED' && userRole === 'seller') {
-        console.log('💰 결제 확인됨 - show_phone 단계로 이동');
         setCurrentStep('show_phone');
       }
       // DATA_SENT 상태일 때 verification 단계로 이동 (구매자용)
       else if (status === 'DATA_SENT' && userRole === 'buyer') {
-        console.log('📤 데이터 전송됨 - verification 단계로 이동');
         setCurrentStep('verification');
       }
       // COMPLETED 상태일 때 거래 완료 페이지로 이동 (모든 사용자)
       else if (status === 'COMPLETED') {
-        console.log('🎉 거래 완료 - 완료 페이지로 이동');
         router.push('/match/complete');
-      } else {
-        console.log('❌ 조건 불일치:', {
-          status,
-          userRole,
-          isSeller,
-          isPaymentConfirmed: status === 'PAYMENT_CONFIRMED',
-          isSellerRole: userRole === 'seller',
-          isDataSent: status === 'DATA_SENT',
-          isBuyerRole: userRole === 'buyer',
-          isCompleted: status === 'COMPLETED',
-        });
       }
     });
     return () => {
@@ -134,24 +112,19 @@ export default function TradingPage() {
       // partner.type을 현재 사용자의 역할로 올바르게 설정
       if (partner.type !== role) {
         updatePartner({ type: role });
-        console.log('🔄 partner.type 업데이트:', role);
       }
-
-      console.log('🔄 userRole 설정:', role);
     }
   }, [partner, isSeller, setUserRole, updatePartner]);
 
   // 보안: partner 정보가 없으면 매칭 페이지로 리다이렉트
   useEffect(() => {
     if (!partner) {
-      console.warn('❌ 유효하지 않은 거래 정보: partner 정보가 없습니다.');
       toast.error('유효하지 않은 거래 정보입니다. 매칭 페이지로 이동합니다.');
       router.push('/match');
       return;
     }
     // partner 정보 유효성 검증
     if (!partner.carrier || !partner.dataAmount || !partner.priceGb) {
-      console.warn('❌ 불완전한 거래 정보:', partner);
       toast.error('거래 정보가 불완전합니다. 매칭 페이지로 이동합니다.');
       router.push('/match');
       return;

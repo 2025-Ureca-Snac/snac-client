@@ -50,7 +50,7 @@ function PaymentSuccessComponent() {
 
     // 컴포넌트 언마운트 시 인터벌 정리
     return () => clearInterval(countdownInterval);
-  }, []); // ✅ 빈 의존성 배열로 한 번만 실행 (Strict Mode 대응)
+  }, [searchParams]); // searchParams 의존성 추가
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">

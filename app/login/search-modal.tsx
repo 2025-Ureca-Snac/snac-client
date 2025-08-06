@@ -77,7 +77,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   }, [isOpen, setIsOpen]);
 
   // 모달 완전 초기화 함수
-  const resetModal = () => {
+  const resetModal = useCallback(() => {
     setIsVerified(false);
     setShowIdVerification(false);
     setIsIdSent(false);
@@ -101,7 +101,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
     setFoundEmail(null);
     setFormHeight(null);
     setIsOpen(null);
-  };
+  }, [idTimer, passwordTimer, setIsOpen]);
 
   // 탭 정의
   const tabs = [
@@ -152,15 +152,11 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
       return;
     }
 
-    console.log('이메일 찾기 인증 요청', idFormData.phone);
-
     try {
       setIsIdVerifying(true); // 인증 요청 시작
       const response = await api.post('/sns/send-verification-code', {
         phone: idFormData.phone,
       });
-
-      console.log('아이디 찾기 인증 요청 응답', response);
 
       if ((response.data as { status?: string })?.status === 'OK') {
         setShowIdVerification(true);
@@ -173,8 +169,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
       } else {
         toast.error('인증코드 전송에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('이메일 찾기 인증 요청 오류', error);
+    } catch {
       toast.error('인증코드 전송에 실패했습니다.');
     } finally {
       setIsIdVerifying(false); // 인증 요청 완료
@@ -198,7 +193,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         const response = await api.post('/email/send-verification-code', {
           email,
         });
-        console.log('비밀번호 찾기 이메일 인증 요청 응답', response);
+
         if ((response.data as { status?: string })?.status === 'OK') {
           setShowPasswordVerification(true);
           setIsPasswordSent(true);
@@ -210,8 +205,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         } else {
           toast.error('인증코드 전송에 실패했습니다.');
         }
-      } catch (error) {
-        console.error('비밀번호 찾기 이메일 인증 요청 오류', error);
+      } catch {
         toast.error('인증코드 전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
       } finally {
         setIsPasswordVerifying(false); // 인증 요청 완료
@@ -227,7 +221,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         const response = await api.post('/sns/send-verification-code', {
           phone,
         });
-        console.log('비밀번호 찾기 휴대폰 인증 요청 응답', response);
+
         if ((response.data as { status?: string })?.status === 'OK') {
           setShowPasswordVerification(true);
           setIsPasswordSent(true);
@@ -240,7 +234,6 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           toast.error('인증코드 전송에 실패했습니다.');
         }
       } catch (error) {
-        console.error('비밀번호 찾기 휴대폰 인증 요청 오류', error);
         toast.error(`인증코드 전송에 실패했습니다. ${error}`);
       } finally {
         setIsPasswordVerifying(false); // 인증 요청 완료
@@ -256,16 +249,13 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
 
   // 이메일 찾기 인증코드 확인
   const handleIdVerificationCheck = useCallback(async () => {
-    console.log('이메일 찾기 인증코드 확인', idFormData.verificationCode);
     try {
       const response = await api.post<unknown>('/sns/verify-code', {
         phone: idFormData.phone,
         code: idFormData.verificationCode,
       });
 
-      console.log('이메일 찾기 인증코드 확인 응답', response);
       if ((response.data as { status?: string })?.status === 'OK') {
-        console.log('이메일 찾기 인증코드 확인 성공');
         setIsIdVerified(true);
         setShowIdVerification(false);
         // 아이디 찾기 버튼에 포커스
@@ -278,8 +268,8 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
       } else {
         toast.error('인증코드가 일치하지 않습니다.');
       }
-    } catch (error) {
-      console.error('이메일 찾기 인증코드 확인 오류', error);
+    } catch {
+      // 인증코드 확인 오류 처리
     }
   }, [idFormData.verificationCode, idFormData.phone]);
 
@@ -296,7 +286,6 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           code: verificationCode,
         });
         if ((response.data as { status?: string })?.status === 'OK') {
-          console.log('비밀번호 찾기 이메일 인증코드 확인 성공');
           setIsPasswordVerified(true);
           setShowPasswordVerification(false);
           setIsVerified(true);
@@ -321,7 +310,6 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
           code: verificationCode,
         });
         if ((response.data as { status?: string })?.status === 'OK') {
-          console.log('비밀번호 찾기 휴대폰 인증코드 확인 성공');
           setIsPasswordVerified(true);
           setShowPasswordVerification(false);
           setIsVerified(true);
@@ -342,7 +330,6 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         }
       }
     } catch (error) {
-      console.error('비밀번호 찾기 인증코드 확인 오류', error);
       toast.error(`인증코드 확인에 실패했습니다. ${error}`);
     }
   }, [
@@ -375,7 +362,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         const response = await api.post<{ data: string }>('member/find-email', {
           phone: idFormData.phone,
         });
-        console.log(response);
+
         setFoundEmail(response.data.data);
       } catch (error) {
         toast.error(`이메일을 찾을 수 없습니다. ${error}`);
@@ -453,8 +440,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
         } else {
           toast.error('비밀번호 변경에 실패했습니다.');
         }
-      } catch (error) {
-        console.error('비밀번호 변경 오류:', error);
+      } catch {
         toast.error('비밀번호 변경 중 오류가 발생했습니다.');
       }
     },

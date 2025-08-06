@@ -29,19 +29,11 @@ function PaymentCompleteComponent() {
   useEffect(() => {
     const cardId = searchParams.get('cardId');
     const amount = searchParams.get('amount');
-    const pay = searchParams.get('pay');
-    const snackMoneyUsed = parseInt(searchParams.get('snackMoneyUsed') || '0');
-    const snackPointsUsed = parseInt(
-      searchParams.get('snackPointsUsed') || '0'
-    );
-
-    console.log('결제 완료 페이지 파라미터:', {
-      cardId,
-      amount,
-      pay,
-      snackMoneyUsed,
-      snackPointsUsed,
-    });
+    // const pay = searchParams.get('pay');
+    // const snackMoneyUsed = parseInt(searchParams.get('snackMoneyUsed') || '0');
+    // const snackPointsUsed = parseInt(
+    //   searchParams.get('snackPointsUsed') || '0'
+    // );
 
     if (cardId && amount) {
       // 결제 완료 확인 API 호출
@@ -56,18 +48,20 @@ function PaymentCompleteComponent() {
 
           if (isPaymentSuccess) {
             // 결제 성공이 확인된 경우에만 차감
-            console.log('결제 성공 확인됨, 차감 처리:', {
-              snackMoneyUsed,
-              snackPointsUsed,
-            });
             // setSnackMoney((prev) => prev - snackMoneyUsed);
             // setSnackPoints((prev) => prev - snackPointsUsed);
+
+            // 지갑 정보 새로고침
+            try {
+              const { api } = await import('@/app/(shared)/utils/api');
+              await api.get('/wallets/summary');
+            } catch {
+              // 지갑 정보 새로고침 실패 처리
+            }
           } else {
-            console.error('결제 실패 확인됨');
             // 결제 실패 시 처리 (예: 에러 페이지로 리다이렉트)
           }
-        } catch (error) {
-          console.error('결제 확인 중 오류:', error);
+        } catch {
           // 오류 시 처리
         }
       };

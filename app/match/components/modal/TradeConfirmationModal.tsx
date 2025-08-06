@@ -52,8 +52,8 @@ export default function TradeConfirmationModal({
     fetch('/searching-lotties.json')
       .then((response) => response.json())
       .then((data) => setAnimationData(data))
-      .catch((error) => {
-        console.error('Lottie 애니메이션 로드 실패:', error);
+      .catch(() => {
+        //.error('Lottie 애니메이션 로드 실패:', error);
       });
   }, []);
 
@@ -79,14 +79,6 @@ export default function TradeConfirmationModal({
           router.push('/match/trading');
         }, 1000);
       } else if (seller) {
-        console.log('🔍 seller 객체 정보:', {
-          tradeId: seller.tradeId,
-          cardId: seller.cardId,
-          name: seller.name,
-          email: seller.email,
-          전체_데이터: seller,
-        });
-
         // 2초 후 trading 페이지로 이동
         setTimeout(() => {
           onCancel(); // 모달 닫기
@@ -96,7 +88,7 @@ export default function TradeConfirmationModal({
     } else if (tradeStatus === 'REJECTED' || tradeStatus === 'CANCELLED') {
       setModalState('timeout');
     }
-  }, [tradeStatus, seller]); // foundMatch, router, onCancel 제거
+  }, [tradeStatus, seller, onCancel, partner, router]); // 필요한 의존성들 추가
 
   // 대기 상태에서 타이머 관리 (취소 버튼 활성화용)
   useEffect(() => {
@@ -131,24 +123,12 @@ export default function TradeConfirmationModal({
     // partner가 있으면 partner의 cardId 사용, 없으면 seller의 cardId 사용
     const cardId = partner?.cardId || seller?.cardId || 999;
 
-    console.log('🔥 거래 요청 발송:', {
-      cardId: cardId,
-      seller_cardId: partner?.cardId || seller?.cardId,
-      seller_id: partner?.tradeId || seller?.tradeId,
-      buyerId: 'user_123',
-      sellerId: partner?.tradeId || seller?.tradeId,
-      sellerName: partner?.seller || seller?.name,
-      dataAmount: partner?.dataAmount || seller?.data,
-      price: partner?.priceGb || seller?.price,
-    });
-
     // 실제 서버에 거래 생성 요청 (HTML 예제와 동일)
     createTrade(cardId);
 
     // 서버 응답 타임아웃 (30초)
     setTimeout(() => {
       if (modalStateRef.current === 'waiting') {
-        console.log('⏰ 거래 요청 타임아웃');
         setModalState('timeout');
       }
     }, 30000); // 30초 타임아웃

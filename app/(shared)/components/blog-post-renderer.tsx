@@ -27,8 +27,7 @@ export default async function BlogPostRenderer({
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         );
-      } catch (error) {
-        console.error('마크다운 변환 실패:', error);
+      } catch {
         return (
           <div className="text-gray-700 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">
             {content}

@@ -33,13 +33,13 @@ export default function PaymentStep({
           await api.get<ApiResponse<{ money: number; point: number }>>(
             '/wallets/summary'
           );
-        console.log('지갑 정보 조회:', response.data);
+        //.log('지갑 정보 조회:', response.data);
         if (response.data.data) {
           setSnackMoney(response.data.data.money);
           setSnackPoints(response.data.data.point);
         }
-      } catch (error) {
-        console.error('지갑 정보 조회 실패:', error);
+      } catch {
+        //.error('지갑 정보 조회 실패:', error);
       } finally {
         setIsLoadingWallet(false);
       }
@@ -75,23 +75,11 @@ export default function PaymentStep({
     setIsProcessing(true);
 
     try {
-      console.log('결제 처리 시작:', {
-        tradeId,
-        amount,
-        snackPointsToUse,
-        finalAmount,
-        remainingMoney:
-          snackMoney -
-          (finalAmount > snackPointsToUse ? finalAmount - snackPointsToUse : 0),
-      });
-
       // WebSocket을 통한 결제 메시지 전송
       const moneyToUse = Math.max(0, finalAmount - snackPointsToUse);
       const success = wsSendPayment(tradeId, finalAmount, snackPointsToUse);
 
       if (success) {
-        console.log('✅ 결제 메시지 전송 성공');
-
         // 지갑 잔액 업데이트 (실제 결제 처리는 서버에서 함)
         if (snackPointsToUse > 0) {
           setSnackPoints((prev) => prev - snackPointsToUse);
@@ -107,8 +95,7 @@ export default function PaymentStep({
       } else {
         toast.error('결제 메시지 전송에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('결제 처리 오류:', error);
+    } catch {
       toast.error('결제 처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);

@@ -149,13 +149,11 @@ export const Modal = () => {
       price: Number(price),
     };
 
-    console.log('서버로 전송하는 최종 데이터:', cards);
-
     try {
       if (isEditMode && editingCardId) {
         // 수정 모드: PUT 요청
-        const response = await api.put(`/cards/${editingCardId}`, cards);
-        console.log('수정 서버 응답:', response.data);
+        await api.put(`/cards/${editingCardId}`, cards);
+
         toast.success('상품이 성공적으로 수정되었습니다.');
         actions.triggerRefetch();
         handleClose();
@@ -164,7 +162,6 @@ export const Modal = () => {
         const response = await api.post('/cards', cards);
         const cardId = (response.data as { data: { cardId: number } }).data
           .cardId;
-        console.log('서버 응답:', cardId);
 
         if (cardCategory === 'BUY') {
           toast.success(
