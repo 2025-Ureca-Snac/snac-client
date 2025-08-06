@@ -40,12 +40,11 @@ export default function MyPagePageClient() {
 
     isProfileLoadedRef.current = true;
     fetchUserProfile();
-  }, []); // fetchUserProfile을 의존성에서 제거
+  }, [fetchUserProfile]); // fetchUserProfile 의존성 추가
 
   // error가 있을 때 로그인 페이지로 이동
   useEffect(() => {
     if (error) {
-      console.log('유저 정보 가져오기 실패 :', error);
       toast.error('로그인 후 이용이 가능합니다.');
       // 로그인 페이지로 이동
       router.push('/login');

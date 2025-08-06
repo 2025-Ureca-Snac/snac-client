@@ -15,7 +15,6 @@ export const useWebSocketStore = create<WebSocketStore>((set, get) => ({
   connectedUsers: 0,
   disconnectFunction: null as (() => void) | null,
   disconnect: () => {
-    console.log('🔌 WebSocket 연결 해제');
     const { disconnectFunction } = get();
     if (disconnectFunction) {
       disconnectFunction(); // 실제 WebSocket 연결 해제 함수 호출

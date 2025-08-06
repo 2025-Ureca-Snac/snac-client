@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function TradingInformationSection() {
   return (
@@ -34,9 +35,11 @@ export default function TradingInformationSection() {
         {/* 오른쪽 이미지 영역 */}
         <div className="md:ml-5 w-full md:w-1/2 flex justify-center mt-8 md:mt-0">
           {/* 원하는 이미지를 아래에 넣으면 됨 */}
-          <img
+          <Image
             src="/potato-lay.png"
             alt="여유롭게 거래하는 감자 캐릭터"
+            width={160}
+            height={160}
             className="w-40 h-40 object-contain"
             style={{ filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.04))' }}
           />

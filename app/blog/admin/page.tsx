@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
 import { useAuthStore } from '@/app/(shared)/stores/auth-store';
@@ -76,8 +77,7 @@ function BlogAdminFormComponent() {
           images: post.images || [],
           imagePositions: post.imagePositions || [],
         });
-      } catch (error) {
-        console.error('Failed to fetch post:', error);
+      } catch {
         const errorMessage = '기존 포스트를 불러오지 못했습니다.';
         setFetchError(errorMessage);
         toast.error(errorMessage);
@@ -227,9 +227,11 @@ function BlogAdminFormComponent() {
                     required={!editId}
                   />
                   {editId && !mainImageFile && formData.images?.[0] && (
-                    <img
+                    <Image
                       src={formData.images[0]}
                       alt="기존 대표 이미지"
+                      width={128}
+                      height={128}
                       className="w-32 h-32 object-cover rounded mt-2 border"
                     />
                   )}

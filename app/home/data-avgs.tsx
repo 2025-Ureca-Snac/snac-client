@@ -42,8 +42,7 @@ export function DataAvg() {
             displayCarrier,
             averagePrice: data.avgPricePerGb,
           };
-        } catch (error) {
-          console.warn(`${carrier} 불러오기 실패 → fallback 사용`, error);
+        } catch {
           return FALLBACK_MAP[carrier];
         }
       });

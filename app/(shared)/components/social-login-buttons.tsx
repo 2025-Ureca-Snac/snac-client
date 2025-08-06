@@ -26,11 +26,11 @@ export default function SocialLoginButtons({
       const success = await linkSocialAccount(providerId);
 
       if (success) {
-        console.log('소셜 로그인 성공');
+        //.log('소셜 로그인 성공');
         router.push('/');
       }
     } catch (error) {
-      console.error('소셜 로그인 실패:', error);
+      //.error('소셜 로그인 실패:', error);
       const errorMessage =
         error instanceof Error ? error.message : '소셜 로그인에 실패했습니다.';
       if (onError) {

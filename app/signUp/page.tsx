@@ -148,14 +148,11 @@ export default function SignUp() {
       return;
     }
 
-    console.log('이메일 인증 요청', formData.email);
     try {
       setIsEmailVerifying(true); // 인증 요청 시작
       const response = await api.post('/email/send-verification-code', {
         email: formData.email,
       });
-
-      console.log('이메일 인증 요청 응답', response);
 
       if ((response.data as { status?: string })?.status === 'OK') {
         setShowEmailVerification(true);
@@ -168,8 +165,7 @@ export default function SignUp() {
       } else {
         toast.error('인증코드 전송에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('이메일 인증 요청 오류', error);
+    } catch {
       toast.error('인증코드 전송에 실패했습니다.');
     } finally {
       setIsEmailVerifying(false); // 인증 요청 완료
@@ -189,8 +185,6 @@ export default function SignUp() {
       return;
     }
 
-    console.log('전화번호 인증 요청', formData.phoneNumber);
-
     try {
       setIsPhoneVerifying(true); // 인증 요청 시작
       const phoneVerificationCode = await api.post(
@@ -199,8 +193,6 @@ export default function SignUp() {
           phone: formData.phoneNumber,
         }
       );
-
-      console.log('전화번호 인증 요청 응답', phoneVerificationCode);
 
       if (
         (phoneVerificationCode.data as { status?: string })?.status === 'OK'
@@ -215,8 +207,7 @@ export default function SignUp() {
       } else {
         toast.error('인증코드 전송에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('전화번호 인증 요청 오류', error);
+    } catch {
       toast.error('인증코드 전송에 실패했습니다.');
     } finally {
       setIsPhoneVerifying(false); // 인증 요청 완료
@@ -229,8 +220,6 @@ export default function SignUp() {
    * @return 이메일 인증코드 확인에 성공 여부 반환(성공, 실패)
    */
   const handleEmailVerificationCheck = useCallback(async () => {
-    console.log('이메일 인증코드 확인', formData.emailVerificationCode);
-
     try {
       const response = await api.post('/email/verify-code', {
         email: formData.email,
@@ -247,10 +236,8 @@ export default function SignUp() {
       } else {
         toast.error('인증코드가 일치하지 않습니다.');
       }
-
-      console.log('이메일 인증코드 확인 응답', response);
-    } catch (error) {
-      console.error('이메일 인증코드 확인 오류', error);
+    } catch {
+      // 이메일 인증코드 확인 오류 처리
     }
   }, [formData.emailVerificationCode, formData.email]);
 
@@ -260,8 +247,6 @@ export default function SignUp() {
    * @return 전화번호 인증코드 확인에 성공 여부 반환(성공, 실패)
    */
   const handlePhoneVerificationCheck = useCallback(async () => {
-    console.log('전화번호 인증코드 확인', formData.phoneVerificationCode);
-
     const response = await api.post('/sns/verify-code', {
       phone: formData.phoneNumber,
       code: formData.phoneVerificationCode,
@@ -296,8 +281,6 @@ export default function SignUp() {
       // 오류 메시지 초기화
       setError(null);
 
-      console.log('회원가입 요청', formData);
-
       try {
         const data = {
           email: formData.email,
@@ -317,8 +300,6 @@ export default function SignUp() {
           setError('회원가입에 실패했습니다.');
         }
       } catch (error: unknown) {
-        console.error('회원가입 오류', error);
-
         // 닉네임 중복 에러 처리
         if (error && typeof error === 'object' && 'response' in error) {
           const apiError = error as {
@@ -419,13 +400,13 @@ export default function SignUp() {
    * @description 비밀번호 중복확인 도움말 텍스트 색상
    * @return 비밀번호 중복확인 도움말 텍스트 색상 반환(일치 시 green, 불일치 시 red, 미입력 시 gray)
    */
-  const passwordHelpTextColor = useMemo(() => {
-    return passwordMatch === 'match'
-      ? 'green'
-      : passwordMatch === 'mismatch'
-        ? 'red'
-        : 'gray';
-  }, [passwordMatch]);
+  // const passwordHelpTextColor = useMemo(() => {
+  //   return passwordMatch === 'match'
+  //     ? 'green'
+  //     : passwordMatch === 'mismatch'
+  //       ? 'red'
+  //       : 'gray';
+  // }, [passwordMatch]);
 
   /**
    * @author 이승우
@@ -575,17 +556,30 @@ export default function SignUp() {
             ref={passwordInputRef}
           />
 
-          <PasswordInput
-            label="비밀번호 확인"
-            id="passwordConfirm"
-            name="passwordConfirm"
-            value={formData.passwordConfirm}
-            onChange={handleInputChange}
-            required
-            helpText={passwordHelpText}
-            showHelpText={passwordMatch !== 'none'}
-            helpTextColor={passwordHelpTextColor}
-          />
+          <div className="space-y-2">
+            <PasswordInput
+              label="비밀번호 확인"
+              id="passwordConfirm"
+              name="passwordConfirm"
+              value={formData.passwordConfirm}
+              onChange={handleInputChange}
+              required
+            />
+            {/* 고정 높이를 위한 빈 공간 */}
+            <div className="h-6">
+              {passwordMatch !== 'none' && (
+                <div
+                  className={`text-sm ${
+                    passwordMatch === 'match'
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  }`}
+                >
+                  {passwordHelpText}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* 오류 메시지 */}
           {error && <ErrorMessage message={error} />}

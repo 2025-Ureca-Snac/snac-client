@@ -113,12 +113,12 @@ export default function TradingHistoryPage({
         setIsLoading(true);
         setError(null);
 
-        console.log('API 호출 시작:', { type, status });
+        //.log('API 호출 시작:', { type, status });
 
         const response = await getTradingHistory(type);
 
-        console.log('API 응답:', response);
-        console.log('응답 content:', response.trades);
+        //.log('API 응답:', response);
+        //.log('응답 content:', response.trades);
 
         // status에 따라 필터링
         let filteredData = response.trades;
@@ -169,16 +169,16 @@ export default function TradingHistoryPage({
 
         setTradingHistory(sortedData);
 
-        console.log('상태 업데이트 완료');
+        //.log('상태 업데이트 완료');
       } catch (err) {
         const errorMessage = handleApiError(err);
         setError(errorMessage);
-        console.error(`${isPurchase ? '구매' : '판매'} 내역 로드 실패:`, err);
+        //.error(`${isPurchase ? '구매' : '판매'} 내역 로드 실패:`, err);
       } finally {
         setIsLoading(false);
       }
     },
-    [type, isPurchase]
+    [type]
   );
 
   // 데이터 로드 (초기 로드 + 탭 변경)
@@ -187,7 +187,7 @@ export default function TradingHistoryPage({
 
     const loadData = async () => {
       if (isMounted) {
-        console.log('거래 내역 로드 시작');
+        //.log('거래 내역 로드 시작');
         await loadTradingHistory(activeTab);
       }
     };
@@ -209,45 +209,52 @@ export default function TradingHistoryPage({
         handleCardClick(targetItem);
       }
     }
-  }, [selectedId, tradingHistory.length]); // tradingHistory.length만 의존
+  }, [selectedId, tradingHistory.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleCardClick = (item: TradingHistoryItem) => {
-    // 슬라이드 중에는 모달 열지 않음
-    if (isDragging) return;
+  const handleCardClick = useCallback(
+    (item: TradingHistoryItem) => {
+      // 슬라이드 중에는 모달 열지 않음
+      if (isDragging) return;
 
-    // TradingHistoryItem을 HistoryItem으로 변환
-    const historyItem: HistoryItem = {
-      id: item.tradeId,
-      date: new Date(item.createdAt).toLocaleDateString('ko-KR'),
-      title: `${item.carrier} ${item.dataAmount}GB`,
-      price: item.priceGb,
-      status: item.status as HistoryItem['status'], // 새로운 상태값을 그대로 사용
-      transactionNumber: `#${item.tradeId.toString().padStart(4, '0')}`,
-      carrier: item.carrier,
-      dataAmount: `${item.dataAmount}GB`,
-      phoneNumber: item.phone || '',
-      cancelReason: item.cancelReason || '',
-      cancelRequested: item.cancelRequested || false,
-      cancelRequestStatus: item.cancelRequestStatus || null,
-      cancelRequestReason: item.cancelRequestReason || null,
-      partnerId: item.partnerId || undefined,
-      partnerFavorite: item.partnerFavorite || false,
-      partnerNickname: item.partnerNickname || '',
-    };
-    setSelectedItem(historyItem);
-    setIsModalOpen(true);
+      // TradingHistoryItem을 HistoryItem으로 변환
+      const historyItem: HistoryItem = {
+        id: item.tradeId,
+        date: new Date(item.createdAt).toLocaleDateString('ko-KR'),
+        title: `${item.carrier} ${item.dataAmount}GB`,
+        price: item.priceGb,
+        status: item.status as HistoryItem['status'], // 새로운 상태값을 그대로 사용
+        transactionNumber: `#${item.tradeId.toString().padStart(4, '0')}`,
+        carrier: item.carrier,
+        dataAmount: `${item.dataAmount}GB`,
+        phoneNumber: item.phone || '',
+        cancelReason: item.cancelReason || '',
+        cancelRequested: item.cancelRequested || false,
+        cancelRequestStatus: item.cancelRequestStatus || null,
+        cancelRequestReason: item.cancelRequestReason || null,
+        partnerId: item.partnerId || undefined,
+        partnerFavorite: item.partnerFavorite || false,
+        partnerNickname: item.partnerNickname || '',
+      };
+      setSelectedItem(historyItem);
+      setIsModalOpen(true);
 
-    // URL 업데이트
-    if (type === 'sales') {
-      window.history.pushState({}, '', `/mypage/sales-history/${item.tradeId}`);
-    } else if (type === 'purchase') {
-      window.history.pushState(
-        {},
-        '',
-        `/mypage/purchase-history/${item.tradeId}`
-      );
-    }
-  };
+      // URL 업데이트
+      if (type === 'sales') {
+        window.history.pushState(
+          {},
+          '',
+          `/mypage/sales-history/${item.tradeId}`
+        );
+      } else if (type === 'purchase') {
+        window.history.pushState(
+          {},
+          '',
+          `/mypage/purchase-history/${item.tradeId}`
+        );
+      }
+    },
+    [isDragging, setSelectedItem, setIsModalOpen, type]
+  );
 
   const handleCardKeyDown = (
     event: React.KeyboardEvent,
@@ -508,10 +515,10 @@ export default function TradingHistoryPage({
   const ErrorState = () => {
     // 에러 발생 시 바로 로그인 페이지로 이동
     useEffect(() => {
-      console.log('거래 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
+      //.log('거래 내역 페이지 에러 발생, 로그인 페이지로 이동:', error);
       toast.error('로그인 후 이용이 가능합니다.');
       router.push('/login');
-    }, [error, router]);
+    }, []);
 
     return (
       <div className="p-6">

@@ -25,7 +25,7 @@ interface BlogCardProps {
  * nickname: "작성자 닉네임", // subtitle -> nickname
  * imageUrl: "/image.jpg", // image -> imageUrl
  * }}
- * onClick={() => console.log('카드 클릭됨')}
+ * onClick={() => {}}
  * />
  * ```
  */

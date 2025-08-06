@@ -134,8 +134,6 @@ export default function ChangePasswordModal({
         toast.error('비밀번호 변경에 실패했습니다.');
       }
     } catch (error: unknown) {
-      console.error('비밀번호 변경 오류:', error);
-
       // 에러 메시지 처리
       if (error && typeof error === 'object' && 'response' in error) {
         const apiError = error as {
@@ -156,7 +154,7 @@ export default function ChangePasswordModal({
     } finally {
       setIsLoading(false);
     }
-  }, [current, next, confirm, passwordMatch, onSubmit, onClose]);
+  }, [current, next, confirm, passwordMatch, onSubmit, onClose, router]);
 
   // 초기화
   const handleReset = () => {

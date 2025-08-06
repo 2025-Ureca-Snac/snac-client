@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import ModalPortal from './modal-portal';
 import { InquiryDetailModalProps } from '../types/inquiry-detail-modal';
 import { DisputeType } from '../types/inquiry';
@@ -46,11 +47,8 @@ export default function InquiryDetailModal({
   };
 
   if (!inquiry) {
-    console.log('InquiryDetailModal: inquiry is null');
     return null;
   }
-
-  console.log('InquiryDetailModal: inquiry data:', inquiry);
 
   const openImageModal = (index: number) => {
     setSelectedImageIndex(index);
@@ -164,9 +162,11 @@ export default function InquiryDetailModal({
                           {inquiry.attachmentUrls.map(
                             (imageUrl: string, index: number) => (
                               <div key={index} className="relative">
-                                <img
+                                <Image
                                   src={imageUrl}
                                   alt={`첨부 이미지 ${index + 1}`}
+                                  width={96}
+                                  height={96}
                                   className="w-full h-24 object-cover rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity"
                                   onClick={() => openImageModal(index)}
                                 />
@@ -281,9 +281,11 @@ export default function InquiryDetailModal({
 
             {/* 이미지 */}
             <div className="relative max-w-full max-h-full">
-              <img
+              <Image
                 src={inquiry.attachmentUrls[selectedImageIndex]}
                 alt={`이미지 ${selectedImageIndex + 1}`}
+                width={800}
+                height={600}
                 className="max-w-full max-h-[80vh] object-contain"
               />
 

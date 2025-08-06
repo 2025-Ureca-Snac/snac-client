@@ -17,7 +17,6 @@ export const useFavorites = () => {
    */
   const getFavorites = useCallback(async (): Promise<FavoriteResponse> => {
     const response = await api.get<ApiResponse<FavoriteResponse>>('/favorites');
-    console.log('단골 목록 조회: ', response.data.data);
     return response.data.data;
   }, []);
 
@@ -29,7 +28,6 @@ export const useFavorites = () => {
   const deleteFavorite = useCallback(
     async (memberId: number): Promise<void> => {
       await api.delete(`/favorites/${memberId}`);
-      console.log('단골 삭제 완료: ', memberId);
     },
     []
   );
@@ -42,8 +40,7 @@ export const useFavorites = () => {
     try {
       const response = await getFavorites();
       setFavorites(response.contents || []);
-    } catch (err) {
-      console.error('단골 목록 로드 실패:', err);
+    } catch {
       setFavorites([]);
       toast.error('단골 목록을 불러오는데 실패했습니다.');
     }
@@ -67,8 +64,7 @@ export const useFavorites = () => {
               // 삭제 후 목록 새로고침
               await loadFavorites();
               toast.success(`${nickname}이(가) 단골에서 삭제되었습니다.`);
-            } catch (err) {
-              console.error('단골 삭제 실패:', err);
+            } catch {
               toast.error('단골 삭제에 실패했습니다.');
             }
           },

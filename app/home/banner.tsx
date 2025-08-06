@@ -46,8 +46,7 @@ export default function Banner({
 
         setDisplayMinutes(minutes);
         setDisplaySeconds(seconds);
-      } catch (error) {
-        console.error('거래 소요 시간 통계 조회 실패:', error);
+      } catch {
         // 에러 시 기본값 사용
         setDisplayMinutes(avgMinutes);
         setDisplaySeconds(avgSeconds);

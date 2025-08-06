@@ -180,7 +180,6 @@ export default function PointContent({
           e.stopPropagation();
           e.preventDefault();
           // TODO: 포인트 적립 기능 구현 예정
-          console.log('포인트 적립 버튼 클릭');
         }}
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}

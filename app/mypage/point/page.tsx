@@ -9,6 +9,7 @@ import {
   useCallback,
 } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import TabNavigation from '@/app/(shared)/components/TabNavigation';
@@ -46,10 +47,6 @@ const getHistory = async (
   }
 
   const response = await api.get<ApiResponse<PointHistoryResponse>>(url);
-  console.log(
-    `${assetType} 내역 API 응답 (size: ${size}, year: ${year}, month: ${month}):`,
-    response
-  );
   return response.data.data;
 };
 
@@ -108,9 +105,8 @@ function PointPageContent() {
     try {
       const balanceResponse = await getBalance();
       setBalance(balanceResponse);
-      console.log('초기 잔액 로드 완료:', balanceResponse);
-    } catch (err) {
-      console.error('잔액 로드 실패:', err);
+    } catch {
+      // 잔액 로드 실패 처리
     }
   }, []);
 
@@ -118,7 +114,6 @@ function PointPageContent() {
   const loadPointData = useCallback(async () => {
     // 무한 로딩 방지
     if (isLoadingRef.current) {
-      console.log('이미 로딩 중이므로 중복 호출을 방지합니다.');
       return;
     }
 
@@ -130,17 +125,11 @@ function PointPageContent() {
       setCurrentSize(size);
       setError(null);
 
-      console.log('포인트/머니 거래 내역 API 호출 시작');
-
       // 현재 활성 탭에 따른 내역 조회 (포인트는 월별 조회, 머니는 전체 조회)
       const historyResponse =
         activeTab === 'POINT'
           ? await getHistory(activeTab, size, selectedYear, selectedMonth)
           : await getHistory(activeTab, size);
-      console.log(
-        `${activeTab} 내역 API 응답 (size: ${size}):`,
-        historyResponse
-      );
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
@@ -161,11 +150,8 @@ function PointPageContent() {
           ...prev,
           point: balanceAfterValue,
         }));
-
-        console.log(`포인트 잔액 업데이트: ${balanceAfterValue}P`);
       } else if (activeTab === 'POINT' && newHistory.length === 0) {
         // 해당 월에 거래 내역이 없으면 이전 상태 유지
-        console.log('해당 월에 포인트 거래 내역이 없어 잔액을 유지합니다.');
       }
 
       // 머니 탭에서 전체 조회 시 잔액 업데이트 (최신 값과 다르면)
@@ -182,19 +168,11 @@ function PointPageContent() {
             ...prev,
             money: balanceAfterValue,
           }));
-
-          console.log(
-            `머니 잔액 업데이트: ${balance.money}S → ${balanceAfterValue}S`
-          );
         }
       }
-
-      console.log(`${activeTab} 내역 저장 완료 (총 ${newHistory.length}개)`);
-      console.log('상태 업데이트 완료');
     } catch (err) {
       const errorMessage = handleApiError(err);
       setError(errorMessage);
-      console.error('포인트/머니 데이터 로드 실패:', err);
     } finally {
       setIsLoading(false);
       isLoadingRef.current = false;
@@ -220,7 +198,6 @@ function PointPageContent() {
 
     const loadData = async () => {
       if (isMounted) {
-        console.log('포인트/머니 초기 로드 시작');
         await loadInitialBalance(); // 잔액 한 번만 로드
         await loadPointData(); // 거래 내역 로드
       }
@@ -259,10 +236,6 @@ function PointPageContent() {
         activeTab === 'POINT'
           ? await getHistory(activeTab, newSize, selectedYear, selectedMonth)
           : await getHistory(activeTab, newSize);
-      console.log(
-        `${activeTab} 더보기 API 응답 (size: ${newSize}):`,
-        historyResponse
-      );
 
       const newHistory = historyResponse.contents || [];
       setAllHistory(newHistory);
@@ -283,13 +256,8 @@ function PointPageContent() {
           ...prev,
           point: balanceAfterValue,
         }));
-
-        console.log(`포인트 잔액 업데이트 (더보기): ${balanceAfterValue}P`);
       } else if (activeTab === 'POINT' && newHistory.length === 0) {
         // 해당 월에 거래 내역이 없으면 이전 상태 유지
-        console.log(
-          '해당 월에 포인트 거래 내역이 없어 잔액을 유지합니다. (더보기)'
-        );
       }
 
       // 머니 탭에서 더보기 시에도 잔액 업데이트 (최신 값과 다르면)
@@ -306,33 +274,15 @@ function PointPageContent() {
             ...prev,
             money: balanceAfterValue,
           }));
-
-          console.log(
-            `머니 잔액 업데이트 (더보기): ${balance.money}S → ${balanceAfterValue}S`
-          );
         }
       }
-
-      console.log(`${activeTab} 더보기 완료 (총 ${newHistory.length}개)`);
     } catch (err) {
       const errorMessage = handleApiError(err);
       setError(errorMessage);
-      console.error('더보기 로드 실패:', err);
     } finally {
       setIsLoadingMore(false);
     }
   };
-
-  // 디버깅용: 상태 변화 확인
-  useEffect(() => {
-    console.log('상태 변화:', {
-      isLoading,
-      error,
-      balance,
-      allHistoryLength: allHistory?.length,
-      activeTab,
-    });
-  }, [isLoading, error, balance, allHistory, activeTab]);
 
   // 현재 탭에 따른 내역 (API에서 이미 필터링됨)
   const currentHistory = allHistory;
@@ -342,9 +292,8 @@ function PointPageContent() {
     try {
       // 내역만 새로고침
       await loadPointData();
-      console.log('데이터 새로고침 완료');
-    } catch (error) {
-      console.error('데이터 새로고침 실패:', error);
+    } catch {
+      // 데이터 새로고침 실패 처리
     }
   };
 
@@ -375,13 +324,11 @@ function PointPageContent() {
   const { onTouchStart, onTouchEnd } = useSwipeNavigation({
     onSwipeLeft: () => {
       if (activeTab === 'POINT') {
-        console.log('Swiping left to MONEY');
         handleTabChange('MONEY');
       }
     },
     onSwipeRight: () => {
       if (activeTab === 'MONEY') {
-        console.log('Swiping right to POINT');
         handleTabChange('POINT');
       }
     },
@@ -431,7 +378,13 @@ function PointPageContent() {
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <img src="/snac-price.svg" alt="스낵 포인트" className="w-5 h-5" />
+            <Image
+              src="/snac-price.svg"
+              alt="스낵 포인트"
+              width={20}
+              height={20}
+              className="w-5 h-5"
+            />
             <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
               스낵 포인트
             </span>
@@ -442,7 +395,13 @@ function PointPageContent() {
         </div>
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <img src="/snac-price.svg" alt="스낵 머니" className="w-5 h-5" />
+            <Image
+              src="/snac-price.svg"
+              alt="스낵 머니"
+              width={20}
+              height={20}
+              className="w-5 h-5"
+            />
             <span className="text-sm font-medium text-green-700 dark:text-green-300">
               스낵 머니
             </span>
@@ -462,7 +421,13 @@ function PointPageContent() {
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
-            <img src="/snac-price.svg" alt="스낵 포인트" className="w-4 h-4" />
+            <Image
+              src="/snac-price.svg"
+              alt="스낵 포인트"
+              width={16}
+              height={16}
+              className="w-4 h-4"
+            />
             <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
               스낵 포인트
             </span>
@@ -473,7 +438,13 @@ function PointPageContent() {
         </div>
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
-            <img src="/snac-price.svg" alt="스낵 머니" className="w-4 h-4" />
+            <Image
+              src="/snac-price.svg"
+              alt="스낵 머니"
+              width={16}
+              height={16}
+              className="w-4 h-4"
+            />
             <span className="text-xs font-medium text-green-700 dark:text-green-300">
               스낵 머니
             </span>
@@ -512,10 +483,9 @@ function PointPageContent() {
   const ErrorState = () => {
     // 에러 발생 시 바로 로그인 페이지로 이동
     useEffect(() => {
-      console.log('포인트 페이지 에러 발생, 로그인 페이지로 이동:', error);
       toast.error('로그인 후 이용이 가능합니다.');
       router.push('/login');
-    }, [error, router]);
+    }, []);
 
     return (
       <div className="bg-white rounded-lg shadow-sm border">
@@ -581,10 +551,8 @@ function PointPageContent() {
 
                           if (Math.abs(deltaX) > threshold) {
                             if (deltaX > 0 && activeTab === 'MONEY') {
-                              console.log('PC drag right to POINT');
                               handleTabChange('POINT');
                             } else if (deltaX < 0 && activeTab === 'POINT') {
-                              console.log('PC drag left to MONEY');
                               handleTabChange('MONEY');
                             }
                           }
@@ -644,8 +612,7 @@ function PointPageContent() {
         open={isSettlementModalOpen}
         onClose={() => setIsSettlementModalOpen(false)}
         currentMoney={balance.money}
-        onSettlementSuccess={(amount, type) => {
-          console.log('정산 성공:', amount, type);
+        onSettlementSuccess={() => {
           setIsSettlementModalOpen(false);
           handleRefreshData?.();
         }}
@@ -655,8 +622,7 @@ function PointPageContent() {
         onClose={() => setIsCancelModalOpen(false)}
         amount={selectedCancelAmount}
         paymentKey={selectedCancelPaymentKey}
-        onCancelSuccess={(amount: number) => {
-          console.log('취소 성공:', amount);
+        onCancelSuccess={() => {
           setIsCancelModalOpen(false);
         }}
         onRefreshData={handleRefreshData}

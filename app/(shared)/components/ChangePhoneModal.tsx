@@ -189,7 +189,7 @@ export default function ChangePhoneModal({
     } finally {
       setIsLoading(false);
     }
-  }, [isVerified, formData, onClose, onSubmit]);
+  }, [isVerified, formData, onSubmit]);
 
   // 초기화
   const handleReset = () => {

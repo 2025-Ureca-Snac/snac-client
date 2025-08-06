@@ -32,7 +32,7 @@ export const BlogContent = ({
   // const [activeTab, setActiveTab] = useState<'all' | 'featured'>('all');
 
   const displayedPosts = posts;
-  console.log('BlogContent가 받은 hasNext 값:', hasNext);
+  //.log('BlogContent가 받은 hasNext 값:', hasNext);
   // const handleTabChange = (tab: 'all' | 'featured') => {
   //   setActiveTab(tab);
   // };

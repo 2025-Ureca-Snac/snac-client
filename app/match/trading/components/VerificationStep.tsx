@@ -57,8 +57,8 @@ export default function VerificationStep({
           if (response.data.status === 'OK' && response.data.data) {
             setAttachmentImageUrl(response.data.data);
           }
-        } catch (error) {
-          console.error('첨부 이미지 URL 가져오기 실패:', error);
+        } catch {
+          //.error('첨부 이미지 URL 가져오기 실패:', error);
         } finally {
           setIsLoadingImage(false);
         }
@@ -79,15 +79,15 @@ export default function VerificationStep({
     try {
       const success = wsSendTradeConfirm(tradeId);
       if (success) {
-        console.log('✅ 거래 확정 요청 성공');
+        //.log('✅ 거래 확정 요청 성공');
         setTimeout(() => {
           onNext();
         }, 1000);
       } else {
         toast.error('거래 확정 요청에 실패했습니다.');
       }
-    } catch (error) {
-      console.error('거래 확정 오류:', error);
+    } catch {
+      //.error('거래 확정 오류:', error);
       toast.error('거래 확정 중 오류가 발생했습니다.');
     } finally {
       setIsConfirming(false);

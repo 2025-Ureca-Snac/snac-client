@@ -99,7 +99,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full md:max-w-[1440px] mx-auto min-h-screen flex flex-col">
       <ConditionalHeader />
-      <main className="flex-1 bg-white dark:bg-gray-900">{children}</main>
+      <main className="flex-1 bg-white dark:bg-gray-900 pt-[57px] md:pt-[67px]">
+        {children}
+      </main>
       <ConditionalFooter />
       <Toaster richColors position="top-center" />
     </div>

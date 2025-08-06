@@ -13,7 +13,6 @@ export const useWebSocketGuard = () => {
     );
 
     if (!isAllowedRoute && isConnected) {
-      console.log('🚫 허용되지 않은 라우트 - WebSocket 연결 해제');
       disconnect();
     }
   }, [pathname, isConnected, disconnect]);

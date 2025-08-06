@@ -19,7 +19,6 @@ export default function PaymentMethods({
       <button
         type="button"
         onClick={() => {
-          console.log('토스페이먼츠 선택');
           onPaymentMethodChange(PAYMENT_METHODS.TOSS);
         }}
         className={`w-full p-3 border rounded-lg flex items-center justify-center transition-colors ${
@@ -47,7 +46,6 @@ export default function PaymentMethods({
       <button
         type="button"
         onClick={() => {
-          console.log('스낵 포인트 선택');
           onPaymentMethodChange(PAYMENT_METHODS.SNACK);
         }}
         className={`w-full p-3 border rounded-lg flex items-center justify-center transition-colors ${

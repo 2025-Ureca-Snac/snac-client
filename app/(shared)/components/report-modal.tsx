@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import ModalPortal from './modal-portal';
 import { toast } from 'sonner';
 
@@ -157,8 +158,8 @@ export default function ReportModal({
 
       // 폼 초기화
       resetForm();
-    } catch (error) {
-      console.error('신고 제출 실패:', error);
+    } catch {
+      // 신고 제출 실패 처리
     } finally {
       setIsSubmitting(false);
     }
@@ -281,9 +282,11 @@ export default function ReportModal({
                     <div className="grid grid-cols-2 gap-2">
                       {imagePreviews.map((preview, index) => (
                         <div key={index} className="relative group">
-                          <img
+                          <Image
                             src={preview}
                             alt={`첨부 이미지 ${index + 1}`}
+                            width={96}
+                            height={96}
                             className="w-full h-24 object-cover rounded-md border cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={() => openImageModal(index)}
                           />
@@ -424,9 +427,11 @@ export default function ReportModal({
 
             {/* 이미지 */}
             <div className="relative max-w-full max-h-full">
-              <img
+              <Image
                 src={imagePreviews[selectedImageIndex]}
                 alt={`이미지 ${selectedImageIndex + 1}`}
+                width={800}
+                height={600}
                 className="max-w-full max-h-[80vh] object-contain"
               />
 
