@@ -48,7 +48,7 @@ export default function TradingPage() {
   const router = useRouter();
   const { partner, setUserRole, userRole, updatePartner } = useMatchStore();
   const [currentStep, setCurrentStep] = useState<TradingStep>('confirmation');
-  const [timeLeft, setTimeLeft] = useState(3000); // 5분 제한
+  const [timeLeft, setTimeLeft] = useState(600); // 10분 제한
   const [isValidPartner, setIsValidPartner] = useState(false);
 
   // TradingPage 진입 시 matchPageRefreshed 세션스토리지 아이템을 false로 설정

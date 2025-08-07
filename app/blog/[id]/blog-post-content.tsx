@@ -2,11 +2,10 @@
 import BlogPostHeader from '@/app/(shared)/components/blog-post-header';
 import BlogPostMeta from '@/app/(shared)/components/blog-post-meta';
 import BlogPostRenderer from '@/app/(shared)/components/blog-post-renderer';
-import BlogPostTOC from '@/app/(shared)/components/blog-post-toc';
 import { BlogPostContentProps } from '@/app/(shared)/types/blog-post';
 
 // 상대 경로 임포트
-import { calculateReadingTime, generateTableOfContents } from './utils';
+import { calculateReadingTime } from './utils';
 
 // 서버 컴포넌트로 블로그 포스트 내용 렌더링
 export default async function BlogPostContent({ post }: BlogPostContentProps) {
@@ -21,17 +20,6 @@ export default async function BlogPostContent({ post }: BlogPostContentProps) {
 
   const readingTime = await getReadingTime();
 
-  // 목차 생성
-  const getTableOfContents = async () => {
-    if (post.markdownContent) {
-      const content = await post.markdownContent;
-      return generateTableOfContents(content);
-    }
-    return [];
-  };
-
-  const tableOfContents = await getTableOfContents();
-
   return (
     <div className="max-w-6xl mx-auto bg-white rounded-2xl my-8 shadow-light flex flex-col">
       {/* 헤더 */}
@@ -44,9 +32,6 @@ export default async function BlogPostContent({ post }: BlogPostContentProps) {
 
         {/* 콘텐츠 렌더링 */}
         <BlogPostRenderer post={post} />
-
-        {/* 목차 */}
-        <BlogPostTOC tableOfContents={tableOfContents} />
       </div>
     </div>
   );
