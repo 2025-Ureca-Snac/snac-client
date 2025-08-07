@@ -177,7 +177,7 @@ function PointPageContent() {
       setIsLoading(false);
       isLoadingRef.current = false;
     }
-  }, [activeTab, selectedYear, selectedMonth, balance.money]);
+  }, [activeTab, selectedYear, selectedMonth]); // balance.money 의존성 제거로 무한 observer 재설정 방지
 
   // URL 파라미터 변경 시 activeTab 업데이트
   useEffect(() => {
