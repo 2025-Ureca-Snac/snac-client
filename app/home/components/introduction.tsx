@@ -216,16 +216,13 @@ const DataItemCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount: 0.5 }}
       transition={{ duration: 0.5, delay }}
-
       className="transition-transform duration-300 hover:scale-[1.05] relative bg-white dark:bg-white  rounded-2xl shadow-light flex flex-col p-4 h-full"
-
     >
       <div className="relative h-20 w-full my-2">
         <Image src={imageUrl} alt={title} layout="fill" objectFit="contain" />
       </div>
 
       <div className="flex-grow flex flex-col items-start mt-2">
-
         <h3 className="font-bold text-gray-900  text-left text-sm md:text-base">
           {title}
         </h3>
@@ -233,7 +230,6 @@ const DataItemCard = ({
           {displayPrice}
         </p>
         <p className="text-xs text-gray-500 ">바삭스코어 {ratingScore}</p>
-
       </div>
 
       <div className="flex justify-center mt-4">
@@ -257,13 +253,13 @@ export default function Introduction() {
   const text1Opacity = useTransform(scrollYProgress, [0, 0.2, 0.3], [1, 1, 0]);
   const text1Y = useTransform(scrollYProgress, [0, 0.3], ['0%', '-100%']);
 
-  const snacScale = useTransform(scrollYProgress, [0.3, 0.6], [0.5, 20]);
+  const snacScale = useTransform(scrollYProgress, [0.6, 1], [0.7, 20]);
   const snacOpacity = useTransform(
     scrollYProgress,
-    [0.3, 0.4, 0.6, 0.7],
+    [0.1, 0.4, 0.7, 0.9],
     [0, 1, 1, 0]
   );
-  const snacY = useTransform(scrollYProgress, [0.3, 0.7], ['50%', '0%']);
+  const snacY = useTransform(scrollYProgress, [0.1, 0.7], ['50%', '0%']);
 
   const tradeItems = [
     {
