@@ -216,16 +216,13 @@ const DataItemCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount: 0.5 }}
       transition={{ duration: 0.5, delay }}
-
       className="transition-transform duration-300 hover:scale-[1.05] relative bg-white dark:bg-white  rounded-2xl shadow-light flex flex-col p-4 h-full"
-
     >
       <div className="relative h-20 w-full my-2">
         <Image src={imageUrl} alt={title} layout="fill" objectFit="contain" />
       </div>
 
       <div className="flex-grow flex flex-col items-start mt-2">
-
         <h3 className="font-bold text-gray-900  text-left text-sm md:text-base">
           {title}
         </h3>
@@ -233,7 +230,6 @@ const DataItemCard = ({
           {displayPrice}
         </p>
         <p className="text-xs text-gray-500 ">바삭스코어 {ratingScore}</p>
-
       </div>
 
       <div className="flex justify-center mt-4">
@@ -257,31 +253,31 @@ export default function Introduction() {
   const text1Opacity = useTransform(scrollYProgress, [0, 0.2, 0.3], [1, 1, 0]);
   const text1Y = useTransform(scrollYProgress, [0, 0.3], ['0%', '-100%']);
 
-  const snacScale = useTransform(scrollYProgress, [0.3, 0.6], [0.5, 20]);
+  const snacScale = useTransform(scrollYProgress, [0.6, 1], [0.7, 20]);
   const snacOpacity = useTransform(
     scrollYProgress,
-    [0.3, 0.4, 0.6, 0.7],
+    [0.1, 0.4, 0.7, 0.9],
     [0, 1, 1, 0]
   );
-  const snacY = useTransform(scrollYProgress, [0.3, 0.7], ['50%', '0%']);
+  const snacY = useTransform(scrollYProgress, [0.1, 0.7], ['50%', '0%']);
 
   const tradeItems = [
     {
       imageUrl: '/SKT.svg',
       title: 'SKT 데이터 1GB',
-      price: 1234,
+      price: 2100,
       ratingScore: 300,
     },
     {
       imageUrl: '/KT.svg',
       title: 'KT 데이터 2GB',
-      price: 2400,
+      price: 2000,
       ratingScore: 280,
     },
     {
       imageUrl: '/LGU+.png',
-      title: 'LGU+ 데이터 500MB',
-      price: 600,
+      title: 'LGU+ 데이터 1GB',
+      price: 1900,
       ratingScore: 320,
     },
   ];
@@ -348,9 +344,9 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                className="mb-10 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
               >
-                SNAC의 약속
+                SNAC의 등장
               </motion.h2>
               <motion.p
                 variants={{
@@ -359,21 +355,31 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                우리는 거래의 모든 순간에 사용자의 안전과 편의를 최우선으로
-                생각합니다.
+                중고나라, 당근마켓, 네이버쇼핑 등 주요 거래 플랫폼의 문제점을
+                조사했습니다.
+                <br />
+                실제 300개의 데이터 중 불편사항 20개를 분석한 결과,
+                <br />
+                <b>18건이 &apos;데이터가 너무 늦게 온다&apos;</b>는 점,{' '}
+                <b>2건이 &apos;개인정보 노출이 싫다&apos;</b>는 점이었습니다.
+                <br />
+                <br />
+                SNAC은 이러한 문제를 해결하기 위해 <b>
+                  개인정보 보호 거래
+                </b>와 <b>실시간 매칭 거래</b>를 핵심 기능으로 삼았습니다.
               </motion.p>
             </motion.div>
             <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
               {[
                 {
                   icon: <ShieldCheck className="w-12 h-12 text-teal-green" />,
-                  title: '완벽한 익명성 보장',
-                  desc: '개인정보를 공개하지 않고 필요한 데이터를 사고팔 수 있습니다.',
+                  title: '개인정보 보호 거래',
+                  desc: '채팅방이 없어 개인정보가 남지않습니다.',
                 },
                 {
                   icon: <Users className="w-12 h-12 text-teal-green" />,
-                  title: '신속한 실시간 매칭',
-                  desc: '시스템이 최적의 거래 상대를 즉시 찾아 연결합니다.',
+                  title: '실시간 매칭 거래',
+                  desc: '지금 접속 중인 거래 상대와 즉시 안전하게 거래할 수 있습니다.',
                 },
               ].map((item, i) => (
                 <motion.div
@@ -416,7 +422,7 @@ export default function Introduction() {
                 }}
                 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
               >
-                당신의 거래를 위한 모든 것
+                SNAC이 해결한 불편함
               </motion.h2>
               <motion.p
                 variants={{
@@ -425,21 +431,29 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                SNAC은 데이터 거래에 필요한 모든 기능을 갖추고 있습니다.
+                기존 플랫폼의 <b>계좌번호 노출</b>과 <b>복잡한 결제 과정</b>을
+                해결하기 위해
+                <br />
+                <b>포인트 충전제도</b>와 <b>간편 결제 시스템</b>을 도입했습니다.
+                <br />
+                또한, 거래에 서툴거나 걱정이 많은 분들을 위해
+                <br />
+                <b>통신사별 거래 방법과 안전한 거래 팁</b>을 블로그에서
+                안내합니다.
               </motion.p>
             </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FeatureCard
                 className="md:col-span-2"
                 icon={<Newspaper size={32} />}
-                title="블로그"
-                description="최신 트렌드와 팁을 만나보세요."
+                title="거래 가이드 및 다양한 정보 글"
+                description="각 통신사별 거래 방법과 안전하게 거래하는 팁 및 정보를 제공합니다."
               />
               <FeatureCard
                 className="md:col-span-2"
                 icon={<CreditCard size={32} />}
-                title="안전 결제 & 포인트"
-                description="토스페이먼츠로 안전하게 결제하고, 거래에 사용할 수 있는 포인트로 충전하세요."
+                title="포인트 충전 & 간편결제"
+                description="토스페이먼츠로 간편하게 결제하고, 포인트로 빠르게 거래할 수 있습니다."
               />
             </div>
           </div>
@@ -469,8 +483,9 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                빠르고 짜릿한 실시간 거래와 안정적인 일반 거래 중 원하는 방식을
-                선택하세요.
+                급할 땐 즉시 매칭되는 <b>실시간 거래</b>,<br />
+                여유가 필요하다면 <b>일반 거래</b>!<br />
+                상황에 맞게 원하는 거래 방식을 선택해보세요.
               </motion.p>
             </motion.div>
             <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -488,8 +503,10 @@ export default function Introduction() {
                   </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  게임처럼 직관적인 UI로 거래의 재미를 느껴보세요. 실시간 알림과
-                  동적인 화면 변화로 거래에 몰입할 수 있습니다.
+                  <b>바로 거래하고 싶을 때,</b> 지금 접속 중인 상대와 즉시
+                  매칭하고
+                  <br />
+                  실시간 알림과 생생한 화면 변화로 거래의 짜릿함을 경험해보세요!
                 </p>
                 <RealtimeTradeVisual />
               </motion.div>
@@ -507,8 +524,9 @@ export default function Introduction() {
                   </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  시간적 여유가 있다면, 익숙한 게시판 형태의 거래 페이지에서
-                  안정적으로 거래를 진행할 수 있습니다.
+                  <b>여유롭게 거래하고 싶을 땐,</b> 거래글을 남기고
+                  <br />
+                  원하는 시간에 상대를 찾아 안전하게 거래할 수 있어요.
                 </p>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {tradeItems.map((item, i) => (
@@ -544,8 +562,11 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                포인트는 현금으로 환전할 수 없지만, SNAC 생태계 안에서 더 큰
-                가치를 가집니다.
+                회원가입만 해도 <b>1,000포인트</b> 즉시 지급!
+                <br />
+                거래할 때마다 <b>10포인트씩</b> 쌓이고,
+                <br />
+                <b>별도의 거래 수수료 없이</b> 포인트로만 간편하게 거래하세요.
               </motion.p>
             </motion.div>
             <div className="flex justify-center">
@@ -560,11 +581,13 @@ export default function Introduction() {
                   <TrendingUp className="w-12 h-12 text-teal-green" />
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      거래 수수료 할인
+                      거래할 때마다 포인트 적립!
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-400">
-                      포인트를 사용하여 거래 시 발생하는 수수료를 할인받을 수
-                      있습니다.
+                      거래가 완료될 때마다 <b>10포인트</b>씩 자동으로
+                      적립됩니다.
+                      <br />
+                      SNAC은 <b>거래 수수료가 전혀 없습니다</b>.
                     </p>
                   </div>
                 </div>
