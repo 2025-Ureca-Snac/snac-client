@@ -20,7 +20,7 @@ const SOCIAL_LINKS = [
   {
     src: '/youtube.svg',
     alt: '유튜브 바로가기',
-    href: 'https://www.youtube.com/',
+    href: 'https://youtu.be/TuABjUV7xGg?si=FRz1jsvUGRyR16Zp',
   },
   {
     src: '/figma.svg',
