@@ -33,7 +33,16 @@ interface NavItemShowProps {
   isLoggedIn: boolean;
 }
 
-const NAV_ITEMS = [
+interface NavItem {
+  key: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  text: string;
+  show: (props: NavItemShowProps) => boolean;
+  isAction?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
   {
     key: 'admin',
     href: '/admin',
@@ -76,11 +85,20 @@ const NAV_ITEMS = [
     text: '로그인',
     show: ({ isLoggedIn }: NavItemShowProps) => !isLoggedIn,
   },
+  {
+    key: 'logout',
+    href: '#',
+    icon: Login,
+    text: '로그아웃',
+    show: ({ isLoggedIn }: NavItemShowProps) => isLoggedIn,
+    isAction: true, // 페이지 이동이 아닌 액션임을 표시
+  },
 ];
 
 export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
   const user = useAuthStore((state: AuthState) => state.user);
   const role = useAuthStore((state: AuthState) => state.role);
+  const logout = useAuthStore((state: AuthState) => state.logout);
   const isLoggedIn: boolean = !!user;
   const isAdmin: boolean = role === ADMIN_ROLE;
   const pathname = usePathname();
@@ -100,11 +118,28 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
     setMounted(true);
   }, []);
 
-  const handleMobileNav = (path: string) => {
+  // 로그아웃 핸들러
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch {}
+  };
+
+  const handleMobileNav = (path: string, isAction?: boolean) => {
     setMenuOpen(false);
-    setTimeout(() => {
-      router.push(path);
-    }, 200);
+
+    if (isAction && path === '#') {
+      // 로그아웃 액션
+      setTimeout(() => {
+        handleLogout();
+      }, 200);
+    } else {
+      // 일반 페이지 이동
+      setTimeout(() => {
+        router.push(path);
+      }, 200);
+    }
   };
 
   if (!mounted) {
@@ -139,7 +174,23 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
         <div className="relative z-10 gap-4 items-center md:flex hidden">
           {NAV_ITEMS.map(
             (item) =>
-              item.show({ isAdmin, isTrading, isLoggedIn }) && (
+              item.show({ isAdmin, isTrading, isLoggedIn }) &&
+              (item.isAction ? (
+                <button
+                  key={item.key}
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+                >
+                  <item.icon
+                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                  />
+                  <span
+                    className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                  >
+                    {item.text}
+                  </span>
+                </button>
+              ) : (
                 <Link
                   href={item.href}
                   key={item.key}
@@ -154,7 +205,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                     {item.text}
                   </span>
                 </Link>
-              )
+              ))
           )}
           <ThemeSwitch
             isDark={isDarkmode}
@@ -224,7 +275,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                     <button
                       type="button"
                       key={item.key}
-                      onClick={() => handleMobileNav(item.href)}
+                      onClick={() => handleMobileNav(item.href, item.isAction)}
                       className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
                     >
                       <item.icon

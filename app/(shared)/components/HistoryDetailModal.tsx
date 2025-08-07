@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { API_STATUS, UPLOAD_ERROR_MESSAGE } from '../constants/api-status';
 import { REASON_MAP } from '../constants/cancel-reasons';
-import type { SendDataResponse } from '../types/api';
 import type { HistoryDetailModalProps } from '../types/history-detail-modal';
 import api from '../utils/api';
 import { getCarrierImageUrl } from '../utils/carrier-utils';
@@ -153,44 +151,6 @@ export default function HistoryDetailModal({
       // 단골 삭제 실패 처리
     } finally {
       setIsLoadingFavorite(false);
-    }
-  };
-
-  // 전송완료 핸들러
-  const handleDataSent = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await api.patch<SendDataResponse>(
-        `/trades/${item.id}/send-data`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      // 응답 상태에 따른 처리
-      if (response.data.status === API_STATUS.OK) {
-        // 성공 시 페이지 새로고침
-        window.location.reload();
-        return;
-      }
-
-      let errorMessage: string = UPLOAD_ERROR_MESSAGE.DEFAULT;
-      switch (response.data.status) {
-        case API_STATUS.BAD_REQUEST:
-          errorMessage = response.data.data || UPLOAD_ERROR_MESSAGE.BAD_IMAGE;
-          break;
-        case API_STATUS.GATEWAY_TIMEOUT:
-          errorMessage = UPLOAD_ERROR_MESSAGE.TIMEOUT;
-          break;
-      }
-      throw new Error(errorMessage);
-    } catch (error) {
-      throw error;
     }
   };
 
@@ -525,7 +485,7 @@ export default function HistoryDetailModal({
             item.status !== 'DATA_SENT' &&
             item.cancelRequestStatus !== 'REQUESTED' &&
             item.cancelRequestStatus !== 'ACCEPTED' && (
-              <DataUploadSection item={item} onDataSent={handleDataSent} />
+              <DataUploadSection item={item} tradeId={item.id} />
             )}
         </div>
 

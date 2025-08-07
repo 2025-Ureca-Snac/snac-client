@@ -543,16 +543,16 @@ export default function TradingHistoryPage({
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
-      <div className="flex w-full min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-gray-900 w-full overflow-hidden">
+      <div className="flex w-full min-h-screen overflow-hidden">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
           <SideMenu />
         </div>
 
         {/* 메인 컨텐츠 */}
-        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2">
-          <div className="max-w-4xl mx-auto w-full">
+        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2 overflow-hidden">
+          <div className="max-w-4xl mx-auto w-full overflow-hidden">
             {/* PC 헤더 */}
             <DesktopHeader />
 
@@ -560,12 +560,12 @@ export default function TradingHistoryPage({
             <MobileHeader />
 
             <section
-              className="w-full max-w-full"
+              className="w-full max-w-full overflow-hidden"
               aria-labelledby={`${type}-history-title`}
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                 {/* 탭 네비게이션 */}
                 <TabNavigation
                   tabs={tabs}

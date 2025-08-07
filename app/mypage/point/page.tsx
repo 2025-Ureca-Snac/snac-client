@@ -333,7 +333,7 @@ function PointPageContent() {
     const url = new URL(window.location.href);
     url.searchParams.set('type', newTab);
     window.history.pushState({}, '', url.toString());
-  }, []);
+  }, []); // activeTab 의존성 제거로 무한 루프 방지
 
   // 스와이프 네비게이션 훅
   const { onTouchStart, onTouchEnd } = useSwipeNavigation({
@@ -472,20 +472,85 @@ function PointPageContent() {
     </div>
   );
 
-  // 로딩 컴포넌트
+  // 로딩 컴포넌트 - 실제 레이아웃과 완전히 일치
   const LoadingState = () => (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      <div className="p-6">
-        <div className="space-y-4">
-          {[...Array(3)].map((_, index) => (
+    <div className="space-y-6">
+      {/* 탭 네비게이션 스켈레톤 */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex">
+          {/* POINT 탭 스켈레톤 */}
+          <div className="flex-1 relative">
+            <div className="flex items-center justify-center py-4 animate-pulse">
+              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+          </div>
+          {/* MONEY 탭 스켈레톤 */}
+          <div className="flex-1">
+            <div className="flex items-center justify-center py-4 animate-pulse">
+              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 콘텐츠 영역 스켈레톤 */}
+      <div className="space-y-4">
+        {/* 필터 버튼 스켈레톤 (포인트 탭일 때만) */}
+        {activeTab === 'POINT' && (
+          <div className="px-4 space-y-4">
+            {/* 월 선택 스켈레톤 */}
+            <div className="flex items-center gap-3 py-1 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+            </div>
+            {/* 필터 버튼 스켈레톤 */}
+            <div className="flex gap-2 animate-pulse">
+              {[...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-16"
+                ></div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 머니 탭 필터 버튼 스켈레톤 */}
+        {activeTab === 'MONEY' && (
+          <div className="px-4">
+            <div className="flex gap-2 animate-pulse">
+              {[...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-16"
+                ></div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 히스토리 아이템 스켈레톤을 카드로 감싸기 */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          {[...Array(4)].map((_, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-3 animate-pulse"
+              className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 last:border-b-0 animate-pulse"
             >
-              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+              {/* 왼쪽: 제목과 날짜 */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-12"></div>
+                </div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+              </div>
+
+              {/* 오른쪽: 금액 */}
+              <div className="text-right">
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-1"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
               </div>
             </div>
           ))}
@@ -514,15 +579,15 @@ function PointPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
-      <div className="flex w-full min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-gray-900 w-full overflow-hidden">
+      <div className="flex w-full min-h-screen overflow-hidden">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
           <SideMenu />
         </div>
 
         {/* 메인 컨텐츠 */}
-        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2">
+        <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2 overflow-hidden">
           <div className="max-w-4xl mx-auto w-full">
             {/* PC 헤더 */}
             <DesktopHeader />
@@ -551,7 +616,7 @@ function PointPageContent() {
                   />
 
                   {/* 스와이프 가능한 콘텐츠 영역 */}
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <AnimatedTabContent tabKey={activeTab}>
                       <motion.div
                         className="select-none overflow-hidden"
