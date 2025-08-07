@@ -265,19 +265,19 @@ export default function Introduction() {
     {
       imageUrl: '/SKT.svg',
       title: 'SKT 데이터 1GB',
-      price: 1234,
+      price: 2100,
       ratingScore: 300,
     },
     {
       imageUrl: '/KT.svg',
       title: 'KT 데이터 2GB',
-      price: 2400,
+      price: 2000,
       ratingScore: 280,
     },
     {
       imageUrl: '/LGU+.png',
-      title: 'LGU+ 데이터 500MB',
-      price: 600,
+      title: 'LGU+ 데이터 1GB',
+      price: 1900,
       ratingScore: 320,
     },
   ];
@@ -483,8 +483,9 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                빠르고 짜릿한 실시간 거래와 안정적인 일반 거래 중 원하는 방식을
-                선택하세요.
+                급할 땐 즉시 매칭되는 <b>실시간 거래</b>,<br />
+                여유가 필요하다면 <b>일반 거래</b>!<br />
+                상황에 맞게 원하는 거래 방식을 선택해보세요.
               </motion.p>
             </motion.div>
             <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -502,8 +503,10 @@ export default function Introduction() {
                   </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  게임처럼 직관적인 UI로 거래의 재미를 느껴보세요. 실시간 알림과
-                  동적인 화면 변화로 거래에 몰입할 수 있습니다.
+                  <b>바로 거래하고 싶을 때,</b> 지금 접속 중인 상대와 즉시
+                  매칭하고
+                  <br />
+                  실시간 알림과 생생한 화면 변화로 거래의 짜릿함을 경험해보세요!
                 </p>
                 <RealtimeTradeVisual />
               </motion.div>
@@ -521,8 +524,9 @@ export default function Introduction() {
                   </h3>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  시간적 여유가 있다면, 익숙한 게시판 형태의 거래 페이지에서
-                  안정적으로 거래를 진행할 수 있습니다.
+                  <b>여유롭게 거래하고 싶을 땐,</b> 거래글을 남기고
+                  <br />
+                  원하는 시간에 상대를 찾아 안전하게 거래할 수 있어요.
                 </p>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {tradeItems.map((item, i) => (
@@ -558,8 +562,11 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                포인트는 현금으로 환전할 수 없지만, SNAC 생태계 안에서 더 큰
-                가치를 가집니다.
+                회원가입만 해도 <b>1,000포인트</b> 즉시 지급!
+                <br />
+                거래할 때마다 <b>10포인트씩</b> 쌓이고,
+                <br />
+                <b>별도의 거래 수수료 없이</b> 포인트로만 간편하게 거래하세요.
               </motion.p>
             </motion.div>
             <div className="flex justify-center">
@@ -574,11 +581,13 @@ export default function Introduction() {
                   <TrendingUp className="w-12 h-12 text-teal-green" />
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      거래 수수료 할인
+                      거래할 때마다 포인트 적립!
                     </h3>
                     <p className="mt-1 text-gray-600 dark:text-gray-400">
-                      포인트를 사용하여 거래 시 발생하는 수수료를 할인받을 수
-                      있습니다.
+                      거래가 완료될 때마다 <b>10포인트</b>씩 자동으로
+                      적립됩니다.
+                      <br />
+                      SNAC은 <b>거래 수수료가 전혀 없습니다</b>.
                     </p>
                   </div>
                 </div>
