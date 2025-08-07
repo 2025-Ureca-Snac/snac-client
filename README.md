@@ -25,72 +25,94 @@
 
 ---
 
+# 🚄 트러블 슈팅
+
+프로젝트 진행 중 발생했던 주요 이슈와 해결 과정을 정리했습니다.
+
+<details>
+  <summary><strong>실시간 매칭 중 중복 접속/부정 로그인 이슈</strong></summary>
+<img width="1857" height="1261" alt="image" src="https://github.com/user-attachments/assets/2ea8a8c5-d877-42b9-8d3b-49bd849472b0" />
+
+- **문제점:**  
+  동일 계정의 여러 클라이언트 동시 접속 시 거래 정보 꼬임, 부정 로그인 위험  
+  또, 실시간 매칭(match)에서 거래 진행(match/trading) 페이지로 이동해도 소켓이 끊어지지 않아야 함.  
+  반대로 match 페이지를 벗어났다 돌아오면 소켓을 정상적으로 새로 연결해야 하는 상황 발생
+
+- **해결 방법:**  
+  - **소켓 세션 관리**:  
+    - `useGlobalSocket.ts`에서 소켓 상태를 전역 관리  
+    - 페이지 이동에 따라 소켓 연결 유지/해제 제어  
+    - `sessionStorage`를 활용, 사용자가 match → match/trading 등 내부 페이지 이동 시 소켓을 유지  
+    - match에서 벗어나거나 새로 진입 시 소켓을 적절히 리프레시하도록 설계 (예: 방문 여부 true/false로 체크)
+
+  ```ts
+  // 간략 예시 (pseudo)
+  // useGlobalSocket.ts 내부
+  useEffect(() => {
+    if (sessionStorage.getItem('hasVisited')) {
+      // 소켓 연결 유지
+    } else {
+      // 소켓 새로 연결
+      sessionStorage.setItem('hasVisited', 'true');
+    }
+    // 페이지 벗어날 때
+    return () => {
+      sessionStorage.setItem('hasVisited', 'false');
+      // 소켓 연결 해제
+    };
+  }, [pathname]);
+  ```
+- **결과:**
+
+  실제 서비스에서 동시 접속/부정 로그인 시도가 모두 차단됨
+  
+  거래 단계(match → match/trading) 페이지 이동 시에도 소켓이 안전하게 유지
+  
+  불필요한 재연결/끊김 없이 사용자 경험(UX)도 자연스럽게 구현됨
+
+</details> 
 
 
-# 🚄 주요 기능
-
-## 홈 화면
-
-![2025-08-0714-53-14-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/9ef81647-4677-4267-9436-361011f8dc25)
 
 
+  
 
-## 로그인/회원가입
-### 로그인
+</details> <details> <summary><strong>API 호출 더블링 현상</strong></summary>
+  
+- **문제점:**
+useEffect의 경우 Dev 환경에서는 두번 발생하는 경우가 있으나 useEffect를 전혀 사용하지않은 상황이라 원인을 파악해보니 이벤트 리스너를 여러 상황에 등록해두어 이벤트가 동시다발적으로 발동된 상황
 
-<img width="1644" height="1346" alt="image" src="https://github.com/user-attachments/assets/7dda8806-947e-4f7a-94b0-20335ce34c19" />
+- **해결 방법:**
+한 화면에서 이미 발송된 전적이 있는지 판단을 하거나 이벤트 리스너를 발생되자마자 지우는 등의 조치로 해결
 
-### 회원가입
+</details>
 
-<img width="3572" height="1880" alt="image" src="https://github.com/user-attachments/assets/21a15f25-74ac-4372-b652-bf44cd369fef" />
+</details> <details> <summary><strong>Oauth 로그인 서비스 구축</strong></summary>
+  
+  [+Oauth 로그인 서비스 구축](https://www.notion.so/2224a475c7f78024ad24ebbf67ed515d?v=2224a475c7f780bf8a45000c850aa9b3&p=23c4a475c7f7807b87b0fa031cc11a3a&pm=s)
 
-## 구매글/판매글 
+</details>
 
+</details> <details> <summary><strong> 모바일 메뉴 내 Link 클릭 불가 이슈 (Next.js + Headless UI)</strong></summary>
+  
+- **문제 발생**: 모바일 환경에서 `<Dialog>`로 구현한 드롭다운 메뉴 내 `<Link>` 컴포넌트가 **렌더링은 되지만 클릭이 되지 않는 문제**가 발생했습니다.
+- **분석 과정**:
+  - z-index 및 stacking context 조정 → 실패
+  - 오버레이 레이어 충돌 확인 → 실패
+  - `<Link>` 대신 `<button>`으로 대체 테스트 → 성공
+- **원인 파악**:
+  - Headless UI의 `<Dialog>`의 **포커스 트래핑(Focus Trap)** 기능이 Next.js의 `<Link>` 내비게이션을 **가로막는 충돌**이 일어났습니다.
+- **해결 방법**:
+  - `<Link>` 대신 `button` 태그 사용
+  - `onClick` 핸들러 내부에서 `router.push()`로 **프로그래밍 방식 라우팅 처리**
+- **예시 코드**:
+```tsx
+기존 코드: <Link href="/mypage">마이페이지</Link>
+↓
+수정 코드: <button onClick={() => router.push('/mypage')}>마이페이지</button>
+```
 
-![12d12d1zx23](https://github.com/user-attachments/assets/1a02a759-205d-497f-9db5-323c9b686453)
-
-
-## 구매글/판매글 거래
-
-![ezgif com-video-to-gif-converter (6)](https://github.com/user-attachments/assets/718a5c2f-fb5f-414f-9151-6b9b2a6580c6)
-
-## 마이페이지
-
-<img width="2459" height="1252" alt="image" src="https://github.com/user-attachments/assets/9072c23b-6a62-4286-86a7-73a00111e271" />
-
-
-<img width="2458" height="1137" alt="image" src="https://github.com/user-attachments/assets/47122926-3914-4ef8-86a2-a6e5ac50d690" />
-
-
-## 소셜 로그인 연동
-
-![2025-08-0700-13-20-ezgif com-censor](https://github.com/user-attachments/assets/d30ee0ac-762c-4b2b-a462-888b01e5d97f)
-
-## 거래 내역
-
-![ff1123-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/8bfb3c24-d595-4cb8-913c-9b0aede3f632)
-
-
-## 실시간 매칭
-
-![2025-08-0715-38-31-ezgif com-optimize](https://github.com/user-attachments/assets/c9b43660-a638-45a2-9efd-88696b34515e)
-
-![2025-08-0716-24-30-ezgif com-optimize](https://github.com/user-attachments/assets/42dfce22-349a-4c7e-a6d6-96a1da17b147)
-
-## 블로그 (읽을거리)
-
-![ezgif com-video-to-gif-converter (9)](https://github.com/user-attachments/assets/a65bf58e-79cf-4965-82a8-9495637323a2)
-
-
-## 어드민 페이지 대쉬보드 및 신고관리
-![ezgif com-video-to-gif-converter (7)](https://github.com/user-attachments/assets/750f4282-1575-4678-bcff-bc965557eb04)
-
-
-## 어드민 페이지 블로그글 등록/수정/삭제
-
-![ezgif com-speed (1)](https://github.com/user-attachments/assets/b1f06775-84b7-4c9f-a637-68631ee6c57a)
-
-
+</details>
 
 
 # 🗂️ 디렉토리 구조
@@ -142,9 +164,6 @@ NEXT_PUBLIC_API_URL={백엔드 서버 URL}
 
 ## 📚 Tech Stack
 
-협업 툴도 적어보기 (지라,피그마 등등)
-
-
 ### 💻 FE Development
 
 [![My Skills](https://skillicons.dev/icons?i=nextjs,ts,tailwind,react)](https://skillicons.dev)
@@ -153,18 +172,6 @@ NEXT_PUBLIC_API_URL={백엔드 서버 URL}
 에자일 방법론 도입
 
 #### 총기간 2025.6.30 ~ 2025.8.8 (39 days)
-## 📅 개발 기간
-
-| 기간                | 주차          | 진행 내용              |
-|---------------------|--------------|------------------------|
-| 2025.6.30 ~ 2025.8.8 | 전체 (39일)   | 프로젝트 전체 기간      |
-| 2025.6.30 ~ 2025.7.6 | 1주차         |                        |
-| 2025.7.7 ~ 2025.7.13 | 2주차         |                        |
-| 2025.7.14 ~ 2025.7.20 | 3주차        |                        |
-| 2025.7.21 ~ 2025.7.27 | 4주차        |                        |
-| 2025.7.28 ~ 2025.8.4  | 5주차        |                        |
-| 2025.8.5 ~ 2025.8.7   | 6주차        |                        |
-
 
 
 # 👩‍💻 팀원
@@ -173,24 +180,12 @@ NEXT_PUBLIC_API_URL={백엔드 서버 URL}
 <table>
   <tbody>
     <tr>
-      <td align="center"><a href="https://github.com/hyonun321"><img src="https://avatars.githubusercontent.com/u/196058650?v=4" width="120px;" alt=""/><br /><b>김현훈</b></a><br /><p>👑팀장</p></td>
-      <td align="center"><a href="https://github.com/yshls"><img src="https://avatars.githubusercontent.com/u/97035336?v=4" width="120px;" alt=""/><br /><b>양세현</b></a><br /><p>개발</p></td>
-      <td align="center"><a href="https://github.com/seungwoo505"><img src="https://avatars.githubusercontent.com/u/51819005?v=4" width="120px;" alt=""/><br /><b>이승우</b></a><br /><p>개발</p></td>
+      <td align="center"><a href="https://github.com/hyonun321"><img src="https://avatars.githubusercontent.com/u/196058650?v=4" width="120px;" alt=""/><br /><b>김현훈</b></a><br /><p>👑거래(일반 거래, 실시간 거래), 블로그</p></td>
+      <td align="center"><a href="https://github.com/yshls"><img src="https://avatars.githubusercontent.com/u/97035336?v=4" width="120px;" alt=""/><br /><b>양세현</b></a><br /><p>메인 페이지, 블로그, 관리자</p></td>
+      <td align="center"><a href="https://github.com/seungwoo505"><img src="https://avatars.githubusercontent.com/u/51819005?v=4" width="120px;" alt=""/><br /><b>이승우</b></a><br /><p>로그인, 회원가입, 마이페이지, 결제, SEO, 최적화</p></td>
     </tr>
   </tbody>
 </table>
-
-## BE
-<table>
-  <tbody>
-    <tr>
-      <td align="center"><a href="https://github.com/iju42829"><img src="https://avatars.githubusercontent.com/u/116072376?v=4" width="120px;" alt=""/><br /><b>이재윤</b></a><br /><p>개발</p></td>
-      <td align="center"><a href="https://github.com/Iamcalmdown"><img src="https://avatars.githubusercontent.com/u/144317474?v=4" width="120px;" alt=""/><br /><b>정동현</b></a><br /><p>개발</p></td>
-      <td align="center"><a href="https://github.com/mike7643"><img src="https://avatars.githubusercontent.com/u/121170730?v=4" width="120px;" alt=""/><br /><b>정유민</b></a><br /><p>개발</p></td>
-      <td align="center"><a href="https://github.com/seokjuun"><img src="https://avatars.githubusercontent.com/u/45346977?v=4" width="120px;" alt=""/><br /><b>홍석준</b></a><br /><p>개발</p></td>
-    </tr>
-  </tbody>
-  </table>
 
 
 # 🎯 커밋 컨벤션
