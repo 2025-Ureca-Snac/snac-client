@@ -43,6 +43,7 @@ export default function AnimatedTabContent({
         animate="animate"
         exit="exit"
         transition={{ duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }}
+        className="overflow-hidden"
       >
         {children}
       </motion.div>
