@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { toast } from 'sonner';
+import { API_STATUS, UPLOAD_ERROR_MESSAGE } from '../constants/api-status';
+import { SendDataResponse } from '../types/api';
+import api from '../utils/api';
 
 interface DataUploadSectionProps {
   item: {
@@ -11,12 +13,12 @@ interface DataUploadSectionProps {
     status: string;
     cancelRequestStatus?: string | null;
   };
-  onDataSent: (file: File) => Promise<void>;
+  tradeId: number;
 }
 
 export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
   item,
-  onDataSent,
+  tradeId,
 }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -55,25 +57,52 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
   };
 
   const handleDataSent = async () => {
-    if (!uploadedFile) return;
-
-    setIsUploading(true);
-    setUploadMessage('');
-    setUploadMessageType(null);
+    if (!uploadedFile) {
+      setUploadMessage('파일을 선택해주세요.');
+      setUploadMessageType('error');
+      return;
+    }
 
     try {
-      await onDataSent(uploadedFile);
-      setUploadMessage('데이터 전송이 완료되었습니다.');
-      setUploadMessageType('success');
-      setUploadedFile(null);
-    } catch (error: unknown) {
-      setUploadMessage('데이터 전송 중 오류가 발생했습니다.');
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : '알 수 없는 오류가 발생했습니다.'
+      setIsUploading(true);
+      setUploadMessage('');
+      setUploadMessageType(null);
+
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+
+      const response = await api.patch<SendDataResponse>(
+        `/trades/${tradeId}/send-data`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
+
+      if (response.data.status === API_STATUS.OK) {
+        setUploadMessage('데이터 전송이 완료되었습니다.');
+        setUploadMessageType('success');
+        setUploadedFile(null);
+      } else {
+        let errorMessage: string = UPLOAD_ERROR_MESSAGE.DEFAULT;
+        switch (response.data.status) {
+          case API_STATUS.BAD_REQUEST:
+            errorMessage = response.data.data || UPLOAD_ERROR_MESSAGE.BAD_IMAGE;
+            break;
+          case API_STATUS.GATEWAY_TIMEOUT:
+            errorMessage = UPLOAD_ERROR_MESSAGE.TIMEOUT;
+            break;
+        }
+
+        setUploadMessage(errorMessage);
+        setUploadMessageType('error');
+      }
+    } catch {
+      setUploadMessage(UPLOAD_ERROR_MESSAGE.DEFAULT);
       setUploadMessageType('error');
+      setUploadedFile(null);
     } finally {
       setIsUploading(false);
     }

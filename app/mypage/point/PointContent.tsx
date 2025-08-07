@@ -42,18 +42,33 @@ export default function PointContent({
   // 무한 스크롤을 위한 ref
   const observerRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer 콜백
+  // Intersection Observer 콜백 (무한 호출 방지)
+  const onLoadMoreRef = useRef(onLoadMore);
+  const hasNextRef = useRef(hasNext);
+  const isLoadingMoreRef = useRef(isLoadingMore);
+
+  // 최신 값들을 ref에 저장
+  useEffect(() => {
+    onLoadMoreRef.current = onLoadMore;
+    hasNextRef.current = hasNext;
+    isLoadingMoreRef.current = isLoadingMore;
+  });
+
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
-      if (target.isIntersecting && hasNext && !isLoadingMore) {
-        onLoadMore();
+      if (
+        target.isIntersecting &&
+        hasNextRef.current &&
+        !isLoadingMoreRef.current
+      ) {
+        onLoadMoreRef.current();
       }
     },
-    [hasNext, isLoadingMore, onLoadMore]
+    [] // 의존성 제거로 observer 재설정 방지
   );
 
-  // Intersection Observer 설정
+  // Intersection Observer 설정 (한 번만 설정)
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       threshold: 0.1,
