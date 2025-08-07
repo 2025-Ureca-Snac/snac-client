@@ -210,13 +210,28 @@ function PointPageContent() {
     };
   }, [loadInitialBalance, loadPointData]); // 의존성 배열 수정
 
-  // 탭 변경 또는 포인트 월별 조회 변경 시 데이터 로드
+  // 탭 변경 또는 포인트 월별 조회 변경 시 데이터 로드 (초기 중복 방지)
+  const prevValuesRef = useRef({ activeTab, selectedYear, selectedMonth });
   useEffect(() => {
-    // 초기 로드가 완료된 후에만 탭/월 변경 시 데이터 로드
-    if (isInitialLoadRef.current) {
-      loadPointData();
+    const currentValues = { activeTab, selectedYear, selectedMonth };
+    const prevValues = prevValuesRef.current;
+
+    // 값이 실제로 변경되었고, 초기 로드가 완료된 경우에만 실행
+    const hasChanged =
+      prevValues.activeTab !== currentValues.activeTab ||
+      prevValues.selectedYear !== currentValues.selectedYear ||
+      prevValues.selectedMonth !== currentValues.selectedMonth;
+
+    if (!isInitialLoadRef.current || !hasChanged) {
+      prevValuesRef.current = currentValues; // 값 업데이트
+      return; // 초기 로드 미완료 또는 값 변경 없음
     }
-  }, [loadPointData]); // loadPointData만 의존성으로 사용
+
+    loadPointData();
+
+    // 이전 값 업데이트
+    prevValuesRef.current = currentValues;
+  }, [activeTab, selectedYear, selectedMonth, loadPointData]); // 실제 변경되는 값들 의존성
 
   // 무한 스크롤 더보기 함수
   const handleLoadMore = async () => {
