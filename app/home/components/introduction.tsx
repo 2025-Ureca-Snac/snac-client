@@ -344,9 +344,9 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                className="mb-10 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
               >
-                SNAC의 약속
+                SNAC의 등장
               </motion.h2>
               <motion.p
                 variants={{
@@ -355,21 +355,31 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                우리는 거래의 모든 순간에 사용자의 안전과 편의를 최우선으로
-                생각합니다.
+                중고나라, 당근마켓, 네이버쇼핑 등 주요 거래 플랫폼의 문제점을
+                조사했습니다.
+                <br />
+                실제 300개의 데이터 중 불편사항 20개를 분석한 결과,
+                <br />
+                <b>18건이 &apos;데이터가 너무 늦게 온다&apos;</b>는 점,{' '}
+                <b>2건이 &apos;개인정보 노출이 싫다&apos;</b>는 점이었습니다.
+                <br />
+                <br />
+                SNAC은 이러한 문제를 해결하기 위해 <b>
+                  개인정보 보호 거래
+                </b>와 <b>실시간 매칭 거래</b>를 핵심 기능으로 삼았습니다.
               </motion.p>
             </motion.div>
             <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
               {[
                 {
                   icon: <ShieldCheck className="w-12 h-12 text-teal-green" />,
-                  title: '완벽한 익명성 보장',
-                  desc: '개인정보를 공개하지 않고 필요한 데이터를 사고팔 수 있습니다.',
+                  title: '개인정보 보호 거래',
+                  desc: '채팅방이 없어 개인정보가 남지않습니다.',
                 },
                 {
                   icon: <Users className="w-12 h-12 text-teal-green" />,
-                  title: '신속한 실시간 매칭',
-                  desc: '시스템이 최적의 거래 상대를 즉시 찾아 연결합니다.',
+                  title: '실시간 매칭 거래',
+                  desc: '지금 접속 중인 거래 상대와 즉시 안전하게 거래할 수 있습니다.',
                 },
               ].map((item, i) => (
                 <motion.div
@@ -412,7 +422,7 @@ export default function Introduction() {
                 }}
                 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
               >
-                당신의 거래를 위한 모든 것
+                SNAC이 해결한 불편함
               </motion.h2>
               <motion.p
                 variants={{
@@ -421,21 +431,29 @@ export default function Introduction() {
                 }}
                 className="mt-4 text-lg text-gray-600 dark:text-gray-400"
               >
-                SNAC은 데이터 거래에 필요한 모든 기능을 갖추고 있습니다.
+                기존 플랫폼의 <b>계좌번호 노출</b>과 <b>복잡한 결제 과정</b>을
+                해결하기 위해
+                <br />
+                <b>포인트 충전제도</b>와 <b>간편 결제 시스템</b>을 도입했습니다.
+                <br />
+                또한, 거래에 서툴거나 걱정이 많은 분들을 위해
+                <br />
+                <b>통신사별 거래 방법과 안전한 거래 팁</b>을 블로그에서
+                안내합니다.
               </motion.p>
             </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <FeatureCard
                 className="md:col-span-2"
                 icon={<Newspaper size={32} />}
-                title="블로그"
-                description="최신 트렌드와 팁을 만나보세요."
+                title="거래 가이드 및 다양한 정보 글"
+                description="각 통신사별 거래 방법과 안전하게 거래하는 팁 및 정보를 제공합니다."
               />
               <FeatureCard
                 className="md:col-span-2"
                 icon={<CreditCard size={32} />}
-                title="안전 결제 & 포인트"
-                description="토스페이먼츠로 안전하게 결제하고, 거래에 사용할 수 있는 포인트로 충전하세요."
+                title="포인트 충전 & 간편결제"
+                description="토스페이먼츠로 간편하게 결제하고, 포인트로 빠르게 거래할 수 있습니다."
               />
             </div>
           </div>
