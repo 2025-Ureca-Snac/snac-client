@@ -55,7 +55,7 @@ export default function SocialLoginButtons({
           <div className="w-22 h-22 md:w-34 md:h-34 rounded-full flex items-center justify-center">
             <button
               type="button"
-              className="p-0 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full focus:bg-gray-100 focus:bg-opacity-20"
+              className="p-0 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full focus:bg-secondary focus:bg-opacity-20"
               onClick={() => handleSocialLogin(providerId)}
               onKeyDown={(e) => handleKeyDown(e, providerId)}
               aria-label={`${name}로 로그인`}

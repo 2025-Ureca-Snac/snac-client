@@ -156,12 +156,12 @@ export default function TradeConfirmationModal({
       />
 
       {/* 모달 컨텐츠 */}
-      <div className="relative bg-gradient-to-b from-green-900 to-black text-white rounded-lg p-8 mx-4 max-w-md w-full">
+      <div className="relative bg-gradient-to-b from-green-900 to-black text-primary-foreground rounded-lg p-8 mx-4 max-w-md w-full">
         {/* 뒤로가기 버튼 (확인 상태에서만 표시) */}
         {modalState === 'confirm' && (
           <button
             onClick={onCancel}
-            className="absolute top-4 left-4 text-white/70 hover:text-white flex items-center space-x-2"
+            className="absolute top-4 left-4 text-primary-foreground/70 hover:text-primary-foreground flex items-center space-x-2"
           >
             <svg
               className="w-5 h-5"
@@ -235,7 +235,7 @@ function ConfirmationContent({
       </p>
 
       {/* 주의사항 */}
-      <div className="text-sm text-gray-300 mb-8 space-y-1">
+      <div className="text-sm text-muted-foreground mb-8 space-y-1">
         <p>*상대방의 응답을 실시간으로 기다리며 거래 시간은 약 3-5분입니다.</p>
         <p>*거래 중에 이탈할 경우 제재를 받을 수 있습니다.</p>
       </div>
@@ -243,7 +243,7 @@ function ConfirmationContent({
       {/* 시작하기 버튼 */}
       <button
         onClick={onStartTrade}
-        className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+        className="w-full bg-green-500 hover:bg-green-600 text-primary-foreground py-3 px-6 rounded-lg font-medium transition-colors"
       >
         시작하기
       </button>
@@ -287,7 +287,7 @@ function WaitingContent({
         {seller.name}님의 응답을 기다리는 중...
       </h2>
 
-      <div className="text-sm text-gray-300 mb-6">
+      <div className="text-sm text-muted-foreground mb-6">
         <p>
           {seller.carrier} / {seller.data}GB / {seller.price.toLocaleString()}원
         </p>
@@ -299,7 +299,7 @@ function WaitingContent({
           <div className="text-2xl font-bold text-yellow-400 mb-2">
             {timeLeft}초
           </div>
-          <div className="text-sm text-gray-300">
+          <div className="text-sm text-muted-foreground">
             취소 버튼 활성화까지 남은 시간
           </div>
         </div>
@@ -307,7 +307,7 @@ function WaitingContent({
 
       {canCancel && (
         <div className="mb-6">
-          <div className="text-sm text-gray-300">
+          <div className="text-sm text-muted-foreground">
             상대방의 응답을 기다리고 있습니다
           </div>
         </div>
@@ -319,8 +319,8 @@ function WaitingContent({
         disabled={!canCancel}
         className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
           canCancel
-            ? 'bg-gray-600 hover:bg-gray-700 text-white cursor-pointer'
-            : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+            ? 'bg-muted hover:bg-muted text-primary-foreground cursor-pointer'
+            : 'bg-card text-muted-foreground cursor-not-allowed'
         }`}
       >
         {canCancel ? '거래 요청 취소' : `취소 불가 (${timeLeft}초 후 가능)`}
@@ -344,7 +344,7 @@ function SuccessContent({ seller }: { seller: User }) {
 
       <h2 className="text-xl font-bold mb-4 text-green-400">매칭 완료!</h2>
 
-      <div className="text-sm text-gray-300 mb-6">
+      <div className="text-sm text-muted-foreground mb-6">
         <p>{seller.name}님이 거래를 수락했습니다</p>
         <p>
           {seller.carrier} / {seller.data}GB / {seller.price.toLocaleString()}원
@@ -395,7 +395,7 @@ function TimeoutContent({
         거래 요청이 처리되지 않았습니다
       </h2>
 
-      <div className="text-sm text-gray-300 mb-6">
+      <div className="text-sm text-muted-foreground mb-6">
         <p>{seller.name}님이 응답하지 않았거나</p>
         <p>거래를 거부했습니다.</p>
       </div>
@@ -404,13 +404,13 @@ function TimeoutContent({
       <div className="space-y-3">
         {/* <button
           onClick={onRetry}
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+          className="w-full bg-green-600 hover:bg-green-700 text-primary-foreground py-3 px-6 rounded-lg font-medium transition-colors"
         >
           다시 시도하기
         </button> */}
         <button
           onClick={onCancel}
-          className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+          className="w-full bg-muted hover:bg-muted text-primary-foreground py-3 px-6 rounded-lg font-medium transition-colors"
         >
           다른 판매자 찾기
         </button>

@@ -29,14 +29,14 @@ export default function FilterButtons({
         <button
           onClick={onReset}
           disabled={resetDisabled}
-          className="px-4 py-3 bg-gray-100 rounded-lg font-bold text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700  md:bg-transparent md:border md:border-gray-400 md:text-gray-400"
+          className="px-4 py-3 bg-secondary rounded-lg font-bold text-foreground hover:bg-muted  md:bg-transparent md:border md:border-gray-400 md:text-muted-foreground"
         >
           {resetText}
         </button>
         <button
           onClick={onApply}
           disabled={applyDisabled}
-          className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-gray-800 dark:bg-gray-200 dark:text-black text-white hover:bg-gray-500"
+          className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-card text-primary-foreground hover:bg-muted"
         >
           {applyText}
         </button>
@@ -49,8 +49,8 @@ export default function FilterButtons({
       <button
         onClick={onReset}
         disabled={resetDisabled}
-        className={`w-[40%] px-6 py-3 bg-gray-600 text-white rounded-lg transition-colors ${
-          resetDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-700'
+        className={`w-[40%] px-6 py-3 bg-muted text-primary-foreground rounded-lg transition-colors ${
+          resetDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted'
         }`}
       >
         {resetText}
@@ -58,7 +58,7 @@ export default function FilterButtons({
       <button
         onClick={onApply}
         disabled={applyDisabled}
-        className={`w-full px-6 py-3 bg-green-600 text-white rounded-lg transition-colors ${
+        className={`w-full px-6 py-3 bg-green-600 text-primary-foreground rounded-lg transition-colors ${
           applyDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'
         }`}
       >

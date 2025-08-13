@@ -471,11 +471,11 @@ export default function MatchPage() {
   // 토큰이 없으면 로딩 상태 표시
   if (!token) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
+      <div className="min-h-screen flex flex-col bg-card">
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">로그인 상태를 확인하는 중...</p>
+            <p className="text-muted-foreground">로그인 상태를 확인하는 중...</p>
           </div>
         </main>
         <Footer />

@@ -49,10 +49,10 @@ interface SortDropdownProps {
         <Listbox.Button
           className={`
             relative w-full rounded-lg
-            bg-white dark:bg-black
-            border border-gray-300 dark:border-white
+            bg-card
+            border border-border
             py-2 pl-4 pr-10 text-left text-sm font-bold
-            text-gray-800 dark:text-gray-100
+            text-foreground
             focus:outline-none
             disabled:opacity-50 disabled:cursor-not-allowed
             transition
@@ -61,15 +61,15 @@ interface SortDropdownProps {
         >
           <span>{selected.label}</span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-white" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </span>
         </Listbox.Button>
         <Listbox.Options
           className="
             absolute z-20 mt-2 w-full rounded-lg
-            bg-white dark:bg-black
+            bg-card
             shadow-lg ring-1 ring-black/10 focus:outline-none
-            border border-gray-200 dark:border-gray-500
+            border border-border
             py-1
           "
         >
@@ -80,9 +80,9 @@ interface SortDropdownProps {
                   className={[
                     'cursor-pointer select-none py-2 pl-4 pr-10 text-sm',
                     active
-                      ? 'bg-gray-200 dark:bg-gray-700 text-black dark:text-white'
-                      : 'text-gray-800 dark:text-gray-100',
-                    selected ? 'font-bold text-gray-900 dark:text-white' : '',
+                      ? 'bg-muted text-card-foreground'
+                      : 'text-foreground',
+                    selected ? 'font-bold text-card-foreground' : '',
                   ].join(' ')}
                   style={{ listStyle: 'none' }}
                 >

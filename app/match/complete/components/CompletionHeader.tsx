@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function CompletionHeader() {
   return (
-    <div className="relative bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white py-12 px-4 overflow-hidden">
+    <div className="relative bg-gradient-to-r from-gray-900 via-black to-gray-900 text-primary-foreground py-12 px-4 overflow-hidden">
       {/* 배경 글로우 효과 */}
       <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 via-transparent to-green-300/5"></div>
       <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-32 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>

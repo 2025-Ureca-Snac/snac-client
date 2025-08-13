@@ -7,8 +7,8 @@ import Link from 'next/link';
 export default function SignUpHeader() {
   return (
     <div className="text-center mb-8">
-      <h1 className="text-3xl font-bold text-black mb-4">회원가입</h1>
-      <p className="text-gray-600">
+      <h1 className="text-3xl font-bold text-card-foreground mb-4">회원가입</h1>
+      <p className="text-muted-foreground">
         이미 계정이 있으신가요?{' '}
         <Link href="/login" className="text-blue-600 hover:text-blue-800">
           로그인

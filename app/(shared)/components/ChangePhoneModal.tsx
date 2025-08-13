@@ -285,7 +285,7 @@ export default function ChangePhoneModal({
   return (
     <ModalPortal isOpen={open} onClose={handleCloseModal}>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] relative">
+        <div className="bg-card rounded-lg p-6 w-full max-w-md max-h-[90vh] relative">
           {/* 상단 아이콘 */}
           <div className="flex flex-col items-center -mt-12 mb-2">
             <div
@@ -309,19 +309,19 @@ export default function ChangePhoneModal({
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black text-center">
+            <div className="text-xl font-extrabold text-card-foreground text-center">
               전화번호 변경
             </div>
             <button
               onClick={handleCloseModal}
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-4 text-2xl text-muted-foreground hover:text-muted-foreground"
               aria-label="닫기"
               tabIndex={0}
             >
               ×
             </button>
           </div>
-          <div className="w-full text-center text-gray-600 mb-4 text-sm">
+          <div className="w-full text-center text-muted-foreground mb-4 text-sm">
             변경하려면 비밀번호를 입력하세요.
           </div>
 
@@ -402,7 +402,7 @@ export default function ChangePhoneModal({
             {/* 상태 메시지 */}
             {isVerified && (
               <div className="space-y-4">
-                <p className="text-sm text-gray-600 text-center">
+                <p className="text-sm text-muted-foreground text-center">
                   {success
                     ? '전화번호가 성공적으로 변경되었습니다.'
                     : '인증이 완료되었습니다. 전화번호를 변경하시겠습니까?'}
@@ -417,7 +417,7 @@ export default function ChangePhoneModal({
               type="button"
               onClick={handleChangePhone}
               disabled={isChangeButtonDisabled()}
-              className="flex-1 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex-1 h-12 rounded-lg bg-black text-primary-foreground font-semibold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}
             >
               {getChangeButtonText()}
@@ -428,7 +428,7 @@ export default function ChangePhoneModal({
                 isCodeSent || isVerified ? handleReset : handleCloseModal
               }
               disabled={isResetButtonDisabled()}
-              className="w-2/5 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-2/5 h-12 rounded-lg bg-muted text-foreground font-semibold hover:bg-secondary transition-colors disabled:bg-secondary disabled:text-muted-foreground disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               tabIndex={0}
             >
               {isCodeSent || isVerified ? '초기화' : '취소'}

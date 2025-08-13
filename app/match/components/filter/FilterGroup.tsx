@@ -33,7 +33,7 @@ export default function FilterGroup({
 
   return (
     <div className="space-y-3">
-      <h3 className="font-medium text-lg md:text-2xl text-white">{title}</h3>
+      <h3 className="font-medium text-lg md:text-2xl text-primary-foreground">{title}</h3>
       <div
         className={`grid gap-3 ${title === '통신사' ? 'grid-cols-3' : 'grid-cols-2'}`}
       >
@@ -48,10 +48,10 @@ export default function FilterGroup({
               disabled={isOptionDisabled}
               className={`px-4 py-3 rounded-lg border transition-all ${
                 isOptionDisabled
-                  ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+                  ? 'bg-muted text-muted-foreground border-border cursor-not-allowed'
                   : isSelected
-                    ? 'bg-white text-black border-white'
-                    : 'bg-transparent text-white border-gray-400 hover:border-white hover:bg-white hover:bg-opacity-10'
+                    ? 'bg-card text-card-foreground border-white'
+                    : 'bg-transparent text-primary-foreground border-gray-400 hover:border-white hover:bg-card hover:bg-opacity-10'
               }`}
             >
               {option.label}

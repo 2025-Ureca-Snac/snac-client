@@ -56,7 +56,7 @@ export default function FindEmailSection({
         type="button"
         onClick={goToLogin}
         tabIndex={0}
-        className="w-full h-12 rounded-lg bg-midnight-black text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-full h-12 rounded-lg bg-black text-primary-foreground font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         로그인하러 가기
       </button>
@@ -114,7 +114,7 @@ export default function FindEmailSection({
           disabled={!isIdVerified}
           tabIndex={0}
           data-find-id-button
-          className="flex-1 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="flex-1 h-12 rounded-lg bg-black text-primary-foreground font-semibold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           아이디 찾기
         </button>
@@ -123,7 +123,7 @@ export default function FindEmailSection({
           onClick={onReset}
           disabled={!isIdSent && !isIdVerified}
           tabIndex={0}
-          className="px-4 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="px-4 h-12 rounded-lg bg-muted text-foreground font-semibold hover:bg-secondary transition-colors disabled:bg-secondary disabled:text-muted-foreground disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           초기화
         </button>

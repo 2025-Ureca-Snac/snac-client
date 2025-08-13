@@ -51,10 +51,10 @@ export default function TradingSteps({
                     <div
                       className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold transition-all duration-500 ${
                         isCompleted
-                          ? 'bg-gradient-to-br from-green-400 to-green-500 text-black shadow-lg'
+                          ? 'bg-gradient-to-br from-green-400 to-green-500 text-card-foreground shadow-lg'
                           : isCurrent
-                            ? 'bg-gradient-to-br from-green-300 to-green-400 text-black shadow-lg animate-pulse'
-                            : 'bg-gray-800 text-gray-500 border-2 border-gray-700'
+                            ? 'bg-gradient-to-br from-green-300 to-green-400 text-card-foreground shadow-lg animate-pulse'
+                            : 'bg-card text-muted-foreground border-2 border-border'
                       }`}
                     >
                       {isCompleted ? (
@@ -84,7 +84,7 @@ export default function TradingSteps({
                         ? 'text-green-400'
                         : isCurrent
                           ? 'text-green-300 animate-pulse'
-                          : 'text-gray-500'
+                          : 'text-muted-foreground'
                     }`}
                   >
                     {step.label}
@@ -95,7 +95,7 @@ export default function TradingSteps({
                     className={`mt-1 text-xs ${
                       isCompleted || isCurrent
                         ? 'text-green-400/70'
-                        : 'text-gray-600'
+                        : 'text-muted-foreground'
                     }`}
                   >
                     {index + 1}/{STEPS.length}
@@ -105,12 +105,12 @@ export default function TradingSteps({
                 {/* 연결선 */}
                 {index < STEPS.length - 1 && (
                   <div className="flex-1 mx-6 relative">
-                    <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+                    <div className="h-1 bg-card rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-700 ease-out ${
                           isCompleted
                             ? 'bg-gradient-to-r from-green-400 to-green-300 shadow-lg'
-                            : 'bg-gray-700'
+                            : 'bg-muted'
                         }`}
                         style={{
                           boxShadow: isCompleted
@@ -133,8 +133,8 @@ export default function TradingSteps({
 
         {/* 하단 진행률 표시 */}
         <div className="mt-8 text-center">
-          <div className="text-gray-400 text-sm mb-2">거래 진행률</div>
-          <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+          <div className="text-muted-foreground text-sm mb-2">거래 진행률</div>
+          <div className="w-full bg-card rounded-full h-2 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-green-400 to-green-300 rounded-full transition-all duration-1000 ease-out"
               style={{

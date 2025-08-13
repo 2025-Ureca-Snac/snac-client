@@ -34,8 +34,8 @@ export default function ActionButtons({
           disabled={isProcessing || !!error}
           className={`flex-[6] py-4 rounded-lg font-semibold text-white ${
             cardInfo.cardCategory === 'SELL'
-              ? 'bg-red-500 hover:bg-red-600'
-              : 'bg-blue-500 hover:bg-blue-600'
+              ? 'bg-black hover:bg-black/80'
+              : 'bg-candy-pink hover:bg-candy-pink/90'
           } ${isProcessing || error ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {isProcessing
@@ -48,7 +48,7 @@ export default function ActionButtons({
         <button
           onClick={onCancel}
           disabled={isProcessing}
-          className={`flex-[4] py-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 ${
+          className={`flex-[4] py-4 rounded-lg border border-border text-foreground hover:bg-muted ${
             isProcessing ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >

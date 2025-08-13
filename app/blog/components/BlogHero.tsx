@@ -24,19 +24,19 @@ export const BlogHero = ({
     <div className="relative bg-gradient-to-r from-gray-100 to-gray-200 py-20">
       <div className="absolute inset-0 bg-[url('/blog-bg-pattern.png')] bg-repeat opacity-10"></div>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <nav className="flex justify-center space-x-2 text-sm text-gray-500 mb-8">
+        <nav className="flex justify-center space-x-2 text-sm text-muted-foreground mb-8">
           {breadcrumbs.map((item, index) => (
             <div key={index} className="flex items-center space-x-2">
               {index > 0 && <span>→</span>}
               {item.href ? (
                 <a
                   href={item.href}
-                  className="text-gray-500 hover:text-gray-700 dark:text-white transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {item.name}
                 </a>
               ) : (
-                <span className="text-gray-700 dark:text-white">
+                <span className="text-foreground">
                   {item.name}
                 </span>
               )}
@@ -44,10 +44,10 @@ export const BlogHero = ({
           ))}
         </nav>
 
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 dark:text-white">
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
           {title}
         </h1>
-        <p className="text-xl text-gray-600 dark:text-white max-w-2xl mx-auto">
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {subtitle}
         </p>
       </div>

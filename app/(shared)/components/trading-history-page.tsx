@@ -437,14 +437,14 @@ export default function TradingHistoryPage({
         <div className="flex items-center gap-2 mb-4">
           <Link
             href="/mypage"
-            className={`text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 rounded`}
+            className={`text-muted-foreground hover:text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 rounded`}
           >
             마이페이지
           </Link>
-          <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">
+          <span className="text-muted-foreground" aria-hidden="true">
             /
           </span>
-          <span className="text-gray-900 dark:text-white font-medium">
+          <span className="text-card-foreground font-medium">
             {pageTitle}
           </span>
         </div>
@@ -452,10 +452,10 @@ export default function TradingHistoryPage({
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-card-foreground mb-2">
           {pageTitle}
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
+        <p className="text-muted-foreground text-lg">
           {pageDescription}
         </p>
       </div>
@@ -470,21 +470,21 @@ export default function TradingHistoryPage({
         <div className="flex items-center gap-2 mb-4">
           <Link
             href="/mypage"
-            className={`text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 rounded`}
+            className={`text-muted-foreground hover:text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 rounded`}
           >
             마이페이지
           </Link>
-          <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">
+          <span className="text-muted-foreground" aria-hidden="true">
             /
           </span>
-          <span className="text-gray-900 dark:text-white font-medium">
+          <span className="text-card-foreground font-medium">
             {pageTitle}
           </span>
         </div>
       </nav>
 
       {/* 제목 */}
-      <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+      <h1 className="text-xl font-bold text-card-foreground">
         {pageTitle}
       </h1>
     </div>
@@ -497,13 +497,13 @@ export default function TradingHistoryPage({
         {[...Array(3)].map((_, index) => (
           <div
             key={index}
-            className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex items-start gap-3 animate-pulse"
+            className="bg-muted rounded-lg p-4 flex items-start gap-3 animate-pulse"
           >
-            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex-shrink-0"></div>
+            <div className="w-12 h-12 bg-muted rounded-lg flex-shrink-0"></div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+              <div className="h-4 bg-muted rounded w-20"></div>
+              <div className="h-5 bg-muted rounded w-32"></div>
+              <div className="h-4 bg-muted rounded w-24"></div>
             </div>
           </div>
         ))}
@@ -523,7 +523,7 @@ export default function TradingHistoryPage({
     return (
       <div className="p-6">
         <div className="text-center py-8">
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-muted-foreground">
             로그인 페이지로 이동 중...
           </div>
         </div>
@@ -543,7 +543,7 @@ export default function TradingHistoryPage({
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 w-full overflow-hidden">
+    <div className="min-h-screen bg-card w-full overflow-hidden">
       <div className="flex w-full min-h-screen overflow-hidden">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
@@ -565,7 +565,7 @@ export default function TradingHistoryPage({
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
                 {/* 탭 네비게이션 */}
                 <TabNavigation
                   tabs={tabs}
@@ -574,7 +574,7 @@ export default function TradingHistoryPage({
                     setActiveTab(tabId as typeof activeTab)
                   }
                   activeTextColor={`text-${theme.primaryColorClass}-600`}
-                  inactiveTextColor="text-gray-500"
+                  inactiveTextColor="text-muted-foreground"
                   underlineColor={`bg-${theme.primaryColorClass}-600`}
                   disableDrag={true}
                 />
@@ -637,7 +637,7 @@ export default function TradingHistoryPage({
                           </div>
                         ) : (
                           <div
-                            className="text-center py-8 text-gray-500 dark:text-gray-400"
+                            className="text-center py-8 text-muted-foreground"
                             role="status"
                             aria-live="polite"
                           >

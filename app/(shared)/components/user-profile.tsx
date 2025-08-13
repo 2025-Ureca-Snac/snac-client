@@ -20,7 +20,7 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="p-6 bg-card rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">사용자 프로필</h2>
 
       <div className="space-y-4">
@@ -46,7 +46,7 @@ export default function UserProfile() {
 
         <button
           onClick={logout}
-          className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+          className="w-full bg-red-500 text-primary-foreground py-2 px-4 rounded-md hover:bg-red-600"
         >
           로그아웃
         </button>

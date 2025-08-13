@@ -20,8 +20,8 @@ export default function PaymentButton({
     <button
       className={`w-full mt-6 py-3 px-4 rounded-md transition-colors font-medium ${
         isInsufficient
-          ? 'bg-gray-400 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed'
-          : 'bg-gray-900 dark:bg-gray-700 text-white hover:bg-gray-800 dark:hover:bg-gray-600'
+          ? 'bg-muted text-muted-foreground cursor-not-allowed'
+          : 'bg-primary text-primary-foreground hover:bg-primary/90'
       }`}
       onClick={onPaymentClick}
       disabled={isInsufficient}

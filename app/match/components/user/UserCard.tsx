@@ -15,7 +15,7 @@ export default function UserCard({ user, onClick }: UserCardProps) {
 
   return (
     <div
-      className="relative flex items-center justify-between p-3 md:p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg hover:border-cyan-400/50 hover:bg-gray-800/70 transition-all duration-300 cursor-pointer group overflow-hidden"
+      className="relative flex items-center justify-between p-3 md:p-4 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg hover:border-cyan-400/50 hover:bg-card/70 transition-all duration-300 cursor-pointer group overflow-hidden"
       onClick={handleClick}
     >
       {/* 호버 시 글로우 효과 */}
@@ -75,11 +75,11 @@ function UserInfo({ user }: { user: User }) {
   return (
     <div className="flex items-center space-x-1 md:space-x-2">
       <UserAvatar />
-      <span className="text-white font-medium text-sm md:text-base">
+      <span className="text-primary-foreground font-medium text-sm md:text-base">
         {user.name}
       </span>
-      <span className="text-gray-400 text-sm md:text-base">|</span>
-      <span className="text-gray-300 text-sm md:text-base">
+      <span className="text-muted-foreground text-sm md:text-base">|</span>
+      <span className="text-muted-foreground text-sm md:text-base">
         <span className="text-cyan-400">{user.carrier}</span> |
         <span className="text-green-400 ml-1">{formatData(user.data)}</span> |
         <span className="text-yellow-400 ml-1">{formatPrice(user.price)}</span>
@@ -102,7 +102,7 @@ function UserAvatar() {
 function ArrowIcon() {
   return (
     <svg
-      className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-cyan-400 transition-colors duration-300"
+      className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground group-hover:text-cyan-400 transition-colors duration-300"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

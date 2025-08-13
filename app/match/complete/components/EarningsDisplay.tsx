@@ -14,7 +14,7 @@ export default function EarningsDisplay({
   bonusPoints = 0,
 }: EarningsDisplayProps) {
   return (
-    <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+    <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
       {/* 서브틀한 글로우 효과 */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 via-transparent to-yellow-300/3"></div>
 
@@ -28,7 +28,7 @@ export default function EarningsDisplay({
           {/* <div className="flex items-center justify-between p-6 bg-blue-900/20 border border-blue-400/30 rounded-xl backdrop-blur-sm">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-400/25">
-                <span className="text-black text-xl">💰</span>
+                <span className="text-card-foreground text-xl">💰</span>
               </div>
               <div>
                 <div className="font-bold text-blue-300">거래 포인트</div>
@@ -45,7 +45,7 @@ export default function EarningsDisplay({
             <div className="flex items-center justify-between p-6 bg-yellow-900/20 border border-yellow-400/30 rounded-xl backdrop-blur-sm">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg shadow-yellow-400/25">
-                  <span className="text-black text-xl">⭐</span>
+                  <span className="text-card-foreground text-xl">⭐</span>
                 </div>
                 <div>
                   <div className="font-bold text-yellow-300">보너스 포인트</div>

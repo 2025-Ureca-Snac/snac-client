@@ -93,6 +93,16 @@ function PointPageContent() {
   const [selectedCancelPaymentKey, setSelectedCancelPaymentKey] =
     useState<string>('');
 
+  // URL 파라미터에 따라 모달 열기
+  useEffect(() => {
+    const modalParam = searchParams.get('modal');
+    if (modalParam === 'recharge') {
+      setIsRechargeModalOpen(true);
+    } else if (modalParam === 'settlement') {
+      setIsSettlementModalOpen(true);
+    }
+  }, [searchParams]);
+
   // 잔액 조회 API 함수
   const getBalance = async (): Promise<BalanceResponse> => {
     const response =
@@ -367,14 +377,14 @@ function PointPageContent() {
         <div className="flex items-center gap-2 mb-4">
           <Link
             href="/mypage"
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
             마이페이지
           </Link>
-          <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">
+          <span className="text-muted-foreground" aria-hidden="true">
             /
           </span>
-          <span className="text-gray-900 dark:text-white font-medium">
+          <span className="text-card-foreground font-medium">
             포인트 • 머니
           </span>
         </div>
@@ -382,17 +392,17 @@ function PointPageContent() {
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-card-foreground mb-2">
           포인트 • 머니
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
+        <p className="text-muted-foreground text-lg">
           스낵 포인트와 머니를 관리하세요
         </p>
       </div>
 
       {/* 요약 카드 */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Image
               src="/snac-price.svg"
@@ -401,15 +411,15 @@ function PointPageContent() {
               height={20}
               className="w-5 h-5"
             />
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+            <span className="text-sm font-medium text-blue-700">
               스낵 포인트
             </span>
           </div>
-          <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+          <div className="text-2xl font-bold text-blue-900">
             {balance.point?.toLocaleString()}P
           </div>
         </div>
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Image
               src="/snac-price.svg"
@@ -418,11 +428,11 @@ function PointPageContent() {
               height={20}
               className="w-5 h-5"
             />
-            <span className="text-sm font-medium text-green-700 dark:text-green-300">
+            <span className="text-sm font-medium text-green-700">
               스낵 머니
             </span>
           </div>
-          <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+          <div className="text-2xl font-bold text-green-900">
             {balance.money?.toLocaleString()}S
           </div>
         </div>
@@ -435,7 +445,7 @@ function PointPageContent() {
     <div className="md:hidden mb-6">
       {/* 요약 카드 */}
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <Image
               src="/snac-price.svg"
@@ -444,15 +454,15 @@ function PointPageContent() {
               height={16}
               className="w-4 h-4"
             />
-            <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+            <span className="text-xs font-medium text-blue-700">
               스낵 포인트
             </span>
           </div>
-          <div className="text-lg font-bold text-blue-900 dark:text-blue-100">
+          <div className="text-lg font-bold text-blue-900">
             {balance.point?.toLocaleString()}P
           </div>
         </div>
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <Image
               src="/snac-price.svg"
@@ -461,11 +471,11 @@ function PointPageContent() {
               height={16}
               className="w-4 h-4"
             />
-            <span className="text-xs font-medium text-green-700 dark:text-green-300">
+            <span className="text-xs font-medium text-green-700">
               스낵 머니
             </span>
           </div>
-          <div className="text-lg font-bold text-green-900 dark:text-green-100">
+          <div className="text-lg font-bold text-green-900">
             {balance.money?.toLocaleString()}S
           </div>
         </div>
@@ -477,19 +487,19 @@ function PointPageContent() {
   const LoadingState = () => (
     <div className="space-y-6">
       {/* 탭 네비게이션 스켈레톤 */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-card border-b border-border">
         <div className="flex">
           {/* POINT 탭 스켈레톤 */}
           <div className="flex-1 relative">
             <div className="flex items-center justify-center py-4 animate-pulse">
-              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+              <div className="h-5 bg-muted rounded w-12"></div>
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
           </div>
           {/* MONEY 탭 스켈레톤 */}
           <div className="flex-1">
             <div className="flex items-center justify-center py-4 animate-pulse">
-              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+              <div className="h-5 bg-muted rounded w-12"></div>
             </div>
           </div>
         </div>
@@ -502,16 +512,16 @@ function PointPageContent() {
           <div className="px-4 space-y-4">
             {/* 월 선택 스켈레톤 */}
             <div className="flex items-center gap-3 py-1 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+              <div className="h-4 bg-muted rounded w-16"></div>
+              <div className="h-8 bg-muted rounded w-20"></div>
+              <div className="h-8 bg-muted rounded w-20"></div>
             </div>
             {/* 필터 버튼 스켈레톤 */}
             <div className="flex gap-2 animate-pulse">
               {[...Array(3)].map((_, index) => (
                 <div
                   key={index}
-                  className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-16"
+                  className="h-8 bg-muted rounded-full w-16"
                 ></div>
               ))}
             </div>
@@ -525,7 +535,7 @@ function PointPageContent() {
               {[...Array(3)].map((_, index) => (
                 <div
                   key={index}
-                  className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-16"
+                  className="h-8 bg-muted rounded-full w-16"
                 ></div>
               ))}
             </div>
@@ -533,25 +543,25 @@ function PointPageContent() {
         )}
 
         {/* 히스토리 아이템 스켈레톤을 카드로 감싸기 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-card rounded-lg shadow-sm border border-border">
           {[...Array(4)].map((_, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700 last:border-b-0 animate-pulse"
+              className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0 animate-pulse"
             >
               {/* 왼쪽: 제목과 날짜 */}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-12"></div>
+                  <div className="h-4 bg-muted rounded w-24"></div>
+                  <div className="h-6 bg-muted rounded-full w-12"></div>
                 </div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                <div className="h-3 bg-muted rounded w-32"></div>
               </div>
 
               {/* 오른쪽: 금액 */}
               <div className="text-right">
-                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-1"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
+                <div className="h-5 bg-muted rounded w-16 mb-1"></div>
+                <div className="h-3 bg-muted rounded w-12"></div>
               </div>
             </div>
           ))}
@@ -569,10 +579,12 @@ function PointPageContent() {
     }, []);
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border">
+      <div className="bg-card rounded-lg shadow-sm border">
         <div className="p-6">
           <div className="text-center py-8">
-            <div className="text-gray-500">로그인 페이지로 이동 중...</div>
+            <div className="text-muted-foreground">
+              로그인 페이지로 이동 중...
+            </div>
           </div>
         </div>
       </div>
@@ -580,7 +592,7 @@ function PointPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 w-full overflow-hidden">
+    <div className="min-h-screen bg-card w-full overflow-hidden">
       <div className="flex w-full min-h-screen overflow-hidden">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
@@ -617,7 +629,7 @@ function PointPageContent() {
                   />
 
                   {/* 스와이프 가능한 콘텐츠 영역 */}
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
                     <AnimatedTabContent tabKey={activeTab}>
                       <motion.div
                         className="select-none overflow-hidden"
@@ -685,13 +697,25 @@ function PointPageContent() {
       {/* 모달들을 motion.div 완전히 밖으로 이동 */}
       <RechargeModal
         open={isRechargeModalOpen}
-        onClose={() => setIsRechargeModalOpen(false)}
+        onClose={() => {
+          setIsRechargeModalOpen(false);
+          // URL에서 modal 파라미터 제거
+          const url = new URL(window.location.href);
+          url.searchParams.delete('modal');
+          window.history.replaceState({}, '', url.toString());
+        }}
         currentMoney={balance.money}
         onRefreshData={handleRefreshData}
       />
       <SettlementModal
         open={isSettlementModalOpen}
-        onClose={() => setIsSettlementModalOpen(false)}
+        onClose={() => {
+          setIsSettlementModalOpen(false);
+          // URL에서 modal 파라미터 제거
+          const url = new URL(window.location.href);
+          url.searchParams.delete('modal');
+          window.history.replaceState({}, '', url.toString());
+        }}
         currentMoney={balance.money}
         onSettlementSuccess={() => {
           setIsSettlementModalOpen(false);
@@ -715,14 +739,14 @@ function PointPageContent() {
 // 로딩 컴포넌트
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-card w-full">
       <div className="flex w-full min-h-screen">
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
           <SideMenu />
         </div>
         <main className="flex-1 flex flex-col md:pt-8 pt-4 md:px-6 px-2">
           <div className="max-w-4xl mx-auto w-full">
-            <div className="bg-white rounded-lg shadow-sm border">
+            <div className="bg-card rounded-lg shadow-sm border">
               <div className="p-6">
                 <div className="space-y-4">
                   {[...Array(3)].map((_, index) => (
@@ -730,10 +754,10 @@ function LoadingFallback() {
                       key={index}
                       className="flex items-center gap-3 p-3 animate-pulse"
                     >
-                      <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                      <div className="w-8 h-8 bg-secondary rounded-full"></div>
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-32"></div>
-                        <div className="h-3 bg-gray-200 rounded w-20"></div>
+                        <div className="h-4 bg-muted rounded w-32"></div>
+                        <div className="h-3 bg-muted rounded w-20"></div>
                       </div>
                     </div>
                   ))}

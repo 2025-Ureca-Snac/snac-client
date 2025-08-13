@@ -99,7 +99,7 @@ export default function VerificationStep({
     return (
       <div className="max-w-2xl mx-auto px-4">
         {/* 메인 카드 - 투명 배경 */}
-        <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+        <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
           {/* 서브틀한 글로우 효과 */}
           <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 via-transparent to-blue-300/3"></div>
 
@@ -112,7 +112,7 @@ export default function VerificationStep({
             <div className="bg-green-900/20 border border-green-400/30 rounded-xl p-6 mb-6 backdrop-blur-sm">
               <div className="flex items-center space-x-3 mb-2">
                 <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-lg shadow-green-400/25">
-                  <span className="text-black text-lg">📱</span>
+                  <span className="text-card-foreground text-lg">📱</span>
                 </div>
                 <h3 className="font-bold text-green-300">데이터 전송 완료</h3>
               </div>
@@ -123,21 +123,21 @@ export default function VerificationStep({
             </div>
 
             {/* 전송 정보 */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
-              <h3 className="font-bold text-white mb-4">전송 정보</h3>
+            <div className="bg-card/50 border border-border/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+              <h3 className="font-bold text-primary-foreground mb-4">전송 정보</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">전송량:</span>
-                  <span className="font-medium text-white">{dataAmount}GB</span>
+                  <span className="text-muted-foreground">전송량:</span>
+                  <span className="font-medium text-primary-foreground">{dataAmount}GB</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">전송 시간:</span>
-                  <span className="font-medium text-white">
+                  <span className="text-muted-foreground">전송 시간:</span>
+                  <span className="font-medium text-primary-foreground">
                     {completionTime}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">잔여 시간:</span>
+                  <span className="text-muted-foreground">잔여 시간:</span>
                   <span className="font-medium text-orange-400">
                     {formatTime(timeLeft)}
                   </span>
@@ -147,7 +147,7 @@ export default function VerificationStep({
 
             {/* 판매자가 업로드한 사진 표시 */}
             {isLoadingImage ? (
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+              <div className="bg-card/50 border border-border/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
                 <div className="flex items-center justify-center space-x-3">
                   <div className="w-6 h-6 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
                   <span className="text-green-300">
@@ -156,8 +156,8 @@ export default function VerificationStep({
                 </div>
               </div>
             ) : attachmentImageUrl ? (
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
-                <h3 className="font-bold text-white mb-4">전송 증명 사진</h3>
+              <div className="bg-card/50 border border-border/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+                <h3 className="font-bold text-primary-foreground mb-4">전송 증명 사진</h3>
                 <div className="relative">
                   <Image
                     src={attachmentImageUrl}
@@ -166,19 +166,19 @@ export default function VerificationStep({
                     width={300}
                     height={300}
                   />
-                  <div className="absolute top-2 right-2 bg-green-500/80 text-white px-2 py-1 rounded-full text-xs font-medium">
+                  <div className="absolute top-2 right-2 bg-green-500/80 text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
                     ✓ 전송 완료
                   </div>
                 </div>
-                <p className="text-gray-300 text-sm mt-3">
+                <p className="text-muted-foreground text-sm mt-3">
                   판매자가 업로드한 데이터 전송 스크린샷입니다.
                 </p>
               </div>
             ) : (
-              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+              <div className="bg-card/50 border border-border/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
                 <div className="flex items-center justify-center space-x-3">
-                  <span className="text-gray-400">📷</span>
-                  <span className="text-gray-300">
+                  <span className="text-muted-foreground">📷</span>
+                  <span className="text-muted-foreground">
                     전송 증명 사진을 불러올 수 없습니다.
                   </span>
                 </div>
@@ -207,8 +207,8 @@ export default function VerificationStep({
               disabled={isConfirming}
               className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 relative overflow-hidden group ${
                 isConfirming
-                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-green-400 to-green-500 text-black hover:from-green-300 hover:to-green-400 shadow-lg hover:shadow-green-400/25'
+                  ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-400 to-green-500 text-card-foreground hover:from-green-300 hover:to-green-400 shadow-lg hover:shadow-green-400/25'
               }`}
             >
               {isConfirming ? (
@@ -219,7 +219,7 @@ export default function VerificationStep({
               ) : (
                 <>
                   <span className="relative z-10">데이터 수신 확인 완료</span>
-                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+                  <div className="absolute inset-0 bg-card/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
                 </>
               )}
             </button>
@@ -233,7 +233,7 @@ export default function VerificationStep({
   return (
     <div className="max-w-2xl mx-auto px-4">
       {/* 메인 카드 - 투명 배경 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 via-transparent to-purple-300/3"></div>
 
@@ -269,19 +269,19 @@ export default function VerificationStep({
           </div>
 
           {/* 전송 완료 정보 */}
-          <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
-            <h3 className="font-bold text-white mb-4">전송 완료 정보</h3>
+          <div className="bg-card/50 border border-border/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+            <h3 className="font-bold text-primary-foreground mb-4">전송 완료 정보</h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">전송량:</span>
-                <span className="font-medium text-white">{dataAmount}GB</span>
+                <span className="text-muted-foreground">전송량:</span>
+                <span className="font-medium text-primary-foreground">{dataAmount}GB</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">전송 시간:</span>
-                <span className="font-medium text-white">{completionTime}</span>
+                <span className="text-muted-foreground">전송 시간:</span>
+                <span className="font-medium text-primary-foreground">{completionTime}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">잔여 시간:</span>
+                <span className="text-muted-foreground">잔여 시간:</span>
                 <span className="font-medium text-orange-400">
                   {formatTime(timeLeft)}
                 </span>
@@ -303,14 +303,14 @@ export default function VerificationStep({
           </div>
 
           {/* 진행 상황 */}
-          <div className="bg-gray-800/50 border border-gray-600/50 rounded-xl p-6 backdrop-blur-sm">
+          <div className="bg-card/50 border border-border/50 rounded-xl p-6 backdrop-blur-sm">
             <div className="flex items-start space-x-3">
               <span className="text-blue-400 text-xl">💡</span>
               <div>
-                <div className="font-bold text-gray-200 mb-2">
+                <div className="font-bold text-muted-foreground mb-2">
                   거래 진행 상황
                 </div>
-                <div className="text-sm text-gray-300">
+                <div className="text-sm text-muted-foreground">
                   데이터 전송이 완료되었습니다. 구매자의 확인을 기다리고
                   있습니다.
                 </div>

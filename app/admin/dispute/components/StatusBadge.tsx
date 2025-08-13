@@ -12,7 +12,7 @@ export const StatusBadge = ({ status }: { status: DisputeStatus }) => (
     <span
       className={`h-2 w-2 rounded-full mr-2 ${STATUS_COLOR_MAP[status]}`}
     ></span>
-    <span className="text-regular-sm text-gray-700 dark:text-gray-300">
+    <span className="text-regular-sm text-foreground">
       {STATUS_LABELS[status]}
     </span>
   </div>

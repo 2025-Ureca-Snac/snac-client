@@ -48,7 +48,7 @@ export const DesktopFooter = () => {
   });
 
   return (
-    <footer className="text-white bg-black md:px-[160px] pt-[80px] pb-8 px-8">
+    <footer className="text-primary-foreground bg-black md:px-[160px] pt-[80px] pb-8 px-8">
       <div className="flex justify-between">
         {/* 로고, 설명, 소셜 */}
         <div className="flex flex-col">
@@ -70,13 +70,13 @@ export const DesktopFooter = () => {
         <div className="flex gap-16">
           {/* 페이지 메뉴 */}
           <div className="space-y-10">
-            <h3 className="text-medium-md text-white">페이지</h3>
+            <h3 className="text-medium-md text-primary-foreground">페이지</h3>
             <ul className="flex flex-col gap-y-6">
               {filteredPageLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-regular-sm  text-white hover:text-gray-400"
+                    className="text-regular-sm  text-primary-foreground hover:text-muted-foreground"
                   >
                     {link.name}
                   </Link>
@@ -87,21 +87,21 @@ export const DesktopFooter = () => {
           {/* 팀소개 */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-medium-md font-semibold text-white hover:text-gray-400 mb-2">
+              <h3 className="text-medium-md font-semibold text-primary-foreground hover:text-muted-foreground mb-2">
                 팀원
               </h3>
-              <span className="text-regular-sm hover:text-gray-400 text-white">
+              <span className="text-regular-sm hover:text-muted-foreground text-primary-foreground">
                 프론트엔드
               </span>
-              <p className="text-regular-sm hover:text-gray-400 text-white">
+              <p className="text-regular-sm hover:text-muted-foreground text-primary-foreground">
                 김현훈, 양세현, 이승우
               </p>
             </div>
             <div>
-              <span className="text-regular-sm hover:text-gray-400 text-white">
+              <span className="text-regular-sm hover:text-muted-foreground text-primary-foreground">
                 백엔드
               </span>
-              <p className="text-regular-sm hover:text-gray-400 text-white">
+              <p className="text-regular-sm hover:text-muted-foreground text-primary-foreground">
                 이재윤, 정동현, 정유민, 홍석준
               </p>
             </div>
@@ -109,9 +109,9 @@ export const DesktopFooter = () => {
         </div>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-gray-700 flex justify-between items-center">
+      <div className="mt-16 pt-8 border-t border-border flex justify-between items-center">
         {/* 저작권 및 약관 */}
-        <div className="flex items-center gap-4 text-regular-xs text-gray-200">
+        <div className="flex items-center gap-4 text-regular-xs text-muted-foreground">
           <span>Copyright © 2025 Snac. All rights reserved</span>
         </div>
         {/* 결제 아이콘 */}

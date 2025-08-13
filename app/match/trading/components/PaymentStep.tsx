@@ -110,10 +110,10 @@ export default function PaymentStep({
   if (isLoadingWallet) {
     return (
       <div className="max-w-3xl mx-auto px-4">
-        <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+        <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
           <div className="relative p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
-            <p className="text-gray-400">지갑 정보를 불러오는 중...</p>
+            <p className="text-muted-foreground">지갑 정보를 불러오는 중...</p>
           </div>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function PaymentStep({
   return (
     <div className="max-w-3xl mx-auto px-4">
       {/* 메인 카드 - 투명 배경 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 via-transparent to-green-300/3"></div>
 
@@ -139,7 +139,7 @@ export default function PaymentStep({
             <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-green-300 to-white bg-clip-text text-transparent mb-2">
               결제 진행
             </h2>
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               보유한 스낵 포인트로 안전하게 결제하세요
             </p>
           </div>
@@ -195,13 +195,13 @@ export default function PaymentStep({
           {/* 포인트 사용량 조절 */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="text-white font-semibold">스낵 포인트 사용량</h4>
+              <h4 className="text-primary-foreground font-semibold">스낵 포인트 사용량</h4>
               <span className="text-purple-300 text-sm">
                 최대 {maxUsablePoints.toLocaleString()}P 사용 가능
               </span>
             </div>
 
-            <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-600/50">
+            <div className="bg-card/50 rounded-xl p-6 border border-border/50">
               <input
                 type="range"
                 min="0"
@@ -210,7 +210,7 @@ export default function PaymentStep({
                 onChange={(e) =>
                   handleSnackPointsChange(Number(e.target.value))
                 }
-                className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
                 style={{
                   background: `linear-gradient(to right, #a855f7 0%, #a855f7 ${(snackPointsToUse / maxUsablePoints) * 100}%, #4b5563 ${(snackPointsToUse / maxUsablePoints) * 100}%, #4b5563 100%)`,
                 }}
@@ -218,7 +218,7 @@ export default function PaymentStep({
               <div className="flex justify-between mt-3">
                 <button
                   onClick={() => handleSnackPointsChange(0)}
-                  className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded"
+                  className="text-xs bg-muted hover:bg-muted text-muted-foreground px-3 py-1 rounded"
                 >
                   0P
                 </button>
@@ -226,11 +226,11 @@ export default function PaymentStep({
                   <div className="text-purple-300 font-bold text-lg">
                     {snackPointsToUse.toLocaleString()}P
                   </div>
-                  <div className="text-gray-400 text-xs">사용할 포인트</div>
+                  <div className="text-muted-foreground text-xs">사용할 포인트</div>
                 </div>
                 <button
                   onClick={() => handleSnackPointsChange(maxUsablePoints)}
-                  className="text-xs bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded"
+                  className="text-xs bg-purple-600 hover:bg-purple-500 text-primary-foreground px-3 py-1 rounded"
                 >
                   최대
                 </button>
@@ -239,32 +239,32 @@ export default function PaymentStep({
           </div>
 
           {/* 결제 요약 */}
-          <div className="mb-8 bg-gray-800/50 rounded-xl p-6 border border-gray-600/50">
-            <h4 className="text-white font-semibold mb-4">결제 요약</h4>
+          <div className="mb-8 bg-card/50 rounded-xl p-6 border border-border/50">
+            <h4 className="text-primary-foreground font-semibold mb-4">결제 요약</h4>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-400">스낵 포인트 사용</span>
+                <span className="text-muted-foreground">스낵 포인트 사용</span>
                 <span className="text-purple-300">
                   -{snackPointsToUse.toLocaleString()}P
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">스낵 머니 사용</span>
+                <span className="text-muted-foreground">스낵 머니 사용</span>
                 <span className="text-blue-300">
                   -
                   {Math.max(0, finalAmount - snackPointsToUse).toLocaleString()}
                   원
                 </span>
               </div>
-              <hr className="border-gray-600" />
+              <hr className="border-border" />
               <div className="flex justify-between text-lg font-bold">
-                <span className="text-white">최종 결제 금액</span>
+                <span className="text-primary-foreground">최종 결제 금액</span>
                 <span className="text-green-300">
                   {finalAmount.toLocaleString()}원
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-400">결제 후 잔액</span>
+                <span className="text-muted-foreground">결제 후 잔액</span>
                 <span className="text-green-400">
                   {Math.max(0, totalAvailable - amount).toLocaleString()}원
                 </span>
@@ -278,8 +278,8 @@ export default function PaymentStep({
             disabled={isProcessing || totalAvailable < amount}
             className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 relative overflow-hidden group ${
               isProcessing || totalAvailable < amount
-                ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                : 'bg-gradient-to-r from-green-400 to-green-500 text-black hover:from-green-300 hover:to-green-400 shadow-lg hover:shadow-green-400/25'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'bg-gradient-to-r from-green-400 to-green-500 text-card-foreground hover:from-green-300 hover:to-green-400 shadow-lg hover:shadow-green-400/25'
             }`}
           >
             {isProcessing ? (
@@ -294,7 +294,7 @@ export default function PaymentStep({
                 <span className="relative z-10">
                   {finalAmount.toLocaleString()}원 결제하기
                 </span>
-                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+                <div className="absolute inset-0 bg-card/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
               </>
             )}
           </button>

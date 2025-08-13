@@ -117,10 +117,10 @@ function PaymentProcessComponent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-muted bg-background">
       <div className="text-center w-full max-w-md mx-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4 loading-spinner"></div>
-        <p className="text-gray-600 dark:text-gray-300 mb-6 loading-message">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4 loading-spinner"></div>
+        <p className="text-muted-foreground mb-6 loading-message">
           결제창을 여는 중입니다...
         </p>
 
@@ -133,7 +133,7 @@ function PaymentProcessComponent() {
         {/* ✅ 샌드박스와 동일한 결제하기 버튼 */}
         <div className="btn-wrapper w-100">
           <button
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-primary-foreground py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handlePaymentClick}
             disabled={!paymentWidget}
           >
@@ -153,10 +153,10 @@ export default function PaymentProcessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen flex items-center justify-center bg-muted bg-background">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">로딩 중...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-muted-foreground">로딩 중...</p>
           </div>
         </div>
       }

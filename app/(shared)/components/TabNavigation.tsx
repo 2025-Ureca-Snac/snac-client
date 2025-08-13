@@ -20,9 +20,9 @@ export default function TabNavigation({
   activeTab,
   onTabChange,
   className = '',
-  activeTextColor = 'text-midnight-black dark:text-white',
-  inactiveTextColor = 'text-gray-400 dark:text-gray-500',
-  underlineColor = 'bg-midnight-black dark:bg-white',
+  activeTextColor = 'text-foreground font-bold',
+  inactiveTextColor = 'text-muted-foreground',
+  underlineColor = 'bg-primary',
   disableDrag = false,
 }: TabNavigationProps) {
   const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
@@ -131,7 +131,7 @@ export default function TabNavigation({
   return (
     <div
       ref={containerRef}
-      className={`flex border-b mb-6 relative ${className} select-none`}
+      className={`flex border-b border-border mb-6 relative ${className} select-none`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

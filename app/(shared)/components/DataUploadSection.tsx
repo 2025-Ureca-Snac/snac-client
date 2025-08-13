@@ -28,10 +28,8 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
   >(null);
 
   const messageTypeClasses = {
-    success:
-      'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700',
-    error:
-      'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700',
+    success: 'bg-green-100 text-green-800 border border-green-200',
+    error: 'bg-destructive/10 text-destructive border border-destructive/20',
   };
 
   const getCarrierUrl = (carrier: string) => {
@@ -110,13 +108,13 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
 
   return (
     <div className="space-y-3">
-      <div className="text-gray-700 dark:text-gray-300 text-sm">
+      <div className="text-foreground text-sm">
         아래 번호로{' '}
         <a
           href={getCarrierUrl(item.carrier || '')}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+          className="text-blue-600 hover:text-blue-800 underline"
         >
           {item.carrier || 'SKT'}
         </a>
@@ -125,36 +123,34 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
 
       {/* 전화번호 표시 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
           전화번호
         </label>
-        <div className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-base font-semibold text-gray-900 dark:text-white">
+        <div className="w-full bg-card border border-border rounded-lg px-3 py-2 text-base font-semibold text-card-foreground">
           {item.phoneNumber || '010-0000-0000'}
         </div>
       </div>
 
       {/* 업로드된 파일 정보 */}
       {uploadedFile && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mb-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400 text-xs">
-                  📎
-                </span>
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-blue-600 text-xs">📎</span>
               </div>
               <div>
-                <div className="text-sm font-medium text-blue-900 dark:text-blue-300">
+                <div className="text-sm font-medium text-blue-900">
                   {uploadedFile.name}
                 </div>
-                <div className="text-xs text-blue-600 dark:text-blue-400">
+                <div className="text-xs text-blue-600">
                   {(uploadedFile.size / 1024).toFixed(1)} KB
                 </div>
               </div>
             </div>
             <button
               onClick={() => setUploadedFile(null)}
-              className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm"
+              className="text-blue-500 hover:text-blue-700 text-sm"
             >
               삭제
             </button>
@@ -175,7 +171,7 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
 
       {/* 액션 버튼 */}
       <div className="flex gap-2">
-        <label className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer text-center">
+        <label className="flex-1 bg-blue-500 text-primary-foreground py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors cursor-pointer text-center">
           파일 업로드
           <input
             type="file"
@@ -189,8 +185,8 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
           disabled={!uploadedFile || isUploading}
           className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
             uploadedFile && !isUploading
-              ? 'bg-green-500 text-white hover:bg-green-600'
-              : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+              ? 'bg-green-500 text-primary-foreground hover:bg-green-600'
+              : 'bg-secondary text-muted-foreground cursor-not-allowed'
           }`}
         >
           {isUploading ? (

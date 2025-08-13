@@ -2,157 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS 변수 정의 */
+/* CSS 변수 정의 (HSL 형식) */
 :root {
   /* 라이트 모드 기본 색상 */
-  --background: #ffffff;
-  --foreground: #171717;
-  --card: #ffffff;
-  --card-foreground: #171717;
-  --popover: #ffffff;
-  --popover-foreground: #171717;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #374151;
-  --muted: #f9fafb;
-  --muted-foreground: #6b7280;
-  --accent: #f3f4f6;
-  --accent-foreground: #374151;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #e5e7eb;
-  --input: #ffffff;
-  --ring: #3b82f6;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 215 13% 25%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 98%;
+  --accent-foreground: 215 13% 25%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 0 0% 100%;
+  --ring: 217 91% 60%;
   --radius: 0.5rem;
 }
 
 /* 다크 모드 색상 */
 .dark {
   color-scheme: dark;
-  --background: #1a1a1a;
-  --foreground: #ffffff;
-  --card: #2d2d2d;
-  --card-foreground: #ffffff;
-  --popover: #2d2d2d;
-  --popover-foreground: #ffffff;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #404040;
-  --secondary-foreground: #e5e7eb;
-  --muted: #404040;
-  --muted-foreground: #a3a3a3;
-  --accent: #404040;
-  --accent-foreground: #e5e7eb;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #525252;
-  --input: #404040;
-  --ring: #3b82f6;
+  --background: 0 0% 10%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 18%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 18%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 158 55% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 25%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 0 0% 25%;
+  --muted-foreground: 0 0% 64%;
+  --accent: 0 0% 25%;
+  --accent-foreground: 0 0% 90%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 32%;
+  --input: 0 0% 25%;
+  --ring: 158 55% 52%;
 }
 
 /* 기본 스타일 적용 */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  @apply bg-background text-foreground transition-colors duration-300;
 }
 
-/* 다크 모드 클래스별 스타일 */
-.dark .bg-white {
-  /* background-color: #2d2d2d; */
-  background-color: var(--card);
+/* 자동 다크 모드 적용을 위한 기본 클래스 매핑 */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-.dark .text-black {
-  /* color: #ffffff; */
-  color: var(--foreground);
-}
-
-.dark .text-gray-600 {
-  /* color: #d1d5db; */
-  color: var(--muted-foreground);
-}
-
-.dark .text-gray-700 {
-  /* color: #e5e7eb; */
-  color: var(--foreground);
-}
-
-.dark .border-gray-200 {
-  /* border-color: #4b5563; */
-  border-color: var(--border);
-}
-
-.dark .bg-gray-100 {
-  /* background-color: #374151; */
-  background-color: var(--secondary);
-}
-
-.dark .bg-gray-200 {
-  /* background-color: #4b5563; */
-  background-color: var(--muted);
-}
-
-.dark .hover\:bg-gray-200:hover {
-  /* background-color: #4b5563; */
-  background-color: var(--accent);
-}
-
-.dark .hover\:border-gray-300:hover {
-  /* border-color: #6b7280; */
-  border-color: var(--border);
-}
-
-/* 추가 다크 모드 스타일 */
-.dark .bg-blue-100 {
-  background-color: rgba(59, 130, 246, 0.15);
-}
-
-.dark .bg-blue-200 {
-  background-color: rgba(59, 130, 246, 0.25);
-}
-
-.dark .hover\:bg-blue-300:hover {
-  background-color: rgba(59, 130, 246, 0.35);
-}
-
-.dark .bg-yellow-600 {
-  background-color: #f59e0b;
-}
-
-.dark .hover\:bg-yellow-700:hover {
-  background-color: #d97706;
-}
-
-.dark .shadow-xl {
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.4),
-    0 10px 10px -5px rgba(0, 0, 0, 0.3);
-}
-
-.dark .border-white {
-  border-color: #525252;
-}
-
-/* 추가 가독성 개선 */
-.dark .text-gray-500 {
-  color: #a3a3a3;
-}
-
-.dark .text-gray-400 {
-  color: #9ca3af;
-}
-
-.dark .bg-gray-50 {
-  background-color: #404040;
-}
-
-.dark .hover\:bg-gray-100:hover {
-  background-color: #525252;
-}
+/* 추가적인 다크 모드 지원을 위한 유틸리티 - Tailwind에서 자동 생성되므로 제거 */
 /* 스크롤바 너비 계산 */
 html {
   scrollbar-gutter: stable;
@@ -193,7 +108,7 @@ body.modal-open {
   }
 
   .password-checklist-item-invalid {
-    @apply bg-red-300;
+    @apply bg-destructive/20;
   }
 
   .password-checklist-text-valid {
@@ -201,6 +116,6 @@ body.modal-open {
   }
 
   .password-checklist-text-invalid {
-    @apply text-red-500;
+    @apply text-destructive;
   }
 }

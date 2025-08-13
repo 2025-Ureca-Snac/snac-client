@@ -27,7 +27,7 @@ export default function TestButton({ onTestModal }: TestButtonProps) {
     <div className="fixed bottom-4 left-4 z-50">
       <button
         onClick={handleTestModal}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+        className="bg-blue-600 text-primary-foreground px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
       >
         🔧 모달 테스트
       </button>

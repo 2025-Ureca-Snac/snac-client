@@ -26,11 +26,11 @@ export const MenuLink = ({
       width={24}
       height={24}
       aria-hidden="true"
-      className={isDarkmode ? 'text-gray-200' : ''}
+      className={isDarkmode ? 'text-muted-foreground' : ''}
     />
     <span
       className={`hidden md:flex text-regular-sm font-medium ${
-        isDarkmode ? 'text-gray-200 hover:text-white' : 'text-midnight-black'
+        isDarkmode ? 'text-muted-foreground hover:text-primary-foreground' : 'text-card-foreground'
       }`}
     >
       {text}

@@ -29,9 +29,9 @@ export default function Page() {
             className="
               flex-1 min-w-0
               px-3 py-1.5
-              border border-gray-300 dark:border-gray-600
+              border border-border
               rounded-full bg-transparent
-              text-gray-700 dark:text-white
+              text-foreground
               focus:outline-none focus:ring-2 focus:ring-white
               transition
               w-full md:w-auto
@@ -44,10 +44,10 @@ export default function Page() {
               flex-shrink-0
               inline-flex items-center space-x-2
               px-3 py-1.5
-              bg-transparent border border-gray-300 dark:border-gray-600
-              text-gray-600 dark:text-white font-medium text-regular-md
+              bg-transparent border border-border
+              text-muted-foreground font-medium text-regular-md
               rounded-full transition-colors duration-200
-              hover:bg-gray-100 dark:hover:bg-gray-800
+              hover:bg-secondary
               whitespace-nowrap
               w-full md:w-auto
               justify-center
@@ -65,9 +65,9 @@ export default function Page() {
           </Link>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-light">
+        <div className="bg-card p-8 rounded-2xl shadow-light">
           {loading && (
-            <div className="text-center py-10 text-gray-600 dark:text-white">
+            <div className="text-center py-10 text-muted-foreground">
               데이터를 불러오는 중...
             </div>
           )}

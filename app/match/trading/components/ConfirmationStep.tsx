@@ -40,7 +40,7 @@ export default function ConfirmationStep({
             <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-green-300 to-white bg-clip-text text-transparent">
               거래 정보 확인
             </h2>
-            <p className="text-gray-400 mt-2">
+            <p className="text-muted-foreground mt-2">
               모든 정보를 확인한 후 거래를 시작하세요
             </p>
           </div>
@@ -48,14 +48,14 @@ export default function ConfirmationStep({
           {/* 거래 정보 카드들 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {/* 거래 상대방 */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-400/20 rounded-full flex items-center justify-center">
                   <span className="text-green-400 text-lg">👤</span>
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm">상대방 닉네임</div>
-                  <div className="text-white font-semibold">
+                  <div className="text-muted-foreground text-sm">상대방 닉네임</div>
+                  <div className="text-primary-foreground font-semibold">
                     {partner.type === 'seller'
                       ? partner.buyerNickname
                       : partner.sellerNickName}
@@ -65,14 +65,14 @@ export default function ConfirmationStep({
             </div>
 
             {/* 통신사 */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-400/20 rounded-full flex items-center justify-center">
                   <span className="text-blue-400 text-lg">📡</span>
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm">통신사</div>
-                  <div className="text-white font-semibold">
+                  <div className="text-muted-foreground text-sm">통신사</div>
+                  <div className="text-primary-foreground font-semibold">
                     {partner.carrier}
                   </div>
                 </div>
@@ -80,14 +80,14 @@ export default function ConfirmationStep({
             </div>
 
             {/* 데이터량 */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-purple-400/20 rounded-full flex items-center justify-center">
                   <span className="text-purple-400 text-lg">📊</span>
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm">데이터량</div>
-                  <div className="text-white font-semibold">
+                  <div className="text-muted-foreground text-sm">데이터량</div>
+                  <div className="text-primary-foreground font-semibold">
                     {partner.dataAmount}GB
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function ConfirmationStep({
             </div>
 
             {/* 상대방 평점 */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-yellow-400/20 rounded-full flex items-center justify-center">
                   <Image
@@ -106,11 +106,11 @@ export default function ConfirmationStep({
                   />
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm">
+                  <div className="text-muted-foreground text-sm">
                     상대방 평점(바삭스코어)
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-white font-semibold">
+                    <span className="text-primary-foreground font-semibold">
                       {partnerRating}
                     </span>
                   </div>
@@ -166,10 +166,10 @@ export default function ConfirmationStep({
           <div className="flex space-x-4">
             <button
               onClick={onNext}
-              className="flex-1 px-8 py-4 bg-gradient-to-r from-green-400 to-green-500 text-black rounded-xl hover:from-green-300 hover:to-green-400 transition-all duration-300 font-bold shadow-lg hover:shadow-green-400/25 relative overflow-hidden group"
+              className="flex-1 px-8 py-4 bg-gradient-to-r from-green-400 to-green-500 text-card-foreground rounded-xl hover:from-green-300 hover:to-green-400 transition-all duration-300 font-bold shadow-lg hover:shadow-green-400/25 relative overflow-hidden group"
             >
               <span className="relative z-10">거래 시작</span>
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+              <div className="absolute inset-0 bg-card/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
             </button>
           </div>
         </div>

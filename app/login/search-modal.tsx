@@ -470,7 +470,7 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
   return (
     <ModalPortal isOpen={!!isOpen} onClose={resetModal}>
       <div className="flex items-center justify-center bg-black bg-opacity-30 h-full">
-        <div className="bg-white rounded-xl w-[90%] max-w-[450px] p-6 md:p-8 relative">
+        <div className="bg-card rounded-xl w-[90%] max-w-[450px] p-6 md:p-8 relative">
           {/* 닫기 버튼 */}
           <button
             className="absolute top-4 right-4 text-2xl"
@@ -485,9 +485,9 @@ export default function SearchModal({ isOpen, setIsOpen }: SearchModalProps) {
             tabs={tabs}
             activeTab={isOpen || 'id'}
             onTabChange={handleTabChange}
-            activeTextColor="text-midnight-black"
-            inactiveTextColor="text-gray-500"
-            underlineColor="bg-midnight-black"
+            activeTextColor="text-card-foreground"
+            inactiveTextColor="text-muted-foreground"
+            underlineColor="bg-black"
           />
 
           {/* 폼 */}

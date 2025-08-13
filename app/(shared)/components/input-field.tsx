@@ -26,7 +26,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       <div>
         <label
           htmlFor={id}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-foreground mb-2"
         >
           {label}
         </label>
@@ -41,7 +41,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           required={required}
           disabled={disabled}
           max={max}
-          className={`w-full px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] ${className}`}
+          className={`w-full px-3 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-secondary disabled:cursor-not-allowed h-[48px] ${className}`}
         />
         <div className="min-h-[20px] mt-2"></div>
       </div>

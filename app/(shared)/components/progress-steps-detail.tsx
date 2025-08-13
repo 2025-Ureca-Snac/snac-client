@@ -21,7 +21,7 @@ export default function ProgressStepsDetail({
 }: ProgressStepsDetailProps) {
   return (
     <div className="space-y-3">
-      <h3 className="font-medium text-gray-900">진행 단계</h3>
+      <h3 className="font-medium text-card-foreground">진행 단계</h3>
       <div className="flex items-center justify-between">
         {steps.map((step, index) => (
           <React.Fragment key={step.id}>
@@ -31,9 +31,9 @@ export default function ProgressStepsDetail({
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                   step.isActive
                     ? cancelRequestedStatus === 'REQUESTED'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-black text-white'
-                    : 'bg-gray-300 text-gray-600'
+                      ? 'bg-red-500 text-primary-foreground'
+                      : 'bg-black text-primary-foreground'
+                    : 'bg-secondary text-muted-foreground'
                 }`}
               >
                 {step.id}
@@ -43,8 +43,8 @@ export default function ProgressStepsDetail({
                   step.isActive
                     ? cancelRequestedStatus === 'REQUESTED'
                       ? 'text-red-500 font-medium underline'
-                      : 'text-black font-medium underline'
-                    : 'text-gray-500'
+                      : 'text-card-foreground font-medium underline'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {step.label}
@@ -59,7 +59,7 @@ export default function ProgressStepsDetail({
                     ? cancelRequestedStatus === 'REQUESTED'
                       ? 'bg-red-500'
                       : 'bg-black'
-                    : 'bg-gray-300'
+                    : 'bg-secondary'
                 }`}
               />
             )}

@@ -193,7 +193,7 @@ const NicknameInputField = forwardRef<
       <div>
         <label
           htmlFor={id}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-foreground mb-2"
         >
           {label}
         </label>
@@ -209,7 +209,7 @@ const NicknameInputField = forwardRef<
             required={required}
             disabled={disabled}
             maxLength={maxLength}
-            className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] pr-10 ${className} ${
+            className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 disabled:bg-secondary disabled:cursor-not-allowed h-[48px] pr-10 ${className} ${
               value.trim() && !nicknameValidation.isValid
                 ? 'border-red-300 focus:ring-red-200'
                 : duplicateCheckResult && duplicateCheckResult.isDuplicate
@@ -219,7 +219,7 @@ const NicknameInputField = forwardRef<
                       duplicateCheckResult &&
                       !duplicateCheckResult.isDuplicate
                     ? 'border-green-300 focus:ring-green-200'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-transparent'
+                    : 'border-border focus:ring-blue-500 focus:border-transparent'
             }`}
           />
           {/* 중복 체크 로딩 아이콘 */}
@@ -279,7 +279,7 @@ const NicknameInputField = forwardRef<
                 >
                   {nicknameValidation.criteria.hasLength && (
                     <svg
-                      className="w-2 h-2 text-white"
+                      className="w-2 h-2 text-primary-foreground"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -311,7 +311,7 @@ const NicknameInputField = forwardRef<
                 >
                   {nicknameValidation.criteria.startsWithLetter && (
                     <svg
-                      className="w-2 h-2 text-white"
+                      className="w-2 h-2 text-primary-foreground"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -343,7 +343,7 @@ const NicknameInputField = forwardRef<
                 >
                   {nicknameValidation.criteria.hasValidChars && (
                     <svg
-                      className="w-2 h-2 text-white"
+                      className="w-2 h-2 text-primary-foreground"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >

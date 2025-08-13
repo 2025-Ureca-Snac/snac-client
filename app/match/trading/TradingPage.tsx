@@ -152,11 +152,11 @@ export default function TradingPage() {
   // partner 정보가 유효하지 않으면 로딩 표시
   if (!isValidPartner) {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="min-h-screen flex flex-col bg-muted">
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">거래 정보를 확인하는 중...</p>
+            <p className="text-muted-foreground">거래 정보를 확인하는 중...</p>
           </div>
         </main>
       </div>
@@ -309,7 +309,7 @@ export default function TradingPage() {
           <div className="max-w-2xl mx-auto mt-8">
             <button
               onClick={handleCancel}
-              className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/25 border border-red-500/30"
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 text-primary-foreground py-4 px-6 rounded-xl font-semibold hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-red-500/25 border border-red-500/30"
             >
               거래 취소
             </button>
@@ -331,8 +331,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('confirmation')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'confirmation'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       거래 확인
@@ -341,8 +341,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('waiting_payment')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'waiting_payment'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       결제 대기
@@ -351,8 +351,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('show_phone')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'show_phone'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       핸드폰번호 표시
@@ -361,8 +361,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('upload_data')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'upload_data'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       데이터 업로드
@@ -371,8 +371,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('verification')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'verification'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       거래 완료
@@ -385,8 +385,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('confirmation')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'confirmation'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       거래 확인
@@ -395,8 +395,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('payment')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'payment'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       결제
@@ -405,8 +405,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('transfer')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'transfer'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       이체
@@ -415,8 +415,8 @@ export default function TradingPage() {
                       onClick={() => setCurrentStep('verification')}
                       className={`block w-full px-3 py-2 rounded text-xs transition-colors ${
                         currentStep === 'verification'
-                          ? 'bg-green-500 text-black font-semibold'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
+                          ? 'bg-green-500 text-card-foreground font-semibold'
+                          : 'bg-muted text-muted-foreground hover:bg-muted border border-border'
                       }`}
                     >
                       인증

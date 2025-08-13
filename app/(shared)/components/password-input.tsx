@@ -47,7 +47,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     const helpTextColorClass: Record<string, string> = {
       red: 'text-red-500',
       green: 'text-green-500',
-      gray: 'text-gray-500',
+      gray: 'text-muted-foreground',
     };
 
     // 비밀번호 유효성 검사 결과
@@ -71,7 +71,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
       <div>
         <label
           htmlFor={id}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-foreground mb-2"
         >
           {label}
         </label>
@@ -105,7 +105,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         {/* 비밀번호 일치 여부 표시 */}
         {showHelpText && helpText && (
           <p
-            className={`text-sm mt-2 min-h-[20px] ${helpTextColorClass[helpTextColor] || 'text-gray-500'}`}
+            className={`text-sm mt-2 min-h-[20px] ${helpTextColorClass[helpTextColor] || 'text-muted-foreground'}`}
           >
             {helpText}
           </p>
@@ -125,7 +125,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               >
                 {value.length >= 6 && value.length <= 12 && (
                   <svg
-                    className="w-2 h-2 text-white"
+                    className="w-2 h-2 text-primary-foreground"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -157,7 +157,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               >
                 {/[a-zA-Z]/.test(value) && (
                   <svg
-                    className="w-2 h-2 text-white"
+                    className="w-2 h-2 text-primary-foreground"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -187,7 +187,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               >
                 {/\d/.test(value) && (
                   <svg
-                    className="w-2 h-2 text-white"
+                    className="w-2 h-2 text-primary-foreground"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -220,7 +220,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               >
                 {/[!?@#$%^&*()~`+\-_]/.test(value) && (
                   <svg
-                    className="w-2 h-2 text-white"
+                    className="w-2 h-2 text-primary-foreground"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >

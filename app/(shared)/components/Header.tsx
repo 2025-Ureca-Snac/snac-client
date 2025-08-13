@@ -155,7 +155,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
         className={`fixed top-0 left-0 right-0 w-full h-[57px] md:h-[67px] px-6 flex justify-between items-center transition-colors duration-300 ${isAdminPage ? 'z-10' : 'z-50'} ${
           isDarkmode
             ? 'bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/50'
-            : 'bg-white border-b'
+            : 'bg-card border-b'
         }`}
       >
         <div className="relative z-10">
@@ -179,13 +179,13 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                 <button
                   key={item.key}
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition focus:outline-none"
                 >
                   <item.icon
-                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                    className={`w-6 h-6 ${isDarkmode ? 'text-primary-foreground' : 'text-foreground'}`}
                   />
                   <span
-                    className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                    className={`text-sm ${isDarkmode ? 'text-primary-foreground' : 'text-card-foreground'}`}
                   >
                     {item.text}
                   </span>
@@ -194,13 +194,13 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                 <Link
                   href={item.href}
                   key={item.key}
-                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none"
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition focus:outline-none"
                 >
                   <item.icon
-                    className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                    className={`w-6 h-6 ${isDarkmode ? 'text-primary-foreground' : 'text-foreground'}`}
                   />
                   <span
-                    className={`text-sm ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                    className={`text-sm ${isDarkmode ? 'text-primary-foreground' : 'text-card-foreground'}`}
                   >
                     {item.text}
                   </span>
@@ -222,7 +222,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             className="focus:outline-none"
           >
             <Menu
-              className={`w-7 h-7 ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+              className={`w-7 h-7 ${isDarkmode ? 'text-primary-foreground' : 'text-card-foreground'}`}
             />
           </button>
         </div>
@@ -245,7 +245,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
             leaveTo="opacity-0"
           >
             <div
-              className="fixed bottom-0 left-0 right-0 bg-black/40 dark:bg-gray-400/20"
+              className="fixed bottom-0 left-0 right-0 bg-black/40"
               style={{ top: `${headerHeight}px` }}
             />
           </Transition.Child>
@@ -261,7 +261,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
           >
             <Dialog.Panel
               // [수정] isDarkmode 변수를 사용하여 동적으로 배경색을 지정합니다.
-              className={`fixed left-0 w-full z-10 px-4 py-4 flex flex-col gap-1 rounded-b-2xl shadow-none ${isDarkmode ? 'bg-gray-900' : 'bg-white'}`}
+              className={`fixed left-0 w-full z-10 px-4 py-4 flex flex-col gap-1 rounded-b-2xl shadow-none ${isDarkmode ? 'bg-background' : 'bg-card'}`}
               style={{
                 top:
                   typeof window !== 'undefined' && window.innerWidth >= 768
@@ -276,13 +276,13 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                       type="button"
                       key={item.key}
                       onClick={() => handleMobileNav(item.href, item.isAction)}
-                      className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition focus:outline-none w-full text-left"
+                      className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-secondary transition focus:outline-none w-full text-left"
                     >
                       <item.icon
-                        className={`w-6 h-6 ${isDarkmode ? 'text-white' : 'text-gray-800'}`}
+                        className={`w-6 h-6 ${isDarkmode ? 'text-primary-foreground' : 'text-foreground'}`}
                       />
                       <span
-                        className={`text-base font-medium ${isDarkmode ? 'text-white' : 'text-gray-900'}`}
+                        className={`text-base font-medium ${isDarkmode ? 'text-primary-foreground' : 'text-card-foreground'}`}
                       >
                         {item.text}
                       </span>

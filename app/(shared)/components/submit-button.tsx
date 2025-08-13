@@ -40,7 +40,7 @@ export default function SubmitButton({
       type={type}
       disabled={isDisabled}
       onClick={onClick}
-      className={`w-full py-3 px-4 bg-black text-white rounded-md hover:bg-gray-800 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
+      className={`w-full py-3 px-4 bg-black text-primary-foreground rounded-md hover:bg-card transition-colors font-medium disabled:bg-muted disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
     >
       {buttonText}
     </button>

@@ -71,16 +71,16 @@ function PaymentFailComponent() {
   }, [searchParams]); // searchParams 의존성 추가
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl text-red-600 dark:text-red-400">✕</span>
+        <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-3xl text-destructive">✕</span>
         </div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-xl font-bold text-card-foreground mb-2">
           결제 실패
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">{failureReason}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+        <p className="text-muted-foreground">{failureReason}</p>
+        <p className="text-sm text-muted-foreground mt-4">
           {countdown}초 후 자동으로 창이 닫힙니다...
         </p>
       </div>
@@ -96,10 +96,10 @@ export default function PaymentFailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">로딩 중...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">로딩 중...</p>
           </div>
         </div>
       }

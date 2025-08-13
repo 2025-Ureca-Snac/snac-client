@@ -21,7 +21,7 @@ export default function CarrierSelect({
 }: CarrierSelectProps) {
   return (
     <div className="space-y-3">
-      <h3 className="text-lg md:text-2xl font-medium text-white">통신사</h3>
+      <h3 className="text-lg md:text-2xl font-medium text-primary-foreground">통신사</h3>
       <div className="grid grid-cols-3 gap-3">
         {CARRIER_OPTIONS.map((option) => (
           <button
@@ -30,10 +30,10 @@ export default function CarrierSelect({
             disabled={disabled}
             className={`px-4 py-3 rounded-lg border transition-all ${
               disabled
-                ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+                ? 'bg-muted text-muted-foreground border-border cursor-not-allowed'
                 : value === option.value
-                  ? 'bg-white text-black border-white'
-                  : 'bg-transparent text-white border-gray-400 hover:border-white hover:bg-white hover:bg-opacity-10'
+                  ? 'bg-card text-card-foreground border-white'
+                  : 'bg-transparent text-primary-foreground border-gray-400 hover:border-white hover:bg-card hover:bg-opacity-10'
             }`}
           >
             {option.label}

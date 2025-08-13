@@ -13,7 +13,7 @@ export default function WaitingPaymentStep({
   return (
     <div className="max-w-3xl mx-auto px-4">
       {/* 메인 카드 - 투명 배경 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 via-transparent to-green-300/3"></div>
 
@@ -55,59 +55,59 @@ export default function WaitingPaymentStep({
               구매자가 결제를 진행중입니다
             </h2>
 
-            <p className="text-lg text-gray-300 mb-8">잠시만 기다려주세요</p>
+            <p className="text-lg text-muted-foreground mb-8">잠시만 기다려주세요</p>
 
             {/* 거래 정보 카드들 */}
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-blue-400/20 rounded-full flex items-center justify-center">
                     <span className="text-blue-400 text-lg">👤</span>
                   </div>
                   <div className="text-left">
-                    <div className="text-gray-400 text-sm">구매자</div>
-                    <div className="text-white font-semibold">
+                    <div className="text-muted-foreground text-sm">구매자</div>
+                    <div className="text-primary-foreground font-semibold">
                       {partner.buyerNickname}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-purple-400/20 rounded-full flex items-center justify-center">
                     <span className="text-purple-400 text-lg">📡</span>
                   </div>
                   <div className="text-left">
-                    <div className="text-gray-400 text-sm">통신사</div>
-                    <div className="text-white font-semibold">
+                    <div className="text-muted-foreground text-sm">통신사</div>
+                    <div className="text-primary-foreground font-semibold">
                       {partner.carrier}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-cyan-400/20 rounded-full flex items-center justify-center">
                     <span className="text-cyan-400 text-lg">📊</span>
                   </div>
                   <div className="text-left">
-                    <div className="text-gray-400 text-sm">데이터량</div>
-                    <div className="text-white font-semibold">
+                    <div className="text-muted-foreground text-sm">데이터량</div>
+                    <div className="text-primary-foreground font-semibold">
                       {partner.dataAmount}GB
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-green-400/20 rounded-full flex items-center justify-center">
                     <span className="text-green-400 text-lg">💰</span>
                   </div>
                   <div className="text-left">
-                    <div className="text-gray-400 text-sm">거래금액</div>
+                    <div className="text-muted-foreground text-sm">거래금액</div>
                     <div className="text-green-400 font-bold">
                       {partner.priceGb.toLocaleString()}원
                     </div>
@@ -142,7 +142,7 @@ export default function WaitingPaymentStep({
             {/* 대기 버튼 */}
             <button
               disabled
-              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-gray-300 py-4 px-6 rounded-xl font-semibold cursor-not-allowed border border-gray-600 relative overflow-hidden"
+              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-muted-foreground py-4 px-6 rounded-xl font-semibold cursor-not-allowed border border-border relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center justify-center space-x-2">
                 <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
