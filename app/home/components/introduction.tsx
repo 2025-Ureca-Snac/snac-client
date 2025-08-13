@@ -318,6 +318,47 @@ export default function Introduction() {
                 새로운 차원
               </span>
             </h1>
+
+            {/* 스크롤 안내 애니메이션 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5, duration: 0.8 }}
+              className="mt-8"
+            >
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className="flex flex-col items-center text-gray-600 dark:text-gray-400"
+              >
+                <span className="text-sm font-medium mb-2">
+                  스크롤하여 더 알아보기
+                </span>
+                <motion.div
+                  animate={{ y: [0, 8, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                  className="w-6 h-10 border-2 border-gray-400 dark:border-gray-500 rounded-full flex justify-center"
+                >
+                  <motion.div
+                    animate={{ y: [0, 12, 0] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    className="w-1 h-3 bg-gray-400 dark:bg-gray-500 rounded-full mt-2"
+                  />
+                </motion.div>
+              </motion.div>
+            </motion.div>
           </motion.div>
 
           <motion.div
