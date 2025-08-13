@@ -32,14 +32,14 @@ function Sidebar() {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 shadow-lg flex-shrink-0 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-30 w-64 bg-card shadow-lg flex-shrink-0 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-center h-20 border-b dark:border-gray-700 gap-2">
+        <div className="flex items-center justify-center h-20 border-b gap-2">
           <ManagerIcon className="h-7 w-7 text-teal-green" />
-          <span className="text-gray-800 dark:text-white text-lg font-bold">
+          <span className="text-foreground text-lg font-bold">
             관리자 패널
           </span>
         </div>
@@ -53,8 +53,8 @@ function Sidebar() {
                 onClick={handleLinkClick}
                 className={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${
                   isActive
-                    ? 'bg-teal-green text-white'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-teal-green text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-card-foreground:text-primary-foreground'
                 }`}
               >
                 <item.icon className="w-6 h-6 mr-3" aria-hidden="true" />
@@ -80,15 +80,15 @@ function AdminHeader() {
   };
 
   return (
-    <header className="flex items-center justify-between h-20 px-6 bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+    <header className="flex items-center justify-between h-20 px-6 bg-card border-b">
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
-          className="md:hidden mr-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+          className="md:hidden mr-4 text-muted-foreground hover:text-foreground focus:outline-none"
         >
           <MenuIcon className="h-6 w-6" />
         </button>
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+        <h1 className="text-xl font-bold text-foreground">
           {getTitle()}
         </h1>
       </div>
@@ -105,7 +105,7 @@ export default function AdminLayout({
 
   return (
     <>
-      <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex h-screen bg-muted bg-background">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <AdminHeader />

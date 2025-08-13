@@ -101,7 +101,7 @@ export default function UploadDataStep({
   return (
     <div className="max-w-2xl mx-auto px-4">
       {/* 메인 카드 - 투명 배경 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-400/5 via-transparent to-blue-300/3"></div>
 
@@ -111,33 +111,33 @@ export default function UploadDataStep({
               데이터 전송 확인
             </h2>
 
-            <p className="text-lg text-gray-300 mb-6">
+            <p className="text-lg text-muted-foreground mb-6">
               구매자에게 데이터를 전송한 후 스크린샷을 업로드해주세요
             </p>
 
             {/* 거래 정보 */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 mb-6 border border-gray-700/50">
+            <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 mb-6 border border-border/50">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-400">구매자:</span>
-                  <span className="ml-2 font-medium text-white">
+                  <span className="text-muted-foreground">구매자:</span>
+                  <span className="ml-2 font-medium text-primary-foreground">
                     {partner.buyerNickname}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400">통신사:</span>
-                  <span className="ml-2 font-medium text-white">
+                  <span className="text-muted-foreground">통신사:</span>
+                  <span className="ml-2 font-medium text-primary-foreground">
                     {partner.carrier}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400">데이터:</span>
-                  <span className="ml-2 font-medium text-white">
+                  <span className="text-muted-foreground">데이터:</span>
+                  <span className="ml-2 font-medium text-primary-foreground">
                     {partner.dataAmount}GB
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400">가격:</span>
+                  <span className="text-muted-foreground">가격:</span>
                   <span className="ml-2 font-medium text-green-400">
                     {partner.priceGb.toLocaleString()}원
                   </span>
@@ -146,10 +146,10 @@ export default function UploadDataStep({
             </div>
 
             {/* 파일 업로드 영역 */}
-            <div className="border-2 border-dashed border-gray-600 rounded-xl p-8 mb-6 bg-gray-800/30">
+            <div className="border-2 border-dashed border-border rounded-xl p-8 mb-6 bg-card/30">
               {!selectedFile ? (
                 <div>
-                  <div className="text-gray-400 mb-4">
+                  <div className="text-muted-foreground mb-4">
                     <svg
                       className="mx-auto h-12 w-12"
                       stroke="currentColor"
@@ -164,17 +164,17 @@ export default function UploadDataStep({
                       />
                     </svg>
                   </div>
-                  <p className="text-gray-300 mb-2">
+                  <p className="text-muted-foreground mb-2">
                     스크린샷을 업로드해주세요
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     PNG, JPG, JPEG 파일만 가능
                   </p>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileSelect}
-                    className="mt-4 block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30 file:border file:border-purple-400/30"
+                    className="mt-4 block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30 file:border file:border-purple-400/30"
                   />
                 </div>
               ) : (
@@ -194,7 +194,7 @@ export default function UploadDataStep({
                       />
                     </svg>
                   </div>
-                  <p className="text-gray-300 mb-2">
+                  <p className="text-muted-foreground mb-2">
                     선택된 파일: {selectedFile.name}
                   </p>
                   <button
@@ -253,8 +253,8 @@ export default function UploadDataStep({
               disabled={!selectedFile || isUploading || uploadSuccess}
               className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 relative overflow-hidden group ${
                 !selectedFile || isUploading || uploadSuccess
-                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-400 to-purple-500 text-black hover:from-purple-300 hover:to-purple-400 shadow-lg hover:shadow-purple-400/25'
+                  ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                  : 'bg-gradient-to-r from-purple-400 to-purple-500 text-card-foreground hover:from-purple-300 hover:to-purple-400 shadow-lg hover:shadow-purple-400/25'
               }`}
             >
               {isUploading ? (
@@ -270,13 +270,13 @@ export default function UploadDataStep({
               ) : (
                 <>
                   <span className="relative z-10">업로드하기</span>
-                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+                  <div className="absolute inset-0 bg-card/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
                 </>
               )}
             </button>
 
             {/* 안내 메시지 */}
-            <div className="text-sm text-gray-400 mt-4 space-y-1">
+            <div className="text-sm text-muted-foreground mt-4 space-y-1">
               <p>*데이터 전송 스크린샷을 업로드해주세요</p>
               <p>*업로드 후 구매자가 확인하면 거래가 완료됩니다</p>
             </div>

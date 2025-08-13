@@ -3,7 +3,7 @@ import { BlogPostInfoProps } from '../types/blog-post';
 
 export default function BlogPostInfo({ post, readingTime }: BlogPostInfoProps) {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-white mb-8 pb-6 border-b border-gray-200 dark:border-text-white">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-8 pb-6 border-b border-border">
       {post.nickname && (
         <div className="flex items-center gap-2">
           <svg

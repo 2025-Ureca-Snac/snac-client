@@ -72,9 +72,9 @@ export const Pagination = ({
     'flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-md border transition-colors';
 
   const defaultButtonStyles =
-    'bg-white border-gray-300 text-gray-700 hover:bg-gray-100 dark:bg-midnight-black dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800';
+    'bg-card border-border text-foreground hover:bg-secondary text-muted-foreground:bg-card';
 
-  const activeButtonStyles = 'bg-gray-700 border-gray-700 text-white';
+  const activeButtonStyles = 'bg-muted border-border text-primary-foreground';
 
   const disabledButtonStyles = 'opacity-50 cursor-not-allowed';
 
@@ -112,7 +112,7 @@ export const Pagination = ({
           ) : (
             <li key={`ellipsis-${index}`}>
               <span
-                className={`${baseButtonStyles} bg-white border-gray-300 text-gray-700 dark:bg-midnight-black dark:border-gray-700 dark:text-gray-400`}
+                className={`${baseButtonStyles} bg-card border-border text-foreground text-muted-foreground`}
               >
                 {number}
               </span>

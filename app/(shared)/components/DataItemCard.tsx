@@ -79,20 +79,23 @@ export const DataItemCard = ({
           text: buyButtonText ?? (isBuyView ? '판매하기' : '구매하기'),
           clickable: true,
           className: isBuyView
-            ? 'bg-candy-pink hover:bg-gray-700 active:bg-gray-800'
-            : 'bg-gray-900 hover:bg-red active:bg-red',
+            ? 'text-white'
+            : 'bg-black hover:bg-black/80 text-white',
+          style: isBuyView ? { backgroundColor: '#FF66C4' } : undefined,
         };
       case 'SOLD_OUT':
         return {
           text: '거래 완료',
           clickable: false,
-          className: 'bg-gray-400 cursor-not-allowed',
+          className: 'bg-muted cursor-not-allowed',
+          style: undefined,
         };
       default:
         return {
           text: '거래중',
           clickable: false,
-          className: 'bg-gray-400 cursor-not-allowed',
+          className: 'bg-muted cursor-not-allowed',
+          style: undefined,
         };
     }
   };
@@ -100,14 +103,14 @@ export const DataItemCard = ({
   const buttonConfig = getButtonConfig();
 
   return (
-    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-[#F3F5F7] rounded-2xl shadow-md w-full max-h-[203px] md:max-h-[348px] flex flex-col p-3">
+    <div className="transition-transform duration-300 hover:scale-[1.02] relative bg-card rounded-2xl shadow-md w-full max-h-[203px] md:max-h-[348px] flex flex-col p-3">
       {isNew && (
-        <span className="absolute top-3 left-3 z-10 bg-red text-white text-regular-2xs md:text-regular-xs font-bold w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] flex items-center justify-center">
+        <span className="absolute top-3 left-3 z-10 bg-red text-primary-foreground text-regular-2xs md:text-regular-xs font-bold w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] flex items-center justify-center">
           {newBadgeText}
         </span>
       )}
       {isMyPost && (
-        <span className="absolute top-3 right-3 z-10 bg-green-400 text-white text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center">
+        <span className="absolute top-3 right-3 z-10 bg-green-400 text-primary-foreground text-regular-2xs md:text-regular-xs w-[47px] md:w-[57px] h-[20px] md:h-[24px] rounded-[16px] font-bold px-1 py-1 flex items-center justify-center">
           MY
         </span>
       )}
@@ -122,13 +125,13 @@ export const DataItemCard = ({
       </div>
 
       <div className="flex-grow flex flex-col items-center md:items-start md:py-[18px] mt-2">
-        <h3 className="text-medium-xs font-bold md:text-medium-md text-[#141718] truncate w-full text-center md:text-left">
+        <h3 className="text-medium-xs font-bold md:text-medium-md text-card-foreground truncate w-full text-center md:text-left">
           {title}
         </h3>
-        <p className="text-medium-sm md:text-medium-sm text-gray-900 h-6 flex items-center">
+        <p className="text-medium-sm md:text-medium-sm text-card-foreground h-6 flex items-center">
           {displayPrice}
         </p>
-        <p className="text-regular-2xs text-gray-500">
+        <p className="text-regular-2xs text-muted-foreground">
           바삭스코어 {ratingScore}
         </p>
       </div>
@@ -141,11 +144,14 @@ export const DataItemCard = ({
               if (!buttonConfig.clickable) {
                 return;
               }
-              
+
               onClickBuy({ email, createdAt });
             }}
             className={`w-full h-full ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
-            style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
+            style={{
+              fontSize: 'clamp(12px, 2.5vw, 16px)',
+              ...buttonConfig.style,
+            }}
             disabled={!buttonConfig.clickable}
           >
             {buttonConfig.text}
@@ -167,7 +173,7 @@ export const DataItemCard = ({
                         });
                       }
                     }}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 whitespace-nowrap text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                    className="flex-1 bg-primary hover:bg-primary/90 whitespace-nowrap text-primary-foreground transition text-regular-md border rounded-lg flex items-center justify-center"
                     style={{ fontSize: 'clamp(8px, 2.5vw, 16px)' }}
                   >
                     <span className="md:hidden">수정</span>
@@ -206,7 +212,7 @@ export const DataItemCard = ({
               </>
             ) : (
               <Button
-                className="w-full bg-gray-400 cursor-not-allowed text-white transition text-regular-md border rounded-lg flex items-center justify-center"
+                className="w-full bg-muted cursor-not-allowed text-muted-foreground transition text-regular-md border rounded-lg flex items-center justify-center"
                 style={{ fontSize: 'clamp(12px, 2.5vw, 16px)' }}
                 disabled
               >

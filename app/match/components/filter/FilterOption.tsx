@@ -30,7 +30,7 @@ export default function FilterOption({
   return (
     <label
       className={`flex items-center space-x-3 cursor-pointer p-2 rounded-lg transition-colors ${
-        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800/30'
+        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-card/30'
       }`}
     >
       <div className="relative">
@@ -46,12 +46,12 @@ export default function FilterOption({
           className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
             checked
               ? 'bg-green-500 border-green-500'
-              : 'bg-transparent border-gray-400 hover:border-gray-300'
+              : 'bg-transparent border-gray-400 hover:border-border'
           } ${disabled ? 'cursor-not-allowed' : ''}`}
         >
           {checked && (
             <svg
-              className="w-4 h-4 text-white"
+              className="w-4 h-4 text-primary-foreground"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -67,7 +67,7 @@ export default function FilterOption({
           )}
         </div>
       </div>
-      <span className="text-white md:text-lg text-base font-noto-sans-kr">
+      <span className="text-primary-foreground md:text-lg text-base font-noto-sans-kr">
         {label}
       </span>
     </label>

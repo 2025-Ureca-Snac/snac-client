@@ -122,7 +122,7 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
   return (
     <div className="space-y-6">
       {/* 단골 등록 카드 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-pink-400/5 via-transparent to-purple-300/3"></div>
 
@@ -132,10 +132,10 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
           </h2>
 
           {/* 상대방 정보 */}
-          <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
+          <div className="bg-card/50 border border-border/50 rounded-xl p-6 mb-6 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">
+                <h3 className="text-lg font-bold text-primary-foreground mb-1">
                   {partner.name}
                 </h3>
 
@@ -146,14 +146,14 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
                     width={16}
                     height={16}
                   />
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     바삭스코어: {partner.rating}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-green-400 font-bold">{partner.data}GB</p>
-                <p className="text-gray-400 text-sm">{partner.carrier}</p>
+                <p className="text-muted-foreground text-sm">{partner.carrier}</p>
               </div>
             </div>
           </div>
@@ -164,10 +164,10 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
             disabled={isCheckingFavorite || isToggling}
             className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 relative overflow-hidden group mb-4 ${
               isCheckingFavorite || isToggling
-                ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
                 : isFavorite
-                  ? 'bg-gradient-to-r from-red-400 to-red-500 text-white hover:from-red-300 hover:to-red-400 shadow-lg hover:shadow-red-400/25'
-                  : 'bg-gradient-to-r from-pink-400 to-purple-500 text-white hover:from-pink-300 hover:to-purple-400 shadow-lg hover:shadow-pink-400/25'
+                  ? 'bg-gradient-to-r from-red-400 to-red-500 text-primary-foreground hover:from-red-300 hover:to-red-400 shadow-lg hover:shadow-red-400/25'
+                  : 'bg-gradient-to-r from-pink-400 to-purple-500 text-primary-foreground hover:from-pink-300 hover:to-purple-400 shadow-lg hover:shadow-pink-400/25'
             }`}
           >
             {isCheckingFavorite ? (
@@ -186,7 +186,7 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
                   <span>{isFavorite ? '💔' : '❤️'}</span>
                   <span>{isFavorite ? '단골 해제하기' : '단골 등록하기'}</span>
                 </span>
-                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+                <div className="absolute inset-0 bg-card/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
               </>
             )}
           </button>
@@ -194,7 +194,7 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
       </div>
 
       {/* 액션 버튼들 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 via-transparent to-blue-300/3"></div>
 
@@ -206,31 +206,31 @@ export default function ActionButtons({ partner }: ActionButtonsProps) {
           <div className="space-y-4">
             <button
               onClick={handleNewMatch}
-              className="w-full bg-gradient-to-r from-green-400 to-green-500 text-black py-4 px-6 rounded-xl font-bold text-lg hover:from-green-300 hover:to-green-400 transition-all duration-300 shadow-lg hover:shadow-green-400/25 relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-green-400 to-green-500 text-card-foreground py-4 px-6 rounded-xl font-bold text-lg hover:from-green-300 hover:to-green-400 transition-all duration-300 shadow-lg hover:shadow-green-400/25 relative overflow-hidden group"
             >
               <span className="relative z-10 flex items-center justify-center space-x-2">
                 <span>🔄</span>
                 <span>새로운 매칭 시작</span>
               </span>
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+              <div className="absolute inset-0 bg-card/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
             </button>
 
             <button
               onClick={handleGoHome}
-              className="w-full border-2 border-gray-600 text-gray-300 py-4 px-6 rounded-xl font-bold text-lg hover:bg-gray-800/50 hover:border-gray-500 transition-all duration-300 relative overflow-hidden group"
+              className="w-full border-2 border-border text-muted-foreground py-4 px-6 rounded-xl font-bold text-lg hover:bg-card/50 hover:border-gray-500 transition-all duration-300 relative overflow-hidden group"
             >
               <span className="relative z-10 flex items-center justify-center space-x-2">
                 <span>🏠</span>
                 <span>홈으로 돌아가기</span>
               </span>
-              <div className="absolute inset-0 bg-gray-700/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+              <div className="absolute inset-0 bg-muted/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
             </button>
           </div>
 
           {/* 거래 히스토리 섹션 */}
-          <div className="mt-8 p-6 bg-gray-800/50 border border-gray-700/50 rounded-xl backdrop-blur-sm">
-            <h3 className="font-bold text-gray-200 mb-3">거래 히스토리</h3>
-            <p className="text-sm text-gray-400 mb-4">
+          <div className="mt-8 p-6 bg-card/50 border border-border/50 rounded-xl backdrop-blur-sm">
+            <h3 className="font-bold text-muted-foreground mb-3">거래 히스토리</h3>
+            <p className="text-sm text-muted-foreground mb-4">
               마이페이지에서 모든 거래 내역을 확인할 수 있습니다.
             </p>
             <button

@@ -110,15 +110,15 @@ const FeatureCard = ({
       viewport={{ amount: 0.5 }}
       transition={{ duration: 0.5 }}
       whileHover={{ scale: 1.03, y: -5 }}
-      className={`relative h-full rounded-3xl bg-white/50 p-8 shadow-light dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 backdrop-blur-md overflow-hidden ${className}`}
+      className={`relative h-full rounded-3xl bg-card/50 p-8 shadow-light /60 border border-border backdrop-blur-md overflow-hidden ${className}`}
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-teal-green to-emerald-600 text-white shadow-light">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-teal-green to-emerald-600 text-primary-foreground shadow-light">
         {icon}
       </div>
-      <h3 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">
-        {title}
-      </h3>
-      <p className="mt-4 text-gray-600 dark:text-gray-400">{description}</p>
+      <h3 className="mt-6 text-2xl font-bold text-card-foreground">{title}</h3>
+      <p className="mt-4 text-muted-foreground text-muted-foreground">
+        {description}
+      </p>
     </motion.div>
   );
 };
@@ -126,7 +126,7 @@ const FeatureCard = ({
 // --- 실시간 거래 시각화 컴포넌트 ---
 const RealtimeTradeVisual = () => {
   return (
-    <div className="relative flex h-80 w-full items-center justify-around rounded-2xl bg-gray-100 p-4 shadow-light dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="relative flex h-80 w-full items-center justify-around rounded-2xl bg-secondary p-4 shadow-light /50 border border-border overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(20,184,166,0.1),transparent_70%)]"></div>
       <div className="absolute inset-0 grid-bg"></div>
 
@@ -176,7 +176,7 @@ const RealtimeTradeVisual = () => {
       </motion.div>
 
       <div className="absolute top-6 left-1/2 -translate-x-1/2 rounded-full bg-black/30 px-4 py-2 text-center backdrop-blur-sm">
-        <p className="font-bold text-white">실시간 데이터 매칭</p>
+        <p className="font-bold text-primary-foreground">실시간 데이터 매칭</p>
       </div>
     </div>
   );
@@ -216,24 +216,26 @@ const DataItemCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount: 0.5 }}
       transition={{ duration: 0.5, delay }}
-      className="transition-transform duration-300 hover:scale-[1.05] relative bg-white dark:bg-white  rounded-2xl shadow-light flex flex-col p-4 h-full"
+      className="transition-transform duration-300 hover:scale-[1.05] relative bg-card rounded-2xl shadow-light flex flex-col p-4 h-full"
     >
       <div className="relative h-20 w-full my-2">
         <Image src={imageUrl} alt={title} layout="fill" objectFit="contain" />
       </div>
 
       <div className="flex-grow flex flex-col items-start mt-2">
-        <h3 className="font-bold text-gray-900  text-left text-sm md:text-base">
+        <h3 className="font-bold text-card-foreground  text-left text-sm md:text-base">
           {title}
         </h3>
-        <p className="text-sm text-gray-800  h-6 flex items-center">
+        <p className="text-sm text-foreground  h-6 flex items-center">
           {displayPrice}
         </p>
-        <p className="text-xs text-gray-500 ">바삭스코어 {ratingScore}</p>
+        <p className="text-xs text-muted-foreground ">
+          바삭스코어 {ratingScore}
+        </p>
       </div>
 
       <div className="flex justify-center mt-4">
-        <button className="w-full h-10 bg-gray-900 text-white transition text-sm font-bold border rounded-lg flex items-center justify-center">
+        <button className="w-full h-10 bg-primary text-primary-foreground transition text-sm font-bold border rounded-lg flex items-center justify-center">
           구매하기
         </button>
       </div>
@@ -283,7 +285,7 @@ export default function Introduction() {
   ];
 
   return (
-    <div className="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+    <div className="bg-muted text-foreground bg-background text-muted-foreground">
       <style jsx global>{`
         .grid-bg {
           background-image:
@@ -304,13 +306,13 @@ export default function Introduction() {
       <div ref={scrollRef} className="relative h-[300vh]">
         <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
           <ParticleBackground />
-          <motion.div className="absolute inset-0 z-0 bg-gradient-to-br from-teal-100/10 via-gray-50/10 to-lime-100/10 dark:from-teal-900/10 dark:via-gray-900/10 dark:to-lime-900/10 backdrop-blur-sm" />
+          <motion.div className="absolute inset-0 z-0 bg-gradient-to-br from-teal-100/10 via-gray-50/10 to-lime-100/10 from-teal-900/10 via-gray-900/10 to-lime-900/10 backdrop-blur-sm" />
 
           <motion.div
             style={{ scale: text1Scale, opacity: text1Opacity, y: text1Y }}
             className="text-center absolute"
           >
-            <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-8xl">
+            <h1 className="text-5xl font-extrabold tracking-tight text-card-foreground sm:text-6xl md:text-8xl">
               데이터 거래의 <br />
               <span className="bg-gradient-to-r from-teal-green via-emerald-500 to-lime-400 bg-clip-text text-transparent">
                 새로운 차원
@@ -329,7 +331,7 @@ export default function Introduction() {
         </div>
       </div>
 
-      <div className="relative z-10 bg-gray-50 dark:bg-gray-900 -mt-[1px]">
+      <div className="relative z-10 bg-muted bg-background -mt-[1px]">
         <section className="py-24 sm:py-32 px-4">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -344,7 +346,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="mb-10 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                className="mb-10 text-3xl font-bold tracking-tight text-card-foreground sm:text-4xl"
               >
                 SNAC의 등장
               </motion.h2>
@@ -353,7 +355,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="mt-4 text-lg text-gray-600 dark:text-gray-400"
+                className="mt-4 text-lg text-muted-foreground text-muted-foreground"
               >
                 중고나라, 당근마켓, 네이버쇼핑 등 주요 거래 플랫폼의 문제점을
                 조사했습니다.
@@ -388,15 +390,15 @@ export default function Introduction() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ amount: 0.5 }}
                   transition={{ duration: 0.5, delay: i * 0.2 }}
-                  className="bg-white dark:bg-gray-800/50 p-8 rounded-2xl shadow-light border border-gray-200 dark:border-gray-700"
+                  className="bg-card/50 p-8 rounded-2xl shadow-light border border-border"
                 >
                   <div className="flex items-center gap-4">
                     {item.icon}
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                      <h3 className="text-xl font-bold text-card-foreground">
                         {item.title}
                       </h3>
-                      <p className="mt-1 text-gray-600 dark:text-gray-400">
+                      <p className="mt-1 text-muted-foreground text-muted-foreground">
                         {item.desc}
                       </p>
                     </div>
@@ -407,7 +409,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        <section className="py-24 sm:py-32 px-4 bg-gray-100 dark:bg-black/20">
+        <section className="py-24 sm:py-32 px-4 bg-secondary">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial="offscreen"
@@ -420,7 +422,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                className="text-3xl font-bold tracking-tight text-card-foreground sm:text-4xl"
               >
                 SNAC이 해결한 불편함
               </motion.h2>
@@ -429,7 +431,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1, transition: { delay: 0.1 } },
                 }}
-                className="mt-4 text-lg text-gray-600 dark:text-gray-400"
+                className="mt-4 text-lg text-muted-foreground text-muted-foreground"
               >
                 기존 플랫폼의 <b>계좌번호 노출</b>과 <b>복잡한 결제 과정</b>을
                 해결하기 위해
@@ -472,7 +474,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                className="text-3xl font-bold tracking-tight text-card-foreground sm:text-4xl"
               >
                 두 가지 거래 방식, 당신의 선택은?
               </motion.h2>
@@ -481,7 +483,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1, transition: { delay: 0.1 } },
                 }}
-                className="mt-4 text-lg text-gray-600 dark:text-gray-400"
+                className="mt-4 text-lg text-muted-foreground text-muted-foreground"
               >
                 급할 땐 즉시 매칭되는 <b>실시간 거래</b>,<br />
                 여유가 필요하다면 <b>일반 거래</b>!<br />
@@ -498,11 +500,11 @@ export default function Introduction() {
               >
                 <div className="flex items-center mb-4">
                   <Zap className="text-yellow-400 mr-3" size={32} />
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-2xl font-bold text-card-foreground">
                     실시간 거래
                   </h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-muted-foreground text-muted-foreground mb-6">
                   <b>바로 거래하고 싶을 때,</b> 지금 접속 중인 상대와 즉시
                   매칭하고
                   <br />
@@ -519,11 +521,11 @@ export default function Introduction() {
               >
                 <div className="flex items-center mb-4">
                   <Clock className="text-emerald-400 mr-3" size={32} />
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-2xl font-bold text-card-foreground">
                     일반 거래
                   </h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-muted-foreground text-muted-foreground mb-6">
                   <b>여유롭게 거래하고 싶을 땐,</b> 거래글을 남기고
                   <br />
                   원하는 시간에 상대를 찾아 안전하게 거래할 수 있어요.
@@ -538,7 +540,7 @@ export default function Introduction() {
           </div>
         </section>
 
-        <section className="py-24 sm:py-32 px-4 bg-gray-100 dark:bg-black/20">
+        <section className="py-24 sm:py-32 px-4 bg-secondary">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial="offscreen"
@@ -551,7 +553,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1 },
                 }}
-                className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl"
+                className="text-3xl font-bold tracking-tight text-card-foreground sm:text-4xl"
               >
                 SNAC 포인트만의 특별한 혜택
               </motion.h2>
@@ -560,7 +562,7 @@ export default function Introduction() {
                   offscreen: { y: 20, opacity: 0 },
                   onscreen: { y: 0, opacity: 1, transition: { delay: 0.1 } },
                 }}
-                className="mt-4 text-lg text-gray-600 dark:text-gray-400"
+                className="mt-4 text-lg text-muted-foreground text-muted-foreground"
               >
                 회원가입만 해도 <b>1,000포인트</b> 즉시 지급!
                 <br />
@@ -575,15 +577,15 @@ export default function Introduction() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ amount: 0.5 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-xl bg-white dark:bg-gray-800/50 p-8 rounded-2xl shadow-light border border-gray-200 dark:border-gray-700"
+                className="w-full max-w-xl bg-card/50 p-8 rounded-2xl shadow-light border border-border"
               >
                 <div className="flex items-center gap-4">
                   <TrendingUp className="w-12 h-12 text-teal-green" />
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    <h3 className="text-xl font-bold text-card-foreground">
                       거래할 때마다 포인트 적립!
                     </h3>
-                    <p className="mt-1 text-gray-600 dark:text-gray-400">
+                    <p className="mt-1 text-muted-foreground text-muted-foreground">
                       거래가 완료될 때마다 <b>10포인트</b>씩 자동으로
                       적립됩니다.
                       <br />

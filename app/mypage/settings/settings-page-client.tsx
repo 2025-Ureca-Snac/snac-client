@@ -90,14 +90,14 @@ export default function SettingsPageClient() {
         <div className="flex items-center gap-2 mb-4">
           <Link
             href="/mypage"
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
             마이페이지
           </Link>
-          <span className="text-gray-400 dark:text-gray-500" aria-hidden="true">
+          <span className="text-muted-foreground" aria-hidden="true">
             /
           </span>
-          <span className="text-gray-900 dark:text-white font-medium">
+          <span className="text-card-foreground font-medium">
             설정
           </span>
         </div>
@@ -105,10 +105,10 @@ export default function SettingsPageClient() {
 
       {/* 제목과 설명 */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-card-foreground mb-2">
           설정
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 text-lg">
+        <p className="text-muted-foreground text-lg">
           계정 설정 및 개인정보를 관리하세요
         </p>
       </div>
@@ -122,21 +122,21 @@ export default function SettingsPageClient() {
       <div className="flex items-center gap-2 mb-4">
         <Link
           href="/mypage"
-          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+          className="text-muted-foreground hover:text-foreground text-sm transition-colors"
         >
           마이페이지
         </Link>
-        <span className="text-gray-400 dark:text-gray-500">/</span>
-        <span className="text-gray-900 dark:text-white font-medium">설정</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="text-card-foreground font-medium">설정</span>
       </div>
 
       {/* 제목 */}
-      <h1 className="text-xl font-bold text-gray-900 dark:text-white">설정</h1>
+      <h1 className="text-xl font-bold text-card-foreground">설정</h1>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 w-full">
+    <div className="min-h-screen bg-card w-full">
       <div className="flex w-full min-h-screen">
         {/* 좌측 메뉴 (데스크탑만) */}
         <div className="hidden md:block w-64 flex-shrink-0 md:pt-8 md:pl-4">
@@ -153,7 +153,7 @@ export default function SettingsPageClient() {
             <MobileHeader />
 
             <section className="w-full max-w-full">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="bg-card rounded-lg shadow-sm border border-border">
                 <div className="p-6">
                   <SettingList onItemClick={handleSettingItemClick} />
                 </div>

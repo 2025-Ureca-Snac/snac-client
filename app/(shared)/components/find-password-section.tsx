@@ -100,7 +100,7 @@ export default function FindPasswordSection({
         <button
           type="button"
           tabIndex={0}
-          className={`px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${passwordAuthType === 'email' ? 'bg-midnight-black text-white' : 'bg-white text-gray-700'}`}
+          className={`px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${passwordAuthType === 'email' ? 'bg-black text-primary-foreground' : 'bg-card text-foreground'}`}
           onClick={() => handlePasswordAuthTypeChange('email')}
         >
           이메일
@@ -108,7 +108,7 @@ export default function FindPasswordSection({
         <button
           type="button"
           tabIndex={0}
-          className={`px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${passwordAuthType === 'phone' ? 'bg-midnight-black text-white' : 'bg-white text-gray-700'}`}
+          className={`px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${passwordAuthType === 'phone' ? 'bg-black text-primary-foreground' : 'bg-card text-foreground'}`}
           onClick={() => handlePasswordAuthTypeChange('phone')}
         >
           휴대폰 번호
@@ -262,7 +262,7 @@ export default function FindPasswordSection({
           }
           tabIndex={0}
           data-find-password-button
-          className="flex-1 h-12 rounded-lg bg-midnight-black text-white font-semibold disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="flex-1 h-12 rounded-lg bg-black text-primary-foreground font-semibold disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           비밀번호 찾기
         </button>
@@ -271,7 +271,7 @@ export default function FindPasswordSection({
           onClick={onReset}
           disabled={!sent && !verified}
           tabIndex={0}
-          className="px-4 h-12 rounded-lg bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="px-4 h-12 rounded-lg bg-muted text-foreground font-semibold hover:bg-secondary transition-colors disabled:bg-secondary disabled:text-muted-foreground disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           초기화
         </button>

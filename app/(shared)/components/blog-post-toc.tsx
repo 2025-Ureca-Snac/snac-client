@@ -7,8 +7,8 @@ export default function BlogPostTOC({ tableOfContents }: BlogPostTOCProps) {
   }
 
   return (
-    <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white  mb-4">
+    <div className="mt-8 p-6 bg-muted rounded-lg">
+      <h3 className="text-lg font-semibold text-card-foreground  mb-4">
         목차
       </h3>
       <nav className="space-y-2">

@@ -34,8 +34,8 @@ export const BlogTabNavigation = ({
           onClick={() => onTabChange('all')}
           className={`text-lg font-medium pb-2 border-b-2 transition-colors ${
             activeTab === 'all'
-              ? 'text-gray-800 border-gray-800'
-              : 'text-gray-500 border-transparent hover:text-gray-700'
+              ? 'text-foreground border-primary font-bold'
+              : 'text-muted-foreground border-transparent hover:text-foreground'
           }`}
         >
           모든글
@@ -44,8 +44,8 @@ export const BlogTabNavigation = ({
           onClick={() => onTabChange('featured')}
           className={`text-lg font-medium pb-2 border-b-2 transition-colors ${
             activeTab === 'featured'
-              ? 'text-gray-800 dark:text-white border-gray-800'
-              : 'text-gray-500 dark:text-white border-transparent hover:text-gray-700'
+              ? 'text-foreground border-primary font-bold'
+              : 'text-muted-foreground border-transparent hover:text-foreground'
           }`}
         >
           Featured

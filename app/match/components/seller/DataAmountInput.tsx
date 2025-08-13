@@ -77,7 +77,7 @@ export default function DataAmountInput({
 
   return (
     <div className="space-y-3">
-      <h3 className={`text-lg md:text-2xl font-medium text-white`}>데이터량</h3>
+      <h3 className={`text-lg md:text-2xl font-medium text-primary-foreground`}>데이터량</h3>
 
       {!isCustomInput ? (
         <div className="space-y-3">
@@ -90,10 +90,10 @@ export default function DataAmountInput({
                 disabled={disabled}
                 className={`px-3 py-3 text-sm rounded-lg border transition-all ${
                   disabled
-                    ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
+                    ? 'bg-muted text-muted-foreground border-border cursor-not-allowed'
                     : Math.abs(value - option.value) < 0.01
-                      ? 'bg-white text-black border-white'
-                      : 'bg-transparent text-white border-gray-400 hover:border-white hover:bg-white hover:bg-opacity-10'
+                      ? 'bg-card text-card-foreground border-white'
+                      : 'bg-transparent text-primary-foreground border-gray-400 hover:border-white hover:bg-card hover:bg-opacity-10'
                 }`}
               >
                 {option.label}
@@ -103,7 +103,7 @@ export default function DataAmountInput({
           {/* 직접 입력 버튼
           <button
             onClick={handleCustomInputToggle}
-            className="w-full py-3 text-sm border border-dashed border-gray-400 text-gray-300 rounded-lg hover:border-white hover:text-white transition-all"
+            className="w-full py-3 text-sm border border-dashed border-gray-400 text-muted-foreground rounded-lg hover:border-white hover:text-primary-foreground transition-all"
           >
             + 직접 입력하기
           </button> */}
@@ -122,25 +122,25 @@ export default function DataAmountInput({
               disabled={disabled}
               className={`flex-1 px-3 py-3 border rounded-lg transition-all ${
                 disabled
-                  ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
-                  : 'bg-gray-800 text-white border-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent'
+                  ? 'bg-muted text-muted-foreground border-border cursor-not-allowed'
+                  : 'bg-card text-primary-foreground border-border focus:ring-2 focus:ring-green-500 focus:border-transparent'
               }`}
               placeholder="데이터량 입력"
             />
 
             {/* 단위 선택 버튼 */}
             <div
-              className={`flex rounded-lg overflow-hidden ${disabled ? 'bg-gray-600' : 'bg-gray-700'}`}
+              className={`flex rounded-lg overflow-hidden ${disabled ? 'bg-muted' : 'bg-muted'}`}
             >
               <button
                 onClick={() => handleUnitChange('GB')}
                 disabled={disabled}
                 className={`px-4 py-3 text-sm font-medium transition-all ${
                   disabled
-                    ? 'text-gray-500 cursor-not-allowed'
+                    ? 'text-muted-foreground cursor-not-allowed'
                     : unit === 'GB'
-                      ? 'bg-green-600 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                      ? 'bg-green-600 text-primary-foreground'
+                      : 'text-muted-foreground hover:text-primary-foreground hover:bg-muted'
                 }`}
               >
                 GB
@@ -150,10 +150,10 @@ export default function DataAmountInput({
                 disabled={disabled}
                 className={`px-4 py-3 text-sm font-medium transition-all ${
                   disabled
-                    ? 'text-gray-500 cursor-not-allowed'
+                    ? 'text-muted-foreground cursor-not-allowed'
                     : unit === 'MB'
-                      ? 'bg-green-600 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                      ? 'bg-green-600 text-primary-foreground'
+                      : 'text-muted-foreground hover:text-primary-foreground hover:bg-muted'
                 }`}
               >
                 MB
@@ -163,7 +163,7 @@ export default function DataAmountInput({
 
           {/* 현재 값 표시 */}
           <div
-            className={`text-xs text-center ${disabled ? 'text-gray-500' : 'text-gray-400'}`}
+            className={`text-xs text-center ${disabled ? 'text-muted-foreground' : 'text-muted-foreground'}`}
           >
             {unit === 'GB'
               ? `${parseFloat(inputValue) || 0}GB`
@@ -176,8 +176,8 @@ export default function DataAmountInput({
             disabled={disabled}
             className={`w-full py-2 text-xs transition-colors ${
               disabled
-                ? 'text-gray-500 cursor-not-allowed'
-                : 'text-gray-400 hover:text-gray-200'
+                ? 'text-muted-foreground cursor-not-allowed'
+                : 'text-muted-foreground hover:text-muted-foreground'
             }`}
           >
             빠른 선택으로 돌아가기

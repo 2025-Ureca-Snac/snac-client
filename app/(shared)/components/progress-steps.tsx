@@ -16,30 +16,28 @@ export default function ProgressSteps({
             className={`h-5 w-5 md:w-8 md:h-8 rounded-full flex items-center justify-center text-sm font-medium ${
               showSnackPayment
                 ? 'bg-green-500 text-white'
-                : 'bg-gray-900 dark:bg-gray-600 text-white'
+                : 'bg-primary text-primary-foreground'
             }`}
           >
             {showSnackPayment ? '✓' : '1'}
           </div>
           <span
             className={`ml-2 text-xs md:text-sm font-medium whitespace-nowrap ${
-              showSnackPayment
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-gray-900 dark:text-white'
+              showSnackPayment ? 'text-green-600' : 'text-card-foreground'
             }`}
           >
             구매 정보 확인
           </span>
         </div>
         <div
-          className={`w-2 md:w-8 h-0.5 ${showSnackPayment ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+          className={`w-2 md:w-8 h-0.5 ${showSnackPayment ? 'bg-green-500' : 'bg-secondary'}`}
         ></div>
         <div className="flex items-center">
           <div
             className={`h-5 w-5 md:w-8 md:h-8 rounded-full flex items-center justify-center text-sm font-medium ${
               showSnackPayment
-                ? 'bg-gray-900 dark:bg-gray-600 text-white'
-                : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground'
             }`}
           >
             2
@@ -47,19 +45,19 @@ export default function ProgressSteps({
           <span
             className={`ml-2 text-xs md:text-sm font-medium whitespace-nowrap ${
               showSnackPayment
-                ? 'text-gray-900 dark:text-white'
-                : 'text-gray-500 dark:text-gray-400'
+                ? 'text-card-foreground'
+                : 'text-muted-foreground'
             }`}
           >
             결제 하기
           </span>
         </div>
-        <div className="w-2 md:w-8 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+        <div className="w-2 md:w-8 h-0.5 bg-secondary"></div>
         <div className="flex items-center">
-          <div className="h-5 w-5 md:w-8 md:h-8 bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full flex items-center justify-center text-sm font-medium">
+          <div className="h-5 w-5 md:w-8 md:h-8 bg-secondary text-muted-foreground rounded-full flex items-center justify-center text-sm font-medium">
             3
           </div>
-          <span className="ml-2 text-xs md:text-sm font-medium whitespace-nowrap text-gray-500 dark:text-gray-400">
+          <span className="ml-2 text-xs md:text-sm font-medium whitespace-nowrap text-muted-foreground">
             결제 정보 확인
           </span>
         </div>

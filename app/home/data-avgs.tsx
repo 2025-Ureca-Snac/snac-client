@@ -70,7 +70,7 @@ export function DataAvg() {
     <div className="text-center h-30 md:h-60 pt-8 md:pt-16">
       <h2 className="flex items-center justify-center gap-2">
         <div className="w-6 h-6 md:w-[44px] md:h-[44px]">
-          <TelecomIcon className="w-full h-full  dark:text-white" />
+          <TelecomIcon className="w-full h-full " />
         </div>
 
         <div className="w-[60px] md:w-[105px] text-right">

@@ -6,7 +6,7 @@ export default function TransferStep() {
   return (
     <div className="max-w-3xl mx-auto px-4">
       {/* 메인 카드 - 투명 배경 */}
-      <div className="relative bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+      <div className="relative bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
         {/* 서브틀한 글로우 효과 */}
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-blue-300/3"></div>
 
@@ -22,7 +22,7 @@ export default function TransferStep() {
             <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-cyan-300 to-white bg-clip-text text-transparent mb-2">
               데이터 전송 대기
             </h2>
-            <p className="text-gray-400">판매자가 데이터를 전송하고 있습니다</p>
+            <p className="text-muted-foreground">판매자가 데이터를 전송하고 있습니다</p>
           </div>
 
           {/* 중앙 로딩 애니메이션 */}
@@ -43,13 +43,13 @@ export default function TransferStep() {
               <div className="absolute inset-0 bg-cyan-400 rounded-full blur-xl opacity-20 animate-pulse"></div>
             </div>
 
-            <p className="text-gray-300 text-lg mb-2">데이터 전송 진행 중...</p>
-            <p className="text-gray-500 text-sm">잠시만 기다려주세요</p>
+            <p className="text-muted-foreground text-lg mb-2">데이터 전송 진행 중...</p>
+            <p className="text-muted-foreground text-sm">잠시만 기다려주세요</p>
           </div>
 
           {/* 전송 상태 카드 */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-gray-700/50">
-            <h3 className="text-white font-semibold mb-4 flex items-center space-x-2">
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-border/50">
+            <h3 className="text-primary-foreground font-semibold mb-4 flex items-center space-x-2">
               <span className="text-cyan-400">📊</span>
               <span>전송 상태</span>
             </h3>
@@ -58,7 +58,7 @@ export default function TransferStep() {
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">✓</span>
+                    <span className="text-primary-foreground text-sm font-bold">✓</span>
                   </div>
                   <div className="absolute -inset-1 bg-green-400 rounded-full blur opacity-30"></div>
                 </div>
@@ -74,7 +74,7 @@ export default function TransferStep() {
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <div className="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center animate-pulse">
-                    <div className="w-3 h-3 bg-white rounded-full animate-ping"></div>
+                    <div className="w-3 h-3 bg-card rounded-full animate-ping"></div>
                   </div>
                   <div className="absolute -inset-1 bg-cyan-400 rounded-full blur opacity-40 animate-pulse"></div>
                 </div>
@@ -90,14 +90,14 @@ export default function TransferStep() {
 
               {/* 전송 확인 대기 */}
               <div className="flex items-center space-x-4">
-                <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center border-2 border-gray-500">
-                  <span className="text-gray-400 text-sm">⏳</span>
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center border-2 border-gray-500">
+                  <span className="text-muted-foreground text-sm">⏳</span>
                 </div>
                 <div>
-                  <div className="text-gray-400 font-medium">
+                  <div className="text-muted-foreground font-medium">
                     전송 확인 대기
                   </div>
-                  <div className="text-gray-500 text-xs">
+                  <div className="text-muted-foreground text-xs">
                     Awaiting Confirmation
                   </div>
                 </div>

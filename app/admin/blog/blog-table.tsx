@@ -31,7 +31,7 @@ export function BlogTable({ search = '' }: { search?: string }) {
 
   return (
     <div className="overflow-x-auto">
-      <div className="mb-4 p-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg dark:bg-yellow-950 dark:text-yellow-100 dark:border-yellow-700">
+      <div className="mb-4 p-4 text-sm text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg">
         <strong>안내:</strong> 제목을 클릭하면 기존 게시글 정보를 수정할 수
         있습니다.
         <br />
@@ -41,8 +41,8 @@ export function BlogTable({ search = '' }: { search?: string }) {
         <span className="font-semibold">새 파일로 교체</span>됩니다.
       </div>
 
-      <table className="w-full text-regular-sm text-left text-gray-500 dark:text-gray-200">
-        <thead className="text-regular-xs text-gray-700 dark:text-gray-100 uppercase bg-gray-50 dark:bg-gray-800">
+      <table className="w-full text-regular-sm text-left text-muted-foreground text-muted-foreground">
+        <thead className="text-regular-xs text-foreground uppercase bg-muted">
           <tr>
             <th scope="col" className="px-6 py-3">
               ID
@@ -62,15 +62,15 @@ export function BlogTable({ search = '' }: { search?: string }) {
           {filteredBlogs.map((blog) => (
             <tr
               key={blog.id}
-              className="bg-white border-b hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+              className="bg-card border-b hover:bg-muted bg-background:bg-card"
             >
-              <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
+              <td className="px-6 py-4 font-medium text-card-foreground">
                 #{blog.id}
               </td>
 
               {/* 제목 클릭 시 모달 오픈 */}
               <td
-                className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:underline"
+                className="px-6 py-4 font-semibold text-card-foreground cursor-pointer hover:underline"
                 onClick={() => {
                   setDetailPost(blog);
                   setDetailOpen(true);
@@ -82,7 +82,7 @@ export function BlogTable({ search = '' }: { search?: string }) {
               <td className="px-6 py-4">{blog.nickname}</td>
               <td className="px-6 py-4 flex justify-center space-x-3">
                 <Link href={`/blog/admin?edit=${blog.id}`} title="수정">
-                  <Edit className="h-6 w-6 text-midnight-black dark:text-gray-200" />
+                  <Edit className="h-6 w-6 text-card-foreground text-muted-foreground" />
                 </Link>
                 <button
                   onClick={() => openDeleteModal(blog.id)}

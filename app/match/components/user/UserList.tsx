@@ -12,7 +12,7 @@ interface UserListProps {
 export default function UserList({ users, onUserClick }: UserListProps) {
   if (users.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
         <div className="text-lg font-medium mb-2">
           필터 조건을 선택해 주세요
         </div>

@@ -242,7 +242,7 @@ export default function ChangePasswordModal({
         onKeyDown={handleKeyDown}
       >
         <form
-          className="bg-white rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-card rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
           onSubmit={handleSubmit}
         >
@@ -271,7 +271,7 @@ export default function ChangePasswordModal({
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black text-center">
+            <div className="text-xl font-extrabold text-card-foreground text-center">
               비밀번호 변경
             </div>
             <button
@@ -280,21 +280,21 @@ export default function ChangePasswordModal({
                 onClose();
               }}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+              className="absolute right-4 top-4 text-2xl text-muted-foreground hover:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
               aria-label="닫기"
               tabIndex={0}
             >
               ×
             </button>
           </div>
-          <div className="w-full text-center text-gray-600 mb-4 text-sm">
+          <div className="w-full text-center text-muted-foreground mb-4 text-sm">
             변경하려면 비밀번호를 입력하세요.
           </div>
           <div className="w-full flex flex-col gap-3 mb-4">
             <div>
               <label
                 htmlFor="current-password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 현재 비밀번호
               </label>
@@ -303,7 +303,7 @@ export default function ChangePasswordModal({
                   ref={currentPasswordRef}
                   id="current-password"
                   type={showCurrentPassword ? 'text' : 'password'}
-                  className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
+                  className="w-full px-3 py-3 pr-10 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-secondary disabled:cursor-not-allowed h-[48px]"
                   value={current}
                   onChange={(e) => setCurrent(e.target.value)}
                   onKeyDown={handleCurrentPasswordKeyDown}
@@ -339,7 +339,7 @@ export default function ChangePasswordModal({
             <div>
               <label
                 htmlFor="new-password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 새 비밀번호
               </label>
@@ -348,12 +348,12 @@ export default function ChangePasswordModal({
                   ref={newPasswordRef}
                   id="new-password"
                   type={showNewPassword ? 'text' : 'password'}
-                  className={`w-full px-3 py-3 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] ${
+                  className={`w-full px-3 py-3 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-secondary disabled:cursor-not-allowed h-[48px] ${
                     next.trim() && !passwordValidation.isValid
                       ? 'border-red-300 focus:ring-red-200'
                       : next.trim() && passwordValidation.isValid
                         ? 'border-green-300 focus:ring-green-200'
-                        : 'border-gray-300 focus:ring-blue-500'
+                        : 'border-border focus:ring-blue-500'
                   }`}
                   value={next}
                   onChange={(e) => setNext(e.target.value)}
@@ -392,7 +392,7 @@ export default function ChangePasswordModal({
                   >
                     {next.length >= 6 && next.length <= 12 && (
                       <svg
-                        className="w-2 h-2 text-white"
+                        className="w-2 h-2 text-primary-foreground"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -422,7 +422,7 @@ export default function ChangePasswordModal({
                   >
                     {/[a-zA-Z]/.test(next) && (
                       <svg
-                        className="w-2 h-2 text-white"
+                        className="w-2 h-2 text-primary-foreground"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -450,7 +450,7 @@ export default function ChangePasswordModal({
                   >
                     {/\d/.test(next) && (
                       <svg
-                        className="w-2 h-2 text-white"
+                        className="w-2 h-2 text-primary-foreground"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -480,7 +480,7 @@ export default function ChangePasswordModal({
                   >
                     {/[!?@#$%^&*()~`+\-_]/.test(next) && (
                       <svg
-                        className="w-2 h-2 text-white"
+                        className="w-2 h-2 text-primary-foreground"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -507,7 +507,7 @@ export default function ChangePasswordModal({
             <div>
               <label
                 htmlFor="confirm-password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 새 비밀번호 한 번 더 입력
               </label>
@@ -516,7 +516,7 @@ export default function ChangePasswordModal({
                   ref={confirmPasswordRef}
                   id="confirm-password"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px]"
+                  className="w-full px-3 py-3 pr-10 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-secondary disabled:cursor-not-allowed h-[48px]"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   onKeyDown={handleConfirmPasswordKeyDown}
@@ -570,14 +570,14 @@ export default function ChangePasswordModal({
                 !passwordValidation.isValid ||
                 isLoading
               }
-              className="w-2/3 py-3 rounded-lg bg-blue-200 text-black font-medium hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="w-2/3 py-3 rounded-lg bg-blue-200 text-card-foreground font-medium hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
               tabIndex={0}
             >
               {isLoading ? '변경 중...' : '변경하기'}
             </button>
             <button
               type="button"
-              className="w-1/3 py-3 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="w-1/3 py-3 rounded-lg bg-secondary text-foreground font-medium hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               onClick={onClose}
               disabled={isLoading}
               tabIndex={0}

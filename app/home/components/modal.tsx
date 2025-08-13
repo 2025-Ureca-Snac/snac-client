@@ -25,11 +25,15 @@ const dataPresets = ['1GB', '2GB'];
 const CheckboxIcon = ({ checked }: { checked: boolean }) => (
   <div
     className={`w-4 h-4 border-2 flex items-center justify-center rounded-sm ${
-      checked ? 'bg-gray-600 border-gray-600' : 'border-gray-300'
+      checked ? 'bg-muted border-border' : 'border-border'
     }`}
   >
     {checked && (
-      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24">
+      <svg
+        className="w-3 h-3 text-primary-foreground"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
         <path
           stroke="currentColor"
           strokeLinecap="round"
@@ -79,7 +83,7 @@ export const Modal = () => {
       case 'LGU+':
         return 'bg-[#EC0B8D] hover:bg-[#c40975]';
       default:
-        return 'bg-gray-600 hover:bg-gray-700';
+        return 'bg-muted hover:bg-muted';
     }
   };
 
@@ -203,7 +207,7 @@ export const Modal = () => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-midnight-black bg-opacity-30" />
+          <div className="fixed inset-0 bg-black bg-opacity-30" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -217,7 +221,7 @@ export const Modal = () => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-card p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex justify-between items-start">
                   <div>
                     <Dialog.Title
@@ -226,7 +230,7 @@ export const Modal = () => {
                     >
                       {isEditMode ? '수정하기' : '등록하기'}
                     </Dialog.Title>
-                    <p className="mt-1 text-regular-sm text-gray-600 dark:text-gray-200">
+                    <p className="mt-1 text-regular-sm text-muted-foreground">
                       {isEditMode
                         ? '수정할 내용을 입력해주세요'
                         : '원하는 조건을 선택해주세요'}
@@ -236,7 +240,7 @@ export const Modal = () => {
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-6">
                   <RadioGroup value={cardCategory} onChange={setCardCategory}>
-                    <RadioGroup.Label className="block text-regular-sm font-medium text-gray-700 dark:text-gray-100 mb-3">
+                    <RadioGroup.Label className="block text-regular-sm font-medium text-foreground mb-3">
                       거래
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-6">
@@ -263,7 +267,7 @@ export const Modal = () => {
                   </RadioGroup>
 
                   <RadioGroup value={carrier} onChange={setCarrier}>
-                    <RadioGroup.Label className="block text-regular-sm text-gray-700 mb-3">
+                    <RadioGroup.Label className="block text-regular-sm text-foreground mb-3">
                       통신사
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-4">
@@ -276,7 +280,7 @@ export const Modal = () => {
                           {({ checked }) => (
                             <span className="flex items-center">
                               <CheckboxIcon checked={checked} />
-                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ml-2">
+                              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center ml-2">
                                 <Image
                                   src={option.imageUrl}
                                   alt={option.name}
@@ -295,7 +299,7 @@ export const Modal = () => {
                   </RadioGroup>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium text-foreground mb-3">
                       데이터량
                     </label>
                     <div className="grid grid-cols-4 gap-2 mb-2">
@@ -304,9 +308,9 @@ export const Modal = () => {
                           key={preset}
                           type="button"
                           onClick={() => handleDataPresetClick(preset)}
-                          className={`w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50 dark:hover:bg-gray-700  ${
+                          className={`w-full py-2 px-3 border border-border rounded-md text-medium-sm hover:bg-muted  ${
                             isPresetSelected(preset)
-                              ? 'bg-gray-100 font-medium'
+                              ? 'bg-secondary font-medium'
                               : ''
                           }`}
                         >
@@ -318,7 +322,7 @@ export const Modal = () => {
                         onClick={() =>
                           document.getElementById('dataAmountInput')?.focus()
                         }
-                        className="w-full py-2 px-3 border border-gray-300 rounded-md text-medium-sm hover:bg-gray-50"
+                        className="w-full py-2 px-3 border border-border rounded-md text-medium-sm hover:bg-muted"
                       >
                         직접입력
                       </button> */}
@@ -332,7 +336,7 @@ export const Modal = () => {
                         type="number"
                         value={dataAmount}
                         onChange={(e) => setDataAmount(e.target.value)}
-                        className="w-5/6 border border-gray-300 rounded-lg py-2 px-3 text-regular placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                        className="w-5/6 border border-border rounded-lg py-2 px-3 text-regular placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                         placeholder="0"
                         required
                       /> */}
@@ -341,7 +345,7 @@ export const Modal = () => {
                         onChange={(e) =>
                           handleDataUnitChange(e.target.value as DataUnit)
                         }
-                        className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                        className="border border-border rounded-md shadow-sm py-2 px-3"
                         aria-label="데이터 단위 선택"
                       >
                         <option value="MB">MB</option>
@@ -353,7 +357,7 @@ export const Modal = () => {
                   <div>
                     <label
                       htmlFor="price"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-foreground"
                     >
                       가격
                     </label>
@@ -363,10 +367,10 @@ export const Modal = () => {
                       value={price}
                       placeholder="1,000"
                       onChange={(e) => setPrice(e.target.value)}
-                      className="mt-1 w-full border border-gray-300 rounded-lg py-2 px-3 text-regular-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 "
+                      className="mt-1 w-full border border-border rounded-lg py-2 px-3 text-regular-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 "
                       required
                     />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-300">
+                    <p className="mt-1 text-xs text-muted-foreground text-muted-foreground">
                       * 최소 가격은 100원 이상입니다.
                     </p>
                   </div>
@@ -375,7 +379,7 @@ export const Modal = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`w-full flex justify-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-regular-md font-medium text-white disabled:bg-gray-300 transition-colors ${getButtonColorClasses()}`}
+                      className={`w-full flex justify-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-regular-md font-medium text-primary-foreground disabled:bg-muted transition-colors ${getButtonColorClasses()}`}
                     >
                       {isLoading
                         ? isEditMode
@@ -388,7 +392,7 @@ export const Modal = () => {
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="w-full flex justify-center py-2 px-3 border border-gray-300 rounded-lg text-regular-md font-medium text-gray-700 bg-white hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full flex justify-center py-2 px-3 border border-border rounded-lg text-regular-md font-medium text-foreground bg-card hover:bg-muted"
                     >
                       취소하기
                     </button>

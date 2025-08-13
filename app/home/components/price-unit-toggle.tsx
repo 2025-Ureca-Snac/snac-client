@@ -24,10 +24,10 @@ export const PriceUnitToggle = ({
 
   return (
     <div
-      className={`relative flex ${containerWidth} items-center rounded-full bg-gray-100 p-1`}
+      className={`relative flex ${containerWidth} items-center rounded-full bg-secondary p-1`}
     >
       <div
-        className={`absolute h-[calc(100%-8px)] w-[calc(50%-4px)] transform rounded-full bg-white ${shadow} transition-transform duration-300 ease-in-out ${
+        className={`absolute h-[calc(100%-8px)] w-[calc(50%-4px)] transform rounded-full bg-card ${shadow} transition-transform duration-300 ease-in-out ${
           currentUnit === 'won' ? 'translate-x-full' : 'translate-x-0'
         }`}
       />
@@ -35,8 +35,8 @@ export const PriceUnitToggle = ({
         onClick={() => setCurrentUnit('snack')}
         className={`relative z-10 flex flex-1 items-center justify-center ${paddingY} text-center ${textSize} font-bold transition-colors duration-300 ${
           currentUnit === 'snack'
-            ? 'text-gray-900 dark:text-gray-100'
-            : 'text-gray-500 dark:text-gray-400'
+            ? 'text-card-foreground'
+            : 'text-muted-foreground'
         }`}
       >
         <Image
@@ -52,8 +52,8 @@ export const PriceUnitToggle = ({
         onClick={() => setCurrentUnit('won')}
         className={`relative z-10 flex flex-1 items-center justify-center ${paddingY} text-center ${textSize} font-bold transition-colors duration-300 ${
           currentUnit === 'won'
-            ? 'text-gray-900 dark:text-gray-100'
-            : 'text-gray-500 dark:text-gray-400'
+            ? 'text-card-foreground'
+            : 'text-muted-foreground'
         }`}
       >
         ₩ 원

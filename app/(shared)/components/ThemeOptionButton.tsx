@@ -19,7 +19,7 @@ export default function ThemeOptionButton({
 }: ThemeOptionButtonProps) {
   return (
     <button
-      className={`w-full py-3 px-3 rounded-lg border border-gray-200 hover:bg-gray-50 flex items-center justify-between ${selected ? colorClass : ''}`}
+      className={`w-full py-3 px-3 rounded-lg border border-border hover:bg-muted flex items-center justify-between ${selected ? colorClass : ''}`}
       onClick={onClick}
     >
       {label}

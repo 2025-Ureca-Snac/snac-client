@@ -178,7 +178,7 @@ export default function FilterSection({
   }, [sellerInfo]);
 
   return (
-    <section className="relative bg-black text-white py-16 px-6 overflow-hidden">
+    <section className="relative bg-black text-primary-foreground py-16 px-6 overflow-hidden">
       {/* 동적 배경 요소들 */}
       <div className="absolute inset-0 z-0">
         {/* 메인 그라데이션 배경 */}
@@ -217,13 +217,13 @@ export default function FilterSection({
         <div className="flex items-center justify-center mb-4">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-400 font-medium text-sm text-gray-300 ">
+            <span className="text-green-400 font-medium text-sm text-muted-foreground ">
               현재 접속자수: {connectedUsers}명
             </span>
           </div>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-semibold text-center mb-6 text-white">
+        <h1 className="text-2xl md:text-3xl font-semibold text-center mb-6 text-primary-foreground">
           {title}
         </h1>
 
@@ -262,7 +262,7 @@ export default function FilterSection({
           {/* 거래 방식을 선택하지 않았을 때 */}
           {!isBuyer && !isSeller && (
             <div className="text-center py-8">
-              <p className="text-gray-300">거래 방식을 선택해주세요</p>
+              <p className="text-muted-foreground">거래 방식을 선택해주세요</p>
             </div>
           )}
         </div>

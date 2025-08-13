@@ -63,13 +63,13 @@ export default function AdminQnaPage() {
   const renderDisputeList = () => {
     if (loading)
       return (
-        <div className="text-center py-20 text-regular-md text-gray-400">
+        <div className="text-center py-20 text-regular-md text-muted-foreground">
           데이터를 불러오는 중입니다...
         </div>
       );
     if (filteredDisputes.length === 0)
       return (
-        <div className="text-center py-20 text-regular-md text-gray-400">
+        <div className="text-center py-20 text-regular-md text-muted-foreground">
           조건에 맞는 문의 내역이 없습니다.
         </div>
       );
@@ -79,30 +79,30 @@ export default function AdminQnaPage() {
         {filteredDisputes.map((d) => (
           <div
             key={d.id}
-            className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-light flex flex-col justify-between"
+            className="bg-card/50 border border-border rounded-lg p-4 shadow-light flex flex-col justify-between"
           >
             <div>
               <div className="flex justify-between items-start mb-3">
                 <div className="flex flex-col mr-2">
-                  <span className="text-regular-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-regular-xs text-muted-foreground">
                     {QNA_TYPE_LABELS[d.type] ?? d.type}
                   </span>
                   <button
                     onClick={() => handleOpenDetailModal(d.id)}
-                    className="text-regular-md font-bold text-gray-900 dark:text-gray-100 hover:underline text-left mt-1 break-words"
+                    className="text-regular-md font-bold text-card-foreground hover:underline text-left mt-1 break-words"
                   >
                     {d.title}
                   </button>
                 </div>
                 {d.status && <StatusBadge status={d.status} />}
               </div>
-              <div className="text-regular-sm text-gray-600 dark:text-gray-400 space-y-2 border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+              <div className="text-regular-sm text-muted-foreground text-muted-foreground space-y-2 border-t border-border pt-3 mt-3">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-500">작성자 ID:</span>
+                  <span className="font-medium text-muted-foreground">작성자 ID:</span>
                   <span className="truncate ml-2">{d.id}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-500">
+                  <span className="font-medium text-muted-foreground">
                     작성자 닉네임:
                   </span>
                   <span className="truncate ml-2">
@@ -111,7 +111,7 @@ export default function AdminQnaPage() {
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="font-medium text-gray-500">접수일:</span>
+                  <span className="font-medium text-muted-foreground">접수일:</span>
                   <span>{new Date(d.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -131,7 +131,7 @@ export default function AdminQnaPage() {
   };
 
   return (
-    <div className="w-full max-w-full mx-auto px-2 md:px-6 py-4 md:py-6  dark:bg-gray-900 min-h-screen">
+    <div className="w-full max-w-full mx-auto px-2 md:px-6 py-4 md:py-6  bg-background min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 md:mb-6">
         <select
           aria-label="문의 유형 필터"
@@ -139,7 +139,7 @@ export default function AdminQnaPage() {
             handleTypeChange(e.target.value as DisputeType | 'ALL')
           }
           value={filters.type}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-teal-green focus:outline-none w-full md:w-auto"
+          className="bg-card border border-border text-regular-sm text-foreground rounded-md px-3 py-2 focus:ring-2 focus:ring-teal-green focus:outline-none w-full md:w-auto"
         >
           {qnaTypeFilterCategories.map((cat) => (
             <option key={cat.value} value={cat.value}>
@@ -153,7 +153,7 @@ export default function AdminQnaPage() {
             handleStatusChange(e.target.value as DisputeStatus | 'ALL')
           }
           value={filters.status}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-regular-sm text-gray-800 dark:text-gray-200 rounded-md px-3 py-2 focus:ring-2 focus:ring-teal-green focus:outline-none w-full md:w-auto"
+          className="bg-card border border-border text-regular-sm text-foreground rounded-md px-3 py-2 focus:ring-2 focus:ring-teal-green focus:outline-none w-full md:w-auto"
         >
           {statusFilterCategories.map((cat) => (
             <option key={cat.value} value={cat.value}>

@@ -71,14 +71,14 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
         role="dialog"
       >
         <div
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-card rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
           onKeyDown={handleKeyDown}
         >
           {/* Header and Close Button */}
           <div className="flex flex-col items-center -mt-12 mb-2">
             <div
-              className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2 border-4 border-white dark:border-gray-800 shadow"
+              className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-2 border-4 border-white shadow"
               style={{ marginTop: '-32px' }}
             >
               <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
@@ -113,20 +113,20 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black dark:text-white text-center">
+            <div className="text-xl font-extrabold text-card-foreground text-center">
               화면 테마
             </div>
             <button
               onClick={onClose}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute right-4 top-4 text-2xl text-muted-foreground hover:text-foreground"
               aria-label="닫기"
               tabIndex={0}
             >
               ×
             </button>
           </div>
-          <div className="w-full text-center text-gray-600 dark:text-gray-400 mb-4 text-sm">
+          <div className="w-full text-center text-muted-foreground text-muted-foreground mb-4 text-sm">
             원하는 테마를 선택해주세요.
           </div>
 
@@ -138,8 +138,8 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
                 type="button"
                 className={`w-full py-3 px-4 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                   selectedTheme === id
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-border bg-card text-foreground hover:border-border:border-gray-500'
                 }`}
                 onClick={() => handleThemeSelect(id)}
                 aria-label={`${label} 선택`}
@@ -165,7 +165,7 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
           <div className="w-full flex gap-2">
             <button
               type="button"
-              className="w-2/3 py-3 rounded-lg bg-blue-200 dark:bg-blue-600 text-black dark:text-white font-bold text-lg hover:bg-blue-300 dark:hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-2/3 py-3 rounded-lg bg-blue-200 text-card-foreground font-bold text-lg hover:bg-blue-300:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               onClick={handleSubmit}
               tabIndex={0}
             >
@@ -173,7 +173,7 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
             </button>
             <button
               type="button"
-              className="w-1/3 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold text-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="w-1/3 py-3 rounded-lg bg-secondary text-foreground font-bold text-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               onClick={onClose}
               tabIndex={0}
             >

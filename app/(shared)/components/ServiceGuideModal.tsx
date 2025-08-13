@@ -22,13 +22,13 @@ export default function ServiceGuideModal({
         role="dialog"
       >
         <div
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
+          className="bg-card rounded-2xl shadow-xl w-[420px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center mx-2 sm:mx-0"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header and Close Button */}
           <div className="flex flex-col items-center -mt-12 mb-2">
             <div
-              className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2 border-4 border-white dark:border-gray-800 shadow"
+              className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-2 border-4 border-white shadow"
               style={{ marginTop: '-32px' }}
             >
               <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
@@ -58,23 +58,23 @@ export default function ServiceGuideModal({
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black dark:text-white text-center">
+            <div className="text-xl font-extrabold text-card-foreground text-center">
               서비스 가이드
             </div>
             <button
               onClick={onClose}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+              className="absolute right-4 top-4 text-2xl text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
               aria-label="닫기"
               tabIndex={0}
             >
               ×
             </button>
           </div>
-          <div className="w-full text-center text-gray-700 dark:text-gray-300 mb-4 text-base">
+          <div className="w-full text-center text-foreground mb-4 text-base">
             통신사별 데이터 쿠폰 거래 시 꼭 알아두세요
           </div>
-          <div className="w-full text-left text-gray-900 dark:text-white text-[15px] flex flex-col gap-5 max-h-[500px] overflow-y-auto pr-2">
+          <div className="w-full text-left text-card-foreground text-[15px] flex flex-col gap-5 max-h-[500px] overflow-y-auto pr-2">
             <div>
               <div className="font-bold text-lg mb-1">SKT (SK텔레콤)</div>
               <ul className="list-disc pl-5 space-y-1">

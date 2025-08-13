@@ -17,38 +17,36 @@ export default function RechargeConfirmModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-card rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 className="text-lg font-semibold text-card-foreground mb-4">
           스낵 충전 필요
         </h3>
 
         <div className="space-y-3 mb-6">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             스낵 머니({snackMoney.toLocaleString()}원) + 스낵 포인트(
             {snackPoints.toLocaleString()}원)가 부족합니다.
           </p>
 
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3">
-            <p className="text-red-800 dark:text-red-300 font-medium">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+            <p className="text-destructive font-medium">
               부족한 금액: {shortage.toLocaleString()}원
             </p>
           </div>
 
-          <p className="text-gray-600 dark:text-gray-300">
-            스낵 충전하러 가시겠습니까?
-          </p>
+          <p className="text-muted-foreground">스낵 충전하러 가시겠습니까?</p>
         </div>
 
         <div className="flex space-x-3">
           <button
             onClick={onClose}
-            className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            className="flex-1 py-2 px-4 border border-border rounded-md text-foreground bg-card hover:bg-muted transition-colors"
           >
             취소
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-2 px-4 bg-gray-900 dark:bg-gray-700 text-white rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors"
+            className="flex-1 py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
           >
             충전하기
           </button>

@@ -71,7 +71,7 @@ export const BlogCard = ({
         {/* 카테고리 배지 (주석 유지) - API에 category가 없으므로 렌더링되지 않음 */}
         {/* {showCategory && (post as any).category && (
           <div className="absolute top-2 left-2">
-            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+            <span className="bg-blue-500 text-primary-foreground text-xs px-2 py-1 rounded-full">
               {(post as any).category}
             </span>
           </div>
@@ -80,7 +80,7 @@ export const BlogCard = ({
         {/* 추천 배지 (주석 유지) - API에 featured가 없으므로 렌더링되지 않음 */}
         {/* {(post as any).featured && (
           <div className="absolute top-2 right-2">
-            <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+            <span className="bg-yellow-500 text-primary-foreground text-xs px-2 py-1 rounded-full">
               추천
             </span>
           </div>
@@ -88,11 +88,11 @@ export const BlogCard = ({
       </div>
 
       {!isDetailed && (
-        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 dark:from-black/10 via-black/30 to-transparent p-5">
-          <h3 className="text-white text-regular-lg font-semibold mb-2 drop-shadow-md line-clamp-2">
+        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/30 to-transparent p-5">
+          <h3 className="text-primary-foreground text-regular-lg font-semibold mb-2 drop-shadow-md line-clamp-2">
             {post.title}
           </h3>
-          <p className="text-white text-regular-sm font-medium drop-shadow-md flex items-center gap-1">
+          <p className="text-primary-foreground text-regular-sm font-medium drop-shadow-md flex items-center gap-1">
             {author}
           </p>
         </div>
@@ -100,11 +100,11 @@ export const BlogCard = ({
 
       {/* 상세 정보 (상세 모드) */}
       {isDetailed && (
-        <div className="p-4 dark:text-white">
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-regular-lg">
+        <div className="p-4">
+          <h3 className="font-semibold text-card-foreground mb-2 line-clamp-2 text-regular-lg">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{author}</p>
+          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{author}</p>
         </div>
       )}
     </div>

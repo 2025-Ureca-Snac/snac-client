@@ -88,15 +88,15 @@ export default function InquiryDetailModal({
     <>
       <ModalPortal isOpen={open} onClose={onClose}>
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* 헤더 */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h2 className="text-xl font-bold text-card-foreground">
                 {inquiry.category === 'REPORT' ? '신고 상세' : '문의 상세'}
               </h2>
               <button
                 onClick={onClose}
-                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -119,14 +119,14 @@ export default function InquiryDetailModal({
               {/* 문의 정보 */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-card-foreground">
                     {inquiry.title}
                   </h3>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       inquiry.status === 'IN_PROGRESS'
-                        ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
-                        : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-green-100 text-green-800'
                     }`}
                   >
                     {inquiry.status === 'IN_PROGRESS'
@@ -135,7 +135,7 @@ export default function InquiryDetailModal({
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>카테고리: {getCategoryName(inquiry.type)}</span>
                   <span>
                     작성일:{' '}
@@ -143,11 +143,11 @@ export default function InquiryDetailModal({
                   </span>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                <div className="bg-muted rounded-lg p-4">
+                  <h4 className="font-medium text-card-foreground mb-2">
                     문의 내용
                   </h4>
-                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                  <p className="text-foreground whitespace-pre-wrap">
                     {inquiry.description}
                   </p>
 
@@ -155,7 +155,7 @@ export default function InquiryDetailModal({
                   {inquiry.attachmentUrls &&
                     inquiry.attachmentUrls.length > 0 && (
                       <div className="mt-4">
-                        <h5 className="font-medium text-gray-900 dark:text-white mb-2">
+                        <h5 className="font-medium text-card-foreground mb-2">
                           첨부 이미지
                         </h5>
                         <div className="grid grid-cols-2 gap-2">
@@ -167,7 +167,7 @@ export default function InquiryDetailModal({
                                   alt={`첨부 이미지 ${index + 1}`}
                                   width={96}
                                   height={96}
-                                  className="w-full h-24 object-cover rounded-md border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity"
+                                  className="w-full h-24 object-cover rounded-md border border-border cursor-pointer hover:opacity-80 transition-opacity"
                                   onClick={() => openImageModal(index)}
                                 />
                               </div>
@@ -183,16 +183,16 @@ export default function InquiryDetailModal({
               {inquiry.answer && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-medium text-gray-900 dark:text-white">
+                    <h4 className="font-medium text-card-foreground">
                       답변
                     </h4>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-muted-foreground">
                       {inquiry.answerAt &&
                         new Date(inquiry.answerAt).toLocaleDateString('ko-KR')}
                     </span>
                   </div>
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border-l-4 border-blue-500">
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                  <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                    <p className="text-foreground whitespace-pre-wrap">
                       {inquiry.answer}
                     </p>
                   </div>
@@ -201,8 +201,8 @@ export default function InquiryDetailModal({
 
               {/* 답변 대기 중인 경우 */}
               {!inquiry.answer && inquiry.status === 'IN_PROGRESS' && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border-l-4 border-yellow-500">
-                  <p className="text-yellow-800 dark:text-yellow-200">
+                <div className="bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-500">
+                  <p className="text-yellow-800">
                     답변을 준비 중입니다. 조금만 기다려주세요.
                   </p>
                 </div>
@@ -210,10 +210,10 @@ export default function InquiryDetailModal({
             </div>
 
             {/* 하단 버튼 */}
-            <div className="flex justify-end p-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end p-6 border-t border-border">
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-muted text-primary-foreground rounded-md hover:bg-muted transition-colors"
               >
                 닫기
               </button>
@@ -237,7 +237,7 @@ export default function InquiryDetailModal({
                 e.stopPropagation();
                 closeImageModal();
               }}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+              className="absolute top-4 right-4 text-primary-foreground hover:text-muted-foreground transition-colors z-10"
             >
               <svg
                 className="w-8 h-8"
@@ -261,7 +261,7 @@ export default function InquiryDetailModal({
                   e.stopPropagation();
                   goToPreviousImage();
                 }}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-10"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-foreground hover:text-muted-foreground transition-colors z-10"
               >
                 <svg
                   className="w-8 h-8"
@@ -301,8 +301,8 @@ export default function InquiryDetailModal({
                       }}
                       className={`w-2 h-2 rounded-full transition-colors ${
                         index === selectedImageIndex
-                          ? 'bg-white'
-                          : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                          ? 'bg-card'
+                          : 'bg-card bg-opacity-50 hover:bg-opacity-75'
                       }`}
                     />
                   ))}
@@ -317,7 +317,7 @@ export default function InquiryDetailModal({
                   e.stopPropagation();
                   goToNextImage();
                 }}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-10"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary-foreground hover:text-muted-foreground transition-colors z-10"
               >
                 <svg
                   className="w-8 h-8"
@@ -336,7 +336,7 @@ export default function InquiryDetailModal({
             )}
 
             {/* 이미지 정보 */}
-            <div className="absolute bottom-4 left-4 text-white text-sm">
+            <div className="absolute bottom-4 left-4 text-primary-foreground text-sm">
               {selectedImageIndex + 1} / {inquiry.attachmentUrls.length}
             </div>
           </div>

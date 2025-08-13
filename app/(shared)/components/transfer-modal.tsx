@@ -204,13 +204,13 @@ export default function SettlementModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">스낵머니 정산</h2>
+          <h2 className="text-xl font-bold text-card-foreground">스낵머니 정산</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-muted-foreground hover:text-muted-foreground transition-colors"
             disabled={isLoading}
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function SettlementModal({
         {isAddingAccount ? (
           <form onSubmit={handleAccountSubmit} className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">계좌 등록</h3>
+              <h3 className="text-lg font-semibold text-card-foreground">계좌 등록</h3>
               <button
                 type="button"
                 onClick={() => setIsAddingAccount(false)}
@@ -250,7 +250,7 @@ export default function SettlementModal({
 
             {/* 은행 선택 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 은행 선택
               </label>
               <select
@@ -258,7 +258,7 @@ export default function SettlementModal({
                 onChange={(e) =>
                   handleAccountInputChange('bankId', parseInt(e.target.value))
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isLoading}
               >
                 <option value="">은행을 선택하세요</option>
@@ -272,7 +272,7 @@ export default function SettlementModal({
 
             {/* 계좌번호 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 계좌번호
               </label>
               <input
@@ -281,7 +281,7 @@ export default function SettlementModal({
                 onChange={(e) =>
                   handleAccountInputChange('accountNumber', e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="계좌번호를 입력하세요"
                 disabled={isLoading}
               />
@@ -289,7 +289,7 @@ export default function SettlementModal({
 
             {/* 예금주명 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 예금주명
               </label>
               <input
@@ -298,7 +298,7 @@ export default function SettlementModal({
                 onChange={(e) =>
                   handleAccountInputChange('accountHolder', e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="예금주명을 입력하세요"
                 disabled={isLoading}
               />
@@ -316,14 +316,14 @@ export default function SettlementModal({
               <button
                 type="button"
                 onClick={() => setIsAddingAccount(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
                 disabled={isLoading}
               >
                 취소
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-500 text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors disabled:bg-muted disabled:cursor-not-allowed"
                 disabled={isLoading}
               >
                 {isLoading ? '등록 중...' : '계좌 등록'}
@@ -337,7 +337,7 @@ export default function SettlementModal({
             {accounts.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-foreground">
                     정산받을 계좌
                   </label>
                   <button
@@ -352,7 +352,7 @@ export default function SettlementModal({
                 <select
                   value={selectedAccountId}
                   onChange={(e) => setSelectedAccountId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
                 >
                   <option value="">계좌를 선택하세요</option>
@@ -371,7 +371,7 @@ export default function SettlementModal({
             <div>
               <label
                 htmlFor="amount"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 정산 금액 (S)
               </label>
@@ -382,13 +382,13 @@ export default function SettlementModal({
                 onChange={(e) =>
                   handleInputChange('amount', parseInt(e.target.value) || 0)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="정산할 금액을 입력하세요"
                 min="1000"
                 max={currentMoney}
                 disabled={isLoading}
               />
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-muted-foreground mt-1">
                 최소 1,000S, 최대 {currentMoney.toLocaleString()}S
               </div>
             </div>
@@ -397,7 +397,7 @@ export default function SettlementModal({
             <div>
               <label
                 htmlFor="message"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-foreground mb-2"
               >
                 메모 (선택사항)
               </label>
@@ -405,13 +405,13 @@ export default function SettlementModal({
                 id="message"
                 value={formData.message}
                 onChange={(e) => handleInputChange('message', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 placeholder="정산과 관련된 메모를 입력하세요"
                 rows={3}
                 maxLength={100}
                 disabled={isLoading}
               />
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-muted-foreground mt-1">
                 {formData.message?.length || 0}/100자
               </div>
             </div>
@@ -428,14 +428,14 @@ export default function SettlementModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-colors"
                 disabled={isLoading}
               >
                 취소
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-500 text-primary-foreground rounded-lg hover:bg-blue-600 transition-colors disabled:bg-muted disabled:cursor-not-allowed"
                 disabled={isLoading}
               >
                 {isLoading

@@ -21,7 +21,7 @@ export default async function BlogPostContent({ post }: BlogPostContentProps) {
   const readingTime = await getReadingTime();
 
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-2xl my-8 shadow-light flex flex-col">
+    <div className="max-w-6xl mx-auto bg-card rounded-2xl my-8 shadow-light flex flex-col">
       {/* 헤더 */}
       <BlogPostHeader title={post.title} />
 

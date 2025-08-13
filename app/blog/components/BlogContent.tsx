@@ -44,7 +44,7 @@ export const BlogContent = ({
   if (isLoading && posts.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center text-gray-500 dark:text-white">
+        <div className="text-center text-muted-foreground">
           게시글을 불러오는 중입니다...
         </div>
       </div>
@@ -74,7 +74,7 @@ export const BlogContent = ({
           <button
             onClick={onShowMore}
             disabled={isLoading}
-            className="bg-white border-2 border-gray-300 text-gray-700 dark:text-white px-8 py-3 rounded-full font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-200 disabled:cursor-not-allowed"
+            className="bg-card border-2 border-border text-foreground px-8 py-3 rounded-full font-medium hover:bg-muted transition-colors disabled:bg-muted disabled:cursor-not-allowed"
           >
             {isLoading ? '로딩 중...' : 'Show more'}
           </button>

@@ -13,7 +13,7 @@ const ReportTypesChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-72 md:h-80 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
+      <div className="w-full h-72 md:h-80 bg-muted rounded-lg animate-pulse" />
     ),
   }
 );
@@ -23,7 +23,7 @@ const QnaTypesChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-72 md:h-80 bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
+      <div className="w-full h-72 md:h-80 bg-muted rounded-lg animate-pulse" />
     ),
   }
 );
@@ -43,7 +43,7 @@ function MetricCard({
   value,
   icon,
   colorClass,
-  valueColorClass = 'text-gray-800 dark:text-gray-100',
+  valueColorClass = 'text-foreground',
   isLoading,
   onClick,
 }: MetricCardProps) {
@@ -51,11 +51,11 @@ function MetricCard({
   const CardContent = (
     <>
       <div>
-        <p className="text-regular-sm font-medium text-gray-500 dark:text-gray-300">
+        <p className="text-regular-sm font-medium text-muted-foreground text-muted-foreground">
           {title}
         </p>
         {isLoading ? (
-          <div className="mt-1 h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
+          <div className="mt-1 h-8 w-24 bg-muted rounded animate-pulse"></div>
         ) : (
           <p className={`text-regular-2xl3xl font-bold ${valueColorClass}`}>
             {value}
@@ -71,14 +71,14 @@ function MetricCard({
   return onClick ? (
     <button
       onClick={onClick}
-      className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex items-center justify-between w-full text-left
-                   cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-green focus:ring-opacity-50"
+      className="bg-card p-6 rounded-2xl shadow-light flex items-center justify-between w-full text-left
+                   cursor-pointer hover:bg-muted:bg-card transition-colors focus:outline-none focus:ring-2 focus:ring-teal-green focus:ring-opacity-50"
       disabled={isLoading}
     >
       {CardContent}
     </button>
   ) : (
-    <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex items-center justify-between">
+    <div className="bg-card p-6 rounded-2xl shadow-light flex items-center justify-between">
       {CardContent}
     </div>
   );
@@ -103,14 +103,14 @@ export function Dashboard() {
           title="총 사용자"
           icon={TotalUserIcon}
           value={dashboardMetrics?.memberCount ?? '...'}
-          colorClass="bg-indigo-100 text-blue-600 dark:bg-indigo-900 dark:text-blue-300"
+          colorClass="bg-indigo-100 text-blue-600"
           isLoading={loading}
         />
         <MetricCard
           title="총 게시글"
           value={dashboardMetrics?.activePostsCount ?? '...'}
           icon={PostIcon}
-          colorClass="bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300"
+          colorClass="bg-green-100 text-green-600"
           isLoading={loading}
           onClick={() => (window.location.href = '/blog/admin')}
         />
@@ -118,7 +118,7 @@ export function Dashboard() {
           title="총 신고"
           value={dashboardMetrics?.countByCategory?.REPORT ?? '...'}
           icon={NewReportIcon}
-          colorClass="bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-300"
+          colorClass="bg-yellow-100 text-yellow-600"
           isLoading={loading}
           onClick={() => (window.location.href = '/admin/dispute/report')}
         />
@@ -126,21 +126,21 @@ export function Dashboard() {
           title="총 문의"
           value={dashboardMetrics?.countByCategory?.QNA ?? '...'}
           icon={QnaIcon}
-          colorClass="bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300"
+          colorClass="bg-purple-100 text-purple-600"
           isLoading={loading}
           onClick={() => (window.location.href = '/dispute/qna')}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex flex-col">
-          <h3 className="text-regular-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+        <div className="bg-card p-6 rounded-2xl shadow-light flex flex-col">
+          <h3 className="text-regular-lg font-semibold text-foreground mb-4">
             신고 유형 분포
           </h3>
           <ReportTypesChart />
         </div>
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-light flex flex-col">
-          <h3 className="text-regular-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+        <div className="bg-card p-6 rounded-2xl shadow-light flex flex-col">
+          <h3 className="text-regular-lg font-semibold text-foreground mb-4">
             문의 유형 분포
           </h3>
           <QnaTypesChart />
