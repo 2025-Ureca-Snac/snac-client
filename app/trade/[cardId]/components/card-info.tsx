@@ -35,7 +35,7 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
                 className="object-contain"
               />
             </div>
-            <h3 className="text-lg font-semibold text-foreground text-muted-foreground">
+            <h3 className="text-lg font-semibold text-muted-foreground">
               {formatCarrierName(cardInfo.carrier)} 데이터
             </h3>
             <p className="text-muted-foreground">
@@ -85,13 +85,17 @@ export default function CardInfo({ cardInfo, unit, children }: CardInfoProps) {
           {/* 상품 정보 */}
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-muted-foreground text-muted-foreground">통신사</span>
+              <span className="text-muted-foreground text-muted-foreground">
+                통신사
+              </span>
               <span className="font-medium text-muted-foreground">
                 {formatCarrierName(cardInfo.carrier)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground text-muted-foreground">데이터량</span>
+              <span className="text-muted-foreground text-muted-foreground">
+                데이터량
+              </span>
               <span className="font-medium text-muted-foreground">
                 {formatDataAmount(cardInfo.dataAmount)}
               </span>

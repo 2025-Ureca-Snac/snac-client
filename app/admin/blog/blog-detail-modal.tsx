@@ -63,9 +63,7 @@ export const BlogDetailModal = ({
 
   const renderContent = () => {
     if (!post.articleUrl) {
-      return (
-        <p className="text-muted-foreground">콘텐츠가 없습니다.</p>
-      );
+      return <p className="text-muted-foreground">콘텐츠가 없습니다.</p>;
     }
 
     if (post.articleUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -81,9 +79,7 @@ export const BlogDetailModal = ({
     }
 
     if (fetching) {
-      return (
-        <p className="text-muted-foreground">컨텐츠 로딩 중...</p>
-      );
+      return <p className="text-muted-foreground">컨텐츠 로딩 중...</p>;
     }
 
     return <MarkdownRenderer content={markdownContent} />;
@@ -108,7 +104,7 @@ export const BlogDetailModal = ({
               </h2>
               <button
                 onClick={onClose}
-                className="text-muted-foreground hover:text-muted-foreground:text-primary-foreground transition-colors"
+                className="text-muted-foreground hover:text-primary-foreground transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -173,9 +169,7 @@ export const BlogDetailModal = ({
             {/* 실제 본문 (마크다운 or 이미지) 
               MarkdownRenderer는 자체적으로 다크모드를 처리하므로 이 부분은 수정하지 않습니다.
             */}
-            <div className="prose prose-lg max-w-none">
-              {renderContent()}
-            </div>
+            <div className="prose prose-lg max-w-none">{renderContent()}</div>
 
             {/* 관련 포스트 */}
             <div className="border-t border-border pt-8 mt-8">

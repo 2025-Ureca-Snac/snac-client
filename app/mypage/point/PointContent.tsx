@@ -384,7 +384,7 @@ export default function PointContent({
                 onCancelClick?.(amount, item.paymentKey || item.id.toString());
               }}
               onMouseDown={(e) => e.stopPropagation()}
-              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
               취소
             </button>
@@ -405,9 +405,7 @@ export default function PointContent({
 
     return (
       <div className="flex items-center gap-3 py-1">
-        <span className="text-sm font-medium text-foreground">
-          조회 기간:
-        </span>
+        <span className="text-sm font-medium text-foreground">조회 기간:</span>
         <select
           value={selectedYear}
           onChange={(e) => {
@@ -476,9 +474,7 @@ export default function PointContent({
             {hasNext && (
               <div ref={observerRef} className="p-4 text-center">
                 {isLoadingMore && (
-                  <div className="text-muted-foreground">
-                    로딩 중...
-                  </div>
+                  <div className="text-muted-foreground">로딩 중...</div>
                 )}
               </div>
             )}
@@ -510,9 +506,7 @@ export default function PointContent({
             {hasNext && (
               <div ref={observerRef} className="p-4 text-center">
                 {isLoadingMore && (
-                  <div className="text-muted-foreground">
-                    로딩 중...
-                  </div>
+                  <div className="text-muted-foreground">로딩 중...</div>
                 )}
               </div>
             )}

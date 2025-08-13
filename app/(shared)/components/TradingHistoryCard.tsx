@@ -56,7 +56,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
       key={item.tradeId}
       role="listitem"
       tabIndex={0}
-      className={`bg-muted rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-secondary focus:bg-secondary:bg-muted focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
+      className={`bg-muted rounded-lg p-4 flex items-start gap-3 cursor-pointer hover:bg-secondary focus:bg-secondary focus:outline-none focus:ring-2 focus:${theme.focusRingColor} focus:ring-offset-2 transition-colors`}
       onClick={() => {
         if (isDragging) return;
         onCardClick(item);
@@ -115,9 +115,7 @@ export const TradingHistoryCard: React.FC<TradingHistoryCardProps> = ({
         {partnerNickname && (
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
-              <span className="text-xs text-muted-foreground">
-                거래자:
-              </span>
+              <span className="text-xs text-muted-foreground">거래자:</span>
               <span className="text-xs font-medium text-foreground">
                 {partnerNickname}
               </span>

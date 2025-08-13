@@ -170,13 +170,8 @@ export default function TradeConfirmationModal({
               className={`w-full py-2 rounded text-white ${
                 modalItem.cardCategory === 'SELL'
                   ? 'bg-black hover:bg-black/80'
-                  : ''
+                  : 'bg-candy-pink hover:bg-candy-pink/90'
               } ${isLoading || error ? 'opacity-50 cursor-not-allowed' : ''}`}
-              style={
-                modalItem.cardCategory === 'BUY'
-                  ? { backgroundColor: '#FF66C4' }
-                  : undefined
-              }
             >
               {isLoading
                 ? '처리중...'

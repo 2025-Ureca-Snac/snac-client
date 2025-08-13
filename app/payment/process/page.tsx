@@ -133,7 +133,7 @@ function PaymentProcessComponent() {
         {/* ✅ 샌드박스와 동일한 결제하기 버튼 */}
         <div className="btn-wrapper w-100">
           <button
-            className="w-full bg-blue-600 text-primary-foreground py-3 px-4 rounded-md hover:bg-blue-700:bg-blue-500 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-primary-foreground py-3 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handlePaymentClick}
             disabled={!paymentWidget}
           >

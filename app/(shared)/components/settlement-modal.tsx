@@ -286,9 +286,7 @@ export default function SettlementModal({
 
         {/* 현재 잔액 */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="text-sm text-blue-600 mb-1">
-            현재 잔액
-          </div>
+          <div className="text-sm text-blue-600 mb-1">현재 잔액</div>
           <div className="text-2xl font-bold text-blue-900">
             {currentMoney.toLocaleString()}S
           </div>
@@ -304,7 +302,7 @@ export default function SettlementModal({
               <button
                 type="button"
                 onClick={() => setIsAddingAccount(false)}
-                className="text-sm text-blue-600 hover:text-blue-800:text-blue-300"
+                className="text-sm text-blue-600 hover:text-blue-800"
                 disabled={isLoading}
               >
                 취소

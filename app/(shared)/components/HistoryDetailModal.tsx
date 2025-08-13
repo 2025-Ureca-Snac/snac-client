@@ -502,7 +502,7 @@ export default function HistoryDetailModal({
             <div className="flex w-full">
               <button
                 onClick={handleTradeCancelClick}
-                className="flex-1 bg-muted text-primary-foreground py-2 px-4 rounded-lg text-sm font-medium hover:bg-muted0 transition-colors"
+                className="flex-1 bg-muted text-primary-foreground py-2 px-4 rounded-lg text-sm font-medium hover:bg-muted transition-colors"
               >
                 거래 취소
               </button>

@@ -79,9 +79,8 @@ export const DataItemCard = ({
           text: buyButtonText ?? (isBuyView ? '판매하기' : '구매하기'),
           clickable: true,
           className: isBuyView
-            ? 'text-white'
+            ? 'bg-candy-pink hover:bg-candy-pink/90 text-white'
             : 'bg-black hover:bg-black/80 text-white',
-          style: isBuyView ? { backgroundColor: '#FF66C4' } : undefined,
         };
       case 'SOLD_OUT':
         return {
@@ -150,7 +149,6 @@ export const DataItemCard = ({
             className={`w-full h-full ${buttonConfig.className} transition text-regular-md border rounded-lg flex items-center justify-center`}
             style={{
               fontSize: 'clamp(12px, 2.5vw, 16px)',
-              ...buttonConfig.style,
             }}
             disabled={!buttonConfig.clickable}
           >

@@ -62,7 +62,7 @@ export function BlogTable({ search = '' }: { search?: string }) {
           {filteredBlogs.map((blog) => (
             <tr
               key={blog.id}
-              className="bg-card border-b hover:bg-muted bg-background:bg-card"
+              className="bg-card border-b hover:bg-muted bg-background"
             >
               <td className="px-6 py-4 font-medium text-card-foreground">
                 #{blog.id}

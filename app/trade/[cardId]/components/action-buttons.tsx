@@ -33,13 +33,10 @@ export default function ActionButtons({
           onClick={onConfirm}
           disabled={isProcessing || !!error}
           className={`flex-[6] py-4 rounded-lg font-semibold text-white ${
-            cardInfo.cardCategory === 'SELL' ? 'bg-black hover:bg-black/80' : ''
+            cardInfo.cardCategory === 'SELL'
+              ? 'bg-black hover:bg-black/80'
+              : 'bg-candy-pink hover:bg-candy-pink/90'
           } ${isProcessing || error ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={
-            cardInfo.cardCategory === 'BUY'
-              ? { backgroundColor: '#FF66C4' }
-              : undefined
-          }
         >
           {isProcessing
             ? '처리중...'

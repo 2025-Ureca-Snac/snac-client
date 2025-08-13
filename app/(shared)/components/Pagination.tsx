@@ -72,7 +72,7 @@ export const Pagination = ({
     'flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-md border transition-colors';
 
   const defaultButtonStyles =
-    'bg-card border-border text-foreground hover:bg-secondary text-muted-foreground:bg-card';
+    'bg-card border-border text-foreground hover:bg-secondary text-muted-foreground bg-card';
 
   const activeButtonStyles = 'bg-muted border-border text-primary-foreground';
 
@@ -112,7 +112,7 @@ export const Pagination = ({
           ) : (
             <li key={`ellipsis-${index}`}>
               <span
-                className={`${baseButtonStyles} bg-card border-border text-foreground text-muted-foreground`}
+                className={`${baseButtonStyles} bg-card border-border text-muted-foreground`}
               >
                 {number}
               </span>

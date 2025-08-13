@@ -227,7 +227,7 @@ export default function CancelModal({
                 <button
                   onClick={handleBack}
                   disabled={isLoading}
-                  className="flex-1 px-8 py-3 border border-border text-foreground rounded-lg bg-card hover:bg-muted:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
+                  className="flex-1 px-8 py-3 border border-border text-foreground rounded-lg bg-card hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
                 >
                   뒤로
                 </button>

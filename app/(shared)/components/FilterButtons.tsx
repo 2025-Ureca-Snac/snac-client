@@ -29,14 +29,14 @@ export default function FilterButtons({
         <button
           onClick={onReset}
           disabled={resetDisabled}
-          className="px-4 py-3 bg-secondary rounded-lg font-bold text-foreground hover:bg-muted:bg-muted  md:bg-transparent md:border md:border-gray-400 md:text-muted-foreground"
+          className="px-4 py-3 bg-secondary rounded-lg font-bold text-foreground hover:bg-muted  md:bg-transparent md:border md:border-gray-400 md:text-muted-foreground"
         >
           {resetText}
         </button>
         <button
           onClick={onApply}
           disabled={applyDisabled}
-          className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-card text-primary-foreground hover:bg-muted0"
+          className="px-2 py-3 rounded-lg font-bold transition-colors bg-teal-green md:bg-card text-primary-foreground hover:bg-muted"
         >
           {applyText}
         </button>

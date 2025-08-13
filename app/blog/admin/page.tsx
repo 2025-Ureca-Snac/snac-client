@@ -245,7 +245,7 @@ function BlogAdminFormComponent() {
                   <button
                     type="button"
                     onClick={() => setPreviewMode(!previewMode)}
-                    className="px-3 py-1 text-sm bg-muted0 text-primary-foreground rounded hover:bg-muted"
+                    className="px-3 py-1 text-sm bg-muted text-primary-foreground rounded hover:bg-muted"
                   >
                     {previewMode ? '편집 모드' : '미리보기'}
                   </button>

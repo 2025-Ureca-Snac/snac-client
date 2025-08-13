@@ -59,7 +59,7 @@ export function ConfirmModal() {
             <button
               type="button"
               onClick={closeConfirmModal}
-              className="rounded-md bg-card px-4 py-2 text-regular-sm font-medium text-foreground text-muted-foreground shadow-light ring-1 ring-inset ring-gray-300 hover:bg-secondary:bg-muted transition-colors"
+              className="rounded-md bg-card px-4 py-2 text-regular-sm font-medium text-muted-foreground shadow-light ring-1 ring-inset ring-gray-300 hover:bg-secondary transition-colors"
             >
               취소
             </button>
@@ -67,7 +67,7 @@ export function ConfirmModal() {
               type="button"
               onClick={handleConfirm}
               disabled={isLoading}
-              className="inline-flex justify-center rounded-md bg-muted px-4 py-2 text-regular-sm font-medium text-primary-foreground shadow-light transition-colors hover:bg-card:bg-muted0 disabled:opacity-50"
+              className="inline-flex justify-center rounded-md bg-muted px-4 py-2 text-regular-sm font-medium text-primary-foreground shadow-light transition-colors hover:bg-card disabled:opacity-50"
             >
               {isLoading ? '처리 중...' : '확인'}
             </button>

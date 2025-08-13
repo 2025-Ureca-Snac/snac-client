@@ -28,10 +28,8 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
   >(null);
 
   const messageTypeClasses = {
-    success:
-      'bg-green-100 text-green-800 border border-green-200',
-    error:
-      'bg-destructive/10 text-destructive border border-destructive/20',
+    success: 'bg-green-100 text-green-800 border border-green-200',
+    error: 'bg-destructive/10 text-destructive border border-destructive/20',
   };
 
   const getCarrierUrl = (carrier: string) => {
@@ -116,7 +114,7 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
           href={getCarrierUrl(item.carrier || '')}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800:text-blue-300 underline"
+          className="text-blue-600 hover:text-blue-800 underline"
         >
           {item.carrier || 'SKT'}
         </a>
@@ -139,9 +137,7 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 text-xs">
-                  📎
-                </span>
+                <span className="text-blue-600 text-xs">📎</span>
               </div>
               <div>
                 <div className="text-sm font-medium text-blue-900">
@@ -154,7 +150,7 @@ export const DataUploadSection: React.FC<DataUploadSectionProps> = ({
             </div>
             <button
               onClick={() => setUploadedFile(null)}
-              className="text-blue-500 hover:text-blue-700:text-blue-300 text-sm"
+              className="text-blue-500 hover:text-blue-700 text-sm"
             >
               삭제
             </button>

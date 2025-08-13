@@ -139,7 +139,7 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
                 className={`w-full py-3 px-4 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                   selectedTheme === id
                     ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-border bg-card text-foreground hover:border-border:border-gray-500'
+                    : 'border-border bg-card text-foreground hover:border-gray-500'
                 }`}
                 onClick={() => handleThemeSelect(id)}
                 aria-label={`${label} 선택`}
@@ -165,7 +165,7 @@ export default function ThemeModal({ open, onClose }: ThemeModalProps) {
           <div className="w-full flex gap-2">
             <button
               type="button"
-              className="w-2/3 py-3 rounded-lg bg-blue-200 text-card-foreground font-bold text-lg hover:bg-blue-300:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-2/3 py-3 rounded-lg bg-blue-200 text-card-foreground font-bold text-lg hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               onClick={handleSubmit}
               tabIndex={0}
             >

@@ -92,9 +92,7 @@ export function MarkdownRenderer({
       </h4>
     ),
     p: ({ children }) => (
-      <p className="mb-4 text-foreground leading-relaxed">
-        {children}
-      </p>
+      <p className="mb-4 text-foreground leading-relaxed">{children}</p>
     ),
     ul: ({ children }) => <ul className="mb-4 pl-6 list-disc">{children}</ul>,
     ol: ({ children }) => (
@@ -102,9 +100,7 @@ export function MarkdownRenderer({
     ),
     li: ({ children }) => <li className="mb-1">{children}</li>,
     strong: ({ children }) => (
-      <strong className="font-semibold text-card-foreground">
-        {children}
-      </strong>
+      <strong className="font-semibold text-card-foreground">{children}</strong>
     ),
     em: ({ children }) => <em className="italic">{children}</em>,
     code({ className, children, ...props }) {
@@ -138,9 +134,7 @@ export function MarkdownRenderer({
       </th>
     ),
     td: ({ children }) => (
-      <td className="border border-border px-4 py-2">
-        {children}
-      </td>
+      <td className="border border-border px-4 py-2">{children}</td>
     ),
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 italic text-foreground">
@@ -148,10 +142,7 @@ export function MarkdownRenderer({
       </blockquote>
     ),
     a: ({ href, children }) => (
-      <a
-        href={href}
-        className="text-blue-600 hover:text-blue-800:text-blue-300 underline"
-      >
+      <a href={href} className="text-blue-600 hover:text-blue-800 underline">
         {children}
       </a>
     ),

@@ -16,7 +16,7 @@ export function ThemeSwitch({ isDark, onToggle }: ThemeSwitchProps) {
         type="button"
         aria-label="테마 토글"
         onClick={onToggle}
-        className="hidden md:flex items-center justify-center p-2 rounded-lg hover:bg-secondary:bg-card transition-colors focus:outline-none"
+        className="hidden md:flex items-center justify-center p-2 rounded-lg hover:bg-secondary transition-colors focus:outline-none"
       >
         <LightDarkModeIcon
           width={24}
@@ -30,7 +30,7 @@ export function ThemeSwitch({ isDark, onToggle }: ThemeSwitchProps) {
         type="button"
         aria-label="테마 토글"
         onClick={onToggle}
-        className="flex w-full items-center gap-3 px-2 py-3 rounded-lg hover:bg-secondary:bg-card transition focus:outline-none md:hidden"
+        className="flex w-full items-center gap-3 px-2 py-3 rounded-lg hover:bg-secondary transition focus:outline-none md:hidden"
       >
         <LightDarkModeIcon
           width={24}

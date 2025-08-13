@@ -179,7 +179,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                 <button
                   key={item.key}
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary:bg-card transition focus:outline-none"
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition focus:outline-none"
                 >
                   <item.icon
                     className={`w-6 h-6 ${isDarkmode ? 'text-primary-foreground' : 'text-foreground'}`}
@@ -194,7 +194,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                 <Link
                   href={item.href}
                   key={item.key}
-                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary:bg-card transition focus:outline-none"
+                  className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition focus:outline-none"
                 >
                   <item.icon
                     className={`w-6 h-6 ${isDarkmode ? 'text-primary-foreground' : 'text-foreground'}`}
@@ -276,7 +276,7 @@ export const Header: FC<HeaderProps> = ({ isTrading = false }) => {
                       type="button"
                       key={item.key}
                       onClick={() => handleMobileNav(item.href, item.isAction)}
-                      className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-secondary:bg-card transition focus:outline-none w-full text-left"
+                      className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-secondary transition focus:outline-none w-full text-left"
                     >
                       <item.icon
                         className={`w-6 h-6 ${isDarkmode ? 'text-primary-foreground' : 'text-foreground'}`}

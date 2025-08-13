@@ -65,7 +65,7 @@ export default function DisputeDetailModal({
               </h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full transition hover:bg-secondary:bg-card/10 group"
+                className="w-8 h-8 flex items-center justify-center rounded-full transition hover:bg-secondary group"
                 aria-label="닫기"
               >
                 <svg
@@ -97,14 +97,14 @@ export default function DisputeDetailModal({
               {/* 작성자, 상대방 */}
               <div className="flex flex-wrap gap-3 text-sm text-muted-foreground text-muted-foreground mb-1">
                 <span>
-                  <span className="font-medium text-foreground text-muted-foreground">
+                  <span className="font-medium text-muted-foreground">
                     작성자
                   </span>{' '}
                   {dispute.reporterNickname}
                 </span>
                 {dispute.opponentNickname && (
                   <span>
-                    <span className="font-medium text-foreground text-muted-foreground">
+                    <span className="font-medium text-muted-foreground">
                       신고대상
                     </span>{' '}
                     {dispute.opponentNickname}

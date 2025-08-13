@@ -293,7 +293,7 @@ export default function InquiryModal({
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSubmitting}
-                      className="w-full p-4 border-2 border-dashed border-border rounded-md hover:border-blue-400:border-blue-500 hover:bg-blue-50:bg-blue-900/20 transition-colors disabled:opacity-50"
+                      className="w-full p-4 border-2 border-dashed border-border rounded-md hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50"
                     >
                       <div className="flex flex-col items-center text-muted-foreground">
                         <svg
@@ -335,7 +335,7 @@ export default function InquiryModal({
                   type="button"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 border border-border text-foreground rounded-md bg-card hover:bg-muted:bg-muted transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2 border border-border text-foreground rounded-md bg-card hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   취소
                 </button>

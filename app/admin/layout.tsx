@@ -39,9 +39,7 @@ function Sidebar() {
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-center h-20 border-b gap-2">
           <ManagerIcon className="h-7 w-7 text-teal-green" />
-          <span className="text-foreground text-lg font-bold">
-            관리자 패널
-          </span>
+          <span className="text-foreground text-lg font-bold">관리자 패널</span>
         </div>
         <nav className="flex-1 px-4 py-4 space-y-2">
           {NAV_ITEMS.map((item) => {
@@ -54,7 +52,7 @@ function Sidebar() {
                 className={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${
                   isActive
                     ? 'bg-teal-green text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-card-foreground:text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-primary-foreground'
                 }`}
               >
                 <item.icon className="w-6 h-6 mr-3" aria-hidden="true" />
@@ -88,9 +86,7 @@ function AdminHeader() {
         >
           <MenuIcon className="h-6 w-6" />
         </button>
-        <h1 className="text-xl font-bold text-foreground">
-          {getTitle()}
-        </h1>
+        <h1 className="text-xl font-bold text-foreground">{getTitle()}</h1>
       </div>
     </header>
   );

@@ -72,7 +72,7 @@ function MetricCard({
     <button
       onClick={onClick}
       className="bg-card p-6 rounded-2xl shadow-light flex items-center justify-between w-full text-left
-                   cursor-pointer hover:bg-muted:bg-card transition-colors focus:outline-none focus:ring-2 focus:ring-teal-green focus:ring-opacity-50"
+                   cursor-pointer hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-teal-green focus:ring-opacity-50"
       disabled={isLoading}
     >
       {CardContent}

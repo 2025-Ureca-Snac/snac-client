@@ -47,7 +47,7 @@ export default function Page() {
               bg-transparent border border-border
               text-muted-foreground font-medium text-regular-md
               rounded-full transition-colors duration-200
-              hover:bg-secondary:bg-card
+              hover:bg-secondary
               whitespace-nowrap
               w-full md:w-auto
               justify-center

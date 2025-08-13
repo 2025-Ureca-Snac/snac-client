@@ -143,7 +143,7 @@ export function ResolveModal() {
                       rows={6}
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
-                      className="w-full p-2 text-regular-sm bg-muted border border-border rounded-md focus:ring-2 focus:ring-gray-400:ring-gray-500 focus:outline-none text-foreground"
+                      className="w-full p-2 text-regular-sm bg-muted border border-border rounded-md focus:ring-2 focus:ring-gray-500 focus:outline-none text-foreground"
                       placeholder="답변을 입력하세요..."
                     />
                   </div>
@@ -162,7 +162,7 @@ export function ResolveModal() {
                       onChange={(e) =>
                         setNewStatus(e.target.value as DisputeStatus)
                       }
-                      className="w-full p-2 text-regular-sm bg-muted border border-border rounded-md focus:ring-2 focus:ring-gray-400:ring-gray-500 focus:outline-none text-foreground"
+                      className="w-full p-2 text-regular-sm bg-muted border border-border rounded-md focus:ring-2 focus:ring-gray-500 focus:outline-none text-foreground"
                     >
                       <option value="ANSWERED">답변완료</option>
                       <option value="NEED_MORE">자료요청</option>
@@ -175,7 +175,7 @@ export function ResolveModal() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="px-6 py-2 font-semibold text-regular-md bg-muted text-primary-foreground rounded-md hover:bg-card:bg-muted0 disabled:bg-muted:bg-muted disabled:cursor-not-allowed"
+                      className="px-6 py-2 font-semibold text-regular-md bg-muted text-primary-foreground rounded-md hover:bg-card disabled:bg-muted disabled:cursor-not-allowed"
                     >
                       {isLoading ? '제출 중...' : '답변 제출'}
                     </button>
