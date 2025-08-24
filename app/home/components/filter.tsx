@@ -58,10 +58,10 @@ export const Filter = () => {
     <>
       {/* PC 사이드바 */}
       <div className="hidden md:block md:w-72 md:flex-shrink-0 mr-8">
-        <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[1050px] bg-white md:max-h-full md:rounded-2xl shadow-light">
+        <div className="flex flex-col max-h-[85vh] md:w-[280px] md:h-[1050px] bg-card md:max-h-full md:rounded-2xl shadow-light">
           <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6 md:pt-5 md:px-5">
             <h2 className="text-heading-lg md:text-medium-xl font-bold flex items-center gap-2">
-              <FilterIcon className="hidden md:block dark:text-white" />
+              <FilterIcon className="hidden md:block" />
               필터
             </h2>
           </div>
@@ -126,11 +126,11 @@ export const Filter = () => {
             className="relative z-40 md:hidden"
             onClose={actions.toggleFilter}
           >
-            <div className="fixed inset-0 bg-midnight-black bg-opacity-50" />
+            <div className="fixed inset-0 bg-black bg-opacity-50" />
 
             <div className="fixed inset-0 flex items-center justify-center p-4">
-              <div className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
-                <div className="flex flex-col max-h-[85vh] bg-white">
+              <div className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-card shadow-xl transition-all">
+                <div className="flex flex-col max-h-[85vh] bg-card">
                   <div className="flex-shrink-0 flex items-center justify-between pt-6 px-6">
                     <h2 className="text-heading-lg font-bold flex items-center gap-2">
                       필터
@@ -140,7 +140,7 @@ export const Filter = () => {
                       className="p-2"
                       aria-label="필터 닫기"
                     >
-                      <CloseIcon className=" dark:text-white" />
+                      <CloseIcon className="" />
                     </button>
                   </div>
 

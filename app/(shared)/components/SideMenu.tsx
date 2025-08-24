@@ -18,6 +18,18 @@ export default function SideMenu() {
     if (item.path.startsWith('/mypage/point')) {
       return pathname.startsWith('/mypage/point');
     }
+    // 판매 내역 페이지의 경우 상세보기 URL도 활성화되도록 처리
+    if (item.path === '/mypage/sales-history') {
+      return pathname.startsWith('/mypage/sales-history');
+    }
+    // 구매 내역 페이지의 경우 상세보기 URL도 활성화되도록 처리
+    if (item.path === '/mypage/purchase-history') {
+      return pathname.startsWith('/mypage/purchase-history');
+    }
+    // 문의 내역 페이지의 경우도 처리
+    if (item.path === '/mypage/report-history') {
+      return pathname.startsWith('/mypage/report-history');
+    }
     return pathname === item.path;
   };
 
@@ -29,7 +41,7 @@ export default function SideMenu() {
 
   return (
     <aside
-      className="w-64 h-fit bg-white border border-gray-200 rounded-lg p-7 flex flex-col gap-1"
+      className="w-64 h-fit bg-card border border-border rounded-lg p-7 flex flex-col gap-1"
       style={{
         boxShadow:
           '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)',
@@ -37,10 +49,10 @@ export default function SideMenu() {
     >
       <button
         onClick={() => router.push('/mypage')}
-        className="text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1"
+        className="text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded px-2 py-1"
         aria-label="마이페이지 홈으로 이동"
       >
-        <h2 className="text-lg font-extrabold mb-5 text-black select-none hover:text-gray-700 transition-colors">
+        <h2 className="text-lg font-extrabold mb-5 text-card-foreground select-none hover:text-foreground transition-colors">
           마이 페이지
         </h2>
       </button>
@@ -50,10 +62,10 @@ export default function SideMenu() {
           return (
             <button
               key={item.id}
-              className={`text-left py-2 px-2 rounded text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              className={`text-left py-2 px-2 rounded text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-primary/10 text-primary border-l-4 border-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-card-foreground'
               } ${item.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={() => handleMenuClick(item)}
               disabled={item.disabled}
@@ -64,7 +76,7 @@ export default function SideMenu() {
               <div className="flex items-center justify-between">
                 <span>{item.label}</span>
                 {item.badge && (
-                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="bg-destructive text-destructive-foreground text-xs px-2 py-1 rounded-full">
                     {item.badge}
                   </span>
                 )}

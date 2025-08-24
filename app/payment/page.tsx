@@ -8,7 +8,7 @@ import ProductDetails from '../(shared)/components/product-details';
 import PaymentMethods from '../(shared)/components/payment-methods';
 import PaymentSummary from '../(shared)/components/payment-summary';
 import PaymentButton from '../(shared)/components/payment-button';
-import api from '../(shared)/utils/api';
+import { api } from '../(shared)/utils/api';
 import { ApiResponse } from '../(shared)/types/api';
 import {
   PAYMENT_METHODS,
@@ -61,8 +61,9 @@ export default function PaymentPage() {
           if (response.data.data) {
             setCardData(response.data.data);
           }
-        } catch {
-          // 카드 상태 조회 실패 처리
+        } catch (error) {
+          console.error('카드 정보 로딩 실패:', error);
+          toast.error('상품 정보를 불러오는데 실패했습니다.');
         }
       };
 
@@ -77,8 +78,9 @@ export default function PaymentPage() {
             '/wallets/summary'
           );
         setWalletData(response.data.data);
-      } catch {
-        // 지갑 정보 조회 실패 처리
+      } catch (error) {
+        console.error('지갑 정보 로딩 실패:', error);
+        toast.error('지갑 정보를 불러오는데 실패했습니다.');
       }
     };
 
@@ -93,8 +95,8 @@ export default function PaymentPage() {
           '/wallets/summary'
         );
       setWalletData(response.data.data);
-    } catch {
-      // 지갑 정보 새로고침 실패 처리
+    } catch (error) {
+      console.error('지갑 정보 새로고침 실패:', error);
     }
   };
 
@@ -232,16 +234,16 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-card-foreground mb-2">
               결제하기
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               통신사, 데이터 용량, 가격이 정확한지 확인해주세요
             </p>
           </div>
@@ -255,8 +257,8 @@ export default function PaymentPage() {
 
             {/* Payment Information */}
             <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+                <h2 className="text-lg font-semibold text-card-foreground mb-4">
                   결제 방법
                 </h2>
 

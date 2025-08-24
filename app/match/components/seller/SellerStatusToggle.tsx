@@ -35,7 +35,7 @@ export default function SellerStatusToggle({
       {/* 상태 토글 버튼 - 형광블랙 컨셉 */}
       <button
         onClick={onToggle}
-        className={`relative w-full px-6 py-5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 text-white shadow-lg hover:shadow-xl ${
+        className={`relative w-full px-6 py-5 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 text-primary-foreground shadow-lg hover:shadow-xl ${
           sellerInfo.isActive
             ? 'bg-gradient-to-r from-green-500 to-emerald-600 border-2 border-green-400'
             : 'bg-gradient-to-r from-slate-700 to-gray-800 border-2 border-slate-500 hover:border-slate-400 animate-pulse'
@@ -105,7 +105,7 @@ export default function SellerStatusToggle({
             ) : (
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             )}
-            <span className="text-gray-950 font-semibold">
+            <span className="text-card-foreground font-semibold">
               구매자를 찾고 있습니다
             </span>
           </div>

@@ -25,7 +25,7 @@ const ArticleCard = ({ title, link, imageUrl }: ArticleCardProps) => (
         className="transition-transform duration-300 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-      <div className="absolute bottom-4 left-4 text-white">
+      <div className="absolute bottom-4 left-4 text-primary-foreground">
         <h3 className="font-bold text-base text-heading-md md:text-medium-xl">
           {title}
         </h3>
@@ -57,7 +57,7 @@ export const ArticleSection = () => {
     return (
       <section className="w-full mx-auto pt-0 md:pt-12 pb-12 px-4 text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-8">읽을거리</h2>
-        <p className="text-gray-500">게시글을 불러오는 중입니다...</p>
+        <p className="text-muted-foreground">게시글을 불러오는 중입니다...</p>
       </section>
     );
   }

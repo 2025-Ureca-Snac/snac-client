@@ -99,7 +99,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full md:max-w-[1440px] mx-auto min-h-screen flex flex-col">
       <ConditionalHeader />
-      <main className="flex-1 bg-white dark:bg-gray-900 pt-[57px] md:pt-[67px]">
+      <main className="flex-1 bg-background pt-[57px] md:pt-[67px]">
         {children}
       </main>
       <ConditionalFooter />
@@ -117,7 +117,12 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <WwwRedirect />
       <body className={`${notoSansKr.className} antialiased`}>
-        <ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <LayoutContent>{children}</LayoutContent>
         </ThemeProvider>
       </body>

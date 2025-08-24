@@ -40,7 +40,7 @@ const VerificationInput = forwardRef<HTMLInputElement, VerificationInputProps>(
       <div>
         <label
           htmlFor={id}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-foreground mb-2"
         >
           {label}
         </label>
@@ -62,13 +62,13 @@ const VerificationInput = forwardRef<HTMLInputElement, VerificationInputProps>(
             required={required}
             disabled={disabled}
             autoComplete={autoComplete}
-            className="flex-1 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed h-[48px] min-w-0"
+            className="flex-1 px-3 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-secondary disabled:cursor-not-allowed h-[48px] min-w-0"
           />
           <button
             type="button"
             onClick={onVerify}
             disabled={verifyDisabled}
-            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap h-[48px] flex items-center justify-center flex-shrink-0"
+            className="px-6 py-3 bg-muted text-foreground rounded-md hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap h-[48px] flex items-center justify-center flex-shrink-0"
           >
             확인
           </button>

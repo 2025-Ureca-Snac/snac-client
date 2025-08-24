@@ -147,23 +147,23 @@ export default function Certification() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-card flex items-center justify-center">
       <div className="text-center max-w-md mx-auto px-6">
         {isProcessing ? (
           <>
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600 dark:border-yellow-400 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground text-lg font-medium">
               인증 처리 중...
             </p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+            <p className="text-muted-foreground text-sm mt-2">
               잠시만 기다려주세요
             </p>
           </>
         ) : (
           <>
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-8 h-8 text-green-600 dark:text-green-400"
+                className="w-8 h-8 text-green-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -176,10 +176,10 @@ export default function Certification() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               인증 완료!
             </h2>
-            <p className="text-gray-600 dark:text-gray-200 mb-6">
+            <p className="text-muted-foreground mb-6">
               인증이 성공적으로 완료되었습니다.
               <br />이 창은 {countdown}초 후 자동으로 닫힙니다.
             </p>
@@ -187,7 +187,7 @@ export default function Certification() {
             {/* 시계가 있는 닫기 버튼 */}
             <button
               onClick={handleClose}
-              className="relative w-full max-w-sm px-8 py-4 bg-blue-600 text-white font-semibold text-lg rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 flex items-center justify-center gap-6 mx-auto"
+              className="relative w-full max-w-sm px-8 py-4 bg-primary text-primary-foreground font-semibold text-lg rounded-lg hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background flex items-center justify-center gap-6 mx-auto"
             >
               {/* 시계 모양 프로그레스 바 */}
               <div className="relative w-16 h-16 flex-shrink-0">
@@ -221,7 +221,7 @@ export default function Certification() {
 
                 {/* 중앙 숫자 */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">
+                  <span className="text-2xl font-bold text-primary-foreground">
                     {countdown}
                   </span>
                 </div>
@@ -230,7 +230,7 @@ export default function Certification() {
               {/* 버튼 텍스트 */}
               <span className="whitespace-nowrap text-lg">지금 닫기</span>
             </button>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-3">
+            <p className="text-muted-foreground text-sm mt-3">
               또는 잠시 기다리시면 자동으로 닫힙니다
             </p>
           </>

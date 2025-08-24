@@ -80,7 +80,7 @@ export default function BuyerMatchingStatus({
   }
 
   return (
-    <div className="relative bg-black text-white py-12 px-6 overflow-hidden">
+    <div className="relative bg-black text-primary-foreground py-12 px-6 overflow-hidden">
       {/* 동적 배경 요소들 */}
       <div className="absolute inset-0 z-0">
         {/* 메인 그라데이션 배경 */}
@@ -119,7 +119,7 @@ export default function BuyerMatchingStatus({
         {onGoBack && (
           <button
             onClick={onGoBack}
-            className="absolute top-4 left-4 flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+            className="absolute top-4 left-4 flex items-center space-x-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
           >
             <svg
               className="w-5 h-5"
@@ -170,21 +170,21 @@ export default function BuyerMatchingStatus({
         </div>
 
         {/* 내 검색 조건 표시 */}
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-green-400/30 rounded-lg p-4 mb-6">
+        <div className="bg-card/50 backdrop-blur-sm border border-green-400/30 rounded-lg p-4 mb-6">
           <h3 className="text-lg font-medium mb-3">내 검색 조건</h3>
           <div className="space-y-2 text-sm">
             {appliedFilters.carrier.length > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">통신사:</span>
-                <span className="text-white">
+                <span className="text-muted-foreground">통신사:</span>
+                <span className="text-primary-foreground">
                   {getFilterDisplayNames('carrier', appliedFilters.carrier)}
                 </span>
               </div>
             )}
             {appliedFilters.dataAmount.length > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">데이터량:</span>
-                <span className="text-white">
+                <span className="text-muted-foreground">데이터량:</span>
+                <span className="text-primary-foreground">
                   {getFilterDisplayNames(
                     'dataAmount',
                     appliedFilters.dataAmount
@@ -194,8 +194,8 @@ export default function BuyerMatchingStatus({
             )}
             {appliedFilters.price.length > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">가격:</span>
-                <span className="text-white">
+                <span className="text-muted-foreground">가격:</span>
+                <span className="text-primary-foreground">
                   {getFilterDisplayNames('price', appliedFilters.price)}
                 </span>
               </div>

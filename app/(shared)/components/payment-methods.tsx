@@ -23,8 +23,8 @@ export default function PaymentMethods({
         }}
         className={`w-full p-3 border rounded-lg flex items-center justify-center transition-colors ${
           paymentMethod === PAYMENT_METHODS.TOSS
-            ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600'
+            ? 'border-primary bg-primary/10'
+            : 'border-border bg-card hover:border-primary hover:bg-muted'
         }`}
       >
         <Image
@@ -50,13 +50,11 @@ export default function PaymentMethods({
         }}
         className={`w-full p-3 border rounded-lg flex items-center justify-center transition-colors ${
           paymentMethod === PAYMENT_METHODS.SNACK
-            ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600'
+            ? 'border-primary bg-primary/10'
+            : 'border-border bg-card hover:border-primary hover:bg-muted'
         }`}
       >
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          스낵으로 결제하기
-        </span>
+        <span className="text-sm text-foreground">스낵으로 결제하기</span>
       </button>
     </div>
   );

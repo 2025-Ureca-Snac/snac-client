@@ -18,7 +18,7 @@ export default function IncomingRequestsPanel({
   if (requests.length === 0) return null;
 
   return (
-    <div className="bg-gray-900 px-4 py-6">
+    <div className="bg-background px-4 py-6">
       <div className="max-w-4xl mx-auto">
         <div
           className="relative border border-orange-400/30 rounded-lg p-6 overflow-hidden"
@@ -116,7 +116,7 @@ function RequestCard({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-              <p className="font-medium text-white">
+              <p className="font-medium text-primary-foreground">
                 <span className="text-orange-400">{request.buyerNickname}</span>
                 님의 거래 요청
               </p>
@@ -124,18 +124,18 @@ function RequestCard({
 
             {/* 거래 상세 정보 */}
             <div
-              className="rounded-lg p-3 mb-3 border border-gray-600/50"
+              className="rounded-lg p-3 mb-3 border border-border/50"
               style={{ backgroundColor: '#374151' }}
             >
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-400">통신사:</span>
+                  <span className="text-muted-foreground">통신사:</span>
                   <span className="ml-2 font-medium text-cyan-400">
                     {sellerInfo.carrier}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400">데이터:</span>
+                  <span className="text-muted-foreground">데이터:</span>
                   <span className="ml-2 font-medium text-green-400">
                     {sellerInfo.dataAmount >= 1
                       ? `${sellerInfo.dataAmount}GB`
@@ -143,14 +143,14 @@ function RequestCard({
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400">가격:</span>
+                  <span className="text-muted-foreground">가격:</span>
                   <span className="ml-2 font-medium text-yellow-400">
                     {sellerInfo.price.toLocaleString()}원
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-400">요청시간:</span>
-                  <span className="ml-2 text-gray-300">
+                  <span className="text-muted-foreground">요청시간:</span>
+                  <span className="ml-2 text-muted-foreground">
                     {new Date(request.createdAt).toLocaleTimeString()}
                   </span>
                 </div>
@@ -158,7 +158,7 @@ function RequestCard({
             </div>
 
             {/* 거래 ID */}
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               거래 ID:{' '}
               <span className="text-orange-400">{request.tradeId}</span>
             </p>

@@ -32,11 +32,11 @@ export default function FilterOption({
   if (variant === 'radio') {
     return (
       <label
-        className={`flex w-full items-center justify-between cursor-pointer dark:text-white py-2 ${className} ${
+        className={`flex w-full items-center justify-between cursor-pointer py-2 ${className} ${
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >
-        <span className="text-gray-500 dark:text-gray-200 text-regular-sm">
+        <span className="text-muted-foreground text-muted-foreground text-regular-sm">
           {label}
         </span>
         <input
@@ -45,7 +45,7 @@ export default function FilterOption({
           checked={checked}
           onChange={handleChange}
           disabled={disabled}
-          className="h-6 w-6 border-gray-300 text-teal-green cursor-pointer focus:ring-teal-green"
+          className="h-6 w-6 border-border text-teal-green cursor-pointer focus:ring-teal-green"
         />
       </label>
     );
@@ -57,7 +57,7 @@ export default function FilterOption({
         className={`flex items-center space-x-3 cursor-pointer p-2 rounded-lg transition-colors ${className} ${
           disabled
             ? 'opacity-50 cursor-not-allowed'
-            : 'hover:bg-gray-800/30 dark:hover:bg-gray-700 dark:text-white'
+            : 'hover:bg-card/30:bg-muted'
         }`}
       >
         <div className="relative">
@@ -72,12 +72,12 @@ export default function FilterOption({
             className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
               checked
                 ? 'bg-green-500 border-green-500'
-                : 'bg-transparent border-gray-400 hover:border-gray-300 dark:hover:bg-gray-700'
+                : 'bg-transparent border-gray-400 hover:border-border'
             } ${disabled ? 'cursor-not-allowed' : ''}`}
           >
             {checked && (
               <svg
-                className="w-4 h-4 text-white"
+                className="w-4 h-4 text-primary-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -93,7 +93,7 @@ export default function FilterOption({
             )}
           </div>
         </div>
-        <span className="text-white dark:text-black md:text-lg text-base font-noto-sans-kr">
+        <span className="text-primary-foreground md:text-lg text-base font-noto-sans-kr">
           {label}
         </span>
       </label>
@@ -106,8 +106,8 @@ export default function FilterOption({
       disabled={disabled}
       className={`w-full flex justify-center items-center px-2 py-2 text-regular-sm h-[40px] rounded-[10px] border transition-colors md:w-full md:justify-start md:h-auto md:p-1 md:border-none md:bg-transparent md:rounded-none ${
         checked
-          ? 'bg-teal-green text-white border-teal-green font-semibold md:bg-transparent md:text-midnight-black md:font-bold md:underline dark:md:text-white'
-          : 'bg-white text-gray-700 hover:bg-gray-50  dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 md:text-gray-500'
+          ? 'bg-teal-green text-primary-foreground border-teal-green font-semibold md:bg-transparent md:text-card-foreground md:font-bold md:underline md:text-primary-foreground'
+          : 'bg-card text-foreground hover:bg-muted  text-muted-foreground bg-muted md:text-muted-foreground'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
     >
       {label}

@@ -25,7 +25,7 @@ export default function FavoriteListModal({
         role="dialog"
       >
         <div
-          className="bg-white rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-card rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 상단 아이콘 */}
@@ -52,18 +52,18 @@ export default function FavoriteListModal({
                 />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black text-center">
+            <div className="text-xl font-extrabold text-card-foreground text-center">
               단골 목록
             </div>
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-4 text-2xl text-muted-foreground hover:text-muted-foreground"
               aria-label="닫기"
             >
               ×
             </button>
           </div>
-          <div className="w-full text-left mb-2 text-gray-700">
+          <div className="w-full text-left mb-2 text-foreground">
             <span className="font-semibold">
               사람 <span className="font-bold">{favorites.length}</span>명
             </span>
@@ -73,7 +73,7 @@ export default function FavoriteListModal({
               favorites.map((favorite) => (
                 <div
                   key={favorite.memberId}
-                  className="w-full text-gray-800 text-base py-3 rounded-lg border border-gray-200 hover:bg-green-50 transition-colors px-3 flex items-center justify-between"
+                  className="w-full text-foreground text-base py-3 rounded-lg border border-border hover:bg-green-50 transition-colors px-3 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -81,12 +81,12 @@ export default function FavoriteListModal({
                         {favorite.nickname.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <span className="font-medium dark:text-gray-100">
+                    <span className="font-medium">
                       {favorite.nickname}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-400 text-xs">
+                    <span className="text-muted-foreground text-xs">
                       #{favorite.memberId}
                     </span>
                     {onDelete && (
@@ -117,7 +117,7 @@ export default function FavoriteListModal({
               ))
             ) : (
               <div className="w-full py-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path
                       d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
@@ -125,10 +125,10 @@ export default function FavoriteListModal({
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-card-foreground mb-2">
                   단골이 없습니다
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   자주 거래하는 사용자를 단골로 등록해보세요!
                 </p>
               </div>

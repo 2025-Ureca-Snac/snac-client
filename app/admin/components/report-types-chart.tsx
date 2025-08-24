@@ -30,7 +30,7 @@ export function ReportTypesChart() {
 
   if (reportChartLoading) {
     return (
-      <div className="w-full h-80 flex items-center justify-center text-gray-500">
+      <div className="w-full h-80 flex items-center justify-center text-muted-foreground">
         데이터를 불러오는 중...
       </div>
     );
@@ -46,7 +46,7 @@ export function ReportTypesChart() {
 
   if (reportChartData.length === 0) {
     return (
-      <div className="w-full h-80 flex items-center justify-center text-gray-400">
+      <div className="w-full h-80 flex items-center justify-center text-muted-foreground">
         표시할 데이터가 없습니다.
       </div>
     );

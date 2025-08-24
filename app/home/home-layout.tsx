@@ -55,13 +55,13 @@ export default function HomeLayout({
         <div>
           {/* 모바일 */}
           <div className="mb-4 md:hidden">
-            <div className="border-b border-t border-gray-200 py-3 mb-3">
+            <div className="border-b border-t border-border py-3 mb-3">
               <button
                 onClick={actions.toggleFilter}
                 className="flex items-center gap-2"
                 aria-label="필터 열기"
               >
-                <FilterIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
+                <FilterIcon className="w-6 h-6 cursor-pointer " />
                 <span className="font-semibold">필터</span>
               </button>
             </div>
@@ -76,7 +76,7 @@ export default function HomeLayout({
                   }}
                   aria-label="새로고침"
                 >
-                  <RefreshIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
+                  <RefreshIcon className="w-6 h-6 cursor-pointer " />
                 </button>
               </div>
 
@@ -105,15 +105,17 @@ export default function HomeLayout({
                 onClick={() => actions.triggerRefetch()}
                 aria-label="새로고침"
               >
-                <RefreshIcon className="w-6 h-6 cursor-pointer  dark:text-white" />
+                <RefreshIcon className="w-6 h-6 cursor-pointer " />
               </button>
             </div>
             <button
               onClick={actions.toggleCreateModal}
-              className="ml-1 px-3 rounded-lg  flex w-auto h-auto justify-center items-center gap-2 border border-gray-300 "
+              className="ml-1 px-3 rounded-lg flex w-auto h-auto justify-center items-center gap-2 border border-border"
             >
-              <PlusIcon className="w-8 h-8 cursor-pointer text-gray-500" />
-              <span className="text-gray-500 hidden lg:block">글 등록하기</span>
+              <PlusIcon className="w-8 h-8 cursor-pointer text-muted-foreground" />
+              <span className="text-muted-foreground hidden lg:block">
+                글 등록하기
+              </span>
             </button>
           </div>
         </div>
@@ -123,13 +125,11 @@ export default function HomeLayout({
               <LoadingSpinner size="lg" />
             </div>
           ) : error ? (
-            <p className="text-center text-red-500 dark:text-red-400 py-10">
-              {error}
-            </p>
+            <p className="text-center text-destructive py-10">{error}</p>
           ) : (
             <>
               {cards.length === 0 && (
-                <p className="text-center text-gray-500 dark:text-gray-100 py-10">
+                <p className="text-center text-muted-foreground py-10">
                   표시할 데이터가 없습니다.
                 </p>
               )}

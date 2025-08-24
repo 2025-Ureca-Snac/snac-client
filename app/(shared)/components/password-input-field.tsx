@@ -43,7 +43,7 @@ export default function PasswordInputField({
         onChange={onChange}
         required={required}
         disabled={disabled}
-        className="text-regular-md block w-full border-b-2 border-gray-300 p-2 py-4 pr-10 focus:outline-none focus:border-b-2 focus:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="text-regular-md block w-full border-b-2 border-border p-2 py-4 pr-10 focus:outline-none focus:border-b-2 focus:border-border disabled:opacity-50 disabled:cursor-not-allowed"
       />
       <button
         type="button"

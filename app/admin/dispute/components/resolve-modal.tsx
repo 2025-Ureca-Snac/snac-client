@@ -69,27 +69,27 @@ export function ResolveModal() {
   return (
     <ModalPortal isOpen={isResolveModalOpen} onClose={closeResolveModal}>
       <div
-        className="fixed inset-0 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm z-50"
+        className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50"
         onClick={closeResolveModal}
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-xs md:max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-light flex flex-col max-h-[90vh] border border-gray-200 dark:border-gray-700"
+          className="relative w-full max-w-xs md:max-w-2xl bg-card rounded-2xl shadow-light flex flex-col max-h-[90vh] border border-border"
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
         >
           {/* 헤더 */}
-          <div className="flex items-start justify-between p-4 md:p-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-2xl">
+          <div className="flex items-start justify-between p-4 md:p-5 border-b border-border bg-muted bg-background rounded-t-2xl">
             <h2
               id="modal-title"
-              className="text-regular-lg md:text-regular-xl font-bold text-gray-900 dark:text-gray-100"
+              className="text-regular-lg md:text-regular-xl font-bold text-card-foreground"
             >
               답변 및 처리
             </h2>
             <button
               onClick={closeResolveModal}
-              className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              className="text-muted-foreground hover:text-foreground"
             >
               <span className="sr-only">닫기</span>
               <svg
@@ -111,21 +111,21 @@ export function ResolveModal() {
           {/* 내용 */}
           <div className="p-3 md:p-6 space-y-4 overflow-y-auto">
             {isLoading && !dispute ? (
-              <div className="py-10 text-center text-regular-md text-gray-400">
+              <div className="py-10 text-center text-regular-md text-muted-foreground">
                 정보를 불러오는 중...
               </div>
             ) : (
               dispute && (
                 <form onSubmit={handleSubmit}>
                   {/* 원본 내용 */}
-                  <div className="p-3 md:p-4 bg-gray-100 dark:bg-gray-800/70 rounded-md mb-4">
-                    <h3 className="font-semibold text-regular-md text-gray-900 dark:text-gray-100">
+                  <div className="p-3 md:p-4 bg-secondary rounded-md mb-4">
+                    <h3 className="font-semibold text-regular-md text-card-foreground">
                       {dispute.title}
                     </h3>
-                    <p className="mt-2 text-regular-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                    <p className="mt-2 text-regular-sm text-foreground whitespace-pre-wrap">
                       {dispute.description}
                     </p>
-                    <p className="mt-3 text-regular-xs text-gray-500">
+                    <p className="mt-3 text-regular-xs text-muted-foreground">
                       작성자 ID: {dispute.reporter}
                     </p>
                   </div>
@@ -134,7 +134,7 @@ export function ResolveModal() {
                   <div>
                     <label
                       htmlFor="answer"
-                      className="block text-regular-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                      className="block text-regular-sm font-medium text-foreground mb-1"
                     >
                       답변 내용
                     </label>
@@ -143,7 +143,7 @@ export function ResolveModal() {
                       rows={6}
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
-                      className="w-full p-2 text-regular-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:outline-none text-gray-800 dark:text-gray-200"
+                      className="w-full p-2 text-regular-sm bg-muted border border-border rounded-md focus:ring-2 focus:ring-gray-500 focus:outline-none text-foreground"
                       placeholder="답변을 입력하세요..."
                     />
                   </div>
@@ -152,7 +152,7 @@ export function ResolveModal() {
                   <div className="mt-4">
                     <label
                       htmlFor="status"
-                      className="block text-regular-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                      className="block text-regular-sm font-medium text-foreground mb-1"
                     >
                       처리 상태 변경
                     </label>
@@ -162,7 +162,7 @@ export function ResolveModal() {
                       onChange={(e) =>
                         setNewStatus(e.target.value as DisputeStatus)
                       }
-                      className="w-full p-2 text-regular-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:outline-none text-gray-800 dark:text-gray-200"
+                      className="w-full p-2 text-regular-sm bg-muted border border-border rounded-md focus:ring-2 focus:ring-gray-500 focus:outline-none text-foreground"
                     >
                       <option value="ANSWERED">답변완료</option>
                       <option value="NEED_MORE">자료요청</option>
@@ -175,7 +175,7 @@ export function ResolveModal() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="px-6 py-2 font-semibold text-regular-md bg-gray-700 text-white dark:bg-gray-600 rounded-md hover:bg-gray-800 dark:hover:bg-gray-500 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
+                      className="px-6 py-2 font-semibold text-regular-md bg-muted text-primary-foreground rounded-md hover:bg-card disabled:bg-muted disabled:cursor-not-allowed"
                     >
                       {isLoading ? '제출 중...' : '답변 제출'}
                     </button>

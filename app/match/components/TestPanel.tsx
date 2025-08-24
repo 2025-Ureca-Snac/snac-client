@@ -97,18 +97,18 @@ export default function TestPanel({
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-gray-800 p-4 rounded-lg shadow-lg min-w-[300px] max-w-[400px]">
-        <h4 className="text-white text-sm font-medium mb-3">🔧 개발 패널</h4>
+      <div className="bg-card p-4 rounded-lg shadow-lg min-w-[300px] max-w-[400px]">
+        <h4 className="text-primary-foreground text-sm font-medium mb-3">🔧 개발 패널</h4>
 
         <div className="space-y-2 text-xs">
           {/* WebSocket 상태 */}
-          <div className="text-gray-300">
+          <div className="text-muted-foreground">
             <strong>WebSocket 상태:</strong>
             <span
               className={`ml-2 px-2 py-1 rounded ${
                 isConnected
-                  ? 'bg-green-600 text-white'
-                  : 'bg-red-600 text-white'
+                  ? 'bg-green-600 text-primary-foreground'
+                  : 'bg-red-600 text-primary-foreground'
               }`}
             >
               {isConnected ? '✅ 연결됨' : '❌ 연결 안됨'}
@@ -116,9 +116,9 @@ export default function TestPanel({
           </div>
 
           {/* 현재 모드 */}
-          <div className="text-gray-300">
+          <div className="text-muted-foreground">
             <strong>현재 모드:</strong>
-            <span className="ml-2 text-white">
+            <span className="ml-2 text-primary-foreground">
               {userRole === 'buyer'
                 ? '🛒 구매자'
                 : userRole === 'seller'
@@ -128,15 +128,15 @@ export default function TestPanel({
           </div>
 
           {/* 매칭 상태 */}
-          <div className="text-gray-300">
+          <div className="text-muted-foreground">
             <strong>매칭 상태:</strong>
-            <span className="ml-2 text-white">
+            <span className="ml-2 text-primary-foreground">
               {getMatchingStatusText(matchingStatus)}
             </span>
           </div>
 
           {/* 매칭 결과 */}
-          <div className="text-gray-300">
+          <div className="text-muted-foreground">
             <strong>매칭 결과:</strong>
             <span className="ml-2 text-green-300">
               {userRole === 'buyer'
@@ -148,7 +148,7 @@ export default function TestPanel({
           </div>
 
           {/* 서버 URL */}
-          <div className="text-gray-300">
+          <div className="text-muted-foreground">
             <strong>서버 URL:</strong>
             <span className="ml-2 text-blue-300 text-[10px]">
               {process.env.NEXT_PUBLIC_WS_URL || 'https://api.snac-app.com/ws'}
@@ -156,7 +156,7 @@ export default function TestPanel({
           </div>
 
           {/* JWT 토큰 */}
-          <div className="text-gray-300">
+          <div className="text-muted-foreground">
             <strong>JWT 토큰:</strong>
             <span className="ml-2 text-yellow-300">{getJWTTokenStatus()}</span>
           </div>
@@ -196,7 +196,7 @@ export default function TestPanel({
                       {selectedSeller && `대상: ${selectedSeller.name}`}
                     </div>
                   ) : (
-                    <div className="text-gray-400">진행중인 거래 없음</div>
+                    <div className="text-muted-foreground">진행중인 거래 없음</div>
                   )}
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function TestPanel({
                     </div>
                   ))
                 ) : (
-                  <div className="text-gray-400">거래 요청 없음</div>
+                  <div className="text-muted-foreground">거래 요청 없음</div>
                 )}
               </div>
             </div>

@@ -158,38 +158,42 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
           </Link>
 
           {/* 머니 카드 */}
-          <Link
-            href="/mypage/point?type=MONEY"
-            className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 block"
-            aria-label="머니 내역 페이지로 이동"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Image
-                src="/snac-price.svg"
-                alt="스낵 머니"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              <span className="font-semibold text-sm">스낵 머니</span>
-            </div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-white font-bold text-xl">
-                {isBalanceLoading || !balance
-                  ? '로딩 중...'
-                  : `${balance.money.toLocaleString()}S`}
-              </span>
-              <Image
-                src="/chevron-down.svg"
-                alt="오른쪽 화살표"
-                width={16}
-                height={16}
-                className="inline-block -rotate-90 text-white opacity-80"
-              />
-            </div>
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2">
+            <Link
+              href="/mypage/point?type=MONEY"
+              className="block mb-4"
+              aria-label="머니 내역 페이지로 이동"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Image
+                  src="/snac-price.svg"
+                  alt="스낵 머니"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6"
+                />
+                <span className="font-semibold text-sm">스낵 머니</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white font-bold text-xl">
+                  {isBalanceLoading || !balance
+                    ? '로딩 중...'
+                    : `${balance.money.toLocaleString()}S`}
+                </span>
+                <Image
+                  src="/chevron-down.svg"
+                  alt="오른쪽 화살표"
+                  width={16}
+                  height={16}
+                  className="inline-block -rotate-90 text-white opacity-80"
+                />
+              </div>
+            </Link>
             <div className="flex gap-2">
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   router.push('/mypage/point?type=MONEY&modal=recharge');
                 }}
                 className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center hover:bg-opacity-30 transition-all"
@@ -198,7 +202,9 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
                 충전
               </button>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   router.push('/mypage/point?type=MONEY&modal=settlement');
                 }}
                 className="flex-1 bg-white bg-opacity-20 text-white py-2.5 rounded-lg font-medium text-center hover:bg-opacity-30 transition-all"
@@ -207,7 +213,7 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
                 정산
               </button>
             </div>
-          </Link>
+          </div>
         </div>
       </div>
 
@@ -256,6 +262,7 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
           />
         </div>
         <div className="flex justify-between text-xs text-muted-foreground">
+          <span>0</span>
           <span>200</span>
           <span>400</span>
           <span>600</span>
@@ -301,14 +308,14 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
           role="dialog"
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-[340px] max-w-full p-6 relative"
+            className="bg-card rounded-2xl shadow-xl w-[340px] max-w-full p-6 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
               <span className="font-bold text-lg">스낵 스코어</span>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-2xl text-gray-400 hover:text-gray-600 absolute top-4 right-4"
+                className="text-2xl text-muted-foreground hover:text-muted-foreground absolute top-4 right-4"
                 aria-label="닫기"
               >
                 ×
@@ -320,7 +327,7 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
                 return (
                   <div
                     key={grade.name}
-                    className={`flex items-center gap-3 rounded-xl px-4 py-2 ${isCurrent ? 'bg-orange-50' : 'bg-white'}`}
+                    className={`flex items-center gap-3 rounded-xl px-4 py-2 ${isCurrent ? 'bg-orange-50 dark:bg-orange-900/20' : 'bg-card'}`}
                   >
                     <Image
                       src={grade.icon}
@@ -331,12 +338,12 @@ export default function ScoreCard({ favoriteCount }: ScoreCardProps = {}) {
                     />
                     <div>
                       <div
-                        className={`font-bold text-base ${isCurrent ? 'text-orange-500' : 'text-gray-900'}`}
+                        className={`font-bold text-base ${isCurrent ? 'text-orange-500 dark:text-orange-400' : 'text-card-foreground'}`}
                       >
                         {grade.name}
                       </div>
                       <div
-                        className={`text-xs ${isCurrent ? 'text-orange-400' : 'text-gray-400'}`}
+                        className={`text-xs ${isCurrent ? 'text-orange-400 dark:text-orange-300' : 'text-muted-foreground'}`}
                       >
                         {grade.range}
                       </div>

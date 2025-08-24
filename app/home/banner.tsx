@@ -74,7 +74,7 @@ export default function Banner({
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent  -translate-x-full animate-glow" />
 
                 <div className="flex flex-col items-center relative z-10">
-                  <span className="w-[70px] h-[64px] bg-white text-midnight-black dark:text-white text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
+                  <span className="w-[70px] h-[64px] bg-card text-card-foreground text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
                     {formatTime(displayMinutes)}
                   </span>
                   <span className="mt-1 text-regular-xs text-white">분</span>
@@ -83,7 +83,7 @@ export default function Banner({
                   :
                 </span>
                 <div className="flex flex-col items-center relative z-10">
-                  <span className="bg-white dark:bg-gray-800 w-[70px] h-[64px] text-midnight-black dark:text-white text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
+                  <span className="bg-card w-[70px] h-[64px] text-card-foreground text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow">
                     {formatTime(displaySeconds)}
                   </span>
                   <span className="mt-1 text-regular-xs text-white">초</span>
@@ -99,14 +99,14 @@ export default function Banner({
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent  -translate-x-full animate-glow" />
 
                 <div className="flex flex-col items-center relative z-10">
-                  <span className="bg-white w-[70px] h-[64px]  text-midnight-black text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow"></span>
+                  <span className="bg-card w-[70px] h-[64px] text-card-foreground text-regular-3xl md:text-heading-xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow"></span>
                   <span className="mt-1 text-regular-xs text-white">분</span>
                 </div>
                 <span className="text-white text-regular-3xl font-bold pb-5 relative z-10">
                   :
                 </span>
                 <div className="flex flex-col items-center relative z-10">
-                  <span className="w-[70px] h-[64px] bg-white text-midnight-black text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow"></span>
+                  <span className="w-[70px] h-[64px] bg-card text-card-foreground text-regular-3xl font-bold px-4 py-2 rounded-lg shadow-lg border-2 border-burst-lime/50 animate-pulse-glow"></span>
                   <span className="mt-1 text-regular-xs text-white">초</span>
                 </div>
               </div>
@@ -149,7 +149,7 @@ export default function Banner({
               {/* 호버 시 연한 배경 */}
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-burst-lime/10 via-burst-lime/10 to-burst-lime/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-              <span className="relative z-10 text-white  font-semibold tracking-wide transition-colors duration-300">
+              <span className="relative z-10 text-white font-semibold tracking-wide transition-colors duration-300">
                 지금 거래하러 가기
               </span>
             </Link>

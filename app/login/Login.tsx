@@ -120,7 +120,7 @@ export default function Login() {
       <div className="w-full md:w-1/2 flex justify-center items-center px-6 py-8 md:px-0 md:h-screen">
         <div className="w-full max-w-sm md:w-[80%] text-center">
           <LoadingSpinner size="lg" color="border-blue-600" />
-          <p className="text-gray-600">로그인 중...</p>
+          <p className="text-muted-foreground">로그인 중...</p>
         </div>
       </div>
     );
@@ -137,7 +137,7 @@ export default function Login() {
             value={id}
             onChange={handleIdChange}
             ref={idInputRef}
-            className="text-regular-md block w-full border-b-2 border-gray-300 p-2 py-4 focus:outline-none focus:border-b-2 focus:border-gray-700 mb-4"
+            className="text-regular-md block w-full border-b-2 border-border p-2 py-4 focus:outline-none focus:border-b-2 focus:border-border mb-4"
           />
           <PasswordInputField
             value={password}
@@ -158,7 +158,7 @@ export default function Login() {
             type="submit"
             disabled={isLoading}
             tabIndex={0}
-            className="text-regular-md w-full bg-midnight-black text-cloud-white rounded-xl py-2 text-center text-lg font-normal mb-6 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="text-regular-md w-full bg-black text-cloud-white rounded-xl py-2 text-center text-lg font-normal mb-6 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             {isLoading ? '로그인 중...' : '로그인'}
           </button>

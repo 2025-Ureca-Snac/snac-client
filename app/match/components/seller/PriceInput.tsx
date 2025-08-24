@@ -23,7 +23,7 @@ export default function PriceInput({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg md:text-2xl font-medium text-white">가격</h3>
+      <h3 className="text-lg md:text-2xl font-medium text-primary-foreground">가격</h3>
       <div className="flex items-center space-x-2">
         <input
           type="number"
@@ -35,19 +35,19 @@ export default function PriceInput({
           disabled={disabled}
           className={`flex-1 px-3 py-3 border rounded-lg transition-all ${
             disabled
-              ? 'bg-gray-700 text-gray-500 border-gray-600 cursor-not-allowed'
-              : 'bg-gray-800 text-white border-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent'
+              ? 'bg-muted text-muted-foreground border-border cursor-not-allowed'
+              : 'bg-card text-primary-foreground border-border focus:ring-2 focus:ring-green-500 focus:border-transparent'
           }`}
           placeholder="가격을 입력하세요"
         />
         <span
-          className={`text-sm font-medium ${disabled ? 'text-gray-500' : 'text-gray-400'}`}
+          className={`text-sm font-medium ${disabled ? 'text-muted-foreground' : 'text-muted-foreground'}`}
         >
           원
         </span>
       </div>
       <div
-        className={`text-xs ${disabled ? 'text-gray-500' : 'text-gray-400'}`}
+        className={`text-xs ${disabled ? 'text-muted-foreground' : 'text-muted-foreground'}`}
       >
         100원 ~ 10,000원 범위에서 입력 가능합니다
       </div>

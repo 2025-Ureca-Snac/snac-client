@@ -180,13 +180,13 @@ export default function ReportModal({
     <>
       <ModalPortal isOpen={open} onClose={handleClose}>
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             {/* 헤더 */}
             <div className="flex items-center justify-between p-6 border-b">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">신고하기</h2>
+                <h2 className="text-xl font-bold text-card-foreground">신고하기</h2>
                 {tradeId && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     거래 ID: {tradeId}
                   </p>
                 )}
@@ -194,7 +194,7 @@ export default function ReportModal({
               <button
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+                className="text-muted-foreground hover:text-muted-foreground transition-colors disabled:opacity-50"
               >
                 <svg
                   className="w-6 h-6"
@@ -216,14 +216,14 @@ export default function ReportModal({
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {/* 카테고리 선택 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   신고 카테고리
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   disabled={isSubmitting}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                 >
                   {REPORT_CATEGORIES.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -235,7 +235,7 @@ export default function ReportModal({
 
               {/* 제목 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   제목 <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -244,17 +244,17 @@ export default function ReportModal({
                   onChange={(e) => setTitle(e.target.value)}
                   disabled={isSubmitting}
                   placeholder="신고 제목을 입력해주세요"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                   maxLength={100}
                 />
-                <div className="text-xs text-gray-500 mt-1 text-right">
+                <div className="text-xs text-muted-foreground mt-1 text-right">
                   {title.length}/100
                 </div>
               </div>
 
               {/* 내용 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   내용 <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -263,17 +263,17 @@ export default function ReportModal({
                   disabled={isSubmitting}
                   placeholder="신고 내용을 자세히 입력해주세요"
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 resize-none"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 resize-none"
                   maxLength={1000}
                 />
-                <div className="text-xs text-gray-500 mt-1 text-right">
+                <div className="text-xs text-muted-foreground mt-1 text-right">
                   {content.length}/1000
                 </div>
               </div>
 
               {/* 이미지 업로드 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   이미지 첨부 (선택)
                 </label>
                 <div className="space-y-3">
@@ -294,7 +294,7 @@ export default function ReportModal({
                             type="button"
                             onClick={() => removeImage(index)}
                             disabled={isSubmitting}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors disabled:opacity-50"
+                            className="absolute -top-2 -right-2 bg-red-500 text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors disabled:opacity-50"
                           >
                             ×
                           </button>
@@ -309,9 +309,9 @@ export default function ReportModal({
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSubmitting}
-                      className="w-full p-4 border-2 border-dashed border-gray-300 rounded-md hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                      className="w-full p-4 border-2 border-dashed border-border rounded-md hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50"
                     >
-                      <div className="flex flex-col items-center text-gray-500">
+                      <div className="flex flex-col items-center text-muted-foreground">
                         <svg
                           className="w-8 h-8 mb-2"
                           fill="none"
@@ -351,14 +351,14 @@ export default function ReportModal({
                   type="button"
                   onClick={handleClose}
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2 border border-border text-foreground rounded-md hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || !title.trim() || !content.trim()}
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-red-500 text-primary-foreground rounded-md hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? '제출 중...' : '신고 제출'}
                 </button>
@@ -383,7 +383,7 @@ export default function ReportModal({
                 e.stopPropagation();
                 closeImageModal();
               }}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+              className="absolute top-4 right-4 text-primary-foreground hover:text-muted-foreground transition-colors z-10"
             >
               <svg
                 className="w-8 h-8"
@@ -407,7 +407,7 @@ export default function ReportModal({
                   e.stopPropagation();
                   goToPreviousImage();
                 }}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-10"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-foreground hover:text-muted-foreground transition-colors z-10"
               >
                 <svg
                   className="w-8 h-8"
@@ -447,8 +447,8 @@ export default function ReportModal({
                       }}
                       className={`w-2 h-2 rounded-full transition-colors ${
                         index === selectedImageIndex
-                          ? 'bg-white'
-                          : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                          ? 'bg-card'
+                          : 'bg-card bg-opacity-50 hover:bg-opacity-75'
                       }`}
                     />
                   ))}
@@ -463,7 +463,7 @@ export default function ReportModal({
                   e.stopPropagation();
                   goToNextImage();
                 }}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-10"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary-foreground hover:text-muted-foreground transition-colors z-10"
               >
                 <svg
                   className="w-8 h-8"
@@ -482,7 +482,7 @@ export default function ReportModal({
             )}
 
             {/* 이미지 정보 */}
-            <div className="absolute bottom-4 left-4 text-white text-sm">
+            <div className="absolute bottom-4 left-4 text-primary-foreground text-sm">
               {selectedImageIndex + 1} / {imagePreviews.length}
             </div>
           </div>

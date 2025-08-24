@@ -357,7 +357,7 @@ export default function ChangeNicknameModal({
         role="dialog"
       >
         <form
-          className="bg-white rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
+          className="bg-card rounded-2xl shadow-xl w-[370px] max-w-full pt-6 pb-8 px-6 relative flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
           onSubmit={handleSubmit}
           onKeyDown={handleKeyDown}
@@ -380,20 +380,20 @@ export default function ChangeNicknameModal({
                 <circle cx="12" cy="7" r="4" stroke="#2563EB" strokeWidth="2" />
               </svg>
             </div>
-            <div className="text-xl font-extrabold text-black text-center">
+            <div className="text-xl font-extrabold text-card-foreground text-center">
               닉네임 변경
             </div>
             <button
               onClick={handleClose}
               type="button"
-              className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-4 text-2xl text-muted-foreground hover:text-muted-foreground"
               aria-label="닫기"
               tabIndex={0}
             >
               ×
             </button>
           </div>
-          <div className="w-full text-center text-gray-600 mb-4 text-sm">
+          <div className="w-full text-center text-muted-foreground mb-4 text-sm">
             현재 닉네임을 수정해주세요.
           </div>
 
@@ -411,7 +411,7 @@ export default function ChangeNicknameModal({
                   type="text"
                   id="nickname"
                   name="nickname"
-                  className={`w-full border rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:text-gray-500 pr-10 ${
+                  className={`w-full border rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 disabled:bg-secondary disabled:text-muted-foreground pr-10 ${
                     nickname.trim() && !nicknameValidation.isValid
                       ? 'border-red-300 focus:ring-red-200'
                       : nickname.trim() &&
@@ -420,7 +420,7 @@ export default function ChangeNicknameModal({
                         ? 'border-green-300 focus:ring-green-200'
                         : duplicateCheckResult?.isDuplicate === true
                           ? 'border-red-300 focus:ring-red-200'
-                          : 'border-gray-200 focus:ring-blue-200'
+                          : 'border-border focus:ring-blue-200'
                   }`}
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
@@ -473,7 +473,7 @@ export default function ChangeNicknameModal({
                   </div>
                 )}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-muted-foreground mt-1">
                 최대 10자까지 입력 가능합니다.
               </div>
               {/* 닉네임 유효성 검사 체크리스트 */}
@@ -490,7 +490,7 @@ export default function ChangeNicknameModal({
                       >
                         {nicknameValidation.criteria.hasLength && (
                           <svg
-                            className="w-2 h-2 text-white"
+                            className="w-2 h-2 text-primary-foreground"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -522,7 +522,7 @@ export default function ChangeNicknameModal({
                       >
                         {nicknameValidation.criteria.startsWithLetter && (
                           <svg
-                            className="w-2 h-2 text-white"
+                            className="w-2 h-2 text-primary-foreground"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -554,7 +554,7 @@ export default function ChangeNicknameModal({
                       >
                         {nicknameValidation.criteria.hasValidChars && (
                           <svg
-                            className="w-2 h-2 text-white"
+                            className="w-2 h-2 text-primary-foreground"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -607,7 +607,7 @@ export default function ChangeNicknameModal({
             <button
               type="submit"
               disabled={isButtonDisabled}
-              className="w-2/3 py-3 rounded-lg bg-blue-200 text-black font-bold text-lg hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="w-2/3 py-3 rounded-lg bg-blue-200 text-card-foreground font-bold text-lg hover:bg-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
               tabIndex={0}
             >
               {isLoading
@@ -620,7 +620,7 @@ export default function ChangeNicknameModal({
             </button>
             <button
               type="button"
-              className="w-1/3 py-3 rounded-lg bg-gray-100 text-gray-700 font-bold text-lg hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="w-1/3 py-3 rounded-lg bg-secondary text-foreground font-bold text-lg hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               onClick={onClose}
               tabIndex={0}
             >
